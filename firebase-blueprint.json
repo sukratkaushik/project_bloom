@@ -1,0 +1,120 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile and preferences",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Google Auth UID" },
+        "email": { "type": "string", "format": "email" },
+        "displayName": { "type": "string" },
+        "createdAt": { "type": "number", "description": "Timestamp in ms" },
+        "updatedAt": { "type": "number", "description": "Timestamp in ms" },
+        "preferences": {
+          "type": "object",
+          "properties": {
+            "theme": { "type": "string" },
+            "measurementSystem": { "type": "string", "enum": ["METRIC", "IMPERIAL"] }
+          }
+        }
+      },
+      "required": ["uid", "email", "createdAt"]
+    },
+    "PregnancyJourney": {
+      "title": "PregnancyJourney",
+      "description": "A user's pregnancy journey",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Owner UID" },
+        "status": { "type": "string", "enum": ["ACTIVE", "COMPLETED_BIRTH", "COMPLETED_LOSS", "ARCHIVED"] },
+        "calculationMethod": { "type": "string", "enum": ["LMP", "CONCEPTION", "ULTRASOUND", "IVF_TRANSFER"] },
+        "referenceDate": { "type": "number" },
+        "estimatedDueDate": { "type": "number" },
+        "actualEndDate": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "setupFlags": { "type": "object" },
+        "pregnancyNum": { "type": "string" },
+        "workSit": { "type": "string" },
+        "partnerSit": { "type": "string" }
+      },
+      "required": ["uid", "status", "calculationMethod", "referenceDate", "estimatedDueDate", "createdAt"]
+    },
+    "DbTask": {
+      "title": "DbTask",
+      "description": "A task in the journey",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Owner UID" },
+        "journeyId": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "targetGestationalWeek": { "type": "number" },
+        "status": { "type": "string", "enum": ["PENDING", "COMPLETED", "SKIPPED"] },
+        "completedAt": { "type": "number" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" },
+        "assignedToPartner": { "type": "boolean" },
+        "isCritical": { "type": "boolean" }
+      },
+      "required": ["uid", "journeyId", "category", "title", "targetGestationalWeek", "status", "createdAt"]
+    },
+    "SymptomLog": {
+      "title": "SymptomLog",
+      "description": "A logged symptom",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Owner UID" },
+        "journeyId": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "symptomType": { "type": "string" },
+        "severity": { "type": "string", "enum": ["MILD", "MODERATE", "SEVERE"] },
+        "notes": { "type": "string" },
+        "createdAt": { "type": "number" },
+        "updatedAt": { "type": "number" }
+      },
+      "required": ["uid", "journeyId", "timestamp", "symptomType", "severity", "createdAt"]
+    },
+    "VitalsLog": {
+      "title": "VitalsLog",
+      "description": "A logged vital sign",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Owner UID" },
+        "journeyId": { "type": "string" },
+        "timestamp": { "type": "number" },
+        "type": { "type": "string", "enum": ["BP", "WEIGHT"] },
+        "systolic": { "type": "number" },
+        "diastolic": { "type": "number" },
+        "pulse": { "type": "number" },
+        "weight": { "type": "number" },
+        "unit": { "type": "string" },
+        "notes": { "type": "string" }
+      },
+      "required": ["uid", "journeyId", "timestamp", "type"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profiles"
+    },
+    "/journeys/{journeyId}": {
+      "schema": { "$ref": "#/entities/PregnancyJourney" },
+      "description": "Pregnancy journeys"
+    },
+    "/tasks/{taskId}": {
+      "schema": { "$ref": "#/entities/DbTask" },
+      "description": "Tasks"
+    },
+    "/symptoms/{symptomId}": {
+      "schema": { "$ref": "#/entities/SymptomLog" },
+      "description": "Symptom logs"
+    },
+    "/vitals/{vitalId}": {
+      "schema": { "$ref": "#/entities/VitalsLog" },
+      "description": "Vitals logs"
+    }
+  }
+}

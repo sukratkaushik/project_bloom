@@ -1,0 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-white: #ffffff;
+  --color-border: #e4e0d8;
+  --color-medium: #7a7a7a;
+  --color-light: #a3a3a3;
+  --color-sage: #6b9278;
+  --color-sage-light: #9ab8a4;
+  --color-sage-pale: #e5eeea;
+  --color-blush: #c8857a;
+  --color-blush-light: #e0ada5;
+  --color-blush-pale: #f9eeec;
+  --color-gold: #b8965a;
+  --color-gold-pale: #f5edde;
+  --color-cream: #fdf8f1;
+  --color-charcoal: #28282a;
+  --color-critical: #b5342a;
+  --color-critical-bg: #fdf0ee;
+  --color-optional: #6b9278;
+  --color-optional-bg: #e5eeea;
+  
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'DM Sans', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply font-sans bg-cream text-charcoal min-h-screen text-[15px] leading-relaxed;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+/* Dark Mode Overrides */
+.dark {
+  --color-white: #28282a;
+  --color-border: #3f3f46;
+  --color-medium: #a1a1aa;
+  --color-light: #71717a;
+  --color-sage: #8bb89b;
+  --color-sage-light: #6b9278;
+  --color-sage-pale: #2a3a31;
+  --color-blush: #e0ada5;
+  --color-blush-light: #c8857a;
+  --color-blush-pale: #3a2522;
+  --color-gold: #d4b175;
+  --color-gold-pale: #3d311d;
+  --color-cream: #1a1a1c;
+  --color-charcoal: #e5e5e5;
+  --color-critical: #e57373;
+  --color-critical-bg: #3d1b1a;
+  --color-optional: #8bb89b;
+  --color-optional-bg: #2a3a31;
+  
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+}
+
+/* Calm Mode Accessibility Overrides */
+body.calm-mode {
+  /* Muted, low-contrast color palette */
+  --color-sage: #7a8a7f;
+  --color-sage-light: #a8b5ab;
+  --color-sage-pale: #f0f4f2;
+  --color-blush: #b58d86;
+  --color-blush-light: #d1b8b3;
+  --color-blush-pale: #fcf9f8;
+  --color-gold: #a69274;
+  --color-gold-pale: #f7f5f0;
+  --color-cream: #fcfbf9;
+  --color-charcoal: #4a4a4a;
+  --color-critical: #856b6b;
+  --color-critical-bg: #f5f0f0;
+  --color-optional: #7a8a7f;
+  --color-optional-bg: #f0f4f2;
+
+  /* Dyslexia-friendly typography with increased line-height */
+  --font-serif: 'Lexend', sans-serif;
+  --font-sans: 'Lexend', sans-serif;
+  
+  background-color: var(--color-cream) !important;
+  color: var(--color-charcoal) !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.03em !important;
+}
+
+body.calm-mode * {
+  /* Globally disable animations and transitions to prevent sensory overload */
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  /* Apply typography overrides to all elements */
+  font-family: 'Lexend', sans-serif !important;
+}
+
+@media print {
+  body {
+    @apply bg-white;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-break-before {
+    page-break-before: always;
+  }
+  .print-avoid-break {
+    page-break-inside: avoid;
+  }
+}
