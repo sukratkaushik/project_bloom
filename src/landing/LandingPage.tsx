@@ -270,8 +270,8 @@ export const LandingPage: React.FC = () => {
           </div>
           
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
-            <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:hello@bloompregnancy.in" className="hover:text-white transition-colors">hello@bloompregnancy.in</a>
           </div>
         </div>

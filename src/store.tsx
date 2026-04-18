@@ -3,7 +3,7 @@ import { PlannerState, BudgetItem } from './types';
 import { db, JourneyStatus, CalculationMethod } from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, addWeeks } from './utils';
-import { auth, db as firestoreDb } from './firebase';
+import { auth, db as firestoreDb, handleFirestoreError, OperationType } from './firebase';
 import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 type PlannerContextType = {
@@ -11,6 +11,7 @@ type PlannerContextType = {
   updateState: (updates: Partial<PlannerState>) => void;
   toggleTask: (id: string) => void;
   toggleAssign: (id: string) => void;
+  deleteTask: (id: string) => void;
   setAssigneeNote: (id: string, note: string) => void;
   setDecision: (id: string, value: string) => void;
   setDecisionNote: (id: string, value: string) => void;
@@ -23,6 +24,8 @@ type PlannerContextType = {
   resetPlan: () => void;
   toggleCalmMode: () => void;
   toggleDarkMode: () => void;
+  toggleFavoriteName: (name: string) => void;
+  toggleFavoritePage: (id: string) => void;
 };
 
 const defaultState: PlannerState = {
@@ -38,6 +41,7 @@ const defaultState: PlannerState = {
   checked: {},
   assigned: {},
   assigneeNotes: {},
+  deletedTasks: {},
   decisions: {},
   decisionNotes: {},
   budgetEst: {},
@@ -52,6 +56,8 @@ const defaultState: PlannerState = {
   hospitalBagItems: [],
   birthPlan: {},
   hasStartedOnboarding: false,
+  weightUnit: 'kg',
+  calendarStartDay: 'monday',
 };
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -73,11 +79,15 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user && state.activeJourneyId) {
-        const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
-        const docSnap = await getDoc(journeyRef);
-        if (docSnap.exists()) {
-          const cloudData = docSnap.data();
-          setState(prev => ({ ...prev, ...cloudData }));
+        try {
+          const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
+          const docSnap = await getDoc(journeyRef);
+          if (docSnap.exists()) {
+            const cloudData = docSnap.data();
+            setState(prev => ({ ...prev, ...cloudData }));
+          }
+        } catch (error) {
+          handleFirestoreError(error, OperationType.GET, `journeys/${state.activeJourneyId}`);
         }
       }
     });
@@ -99,7 +109,9 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         estimatedDueDate: state.dueDate ? new Date(state.dueDate).getTime() : Date.now(),
         createdAt: state.createdAt || Date.now(),
         updatedAt: Date.now()
-      }, { merge: true }).catch(err => console.error("Firestore sync error:", err));
+      }, { merge: true }).catch(err => {
+        handleFirestoreError(err, OperationType.WRITE, `journeys/${state.activeJourneyId}`);
+      });
     }
   }, [state]);
 
@@ -118,6 +130,13 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setState((prev) => ({
       ...prev,
       assigned: { ...prev.assigned, [id]: !prev.assigned[id] },
+    }));
+  };
+
+  const deleteTask = (id: string) => {
+    setState((prev) => ({
+      ...prev,
+      deletedTasks: { ...prev.deletedTasks, [id]: true },
     }));
   };
 
@@ -252,6 +271,26 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setState((prev) => ({ ...prev, isDarkModeActive: !prev.isDarkModeActive }));
   };
 
+  const toggleFavoriteName = (name: string) => {
+    setState((prev) => {
+      const current = prev.favoriteNames || [];
+      if (current.includes(name)) {
+        return { ...prev, favoriteNames: current.filter(n => n !== name) };
+      }
+      return { ...prev, favoriteNames: [...current, name] };
+    });
+  };
+
+  const toggleFavoritePage = (id: string) => {
+    setState((prev) => {
+      const current = prev.favoritePages || [];
+      if (current.includes(id)) {
+        return { ...prev, favoritePages: current.filter(p => p !== id) };
+      }
+      return { ...prev, favoritePages: [...current, id] };
+    });
+  };
+
   useEffect(() => {
     if (state.isCalmModeActive) {
       document.body.classList.add('calm-mode');
@@ -275,6 +314,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updateState,
         toggleTask,
         toggleAssign,
+        deleteTask,
         setAssigneeNote,
         setDecision,
         setDecisionNote,
@@ -287,6 +327,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         resetPlan,
         toggleCalmMode,
         toggleDarkMode,
+        toggleFavoriteName,
+        toggleFavoritePage,
       }}
     >
       {children}

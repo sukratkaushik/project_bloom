@@ -10,7 +10,10 @@ import {
   AlertTriangle, 
   Trash2, 
   Play, 
-  Square 
+  Square,
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 
 export const KickCounter: React.FC = () => {
@@ -19,21 +22,13 @@ export const KickCounter: React.FC = () => {
   const [kickCount, setKickCount] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-
-  // Load last 7 days history
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
   
-  const history = useLiveQuery(
+  const rawHistory = useLiveQuery(
     () => {
       if (!state.activeJourneyId) return [];
       return db.kickSessions
-        .where('[journeyId+startTime]')
-        .between(
-          [state.activeJourneyId, sevenDaysAgo],
-          [state.activeJourneyId, Date.now()],
-          true,
-          true
-        )
+        .where('journeyId')
+        .equals(state.activeJourneyId)
         .reverse()
         .sortBy('startTime');
     },
@@ -41,10 +36,46 @@ export const KickCounter: React.FC = () => {
   ) || [];
 
   // Warning logic
-  const lastSession = history.length > 0 ? history[0] : null;
+  const lastSession = rawHistory.length > 0 ? rawHistory[0] : null;
   const showRedWarning = lastSession && 
     !lastSession.completed && 
     (lastSession.endTime - lastSession.startTime) > 2 * 60 * 60 * 1000;
+
+  // Calendar Logic
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday, 1 is Monday ...
+  
+  const isSundayStart = state.calendarStartDay === 'sunday';
+  const startDay = isSundayStart ? firstDay : (firstDay === 0 ? 6 : firstDay - 1);
+
+  const days = [];
+  for (let i = 0; i < startDay; i++) {
+    days.push(null);
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(i);
+  }
+
+  const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
+
+  const logDates = new Set(rawHistory.map(session => {
+    const d = new Date(session.startTime);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }));
+
+  const history = selectedDateFilter 
+    ? rawHistory.filter(session => {
+        const d = new Date(session.startTime);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return dStr === selectedDateFilter;
+      })
+    : rawHistory;
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -228,11 +259,66 @@ export const KickCounter: React.FC = () => {
         </div>
       )}
 
+      {/* Calendar View */}
+      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-sage" />
+            <h3 className="font-semibold text-charcoal text-[17px]">Calendar View</h3>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={prevMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronLeft className="w-5 h-5 text-charcoal" /></button>
+            <span className="font-semibold text-[14px] text-charcoal min-w-[120px] text-center">
+              {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <button onClick={nextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronRight className="w-5 h-5 text-charcoal" /></button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {(isSundayStart ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']).map(d => (
+              <div key={d} className="text-center text-[11px] font-semibold text-medium uppercase tracking-wider">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {days.map((d, i) => {
+              if (d === null) return <div key={`empty-${i}`} className="aspect-square" />;
+              
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+              const hasLog = logDates.has(dateStr);
+              const isSelected = selectedDateFilter === dateStr;
+              
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDateFilter(isSelected ? null : dateStr)}
+                  className={`aspect-square rounded-full flex items-center justify-center text-[14px] transition-all relative mx-auto w-8 h-8 sm:w-10 sm:h-10
+                    ${isSelected ? 'bg-sage text-white font-bold shadow-md' : 'hover:bg-gray-100 text-charcoal'}
+                    ${hasLog && !isSelected ? 'font-bold' : ''}
+                  `}
+                >
+                  {d}
+                  {hasLog && !isSelected && (
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-sage"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
       {/* History */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border bg-gray-50/50">
-          <h3 className="font-semibold text-charcoal text-[17px]">Recent Sessions</h3>
-          <p className="text-[13px] text-medium mt-1">Last 7 days</p>
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
+          <div className="flex flex-col">
+            <h3 className="font-semibold text-charcoal text-[17px]">Recent Sessions</h3>
+          </div>
+          {selectedDateFilter && (
+            <button onClick={() => setSelectedDateFilter(null)} className="text-[12px] font-semibold text-sage hover:text-sage-dark">
+              Clear Filter
+            </button>
+          )}
         </div>
         
         {history.length > 0 ? (

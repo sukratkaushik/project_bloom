@@ -10,7 +10,11 @@ import {
   CheckCircle, 
   XCircle, 
   RotateCcw, 
-  Phone 
+  Phone,
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon,
+  Trash2
 } from 'lucide-react';
 
 export const ContractionTimer: React.FC = () => {
@@ -47,6 +51,60 @@ export const ContractionTimer: React.FC = () => {
     },
     [sessionId]
   ) || [];
+
+  const rawHistorySessions = useLiveQuery(
+    () => {
+      if (!state.activeJourneyId) return [];
+      return db.contractionSessions
+        .where('journeyId')
+        .equals(state.activeJourneyId)
+        .reverse()
+        .sortBy('startedAt');
+    },
+    [state.activeJourneyId]
+  ) || [];
+
+  // Calendar Logic
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday, 1 is Monday ...
+  
+  const isSundayStart = state.calendarStartDay === 'sunday';
+  const startDay = isSundayStart ? firstDay : (firstDay === 0 ? 6 : firstDay - 1);
+
+  const days = [];
+  for (let i = 0; i < startDay; i++) {
+    days.push(null);
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(i);
+  }
+
+  const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
+
+  const logDates = new Set(rawHistorySessions.map(session => {
+    const d = new Date(session.startedAt);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }));
+
+  const historySessions = selectedDateFilter 
+    ? rawHistorySessions.filter(session => {
+        const d = new Date(session.startedAt);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return dStr === selectedDateFilter;
+      })
+    : rawHistorySessions;
+
+  const handleDeleteSession = async (id: string) => {
+    await db.contractionSessions.delete(id);
+    // Note: We don't delete underlying records to keep it simple, or we could.
+    // Assuming deleting the session is enough for the user view.
+  };
 
   useEffect(() => {
     let interval: ReturnType<typeof setInterval>;
@@ -309,6 +367,104 @@ export const ContractionTimer: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Calendar View */}
+      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-sage" />
+            <h3 className="font-semibold text-charcoal text-[17px]">Calendar View</h3>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={prevMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronLeft className="w-5 h-5 text-charcoal" /></button>
+            <span className="font-semibold text-[14px] text-charcoal min-w-[120px] text-center">
+              {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <button onClick={nextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronRight className="w-5 h-5 text-charcoal" /></button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {(isSundayStart ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']).map(d => (
+              <div key={d} className="text-center text-[11px] font-semibold text-medium uppercase tracking-wider">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {days.map((d, i) => {
+              if (d === null) return <div key={`empty-${i}`} className="aspect-square" />;
+              
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+              const hasLog = logDates.has(dateStr);
+              const isSelected = selectedDateFilter === dateStr;
+              
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDateFilter(isSelected ? null : dateStr)}
+                  className={`aspect-square rounded-full flex items-center justify-center text-[14px] transition-all relative mx-auto w-8 h-8 sm:w-10 sm:h-10
+                    ${isSelected ? 'bg-sage text-white font-bold shadow-md' : 'hover:bg-gray-100 text-charcoal'}
+                    ${hasLog && !isSelected ? 'font-bold' : ''}
+                  `}
+                >
+                  {d}
+                  {hasLog && !isSelected && (
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-sage"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* History Sessions */}
+      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden mb-6">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
+          <div className="flex flex-col">
+            <h3 className="font-semibold text-charcoal text-[17px]">Past Sessions</h3>
+          </div>
+          {selectedDateFilter && (
+            <button onClick={() => setSelectedDateFilter(null)} className="text-[12px] font-semibold text-sage hover:text-sage-dark">
+              Clear Filter
+            </button>
+          )}
+        </div>
+        
+        {historySessions.length > 0 ? (
+          <div className="divide-y divide-border">
+            {historySessions.map((session) => (
+              <div key={session.id} className="flex items-center justify-between p-4 sm:px-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-center gap-4">
+                  <div className="w-10 h-10 rounded-full bg-sage-pale/20 flex items-center justify-center shrink-0">
+                    <Timer className="w-5 h-5 text-sage" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-[15px] text-charcoal">
+                      {new Date(session.startedAt).toLocaleString('en-IN', {
+                        day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit'
+                      })}
+                    </h4>
+                    <p className="text-[13px] text-medium mt-0.5">
+                      Duration: {Math.round((session.endedAt - session.startedAt) / 60000)} mins
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => handleDeleteSession(session.id)}
+                  className="p-2 text-medium hover:text-critical hover:bg-critical-bg rounded-lg transition-colors"
+                >
+                  <Trash2 className="w-5 h-5" />
+                </button>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-8 text-center text-medium">
+            <p className="text-[15px] mb-1">No past sessions found.</p>
+            <p className="text-[14px]">Historical sessions will appear here once saved.</p>
+          </div>
+        )}
+      </div>
 
       {!state.isCalmModeActive && (
         <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">

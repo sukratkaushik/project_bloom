@@ -1,14 +1,14 @@
 import React from 'react';
 import { Task } from '../types';
 import { usePlanner } from '../store';
-import { Check } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 
 type TaskItemProps = {
   task: Task;
 };
 
 export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
-  const { state, toggleTask, toggleAssign, setAssigneeNote } = usePlanner();
+  const { state, toggleTask, toggleAssign, setAssigneeNote, deleteTask } = usePlanner();
   
   const isDone = !!state.checked[task.id];
   const isAssigned = !!state.assigned[task.id];
@@ -59,37 +59,50 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
         )}
       </div>
       
-      {canAssign && (
-        <div className="ml-auto shrink-0 flex flex-col items-end gap-1.5">
-          <button 
-            onClick={(e) => {
-              e.stopPropagation();
-              toggleAssign(task.id);
-            }}
-            className={`text-[11px] px-2.5 py-1 border rounded-[10px] font-sans transition-all
-              ${isAssigned ? 'border-blush-light text-blush bg-blush-pale' : 'border-border text-light bg-transparent hover:border-blush hover:text-blush hover:bg-blush-pale'}`}
-          >
-            {isAssigned ? '✓ Assigned' : 'Assign to partner'}
-          </button>
-          
-          {isAssigned && (
-            <input
-              type="text"
-              value={assigneeNote}
-              onChange={(e) => setAssigneeNote(task.id, e.target.value)}
-              onClick={(e) => e.stopPropagation()}
-              placeholder="Who's doing this?"
-              className="text-[10px] p-[3px_6px] border border-border rounded-[4px] bg-white text-charcoal w-[110px] focus:outline-none focus:border-blush transition-colors placeholder:italic placeholder:text-light"
-            />
-          )}
-        </div>
-      )}
+      <div className="ml-auto shrink-0 flex items-start gap-3">
+        {canAssign && (
+          <div className="flex flex-col items-end gap-1.5">
+            <button 
+              onClick={(e) => {
+                e.stopPropagation();
+                toggleAssign(task.id);
+              }}
+              className={`text-[11px] px-2.5 py-1 border rounded-[10px] font-sans transition-all
+                ${isAssigned ? 'border-blush-light text-blush bg-blush-pale' : 'border-border text-light bg-transparent hover:border-blush hover:text-blush hover:bg-blush-pale'}`}
+            >
+              {isAssigned ? '✓ Assigned' : 'Assign to partner'}
+            </button>
+            
+            {isAssigned && (
+              <input
+                type="text"
+                value={assigneeNote}
+                onChange={(e) => setAssigneeNote(task.id, e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                placeholder="Who's doing this?"
+                className="text-[10px] p-[3px_6px] border border-border rounded-[4px] bg-white text-charcoal w-[110px] focus:outline-none focus:border-blush transition-colors placeholder:italic placeholder:text-light"
+              />
+            )}
+          </div>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            deleteTask(task.id);
+          }}
+          className="text-gray-300 hover:text-red-400 transition-colors mt-1"
+          title="Delete task"
+        >
+          <Trash2 size={16} />
+        </button>
+      </div>
     </div>
   );
 };
 
 export const TaskList: React.FC<{ tasks: Task[], filterTasks: (t: Task[]) => Task[] }> = ({ tasks, filterTasks }) => {
-  const filtered = filterTasks(tasks);
+  const { state } = usePlanner();
+  const filtered = filterTasks(tasks).filter(t => !state.deletedTasks?.[t.id]);
   
   if (filtered.length === 0) {
     return <div className="text-center p-10 text-light text-[14px] italic">No tasks for your current settings in this section.</div>;

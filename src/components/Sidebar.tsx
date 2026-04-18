@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS } from '../data';
 import { Task } from '../types';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
+import { ChevronDown, ChevronRight, Star } from 'lucide-react';
 
 type SidebarProps = {
   activePage: string;
@@ -10,8 +13,34 @@ type SidebarProps = {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks }) => {
-  const { state, toggleCalmMode, toggleDarkMode } = usePlanner();
+  const { state, toggleCalmMode, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
   const [toast, setToast] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    daily: true,
+    smart: true,
+    tasks: false,
+    health: false,
+    labor: false,
+  });
+
+  const toggleSection = (id: string) => {
+    setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const SectionHeader = ({ id, label }: { id: string, label: string }) => {
+    const isExpanded = expandedSections[id];
+    return (
+      <div 
+        className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
+        onClick={() => toggleSection(id)}
+      >
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors">{label}</div>
+        <div className="text-light group-hover:text-charcoal flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 transition-colors mr-1">
+          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        </div>
+      </div>
+    );
+  };
 
   const getCount = (tasks: Task[]) => {
     const filtered = filterTasks(tasks);
@@ -28,65 +57,153 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     setTimeout(() => setToast(false), 2500);
   };
 
-  const handlePrint = () => {
-    window.print();
+  const handleLogout = async () => {
+    try {
+      if (auth.currentUser) {
+        await signOut(auth);
+      }
+      resetPlan();
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
-  const NavItem = ({ id, icon, label, count }: { id: string, icon: string, label: string, count?: string }) => {
+  const NavItem = ({ id, icon, label, count, hideFavorite }: { id: string, icon: string, label: string, count?: string, hideFavorite?: boolean }) => {
     const isActive = activePage === id;
+    const isFav = state.favoritePages?.includes(id);
+
     return (
-      <button
-        onClick={() => setActivePage(id)}
-        className={`flex items-center gap-2.5 p-[10px_12px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all border-none w-full text-left mb-0.5
-          ${isActive ? 'bg-sage-pale text-sage font-semibold' : 'bg-transparent text-medium hover:bg-sage-pale hover:text-sage'}`}
-      >
-        <span className="text-[16px] w-5 text-center">{icon}</span>
-        {label}
-        {count && !state.isCalmModeActive && (
-          <span className={`ml-auto text-[11px] rounded-[10px] px-[7px] py-[1px] font-semibold
-            ${isActive ? 'bg-white text-sage' : 'bg-sage-pale text-sage'}`}>
-            {count}
-          </span>
+      <div className="group relative flex items-center mb-0.5">
+        <button
+          onClick={() => setActivePage(id)}
+          className={`flex items-center gap-2.5 p-[10px_12px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all border-none w-full text-left
+            ${isActive ? 'bg-sage-pale text-sage font-semibold' : 'bg-transparent text-medium hover:bg-sage-pale hover:text-sage'}
+            ${!hideFavorite ? 'pr-8' : ''}`}
+        >
+          <span className="text-[16px] w-5 text-center">{icon}</span>
+          {label}
+          {count && !state.isCalmModeActive && (
+            <span className={`ml-auto text-[11px] rounded-[10px] px-[7px] py-[1px] font-semibold
+              ${isActive ? 'bg-white text-sage' : 'bg-sage-pale text-sage'}`}>
+              {count}
+            </span>
+          )}
+        </button>
+        {!hideFavorite && (
+          <button
+            onClick={(e) => { e.stopPropagation(); toggleFavoritePage(id); }}
+            className={`absolute right-2 p-1.5 rounded-md transition-opacity
+              ${isFav ? 'opacity-100 text-gold' : 'opacity-0 group-hover:opacity-100 text-medium hover:text-gold hover:bg-gold/10'}`}
+            title={isFav ? "Remove from Favorites" : "Add to Favorites"}
+          >
+            <Star className={`w-3.5 h-3.5 ${isFav ? 'fill-gold' : ''}`} />
+          </button>
         )}
-      </button>
+      </div>
     );
   };
 
+  const ALL_NAV_ITEMS = [
+    { id: 'kickcounter', icon: '👣', label: 'Kick Counter' },
+    { id: 'contractions', icon: '⏱', label: 'Contraction Timer' },
+    { id: 'vitals', icon: '💙', label: 'Vitals (BP/Weight)' },
+    { id: 'mood', icon: '😊', label: 'Mood Tracker' },
+    { id: 'hydration', icon: '💧', label: 'Hydration' },
+    { id: 'nutrition', icon: '🥗', label: 'Nutrition & Supplements' },
+    { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
+    { id: 'askbloom', icon: '✨', label: 'AskBloom AI' },
+    { id: 'foodscanner', icon: '🍎', label: 'Food Scanner' },
+    { id: 'babynames', icon: '🌟', label: 'Name Generator' },
+    { id: 'dev', icon: '🌱', label: 'Development', count: getCount(devTasks) },
+    { id: 'prep', icon: '📋', label: 'Preparation', count: getCount(prepTasks) },
+    { id: 'finance', icon: '💰', label: 'Financial', count: getCount(FIN_TASKS) },
+    { id: 'deadlines', icon: '📅', label: 'Deadlines', count: getCount(DEADLINE_TASKS) },
+    { id: 'medical', icon: '🏥', label: 'Medical', count: getCount(medTasks) },
+    { id: 'schemes', icon: '🏛', label: 'Government Schemes' },
+    { id: 'readiness', icon: '🔮', label: 'Labor Readiness' },
+    { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag' },
+    { id: 'birthplan', icon: '📜', label: 'Birth Plan Builder' },
+    { id: 'decisions', icon: '✦', label: 'Decisions' },
+    { id: 'postpartum', icon: '🍃', label: 'Early Parenthood' },
+    { id: 'notes', icon: '📝', label: 'Notes & Journal' },
+  ];
+
   return (
     <div className="sticky top-[80px] pt-8 no-print">
-      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Planning sections</div>
+      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
+      <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
       
-      <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" />
-      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 mt-4 pl-3">Daily Utilities</div>
-      <NavItem id="kickcounter" icon="👣" label="Kick Counter" />
-      <NavItem id="contractions" icon="⏱" label="Contraction Timer" />
-      <NavItem id="vitals" icon="💙" label="Vitals (BP/Weight)" />
-      <NavItem id="mood" icon="😊" label="Mood Tracker" />
-      <NavItem id="hydration" icon="💧" label="Hydration" />
-      <NavItem id="nutrition" icon="🥗" label="Nutrition & Supplements" />
+      {state.favoritePages && state.favoritePages.length > 0 && (
+        <div className="mt-4 mb-2">
+          <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
+            <Star className="w-3 h-3 fill-gold" /> Favourites
+          </div>
+          <div className="space-y-0.5">
+            {state.favoritePages.map(pageId => {
+              const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+              if (!item) return null;
+              return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} count={item.count} hideFavorite />;
+            })}
+          </div>
+        </div>
+      )}
       
-      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 mt-4 pl-3">Planning sections</div>
-      <NavItem id="dev" icon="🌱" label="Development" count={getCount(devTasks)} />
-      <NavItem id="medical" icon="🏥" label="Medical" count={getCount(medTasks)} />
-      <NavItem id="schemes" icon="🏛" label="Government Schemes" />
-      <NavItem id="prep" icon="📋" label="Preparation" count={getCount(prepTasks)} />
-      <NavItem id="hospitalbag" icon="👜" label="Hospital Bag" />
-      <NavItem id="finance" icon="💰" label="Financial" count={getCount(FIN_TASKS)} />
-      <NavItem id="decisions" icon="✦" label="Decisions" />
-      <NavItem id="birthplan" icon="📜" label="Birth Plan Builder" />
-      <NavItem id="deadlines" icon="📅" label="Deadlines" count={getCount(DEADLINE_TASKS)} />
-      <NavItem id="postpartum" icon="🍃" label="Early Parenthood" />
-      <NavItem id="symptoms" icon="📈" label="Symptom Log" />
-      <NavItem id="readiness" icon="🔮" label="Labor Readiness" />
-      <NavItem id="foodscanner" icon="🍎" label="Food Scanner" />
-      <NavItem id="askbloom" icon="✨" label="AskBloom AI" />
-      
-      <div className="h-px bg-border my-2.5" />
-      
+      <SectionHeader id="daily" label="Daily Health & Tracking" />
+      {expandedSections['daily'] && (
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NavItem id="kickcounter" icon="👣" label="Kick Counter" />
+          <NavItem id="contractions" icon="⏱" label="Contraction Timer" />
+          <NavItem id="vitals" icon="💙" label="Vitals (BP/Weight)" />
+          <NavItem id="mood" icon="😊" label="Mood Tracker" />
+          <NavItem id="hydration" icon="💧" label="Hydration" />
+          <NavItem id="nutrition" icon="🥗" label="Nutrition & Supplements" />
+          <NavItem id="symptoms" icon="📈" label="Symptom Log" />
+        </div>
+      )}
+
+      <SectionHeader id="smart" label="Smart Tools" />
+      {expandedSections['smart'] && (
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NavItem id="askbloom" icon="✨" label="AskBloom AI" />
+          <NavItem id="foodscanner" icon="🍎" label="Food Scanner" />
+          <NavItem id="babynames" icon="🌟" label="Name Generator" />
+        </div>
+      )}
+
+      <SectionHeader id="tasks" label="Planning & Tasks" />
+      {expandedSections['tasks'] && (
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NavItem id="dev" icon="🌱" label="Development" count={getCount(devTasks)} />
+          <NavItem id="prep" icon="📋" label="Preparation" count={getCount(prepTasks)} />
+          <NavItem id="finance" icon="💰" label="Financial" count={getCount(FIN_TASKS)} />
+          <NavItem id="deadlines" icon="📅" label="Deadlines" count={getCount(DEADLINE_TASKS)} />
+        </div>
+      )}
+
+      <SectionHeader id="health" label="Medical & Govt" />
+      {expandedSections['health'] && (
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NavItem id="medical" icon="🏥" label="Medical" count={getCount(medTasks)} />
+          <NavItem id="schemes" icon="🏛" label="Government Schemes" />
+        </div>
+      )}
+
+      <SectionHeader id="labor" label="Labor & Postpartum" />
+      {expandedSections['labor'] && (
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+          <NavItem id="readiness" icon="🔮" label="Labor Readiness" />
+          <NavItem id="hospitalbag" icon="👜" label="Hospital Bag" />
+          <NavItem id="birthplan" icon="📜" label="Birth Plan Builder" />
+          <NavItem id="decisions" icon="✦" label="Decisions" />
+          <NavItem id="postpartum" icon="🍃" label="Early Parenthood" />
+        </div>
+      )}
+
+      <div className="h-px bg-border my-4" />
       <NavItem id="notes" icon="📝" label="Notes & Journal" />
-      
-      <div className="h-px bg-border my-2.5" />
-      
+      <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
+      <div className="h-px bg-border my-4" />
+
       <button 
         onClick={toggleCalmMode}
         className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
@@ -119,13 +236,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       >
         💾 Save Progress
       </button>
-      
-      <button 
-        onClick={handlePrint}
-        className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13px] font-medium text-medium cursor-pointer transition-all hover:border-charcoal hover:text-charcoal"
-      >
-        🖨 Print Screen
-      </button>
 
       <button 
         onClick={() => {
@@ -136,6 +246,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13px] font-medium text-sage cursor-pointer transition-all hover:bg-sage hover:text-white"
       >
         📄 Export Care Plan PDF
+      </button>
+
+      <button 
+        onClick={handleLogout}
+        className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
+      >
+        🚪 Log Out
       </button>
 
       {/* Toast */}

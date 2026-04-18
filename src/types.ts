@@ -73,6 +73,7 @@ export type PlannerState = {
   checked: Record<string, boolean>;
   assigned: Record<string, boolean>;
   assigneeNotes: Record<string, string>;
+  deletedTasks: Record<string, boolean>;
   decisions: Record<string, string>;
   decisionNotes: Record<string, string>;
   budgetEst: Record<string, string>;
@@ -91,5 +92,10 @@ export type PlannerState = {
   premiumPlan?: 'monthly' | 'annual';
   premiumExpiry?: string;
   razorpayPaymentId?: string;
+  favoriteNames?: string[];
+  favoritePages?: string[];
+  userName?: string;
+  weightUnit?: 'kg' | 'lbs';
+  calendarStartDay?: 'sunday' | 'monday';
   createdAt?: number;
 };

@@ -9,7 +9,10 @@ import {
   AlertTriangle, 
   TrendingUp, 
   Trash2, 
-  Plus 
+  Plus,
+  ChevronLeft,
+  ChevronRight,
+  Calendar as CalendarIcon
 } from 'lucide-react';
 
 const Sparkline = ({ data, color, width = 300, height = 60 }: { data: number[], color: string, width?: number, height?: number }) => {
@@ -44,7 +47,6 @@ export const VitalsTracker: React.FC = () => {
   const [diastolic, setDiastolic] = useState('');
   const [pulse, setPulse] = useState('');
   const [weight, setWeight] = useState('');
-  const [unit, setUnit] = useState(() => localStorage.getItem('bloom_weight_unit') || 'kg');
   const [notes, setNotes] = useState('');
   
   const [date, setDate] = useState(() => new Date().toISOString().split('T')[0]);
@@ -100,7 +102,7 @@ export const VitalsTracker: React.FC = () => {
       await db.vitalsLogs.put({
         ...entry,
         weight: parseFloat(weight),
-        unit,
+        unit: state.weightUnit || 'kg',
       });
       setWeight('');
     }
@@ -112,10 +114,11 @@ export const VitalsTracker: React.FC = () => {
     await db.vitalsLogs.delete(id);
   };
 
+  const { updateState } = usePlanner();
+  const unit = state.weightUnit || 'kg';
+
   const toggleUnit = () => {
-    const newUnit = unit === 'kg' ? 'lbs' : 'kg';
-    setUnit(newUnit);
-    localStorage.setItem('bloom_weight_unit', newUnit);
+    updateState({ weightUnit: unit === 'kg' ? 'lbs' : 'kg' });
   };
 
   const getBPClassification = () => {
@@ -140,6 +143,44 @@ export const VitalsTracker: React.FC = () => {
   const sysData = bpLogs.slice(0, 10).reverse().map(l => l.systolic || 0).filter(v => v > 0);
   const diaData = bpLogs.slice(0, 10).reverse().map(l => l.diastolic || 0).filter(v => v > 0);
   const wData = weightLogs.slice(0, 10).reverse().map(l => l.weight || 0).filter(v => v > 0);
+
+  // Calendar Logic
+  const [currentMonth, setCurrentMonth] = useState(() => new Date());
+  const [selectedDateFilter, setSelectedDateFilter] = useState<string | null>(null);
+
+  const year = currentMonth.getFullYear();
+  const month = currentMonth.getMonth();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay(); // 0 is Sunday, 1 is Monday ...
+  
+  const isSundayStart = state.calendarStartDay === 'sunday';
+  // If Sunday start: just use firstDay (0-6).
+  // If Monday start: shift so Monday is 0, Sunday is 6.
+  const startDay = isSundayStart ? firstDay : (firstDay === 0 ? 6 : firstDay - 1);
+
+  const days = [];
+  for (let i = 0; i < startDay; i++) {
+    days.push(null);
+  }
+  for (let i = 1; i <= daysInMonth; i++) {
+    days.push(i);
+  }
+
+  const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
+  const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
+
+  const logDates = new Set(logs.map(l => {
+    const d = new Date(l.timestamp);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  }));
+
+  const filteredLogs = selectedDateFilter 
+    ? logs.filter(l => {
+        const d = new Date(l.timestamp);
+        const dStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        return dStr === selectedDateFilter;
+      })
+    : logs;
 
   if (!state.activeJourneyId) {
     return (
@@ -280,11 +321,64 @@ export const VitalsTracker: React.FC = () => {
       </div>
 
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border bg-gray-50/50">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            <CalendarIcon className="w-5 h-5 text-sage" />
+            <h3 className="font-semibold text-charcoal text-[17px]">Calendar View</h3>
+          </div>
+          <div className="flex items-center gap-4">
+            <button onClick={prevMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronLeft className="w-5 h-5 text-charcoal" /></button>
+            <span className="font-semibold text-[14px] text-charcoal min-w-[120px] text-center">
+              {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            </span>
+            <button onClick={nextMonth} className="p-1 hover:bg-gray-200 rounded-full transition-colors"><ChevronRight className="w-5 h-5 text-charcoal" /></button>
+          </div>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-7 gap-1 mb-2">
+            {(isSundayStart ? ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] : ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']).map(d => (
+              <div key={d} className="text-center text-[11px] font-semibold text-medium uppercase tracking-wider">{d}</div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-1">
+            {days.map((d, i) => {
+              if (d === null) return <div key={`empty-${i}`} className="aspect-square" />;
+              
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+              const hasLog = logDates.has(dateStr);
+              const isSelected = selectedDateFilter === dateStr;
+              
+              return (
+                <button
+                  key={i}
+                  onClick={() => setSelectedDateFilter(isSelected ? null : dateStr)}
+                  className={`aspect-square rounded-full flex items-center justify-center text-[14px] transition-all relative mx-auto w-8 h-8 sm:w-10 sm:h-10
+                    ${isSelected ? 'bg-sage text-white font-bold shadow-md' : 'hover:bg-gray-100 text-charcoal'}
+                    ${hasLog && !isSelected ? 'font-bold' : ''}
+                  `}
+                >
+                  {d}
+                  {hasLog && !isSelected && (
+                    <div className="absolute bottom-1 w-1 h-1 rounded-full bg-sage"></div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
           <h3 className="font-semibold text-charcoal text-[17px]">History</h3>
+          {selectedDateFilter && (
+            <button onClick={() => setSelectedDateFilter(null)} className="text-[12px] font-semibold text-sage hover:text-sage-dark">
+              Clear Filter
+            </button>
+          )}
         </div>
         <div className="divide-y divide-border">
-          {logs.map((log) => {
+          {filteredLogs.map((log) => {
             const dateStr = new Date(log.timestamp).toLocaleString('en-IN', {
               day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit'
             });
