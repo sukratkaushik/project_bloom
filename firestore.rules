@@ -90,7 +90,7 @@ service cloud.firestore {
     }
 
     function isDocOwner() {
-      return isAuthenticated() && request.auth.uid == resource.data.uid;
+      return isAuthenticated() && (resource == null || request.auth.uid == resource.data.uid);
     }
 
     function uidUnchanged() {
@@ -184,11 +184,6 @@ service cloud.firestore {
     }
 
     match /journeys/{journeyId} {
-      allow read: if isDocOwner() || (isAuthenticated() && request.query.limit <= 100); // Need to allow querying by uid
-      // Better read rule for queries:
-      allow list: if isAuthenticated() && request.query.limit <= 100; // In production, we'd enforce where uid == request.auth.uid, but firestore rules can't easily check query params for equality without specific setup, so we rely on the query having where('uid', '==', auth.uid) and the rule checking resource.data.uid on read.
-      // Wait, `allow read: if isDocOwner()` applies to `get` and `list` if the query matches.
-      // Actually, for list, `resource.data` is evaluated against each document.
       allow read: if isDocOwner();
       allow create: if isAuthenticated() && isValidJourney() && uidUnchanged();
       allow update: if isDocOwner() && isValidJourney() && uidNotModified();

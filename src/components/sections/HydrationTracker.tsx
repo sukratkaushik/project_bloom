@@ -87,11 +87,12 @@ export const HydrationTracker: React.FC = () => {
   };
   const streak = calculateStreak();
 
-  // 7-day history circles (Mon-Sun)
-  // For simplicity, we just show last 7 days ending today
-  const last7Days = Array.from({length: 7}, (_, i) => {
+  // Current week (Mon-Sun)
+  const currentWeekDays = Array.from({length: 7}, (_, i) => {
     const d = new Date();
-    d.setDate(d.getDate() - (6 - i));
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    d.setDate(diff + i);
     return d;
   });
 
@@ -212,11 +213,11 @@ export const HydrationTracker: React.FC = () => {
         <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6">
           <div className="flex items-center gap-2 mb-6">
             <TrendingUp className="w-5 h-5 text-sage" />
-            <h3 className="font-semibold text-charcoal text-[16px]">Last 7 Days</h3>
+            <h3 className="font-semibold text-charcoal text-[16px]">This Week</h3>
           </div>
           
           <div className="flex justify-between items-end h-[60px]">
-            {last7Days.map((d, i) => {
+            {currentWeekDays.map((d, i) => {
               const dStr = d.toISOString().split('T')[0];
               const dayLogs = logs.filter(l => l.date === dStr);
               const total = dayLogs.reduce((acc, log) => acc + log.amountMl, 0);

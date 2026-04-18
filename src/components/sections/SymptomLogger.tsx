@@ -4,7 +4,7 @@ import { db, SymptomType, Severity } from '../../db';
 import { usePlanner } from '../../store';
 import { v4 as uuidv4 } from 'uuid';
 import { Activity, Plus, Trash2 } from 'lucide-react';
-import { auth, db as firestoreDb } from '../../firebase';
+import { auth, db as firestoreDb, handleFirestoreError, OperationType } from '../../firebase';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export const SymptomLogger: React.FC = () => {
@@ -49,7 +49,7 @@ export const SymptomLogger: React.FC = () => {
           uid: auth.currentUser.uid
         });
       } catch (err) {
-        console.error("Failed to sync symptom to cloud", err);
+        handleFirestoreError(err, OperationType.WRITE, `symptoms/${id}`);
       }
     }
 
@@ -66,7 +66,7 @@ export const SymptomLogger: React.FC = () => {
         const symptomRef = doc(firestoreDb, 'symptoms', id);
         await deleteDoc(symptomRef);
       } catch (err) {
-        console.error("Failed to delete symptom from cloud", err);
+        handleFirestoreError(err, OperationType.DELETE, `symptoms/${id}`);
       }
     }
   };

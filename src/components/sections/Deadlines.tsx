@@ -4,10 +4,10 @@ import { DEADLINE_TASKS } from '../../data';
 import { Task } from '../../types';
 import { ContextBanner } from '../ContextBanner';
 import { addWeeks, fmtDay, fmtMonth } from '../../utils';
-import { Check } from 'lucide-react';
+import { Check, Trash2 } from 'lucide-react';
 
 export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filterTasks }) => {
-  const { state, toggleTask } = usePlanner();
+  const { state, toggleTask, deleteTask } = usePlanner();
   
   const today = new Date();
   const sorted = [...DEADLINE_TASKS].sort((a, b) => (a.weeksBeforeDue || 0) - (b.weeksBeforeDue || 0));
@@ -66,6 +66,16 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
                   </div>
                 )}
               </div>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  deleteTask(t.id);
+                }}
+                className="text-gray-300 hover:text-red-400 transition-colors mt-1.5 ml-2"
+                title="Delete task"
+              >
+                <Trash2 size={16} />
+              </button>
             </div>
           );
         })}

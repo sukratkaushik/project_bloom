@@ -23,10 +23,13 @@ import { NutritionTracker } from './sections/NutritionTracker';
 import { HospitalBag } from './sections/HospitalBag';
 import { BirthPlanBuilder } from './sections/BirthPlanBuilder';
 import { GovernmentSchemes } from './sections/GovernmentSchemes';
+import { BabyNames } from './sections/BabyNames';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS, POSTPARTUM_TASKS } from '../data';
 import { Task } from '../types';
 
 import { PregnancyTracker } from './sections/PregnancyTracker';
+
+import { Profile } from './sections/Profile';
 
 export const Dashboard: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -45,6 +48,7 @@ export const Dashboard: React.FC = () => {
   // Filter tasks based on state to get accurate count
   const filterTasks = (tasks: Task[]) => {
     return tasks.filter(t => {
+      if (state.deletedTasks?.[t.id]) return false;
       if (t.flags && t.flags.length && !t.flags.some(f => state.flags[f])) return false;
       if (t.onlyPreg && !t.onlyPreg.includes(state.pregnancyNum)) return false;
       if (t.onlyWork && !t.onlyWork.includes(state.workSit)) return false;
@@ -159,7 +163,9 @@ export const Dashboard: React.FC = () => {
           {activePage === 'hospitalbag' && <HospitalBag />}
           {activePage === 'birthplan' && <BirthPlanBuilder />}
           {activePage === 'schemes' && <GovernmentSchemes />}
+          {activePage === 'babynames' && <BabyNames />}
           {activePage === 'notes' && <Notes />}
+          {activePage === 'profile' && <Profile />}
         </main>
       </div>
     </div>
