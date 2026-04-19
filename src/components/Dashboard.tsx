@@ -28,6 +28,7 @@ import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS
 import { Task } from '../types';
 
 import { PregnancyTracker } from './sections/PregnancyTracker';
+import { PartnerSync } from './sections/PartnerSync';
 
 import { Profile } from './sections/Profile';
 
@@ -164,6 +165,7 @@ export const Dashboard: React.FC = () => {
           {activePage === 'birthplan' && <BirthPlanBuilder />}
           {activePage === 'schemes' && <GovernmentSchemes />}
           {activePage === 'babynames' && <BabyNames />}
+          {activePage === 'partnersync' && <PartnerSync />}
           {activePage === 'notes' && <Notes />}
           {activePage === 'profile' && <Profile />}
         </main>

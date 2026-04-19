@@ -60,6 +60,39 @@ export type HospitalBagItem = {
   isCustom: boolean;
 };
 
+export type SyncPermissions = {
+  mode?: 'edit' | 'read';
+  excludedTaskIds?: string[];
+  
+  kickcounter: boolean;
+  contractions: boolean;
+  vitals: boolean;
+  mood: boolean;
+  hydration: boolean;
+  nutrition: boolean;
+  symptoms: boolean;
+
+  askbloom: boolean;
+  foodscanner: boolean;
+  babynames: boolean;
+
+  dev: boolean;
+  prep: boolean;
+  finance: boolean;
+  deadlines: boolean;
+
+  medical: boolean;
+  schemes: boolean;
+
+  readiness: boolean;
+  hospitalbag: boolean;
+  birthplan: boolean;
+  decisions: boolean;
+  postpartum: boolean;
+
+  notes: boolean;
+};
+
 export type PlannerState = {
   isSetup: boolean;
   dueDate: string | null;
@@ -98,4 +131,6 @@ export type PlannerState = {
   weightUnit?: 'kg' | 'lbs';
   calendarStartDay?: 'sunday' | 'monday';
   createdAt?: number;
+  syncPermissions?: SyncPermissions;
+  isPartnerReadOnly?: boolean;
 };

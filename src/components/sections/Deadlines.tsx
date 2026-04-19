@@ -3,6 +3,7 @@ import { usePlanner } from '../../store';
 import { DEADLINE_TASKS } from '../../data';
 import { Task } from '../../types';
 import { ContextBanner } from '../ContextBanner';
+import { CustomTaskList } from './CustomTaskList';
 import { addWeeks, fmtDay, fmtMonth } from '../../utils';
 import { Check, Trash2 } from 'lucide-react';
 
@@ -80,6 +81,8 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
           );
         })}
       </div>
+      
+      <CustomTaskList sectionId="deadlines" title="My Custom Deadlines" />
     </div>
   );
 };

@@ -226,7 +226,7 @@ export const exportToPDF = async (state: PlannerState) => {
   addHeader('Hospital Bag');
   if (state.hospitalBagItems && state.hospitalBagItems.length > 0) {
     const bagItems = state.hospitalBagItems.map(item => ({
-      text: item.name,
+      text: item.label,
       checked: !!item.packed
     }));
     printChecklist(bagItems);
