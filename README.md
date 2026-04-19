@@ -1,20 +1,510 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# 🌸 Bloom — Privacy-First Pregnancy Planner
 
-# Run and deploy your AI Studio app
+> A comprehensive, offline-capable pregnancy companion that helps expectant parents track milestones, health vitals, tasks, and decisions — all while keeping data private and local.
 
-This contains everything you need to run your app locally.
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+[![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6.svg)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-6.x-646cff.svg)](https://vitejs.dev/)
+[![PWA](https://img.shields.io/badge/PWA-Installable-brightgreen.svg)]()
 
-View your app in AI Studio: https://ai.studio/apps/2d20732a-d05e-46fd-a4a4-7911f2f5b663
+---
 
-## Run Locally
+## Table of Contents
 
-**Prerequisites:**  Node.js
+1. [Overview](#overview)
+2. [Key Features](#key-features)
+3. [Tech Stack](#tech-stack)
+4. [Architecture](#architecture)
+   - [High-Level Architecture Diagram](#high-level-architecture-diagram)
+   - [Component Hierarchy](#component-hierarchy-uml-component-diagram)
+   - [Entity-Relationship Diagram](#entity-relationship-er-diagram)
+   - [State Management Flow](#state-management-flow)
+   - [Peer-to-Peer Sync Sequence Diagram](#peer-to-peer-sync-sequence-diagram)
+5. [Project Structure](#project-structure)
+6. [Getting Started](#getting-started)
+7. [Environment Variables](#environment-variables)
+8. [License](#license)
 
+---
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Overview
+
+**Bloom** is a React + TypeScript Progressive Web App (PWA) designed as an all-in-one pregnancy planner. It guides users through all three trimesters with curated checklists, medical appointment tracking, financial planning, health logging, and AI-powered tools — all while prioritising **data privacy** through local-first storage with IndexedDB (Dexie.js).
+
+The app supports:
+
+- **Offline operation** via PWA service workers
+- **Peer-to-peer partner sync** via WebRTC (PeerJS) — no central server needed for sharing
+- **Google Authentication** via Firebase Auth for optional cloud persistence
+- **Gemini AI integration** for food safety scanning, a pregnancy Q&A chatbot, and baby name suggestions
+- **FHIR R4 interoperability** for exporting health data to enterprise EHR systems (Epic, Cerner)
+- **PDF export** of the entire pregnancy care plan via jsPDF
+
+---
+
+## Key Features
+
+| Category | Features |
+|---|---|
+| **Pregnancy Tracker** | Week-by-week baby development with fruit-size comparisons, body changes, trimester progress |
+| **Task Management** | Curated checklists for Development milestones, Medical appointments, Preparation, Financial tasks, Deadlines, Postpartum — filterable by trimester, work situation, and pregnancy flags (high-risk, multiples, IVF, mental health) |
+| **Health Tracking** | Kick counter, Contraction timer, Vitals tracker (BP & weight), Mood tracker, Hydration tracker, Nutrition/supplement tracker, Symptom logger |
+| **AI-Powered Tools** | Food safety scanner (Gemini Vision), Ask Bloom chatbot, Baby name generator with cultural/meaning filters |
+| **Planning Tools** | Birth plan builder, Hospital bag checklist, Government schemes finder, Decision tracker (birth setting, pain relief, feeding, etc.) |
+| **Labor Readiness** | Predictive labor readiness score using biometrics (HRV, RHR, BBT, Braxton Hicks frequency) |
+| **Partner Sync** | Real-time P2P data sync via WebRTC with granular permission controls (read-only / edit, per-section exclusions) |
+| **Export** | Full PDF export of pregnancy plan, decisions, checklists, vitals, and hospital bag |
+| **EHR Integration** | FHIR R4 compliant data mapping for Blood Pressure, Weight, and Fetal Kick Count with OAuth 2.0 EHR client |
+| **UI/UX** | Calm Mode (reduces visual clutter), Dark Mode, critical-only filter, responsive design, installable PWA |
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| **Framework** | React 19 with TypeScript |
+| **Build Tool** | Vite 6 with HMR |
+| **Styling** | Tailwind CSS 4 (via `@tailwindcss/vite`) |
+| **State Management** | React Context API (`PlannerProvider` / `usePlanner` hook) |
+| **Local Database** | Dexie.js (IndexedDB wrapper) — 7 object stores |
+| **Authentication** | Firebase Auth (Google Sign-In) |
+| **Cloud Persistence** | Firebase Firestore (optional, for state backup) |
+| **AI / ML** | Google Gemini API (`gemini-2.0-flash`) for food scanning, chatbot, name generation |
+| **P2P Sync** | PeerJS (WebRTC) for real-time partner data sync |
+| **PDF Export** | jsPDF |
+| **EHR Interop** | Custom FHIR R4 mapper + OAuth 2.0 client |
+| **PWA** | vite-plugin-pwa with auto-update service worker |
+| **Icons** | Lucide React |
+
+---
+
+## Architecture
+
+### High-Level Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         BLOOM PWA (Client)                          │
+│                                                                     │
+│  ┌────────────┐  ┌───────────────┐  ┌────────────────────────────┐ │
+│  │  Landing   │→ │ SetupScreen   │→ │        Dashboard           │ │
+│  │   Page     │  │ (Onboarding)  │  │   (20+ feature sections)   │ │
+│  └────────────┘  └───────────────┘  └────────────────────────────┘ │
+│                                                                     │
+│  ┌───────────────────────────────────────────────────────────────┐  │
+│  │              State Management (React Context)                 │  │
+│  │            PlannerProvider  →  usePlanner() hook              │  │
+│  └───────────────────┬───────────────────────┬──────────────────┘  │
+│                      │                       │                      │
+│  ┌───────────────────▼──────┐  ┌─────────────▼────────────────┐   │
+│  │  Dexie.js (IndexedDB)    │  │  Firebase Firestore (Cloud)  │   │
+│  │  • kickSessions          │  │  • State backup/restore      │   │
+│  │  • contractionSessions   │  │  • Cross-device persistence  │   │
+│  │  • vitalsLogs            │  └──────────────────────────────┘   │
+│  │  • moodLogs              │                                      │
+│  │  • hydrationLogs         │  ┌──────────────────────────────┐   │
+│  │  • supplementLogs        │  │  SyncEngine (PeerJS/WebRTC)  │   │
+│  │  • symptomLogs           │  │  • Host / Connect modes      │   │
+│  └──────────────────────────┘  │  • Permission-based sharing  │   │
+│                                 │  • Bidirectional state sync  │   │
+│                                 └──────────────────────────────┘   │
+└───────────────────────┬─────────────────────────────────────────────┘
+                        │
+         ┌──────────────┼──────────────┐
+         ▼              ▼              ▼
+  ┌─────────────┐ ┌──────────┐ ┌────────────┐
+  │  Firebase   │ │  Gemini  │ │  EHR/FHIR  │
+  │  Auth       │ │  AI API  │ │  Server    │
+  │  (Google)   │ │ (Google) │ │ (Epic etc) │
+  └─────────────┘ └──────────┘ └────────────┘
+```
+
+### Component Hierarchy (UML Component Diagram)
+
+```
+                              ┌──────────┐
+                              │   App    │
+                              │ (Router) │
+                              └────┬─────┘
+                                   │
+            ┌──────────────────────┼───────────────────────┐
+            │                      │                       │
+     ┌──────▼───────┐  ┌──────────▼──────────┐  ┌─────────▼──────┐
+     │ LandingPage  │  │    SetupScreen      │  │   Dashboard    │
+     │ (Auth + CTA) │  │ (Multi-step wizard) │  │                │
+     └──────────────┘  └─────────────────────┘  └───────┬────────┘
+                                                        │
+                                         ┌──────────────┼──────────┐
+                                         │              │          │
+                                   ┌─────▼─────┐ ┌─────▼────┐ ┌───▼───┐
+                                   │  Sidebar  │ │  Header  │ │ Main  │
+                                   │ (Nav)     │ │ (Stats)  │ │Content│
+                                   └───────────┘ └──────────┘ └───┬───┘
+                                                                  │
+  ┌───────────────────────────────────────────────────────────────┐
+  │                    Dashboard Sections (21 pages)               │
+  ├──────────────────┬──────────────────┬──────────────────────────┤
+  │ PregnancyTracker │ Development      │ Medical                  │
+  │ Preparation      │ Financial        │ Decisions                │
+  │ Deadlines        │ Postpartum       │ SymptomLogger            │
+  │ LaborReadiness   │ FoodScanner      │ AskBloom (AI Chatbot)    │
+  │ KickCounter      │ ContractionTimer │ VitalsTracker            │
+  │ MoodTracker      │ HydrationTracker │ NutritionTracker         │
+  │ HospitalBag      │ BirthPlanBuilder │ GovernmentSchemes        │
+  │ BabyNames        │ PartnerSync      │ Notes                    │
+  │ Profile          │                  │                          │
+  └──────────────────┴──────────────────┴──────────────────────────┘
+```
+
+### Entity-Relationship (ER) Diagram
+
+The app uses two storage layers: **Dexie.js (IndexedDB)** for time-series health data and **React Context + Firestore** for planning state. All Dexie tables share a `journeyId` foreign key that ties records to a specific pregnancy journey.
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                     DEXIE.JS (IndexedDB) — BloomDB v3                   │
+└─────────────────────────────────────────────────────────────────────────┘
+
+  ┌─────────────────────┐         ┌─────────────────────────┐
+  │   kickSessions      │         │  contractionSessions    │
+  ├─────────────────────┤         ├─────────────────────────┤
+  │ PK  id (auto++)     │         │ PK  id (auto++)         │
+  │ FK  journeyId ──────┼────┐    │ FK  journeyId ──────────┼────┐
+  │     kicks: Array     │    │    │     contractions: Array  │    │
+  │     startTime        │    │    │     startTime            │    │
+  │     endTime          │    │    │     endTime              │    │
+  │     targetKicks      │    │    │     ended                │    │
+  └─────────────────────┘    │    └─────────────────────────┘    │
+                              │                                   │
+  ┌─────────────────────┐    │    ┌─────────────────────────┐    │
+  │    vitalsLogs       │    │    │      moodLogs           │    │
+  ├─────────────────────┤    │    ├─────────────────────────┤    │
+  │ PK  id (auto++)     │    │    │ PK  id (auto++)         │    │
+  │ FK  journeyId ──────┼────┤    │ FK  journeyId ──────────┼────┤
+  │     timestamp        │    │    │     timestamp            │    │
+  │     type (BP|Weight) │    │    │     mood                 │    │
+  │     systolic?        │    │    │     energy               │    │
+  │     diastolic?       │    │    │     notes?               │    │
+  │     pulse?           │    │    └─────────────────────────┘    │
+  │     weight?          │    │                                   │
+  │     unit?            │    │    ┌─────────────────────────┐    │
+  │     notes?           │    │    │    hydrationLogs        │    │
+  └─────────────────────┘    │    ├─────────────────────────┤    │
+                              │    │ PK  id (auto++)         │    │
+  ┌─────────────────────┐    │    │ FK  journeyId ──────────┼────┤
+  │  supplementLogs     │    │    │     timestamp            │    │
+  ├─────────────────────┤    │    │     glasses              │    │
+  │ PK  id (auto++)     │    │    │     goal                 │    │
+  │ FK  journeyId ──────┼────┤    │     notes?               │    │
+  │     timestamp        │    │    └─────────────────────────┘    │
+  │     supplements[]    │    │                                   │
+  │     notes?           │    │    ┌─────────────────────────┐    │
+  └─────────────────────┘    │    │     symptomLogs         │    │
+                              │    ├─────────────────────────┤    │
+                              │    │ PK  id (auto++)         │    │
+                              └────│ FK  journeyId ──────────┼────┘
+                                   │     timestamp            │
+                                   │     symptoms[]           │
+                                   │     severity             │
+                                   │     notes?               │
+                                   └─────────────────────────┘
+
+  All tables indexed on: [id, journeyId]
+```
+
+#### PlannerState (React Context + Firestore)
+
+```
+┌───────────────────────────────────────────────────────────────┐
+│                     PlannerState                              │
+├───────────────────────────────────────────────────────────────┤
+│  Profile & Setup                                              │
+│  ├─ dueDate, lmp, t1End, t2End                               │
+│  ├─ pregnancyNum (first | subsequent)                         │
+│  ├─ workSit (employed | selfemployed | remote | ...)          │
+│  ├─ flags: { highRisk, multiples, ivf, mentalHealth }         │
+│  ├─ isSetup, hasStartedOnboarding                             │
+│  └─ activeJourneyId (links to Dexie FK)                       │
+│                                                               │
+│  Task Tracking                                                │
+│  ├─ checked: Record<taskId, boolean>                          │
+│  ├─ assigned: Record<taskId, string>                          │
+│  ├─ assigneeNotes: Record<taskId, string>                     │
+│  ├─ deletedTasks: Record<taskId, boolean>                     │
+│  └─ customTasks: CustomTask[]                                 │
+│                                                               │
+│  Financial                                                    │
+│  ├─ budgetEst: Record<itemId, number>                         │
+│  ├─ budgetAct: Record<itemId, number>                         │
+│  └─ customBudgetItems: BudgetItem[]                           │
+│                                                               │
+│  Decisions & Planning                                         │
+│  ├─ decisions: Record<decisionId, string>                     │
+│  ├─ decisionNotes: Record<decisionId, string>                 │
+│  ├─ birthPlan: Record<string, any>                            │
+│  ├─ hospitalBagItems: HospitalBagItem[]                       │
+│  ├─ notes: Record<sectionId, string>                          │
+│  └─ favoriteNames: BabyName[]                                 │
+│                                                               │
+│  UI Preferences                                               │
+│  ├─ critFilter: boolean                                       │
+│  ├─ isCalmModeActive: boolean                                 │
+│  └─ isDarkModeActive: boolean                                 │
+│                                                               │
+│  Sync                                                         │
+│  ├─ syncPermissions: { mode, excludedTaskIds, per-section }   │
+│  └─ isPartnerReadOnly: boolean                                │
+└───────────────────────────────────────────────────────────────┘
+```
+
+### State Management Flow
+
+```
+  ┌──────────────────────────────────────────────────────────┐
+  │                   PlannerProvider                         │
+  │                                                          │
+  │  ┌────────────────────┐    ┌──────────────────────────┐  │
+  │  │  useState(state)   │◄───│  Firebase onSnapshot()   │  │
+  │  │                    │    │  (load on auth change)    │  │
+  │  └────────┬───────────┘    └──────────────────────────┘  │
+  │           │                                              │
+  │  ┌────────▼───────────┐                                  │
+  │  │  updateState(patch) │                                  │
+  │  │  (merges partial)   │                                  │
+  │  └────────┬───────────┘                                  │
+  │           │                                              │
+  │           ├──────────────────┐                            │
+  │           │                  │                            │
+  │  ┌────────▼──────────┐  ┌───▼──────────────────────┐    │
+  │  │  setState(merged) │  │  saveToFirestore(merged)  │    │
+  │  │  (local render)   │  │  (debounced cloud save)   │    │
+  │  └───────────────────┘  └──────────────────────────┘    │
+  │                                                          │
+  │  useEffect: on state change → syncEngine.broadcastState()│
+  └──────────────────────────────────────────────────────────┘
+
+  Components access state via:
+    const { state, updateState } = usePlanner();
+```
+
+### Peer-to-Peer Sync Sequence Diagram
+
+```
+  Partner A (Host)                    Partner B (Joiner)
+  ══════════════                      ══════════════════
+       │                                    │
+       │  1. initHost()                     │
+       │  ───────────►                      │
+       │  PeerJS generates ID               │
+       │                                    │
+       │  2. Share Peer ID (QR/text)        │
+       │  ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─►│
+       │                                    │
+       │                3. connectToPartner(peerId)
+       │                ◄───────────────────│
+       │                                    │
+       │  4. WebRTC DataChannel opens       │
+       │  ◄─────────────────────────────────│
+       │                                    │
+       │  5. broadcastState(filteredState)   │
+       │  ─────────────────────────────────►│
+       │     { state: {...},                │
+       │       dexie: {kickSessions, ...},  │
+       │       config: {mode: 'edit'} }     │
+       │                                    │
+       │  6. onStateReceived()              │
+       │  ◄─────────────────────────────────│
+       │     Partner B sends their state    │
+       │                                    │
+       │  7. Continuous bidirectional sync   │
+       │  ◄────────────────────────────────►│
+       │     (filtered by syncPermissions)  │
+       │                                    │
+
+  Permission Controls:
+  ┌──────────────────────────────────────────────┐
+  │  syncPermissions: {                          │
+  │    mode: 'edit' | 'read',                    │
+  │    excludedTaskIds: string[],                │
+  │    dev, prep, medical, finance, ...: boolean │
+  │  }                                           │
+  └──────────────────────────────────────────────┘
+```
+
+### FHIR Integration Class Diagram
+
+```
+  ┌────────────────────────────────────────┐
+  │         fhirIntegration.ts             │
+  ├────────────────────────────────────────┤
+  │                                        │
+  │  «interface» BloomBloodPressure        │
+  │  «interface» BloomWeight               │
+  │  «interface» BloomFetalKick            │
+  │        │                               │
+  │        ▼  (mapped by)                  │
+  │  mapBloodPressureToFHIR() ──┐          │
+  │  mapWeightToFHIR() ─────────┤          │
+  │  mapFetalKickCountToFHIR() ─┘          │
+  │        │                               │
+  │        ▼  produces                     │
+  │  «interface» FHIRObservation (R4)      │
+  │  «interface» FHIRCodeableConcept       │
+  │  «interface» FHIRQuantity              │
+  │        │                               │
+  │        ▼  consumed by                  │
+  │  ┌──────────────────────────────────┐  │
+  │  │      EHRFHIRClient              │  │
+  │  ├──────────────────────────────────┤  │
+  │  │ - config: EHRClientConfig       │  │
+  │  │ - accessToken: string           │  │
+  │  │ - tokenExpiresAt: number        │  │
+  │  ├──────────────────────────────────┤  │
+  │  │ - authenticate(): Promise<str>  │  │
+  │  │ + postObservation(obs): boolean │  │
+  │  └──────────────────────────────────┘  │
+  │        │                               │
+  │        ▼  connects to                  │
+  │  EHR Server (Epic / Cerner)            │
+  │  via OAuth 2.0 Client Credentials      │
+  └────────────────────────────────────────┘
+```
+
+---
+
+## Project Structure
+
+```
+Project_Bloom/
+├── index.html                    # HTML entry point
+├── package.json                  # Dependencies & scripts
+├── vite.config.ts                # Vite + PWA + Tailwind config
+├── tsconfig.json                 # TypeScript config
+├── metadata.json                 # App metadata
+├── public/                       # Static assets (PWA icons)
+│   ├── pwa-192x192.svg
+│   └── pwa-512x512.svg
+└── src/
+    ├── index.css                 # Tailwind imports + custom theme
+    ├── main.tsx                  # React entry point
+    ├── App.tsx                   # Root component (routing by state)
+    ├── types.ts                  # TypeScript interfaces & types
+    ├── store.tsx                 # PlannerProvider (Context + Firestore)
+    ├── db.ts                     # Dexie.js database schema (BloomDB v3)
+    ├── firebase.ts               # Firebase init, Auth, Firestore helpers
+    ├── syncEngine.ts             # PeerJS WebRTC sync engine
+    ├── data.ts                   # Static task/decision/budget data
+    ├── weeklyData.ts             # Week-by-week pregnancy development data
+    ├── utils.ts                  # Date formatting utilities
+    ├── utils/
+    │   ├── fhirIntegration.ts    # FHIR R4 mappers + EHR OAuth client
+    │   ├── laborPrediction.ts    # Predictive labor readiness algorithm
+    │   └── pdfExport.ts          # jsPDF pregnancy plan export
+    ├── landing/
+    │   └── LandingPage.tsx       # Marketing landing page with auth
+    └── components/
+        ├── SetupScreen.tsx       # Multi-step onboarding wizard
+        ├── Dashboard.tsx         # Main dashboard shell
+        ├── Sidebar.tsx           # Navigation sidebar
+        ├── TaskCard.tsx          # Reusable task checklist card
+        ├── LegalPages.tsx        # Privacy Policy & Terms of Service
+        └── sections/             # Feature-specific pages
+            ├── PregnancyTracker.tsx
+            ├── Development.tsx
+            ├── Medical.tsx
+            ├── Preparation.tsx
+            ├── Financial.tsx
+            ├── Decisions.tsx
+            ├── Deadlines.tsx
+            ├── Postpartum.tsx
+            ├── SymptomLogger.tsx
+            ├── LaborReadiness.tsx
+            ├── FoodScanner.tsx
+            ├── AskBloom.tsx
+            ├── KickCounter.tsx
+            ├── ContractionTimer.tsx
+            ├── VitalsTracker.tsx
+            ├── MoodTracker.tsx
+            ├── HydrationTracker.tsx
+            ├── NutritionTracker.tsx
+            ├── HospitalBag.tsx
+            ├── BirthPlanBuilder.tsx
+            ├── GovernmentSchemes.tsx
+            ├── BabyNames.tsx
+            ├── PartnerSync.tsx
+            ├── Notes.tsx
+            └── Profile.tsx
+```
+
+---
+
+## Getting Started
+
+### Prerequisites
+
+- **Node.js** 18+ and **npm**
+- A **Firebase project** with Authentication (Google provider) and Firestore enabled
+- A **Google Gemini API key** for AI features
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/sukratkaushik/Project_Bloom.git
+cd Project_Bloom
+
+# Install dependencies
+npm install
+```
+
+### Configuration
+
+Create a `.env` file in the project root:
+
+```env
+# Google Gemini AI
+GEMINI_API_KEY=your_gemini_api_key
+
+# Firebase (configured in src/firebase.ts)
+# Update the firebaseConfig object with your project credentials
+
+# EHR Integration (optional)
+EHR_CLIENT_ID=your_ehr_client_id
+EHR_CLIENT_SECRET=your_ehr_client_secret
+EHR_TOKEN_ENDPOINT=https://authorization.epic.com/oauth2/token
+EHR_FHIR_BASE_URL=https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4
+```
+
+### Development
+
+```bash
+# Start the development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+The app runs on `http://localhost:5173` by default.
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `GEMINI_API_KEY` | Yes | Google Gemini API key for AI features (food scanner, chatbot, baby names) |
+| `EHR_CLIENT_ID` | No | OAuth 2.0 client ID for EHR FHIR integration |
+| `EHR_CLIENT_SECRET` | No | OAuth 2.0 client secret for EHR FHIR integration |
+| `EHR_TOKEN_ENDPOINT` | No | OAuth 2.0 token endpoint URL |
+| `EHR_FHIR_BASE_URL` | No | FHIR R4 base URL for the EHR server |
+
+Firebase configuration is hardcoded in `src/firebase.ts` and should be updated with your own project credentials.
+
+---
+
+## License
+
+This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for details.
