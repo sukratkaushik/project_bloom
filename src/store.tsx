@@ -58,6 +58,14 @@ const defaultState: PlannerState = {
   hasStartedOnboarding: false,
   weightUnit: 'kg',
   calendarStartDay: 'monday',
+  syncPermissions: {
+    kickcounter: true, contractions: true, vitals: true, mood: true, hydration: true, nutrition: true, symptoms: true,
+    askbloom: true, foodscanner: true, babynames: true,
+    dev: true, prep: true, finance: true, deadlines: true,
+    medical: true, schemes: true,
+    readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
+    notes: true,
+  },
 };
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -120,73 +128,101 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const toggleTask = (id: string) => {
-    setState((prev) => ({
-      ...prev,
-      checked: { ...prev.checked, [id]: !prev.checked[id] },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        checked: { ...prev.checked, [id]: !prev.checked[id] },
+      };
+    });
   };
 
   const toggleAssign = (id: string) => {
-    setState((prev) => ({
-      ...prev,
-      assigned: { ...prev.assigned, [id]: !prev.assigned[id] },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        assigned: { ...prev.assigned, [id]: !prev.assigned[id] },
+      };
+    });
   };
 
   const deleteTask = (id: string) => {
-    setState((prev) => ({
-      ...prev,
-      deletedTasks: { ...prev.deletedTasks, [id]: true },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        deletedTasks: { ...prev.deletedTasks, [id]: true },
+      };
+    });
   };
 
   const setAssigneeNote = (id: string, note: string) => {
-    setState((prev) => ({
-      ...prev,
-      assigneeNotes: { ...prev.assigneeNotes, [id]: note },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        assigneeNotes: { ...prev.assigneeNotes, [id]: note },
+      };
+    });
   };
 
   const setDecision = (id: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      decisions: { ...prev.decisions, [id]: value },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        decisions: { ...prev.decisions, [id]: value },
+      };
+    });
   };
 
   const setDecisionNote = (id: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      decisionNotes: { ...prev.decisionNotes, [id]: value },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        decisionNotes: { ...prev.decisionNotes, [id]: value },
+      };
+    });
   };
 
   const setBudgetEst = (id: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      budgetEst: { ...prev.budgetEst, [id]: value },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        budgetEst: { ...prev.budgetEst, [id]: value },
+      };
+    });
   };
 
   const setBudgetAct = (id: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      budgetAct: { ...prev.budgetAct, [id]: value },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        budgetAct: { ...prev.budgetAct, [id]: value },
+      };
+    });
   };
 
   const addCustomBudgetItem = (label: string) => {
     const id = 'custom_' + Date.now();
-    setState((prev) => ({
-      ...prev,
-      customBudgetItems: [...prev.customBudgetItems, { id, label }],
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        customBudgetItems: [...prev.customBudgetItems, { id, label }],
+      };
+    });
   };
 
   const addCustomTask = (section: string, text: string) => {
     const id = `custom_task_${Date.now()}`;
     const newTask = { id, text, crit: false };
     setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
       const sectionTasks = prev.customTasks[section] || [];
       return {
         ...prev,
@@ -199,10 +235,13 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const setNote = (id: string, value: string) => {
-    setState((prev) => ({
-      ...prev,
-      notes: { ...prev.notes, [id]: value },
-    }));
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        notes: { ...prev.notes, [id]: value },
+      };
+    });
   };
 
   const generatePlan = async (setupData: Partial<PlannerState>) => {

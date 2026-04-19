@@ -42,10 +42,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     );
   };
 
-  const getCount = (tasks: Task[]) => {
+  const getProgress = (tasks: Task[]) => {
     const filtered = filterTasks(tasks);
+    const total = filtered.length;
     const done = filtered.filter(t => state.checked[t.id]).length;
-    return `${done}/${filtered.length}`;
+    return { done, total };
   };
 
   const devTasks = [...DEV_TASKS.t1, ...DEV_TASKS.t2, ...DEV_TASKS.t3];
@@ -68,7 +69,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     }
   };
 
-  const NavItem = ({ id, icon, label, count, hideFavorite }: { id: string, icon: string, label: string, count?: string, hideFavorite?: boolean }) => {
+  const NavItem = ({ id, icon, label, progress, hideFavorite }: { id: string, icon: string, label: string, progress?: {done: number, total: number}, hideFavorite?: boolean }) => {
     const isActive = activePage === id;
     const isFav = state.favoritePages?.includes(id);
 
@@ -82,11 +83,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         >
           <span className="text-[16px] w-5 text-center">{icon}</span>
           {label}
-          {count && !state.isCalmModeActive && (
-            <span className={`ml-auto text-[11px] rounded-[10px] px-[7px] py-[1px] font-semibold
-              ${isActive ? 'bg-white text-sage' : 'bg-sage-pale text-sage'}`}>
-              {count}
-            </span>
+          {progress && !state.isCalmModeActive && progress.total > 0 && (
+            <div className="ml-auto w-12 flex flex-col gap-1 items-end">
+              <span className={`text-[10px] font-semibold leading-none
+                ${isActive ? 'text-sage-dark' : 'text-medium'}`}>
+                {progress.done}/{progress.total}
+              </span>
+              <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${isActive ? 'bg-sage-dark' : 'bg-sage'} transition-all duration-300`} 
+                  style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }} 
+                />
+              </div>
+            </div>
           )}
         </button>
         {!hideFavorite && (
@@ -114,17 +123,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'askbloom', icon: '✨', label: 'AskBloom AI' },
     { id: 'foodscanner', icon: '🍎', label: 'Food Scanner' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
-    { id: 'dev', icon: '🌱', label: 'Development', count: getCount(devTasks) },
-    { id: 'prep', icon: '📋', label: 'Preparation', count: getCount(prepTasks) },
-    { id: 'finance', icon: '💰', label: 'Financial', count: getCount(FIN_TASKS) },
-    { id: 'deadlines', icon: '📅', label: 'Deadlines', count: getCount(DEADLINE_TASKS) },
-    { id: 'medical', icon: '🏥', label: 'Medical', count: getCount(medTasks) },
+    { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },
+    { id: 'prep', icon: '📋', label: 'Preparation', progress: getProgress(prepTasks) },
+    { id: 'finance', icon: '💰', label: 'Financial', progress: getProgress(FIN_TASKS) },
+    { id: 'deadlines', icon: '📅', label: 'Deadlines', progress: getProgress(DEADLINE_TASKS) },
+    { id: 'medical', icon: '🏥', label: 'Medical', progress: getProgress(medTasks) },
     { id: 'schemes', icon: '🏛', label: 'Government Schemes' },
     { id: 'readiness', icon: '🔮', label: 'Labor Readiness' },
     { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag' },
     { id: 'birthplan', icon: '📜', label: 'Birth Plan Builder' },
     { id: 'decisions', icon: '✦', label: 'Decisions' },
     { id: 'postpartum', icon: '🍃', label: 'Early Parenthood' },
+    { id: 'partnersync', icon: '🤝', label: 'Partner Sync' },
     { id: 'notes', icon: '📝', label: 'Notes & Journal' },
   ];
 
@@ -142,7 +152,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             {state.favoritePages.map(pageId => {
               const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
               if (!item) return null;
-              return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} count={item.count} hideFavorite />;
+              return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
             })}
           </div>
         </div>
@@ -173,17 +183,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <SectionHeader id="tasks" label="Planning & Tasks" />
       {expandedSections['tasks'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="dev" icon="🌱" label="Development" count={getCount(devTasks)} />
-          <NavItem id="prep" icon="📋" label="Preparation" count={getCount(prepTasks)} />
-          <NavItem id="finance" icon="💰" label="Financial" count={getCount(FIN_TASKS)} />
-          <NavItem id="deadlines" icon="📅" label="Deadlines" count={getCount(DEADLINE_TASKS)} />
+          <NavItem id="dev" icon="🌱" label="Development" progress={getProgress(devTasks)} />
+          <NavItem id="prep" icon="📋" label="Preparation" progress={getProgress(prepTasks)} />
+          <NavItem id="finance" icon="💰" label="Financial" progress={getProgress(FIN_TASKS)} />
+          <NavItem id="deadlines" icon="📅" label="Deadlines" progress={getProgress(DEADLINE_TASKS)} />
         </div>
       )}
 
       <SectionHeader id="health" label="Medical & Govt" />
       {expandedSections['health'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="medical" icon="🏥" label="Medical" count={getCount(medTasks)} />
+          <NavItem id="medical" icon="🏥" label="Medical" progress={getProgress(medTasks)} />
           <NavItem id="schemes" icon="🏛" label="Government Schemes" />
         </div>
       )}
@@ -200,6 +210,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       )}
 
       <div className="h-px bg-border my-4" />
+      <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
       <NavItem id="notes" icon="📝" label="Notes & Journal" />
       <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
       <div className="h-px bg-border my-4" />
