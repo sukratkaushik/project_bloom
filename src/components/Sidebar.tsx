@@ -213,6 +213,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
       <NavItem id="notes" icon="📝" label="Notes & Journal" />
       <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
+
+      <button 
+        onClick={() => setActivePage('feedback')}
+        className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-sage hover:bg-sage-pale hover:text-sage flex items-center justify-between
+          ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage' : ''}`}
+      >
+        <span className="flex items-center gap-2">
+          <span className="text-[16px]">💬</span> Feedback & Support
+        </span>
+      </button>
+
+      {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
+        <button 
+          onClick={() => setActivePage('admin-feedbacks')}
+          className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
+            ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600' : ''}`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-[16px]">👑</span> Admin: Feedbacks
+          </span>
+        </button>
+      )}
+
       <div className="h-px bg-border my-4" />
 
       <button 

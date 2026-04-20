@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
+import { auth } from '../firebase';
+import { signOut } from 'firebase/auth';
 
 const CONSIDERATIONS = [
   { id: 'highRisk', label: '🏥 High-risk pregnancy' },
@@ -10,7 +12,7 @@ const CONSIDERATIONS = [
 ];
 
 export const SetupScreen: React.FC = () => {
-  const { generatePlan } = usePlanner();
+  const { generatePlan, resetPlan } = usePlanner();
   const [dueDate, setDueDate] = useState('');
   const [pregnancyNum, setPregnancyNum] = useState('first');
   const [workSit, setWorkSit] = useState('employed');
@@ -33,6 +35,19 @@ export const SetupScreen: React.FC = () => {
       partnerSit,
       flags,
     });
+    window.location.hash = '#dashboard';
+  };
+
+  const handleLogout = async () => {
+    try {
+      if (auth.currentUser) {
+        await signOut(auth);
+      }
+      resetPlan();
+      window.location.hash = '#';
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   return (
@@ -125,6 +140,13 @@ export const SetupScreen: React.FC = () => {
           className="w-full mt-8 p-[17px] bg-gradient-to-br from-sage to-sage-light text-white border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] cursor-pointer transition-all hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]"
         >
           ✦ Generate My Personalised Plan
+        </button>
+
+        <button 
+          onClick={handleLogout}
+          className="w-full mt-4 p-[15px] bg-transparent text-medium border border-border rounded-[12px] font-sans text-[14px] font-medium cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg hover:text-critical"
+        >
+          Not right now (Logout)
         </button>
       </div>
     </div>
