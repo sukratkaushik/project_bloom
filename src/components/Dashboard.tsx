@@ -33,7 +33,6 @@ import { Feedback } from './sections/Feedback';
 import { AdminFeedbacks } from './sections/AdminFeedbacks';
 
 import { Profile } from './sections/Profile';
-import { FloatingChatbot } from './FloatingChatbot';
 
 export const Dashboard: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -175,25 +174,6 @@ export const Dashboard: React.FC = () => {
           {activePage === 'profile' && <Profile />}
         </main>
       </div>
-
-      {/* Dashboard Footer */}
-      <footer className="mt-auto border-t border-border bg-cream py-8 px-6 no-print w-full z-10 relative">
-        <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-medium">
-          <div className="flex items-center gap-2">
-            <span className="font-serif text-[18px] text-sage italic tracking-wider">bloom</span>
-            <span className="opacity-60 hidden sm:inline">|</span>
-            <span className="opacity-80">Made with ❤️ for Indian mothers</span>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
-            <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
-            <a href="mailto:hello@bloompregnancy.in" className="hover:text-sage transition-colors">Support</a>
-          </div>
-        </div>
-      </footer>
-
-      <FloatingChatbot />
     </div>
   );
 };
