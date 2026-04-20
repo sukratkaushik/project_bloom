@@ -10,8 +10,6 @@ import {
 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
   const [gender, setGender] = useState('Neutral');
@@ -28,6 +26,7 @@ export const BabyNames: React.FC = () => {
     setError('');
     
     try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
       const prompt = `You are a helpful assistant for expecting parents in India. Generate 6 beautiful, meaningful baby names based on these preferences:
       - Gender: ${gender}
       - Origin/Style: ${origin}

@@ -26,6 +26,7 @@ type PlannerContextType = {
   toggleDarkMode: () => void;
   toggleFavoriteName: (name: string) => void;
   toggleFavoritePage: (id: string) => void;
+  claimDailyKnowledge: () => void;
 };
 
 const defaultState: PlannerState = {
@@ -66,6 +67,8 @@ const defaultState: PlannerState = {
     readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
     notes: true,
   },
+  dailyKnowledgeStreak: 0,
+  lastKnowledgeDropDate: null,
 };
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -330,6 +333,29 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  const claimDailyKnowledge = () => {
+    setState((prev) => {
+      const today = new Date().toISOString().split('T')[0];
+      if (prev.lastKnowledgeDropDate === today) return prev;
+
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      const yesterdayStr = yesterday.toISOString().split('T')[0];
+
+      let newStreak = (prev.dailyKnowledgeStreak || 0) + 1;
+      // If the last claim wasn't yesterday (and wasn't never), the streak is broken
+      if (prev.lastKnowledgeDropDate !== yesterdayStr && prev.lastKnowledgeDropDate !== null) {
+        newStreak = 1;
+      }
+
+      return {
+        ...prev,
+        dailyKnowledgeStreak: newStreak,
+        lastKnowledgeDropDate: today
+      };
+    });
+  };
+
   useEffect(() => {
     if (state.isCalmModeActive) {
       document.body.classList.add('calm-mode');
@@ -368,6 +394,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         toggleDarkMode,
         toggleFavoriteName,
         toggleFavoritePage,
+        claimDailyKnowledge,
       }}
     >
       {children}
