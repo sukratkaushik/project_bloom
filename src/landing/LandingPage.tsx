@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
-import { signInWithGoogle } from '../firebase';
+import { auth, signInWithGoogle } from '../firebase';
 import { 
   ShieldCheck, 
   WifiOff, 
@@ -20,15 +20,32 @@ import {
 } from 'lucide-react';
 
 export const LandingPage: React.FC = () => {
-  const { updateState } = usePlanner();
+  const { state, updateState } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
+  const [user, setUser] = useState(auth.currentUser);
+
+  React.useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
+    return () => unsubscribe();
+  }, []);
+
+  const isSetupComplete = state.isSetup;
 
   const handleStart = async () => {
     try {
+      if (isSetupComplete) {
+        window.location.hash = '#dashboard';
+        return;
+      }
+
       setIsLoggingIn(true);
       const user = await signInWithGoogle();
       if (user) {
-        updateState({ hasStartedOnboarding: true, isSetup: false });
+        if (!state.isSetup) {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+        } else {
+          window.location.hash = '#dashboard';
+        }
       }
     } catch (error: any) {
       // Don't log or show an alert if the user intentionally closed the popup
@@ -51,7 +68,7 @@ export const LandingPage: React.FC = () => {
         <div className="flex gap-4">
           <button onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
             {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            Continue with Google
+            {isSetupComplete ? "Open Dashboard" : "Continue with Google"}
           </button>
         </div>
       </nav>
@@ -84,7 +101,7 @@ export const LandingPage: React.FC = () => {
             className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70"
           >
             {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-            Get Started
+            {isSetupComplete ? "Go to Dashboard" : "Get Started"}
             {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
           </button>
           <a href="#how-it-works" className="font-medium text-medium px-6 py-4 hover:text-charcoal transition-colors">

@@ -15,6 +15,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 const AppContent: React.FC = () => {
   const { state, updateState } = usePlanner();
   const [isAuthReady, setIsAuthReady] = useState(false);
+  const [user, setUser] = useState(auth.currentUser);
   const [currentHash, setCurrentHash] = useState(window.location.hash);
 
   useEffect(() => {
@@ -24,9 +25,10 @@ const AppContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser);
       setIsAuthReady(true);
-      if (user && !state.hasStartedOnboarding && !state.isSetup) {
+      if (currentUser && !state.hasStartedOnboarding && !state.isSetup) {
         // If user is logged in but hasn't started onboarding, start it
         updateState({ hasStartedOnboarding: true });
       }
@@ -46,11 +48,17 @@ const AppContent: React.FC = () => {
     return <div className="min-h-screen bg-cream flex items-center justify-center font-serif text-sage text-2xl italic">Loading...</div>;
   }
 
-  if (state.isSetup) {
+  if (currentHash === '' || currentHash === '#landing') {
+    return <LandingPage />;
+  }
+
+  // If hash is #dashboard, and user is setup, show dashboard
+  if (currentHash === '#dashboard' && state.isSetup) {
     return <Dashboard />;
   }
 
-  if (state.hasStartedOnboarding || auth.currentUser) {
+  // If hash is #setup or user is going through onboarding flow
+  if (currentHash === '#setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
     return <SetupScreen />;
   }
 

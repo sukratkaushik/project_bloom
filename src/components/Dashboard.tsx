@@ -29,6 +29,8 @@ import { Task } from '../types';
 
 import { PregnancyTracker } from './sections/PregnancyTracker';
 import { PartnerSync } from './sections/PartnerSync';
+import { Feedback } from './sections/Feedback';
+import { AdminFeedbacks } from './sections/AdminFeedbacks';
 
 import { Profile } from './sections/Profile';
 
@@ -166,6 +168,8 @@ export const Dashboard: React.FC = () => {
           {activePage === 'schemes' && <GovernmentSchemes />}
           {activePage === 'babynames' && <BabyNames />}
           {activePage === 'partnersync' && <PartnerSync />}
+          {activePage === 'feedback' && <Feedback />}
+          {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
           {activePage === 'notes' && <Notes />}
           {activePage === 'profile' && <Profile />}
         </main>
