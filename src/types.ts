@@ -133,6 +133,4 @@ export type PlannerState = {
   createdAt?: number;
   syncPermissions?: SyncPermissions;
   isPartnerReadOnly?: boolean;
-  dailyKnowledgeStreak?: number;
-  lastKnowledgeDropDate?: string | null;
 };
