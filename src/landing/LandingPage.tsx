@@ -18,7 +18,8 @@ import {
   Lock,
   Loader2,
   Cloud,
-  Calendar
+  Calendar,
+  Sparkles
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 
@@ -52,7 +53,6 @@ export const LandingPage: React.FC = () => {
         }
       }
     } catch (error: any) {
-      // Don't log or show an alert if the user intentionally closed the popup
       if (error?.code !== 'auth/popup-closed-by-user') {
         console.error("Login failed", error);
         alert("Failed to log in with Google. Please try again.");
@@ -94,6 +94,11 @@ export const LandingPage: React.FC = () => {
       {/* Hero Section */}
       <section className="relative px-6 pt-16 pb-20 md:pt-32 md:pb-40 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
         
+        {/* Animated Background Blobs */}
+        <div className="absolute top-0 -left-12 md:-left-24 w-72 h-72 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob -z-10"></div>
+        <div className="absolute top-0 right-32 w-72 h-72 bg-blush-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-2000 -z-10"></div>
+        <div className="absolute -bottom-8 left-1/3 w-72 h-72 bg-gold-pale/40 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-4000 -z-10"></div>
+
         {/* Left Side: Text Content */}
         <div className="flex-1 text-left flex flex-col items-start w-full max-w-[600px] z-20">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-sage-light text-[12px] font-semibold text-sage mb-8 shadow-sm">
@@ -229,7 +234,7 @@ export const LandingPage: React.FC = () => {
             { icon: <Timer className="w-6 h-6 text-sage" />, title: "Contraction Timer", desc: "Time contractions and get the 5-1-1 hospital rule calculated automatically." },
             { icon: <Heart className="w-6 h-6 text-sage" />, title: "BP Tracker", desc: "Log blood pressure with preeclampsia threshold alerts. Free at PHCs." },
             { icon: <Bot className="w-6 h-6 text-gold" />, title: "AskBloom AI", desc: "Ask anything about your pregnancy at 2am. Grounded in WHO guidelines.", premium: true },
-            { icon: <Camera className="w-6 h-6 text-gold" />, title: "Food Scanner", desc: "Photograph any food — instant pregnancy safety check for Indian cuisine.", premium: true },
+            { icon: <Sparkles className="w-6 h-6 text-gold" />, title: "Name Boutique", desc: "AI-powered baby name generator based on style, origin, and cultural meanings.", premium: true },
             { icon: <Landmark className="w-6 h-6 text-sage" />, title: "Govt Schemes", desc: "JSY, PMMVY, PMSMA, JSSK — know your entitlements." }
           ].map((feature, i) => (
             <div key={i} className="bg-white border-[1.5px] border-border rounded-[16px] p-6 sm:p-8 hover:shadow-md transition-shadow group">

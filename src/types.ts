@@ -134,5 +134,5 @@ export type PlannerState = {
   syncPermissions?: SyncPermissions;
   isPartnerReadOnly?: boolean;
   dailyKnowledgeStreak?: number;
-  lastKnowledgeDropDate?: string | null;
+  lastKnowledgeDropDate?: string;
 };
