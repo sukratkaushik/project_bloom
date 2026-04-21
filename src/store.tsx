@@ -67,8 +67,6 @@ const defaultState: PlannerState = {
     readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
     notes: true,
   },
-  dailyKnowledgeStreak: 0,
-  lastKnowledgeDropDate: null,
 };
 
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
@@ -125,6 +123,30 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       });
     }
   }, [state]);
+
+  const claimDailyKnowledge = () => {
+    setState((prev) => {
+      const today = new Date().toISOString().split('T')[0];
+      if (prev.lastKnowledgeDropDate === today) return prev;
+      
+      let newStreak = (prev.dailyKnowledgeStreak || 0) + 1;
+      
+      if (prev.lastKnowledgeDropDate) {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toISOString().split('T')[0];
+        if (prev.lastKnowledgeDropDate !== yesterdayStr) {
+          newStreak = 1;
+        }
+      }
+      
+      return {
+        ...prev,
+        lastKnowledgeDropDate: today,
+        dailyKnowledgeStreak: newStreak
+      };
+    });
+  };
 
   const updateState = (updates: Partial<PlannerState>) => {
     setState((prev) => ({ ...prev, ...updates }));
@@ -330,29 +352,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         return { ...prev, favoritePages: current.filter(p => p !== id) };
       }
       return { ...prev, favoritePages: [...current, id] };
-    });
-  };
-
-  const claimDailyKnowledge = () => {
-    setState((prev) => {
-      const today = new Date().toISOString().split('T')[0];
-      if (prev.lastKnowledgeDropDate === today) return prev;
-
-      const yesterday = new Date();
-      yesterday.setDate(yesterday.getDate() - 1);
-      const yesterdayStr = yesterday.toISOString().split('T')[0];
-
-      let newStreak = (prev.dailyKnowledgeStreak || 0) + 1;
-      // If the last claim wasn't yesterday (and wasn't never), the streak is broken
-      if (prev.lastKnowledgeDropDate !== yesterdayStr && prev.lastKnowledgeDropDate !== null) {
-        newStreak = 1;
-      }
-
-      return {
-        ...prev,
-        dailyKnowledgeStreak: newStreak,
-        lastKnowledgeDropDate: today
-      };
     });
   };
 
