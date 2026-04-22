@@ -90,14 +90,6 @@ export const LandingPage: React.FC = () => {
       return;
     }
     
-    if (isRegistering) {
-      const age = parseInt(ageInput, 10);
-      if (isNaN(age) || age < 18) {
-        setOtpError('You must be at least 18 years old to create an account.');
-        return;
-      }
-    }
-
     setOtpError('');
     setOtpSent(true);
   };
