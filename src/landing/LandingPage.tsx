@@ -19,7 +19,9 @@ import {
   Loader2,
   Cloud,
   Calendar,
-  Sparkles
+  Sparkles,
+  Mail,
+  X
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 
@@ -62,17 +64,190 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const handleGuestStart = () => {
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const [ageInput, setAgeInput] = useState('');
+  const [genderInput, setGenderInput] = useState('');
+  const [partnerCodeInput, setPartnerCodeInput] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [otpInput, setOtpInput] = useState('');
+  const [otpSent, setOtpSent] = useState(false);
+  const [otpError, setOtpError] = useState('');
+
+  const handleEmailLoginClick = () => {
     if (isSetupComplete) {
       window.location.hash = '#dashboard';
       return;
     }
-    updateState({ hasStartedOnboarding: true, isSetup: false });
-    window.location.hash = '#setup';
+    setShowEmailModal(true);
+  };
+
+  const handleSendOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!emailInput.includes('@')) {
+      setOtpError('Please enter a valid email address.');
+      return;
+    }
+    
+    if (isRegistering) {
+      const age = parseInt(ageInput, 10);
+      if (isNaN(age) || age < 18) {
+        setOtpError('You must be at least 18 years old to create an account.');
+        return;
+      }
+    }
+
+    setOtpError('');
+    setOtpSent(true);
+  };
+
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Simulate OTP verification (accepting 123456 as standard mockup)
+    if (otpInput === '123456') {
+      setShowEmailModal(false);
+      updateState({ hasStartedOnboarding: true, isSetup: false });
+      window.location.hash = '#setup';
+    } else {
+      setOtpError('Invalid code. For this demo, please use 123456.');
+    }
   };
 
   return (
-    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
+      {/* Email OTP Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-[24px] p-8 w-full max-w-[400px] shadow-2xl relative animate-in zoom-in-95 duration-200">
+            <button 
+              onClick={() => { setShowEmailModal(false); setOtpSent(false); setOtpError(''); setOtpInput(''); setNameInput(''); setAgeInput(''); setGenderInput(''); setPartnerCodeInput(''); setIsRegistering(false); }}
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
+            >
+              <X size={20} />
+            </button>
+            
+            <div className="w-12 h-12 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-6 shadow-sm">
+              <Mail size={24} />
+            </div>
+            
+            <h2 className="font-serif text-[24px] font-bold text-charcoal mb-2">
+              {otpSent ? 'Check your email' : (isRegistering ? 'Create your account' : 'Welcome back')}
+            </h2>
+            <p className="text-[14px] text-medium mb-6 leading-relaxed">
+              {otpSent ? `We've sent a 6-digit security code to ${emailInput}.` : (isRegistering ? 'Enter your details to receive a secure one-time password (OTP).' : 'Enter your email address to log in securely with an OTP.')}
+            </p>
+            
+            {!otpSent ? (
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+                {isRegistering && (
+                  <>
+                    <div>
+                      <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Full Name</label>
+                      <input 
+                        type="text" 
+                        value={nameInput}
+                        onChange={(e) => setNameInput(e.target.value)}
+                        placeholder="Jane Doe"
+                        className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                        required
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Age</label>
+                        <input 
+                          type="number" 
+                          value={ageInput}
+                          onChange={(e) => setAgeInput(e.target.value)}
+                          placeholder="28"
+                          className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                          required={isRegistering}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Gender</label>
+                        <select 
+                          value={genderInput}
+                          onChange={(e) => setGenderInput(e.target.value)}
+                          className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow bg-white"
+                          required={isRegistering}
+                        >
+                          <option value="" disabled>Select</option>
+                          <option value="female">Female</option>
+                          <option value="male">Male</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-1 block">Partner Code <span className="text-medium normal-case font-normal">(Optional)</span></label>
+                      <p className="text-[11px] text-medium mb-2 leading-tight">Can be collected from the Partner Sync option of an existing user.</p>
+                      <input 
+                        type="text" 
+                        value={partnerCodeInput}
+                        onChange={(e) => setPartnerCodeInput(e.target.value)}
+                        placeholder="e.g. A1B2C3"
+                        className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow uppercase"
+                      />
+                    </div>
+                  </>
+                )}
+                <div>
+                  <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Email Address</label>
+                  <input 
+                    type="email" 
+                    value={emailInput}
+                    onChange={(e) => setEmailInput(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                    required
+                  />
+                </div>
+                {otpError && <div className="text-[13px] text-critical font-medium">{otpError}</div>}
+                <button type="submit" className="w-full bg-charcoal text-white rounded-[12px] font-bold py-3.5 hover:bg-gray-800 transition-colors mt-2 shadow-sm">
+                  Send OTP Code
+                </button>
+                <div className="text-center mt-2">
+                  <button 
+                    type="button" 
+                    onClick={() => setIsRegistering(!isRegistering)}
+                    className="text-[13px] text-medium font-semibold hover:text-charcoal transition-colors"
+                  >
+                    {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
+                <div>
+                  <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">6-Digit Code</label>
+                  <input 
+                    type="text" 
+                    maxLength={6}
+                    value={otpInput}
+                    onChange={(e) => setOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
+                    placeholder="123456"
+                    className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[20px] tracking-[8px] text-center font-bold focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                    required
+                  />
+                </div>
+                {otpError && <div className="text-[13px] text-critical font-medium text-center">{otpError}</div>}
+                <button type="submit" className="w-full bg-sage text-white rounded-[12px] font-bold py-3.5 hover:bg-sage-dark transition-colors mt-2 shadow-sm">
+                  Verify & Continue
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => { setOtpSent(false); setOtpError(''); setOtpInput(''); }}
+                  className="text-[13px] text-medium font-semibold hover:text-charcoal mt-2 transition-colors"
+                >
+                  Wrong email? Change address
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
       {/* Navigation */}
       <nav className="w-full max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
         <div className="font-serif text-[24px] font-medium text-sage italic tracking-wider">
@@ -80,9 +255,14 @@ export const LandingPage: React.FC = () => {
         </div>
         <div className="flex gap-4">
           {!isSetupComplete && (
-            <button onClick={handleGuestStart} className="bg-white border border-border text-charcoal rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-cream transition-colors shadow-sm">
-              Continue without login
-            </button>
+            <>
+              <button onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-cream transition-colors">
+                Log In
+              </button>
+              <button onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-white border border-border text-charcoal rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-cream transition-colors shadow-sm">
+                Sign Up
+              </button>
+            </>
           )}
           <button onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
             {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
@@ -130,10 +310,10 @@ export const LandingPage: React.FC = () => {
             </button>
             {!isSetupComplete && (
               <button
-                onClick={handleGuestStart}
+                onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }}
                 className="inline-flex items-center justify-center gap-2 bg-white border-[1.5px] border-sage text-sage rounded-full font-semibold px-8 py-4 text-[17px] hover:bg-sage-pale transition-colors w-full sm:w-auto"
               >
-                Continue without login
+                Sign Up with Email
               </button>
             )}
             <a href="#how-it-works" className="font-medium text-medium px-4 py-4 hover:text-charcoal transition-colors whitespace-nowrap">
