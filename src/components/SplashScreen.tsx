@@ -15,9 +15,9 @@ export const SplashScreen: React.FC = () => {
           <div className="absolute inset-0 border-[4px] border-blush/50 rounded-full animate-[spin_3s_linear_infinite_reverse]" style={{ borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%', transform: 'scale(0.85)' }}></div>
           <div className="absolute inset-0 border-[2px] border-gold/40 rounded-full animate-[spin_5s_linear_infinite]" style={{ borderRadius: '50% 50% 30% 70% / 70% 30% 70% 30%', transform: 'scale(0.7)' }}></div>
           
-          {/* Pulsing Core Icon/Text */}
-          <div className="font-serif text-[56px] font-medium text-sage italic tracking-wider animate-[pulse_1.5s_ease-in-out_infinite]">
-            b
+          {/* Pulsing Core Logo */}
+          <div className="animate-[pulse_1.5s_ease-in-out_infinite] z-20">
+            <img src="/logo.png" alt="Bloom Logo" className="w-36 h-36 md:w-48 md:h-48 object-contain drop-shadow-md" />
           </div>
         </div>
         
