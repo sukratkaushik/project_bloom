@@ -72,8 +72,9 @@ export const Dashboard: React.FC = () => {
         <div className="max-w-[1000px] mx-auto flex items-stretch min-h-[60px]">
           <button 
             onClick={() => updateState({ isSetup: false })}
-            className="font-serif text-[20px] font-medium text-sage flex items-center pr-6 border-r border-border mr-5 tracking-[2px] italic cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
+            className="font-serif text-[20px] font-medium text-sage flex items-center gap-3 pr-6 border-r border-border mr-5 tracking-[2px] italic cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
           >
+            <img src="/logo.png" alt="Bloom Logo" className="w-8 h-8 object-contain" />
             bloom
           </button>
           

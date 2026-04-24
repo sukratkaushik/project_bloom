@@ -242,7 +242,8 @@ export const LandingPage: React.FC = () => {
       )}
       {/* Navigation */}
       <nav className="w-full max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="font-serif text-[24px] font-medium text-sage italic tracking-wider">
+        <div className="font-serif text-[24px] font-medium text-sage italic tracking-wider flex items-center gap-3">
+          <img src="/logo.png" alt="Bloom Logo" className="w-10 h-10 object-contain" />
           bloom
         </div>
         <div className="flex gap-4">
@@ -321,12 +322,19 @@ export const LandingPage: React.FC = () => {
           
           {/* Outer Protective Rings (The Womb/Growth) */}
           <div className="absolute w-[320px] h-[320px] md:w-[450px] md:h-[450px] border-[2px] border-sage/30 rounded-full animate-[spin_25s_linear_infinite]" style={{ borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' }} />
-          <div className="absolute w-[300px] h-[300px] md:w-[420px] md:h-[420px] border-[3px] border-blush/40 rounded-full animate-[spin_20s_linear_infinite_reverse]" style={{ borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%' }} />
-          <div className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] border-[4px] border-gold/30 rounded-full animate-[spin_15s_linear_infinite]" style={{ borderRadius: '50% 50% 30% 70% / 70% 30% 70% 30%' }} />
           
-          {/* Inner Core (The Seed/Baby/Heartbeat) */}
-          <div className="relative w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-sage to-sage-light rounded-full shadow-[0_0_50px_rgba(107,146,120,0.8)] flex items-center justify-center animate-[pulse_2s_ease-in-out_infinite]">
-            <Heart className="w-10 h-10 md:w-14 md:h-14 text-white fill-white" style={{ animation: 'pulse 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite' }} />
+          {/* Middle Ring (Mama's embrace) */}
+          <div className="absolute w-[300px] h-[300px] md:w-[420px] md:h-[420px] border-[3px] border-blush/40 rounded-full animate-[spin_20s_linear_infinite_reverse]" style={{ borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%' }} />
+          
+          {/* Inner Orbit (Baby growing) */}
+          <div className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] border-[4px] border-gold/30 rounded-full animate-[spin_15s_linear_infinite]" style={{ borderRadius: '50% 50% 30% 70% / 70% 30% 70% 30%' }}>
+            {/* Small glowing orb representing the baby moving within */}
+            <div className="absolute top-[-2px] left-1/2 w-4 h-4 md:w-6 md:h-6 bg-gradient-to-r from-blush to-blush-light rounded-full -translate-x-1/2 shadow-[0_0_20px_rgba(242,166,166,0.9)] animate-pulse border-2 border-white/50 z-20" style={{ animationDuration: '2s' }}></div>
+          </div>
+          
+          {/* Inner Core (The Mama/Baby Connection) */}
+          <div className="relative w-36 h-36 md:w-56 md:h-56 bg-white/60 backdrop-blur-sm rounded-full shadow-[0_0_50px_rgba(242,166,166,0.2)] flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] border border-white/60">
+            <img src="/logo.png" alt="Bloom Logo" className="w-28 h-28 md:w-44 md:h-44 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
           </div>
 
           {/* Floating Accents */}
