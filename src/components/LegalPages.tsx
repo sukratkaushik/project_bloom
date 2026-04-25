@@ -35,7 +35,7 @@ export const PrivacyPolicy: React.FC = () => {
           </ul>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">3. How We Use Your Information</h2>
-          <p>We use your information solely to provide, maintain, and improve the Bloom app. We do not sell your personal or health data to third parties, advertisers, or data brokers.</p>
+          <p>We use your information to provide, maintain, and improve the Bloom app. Your data is used to train our LLM model, and is encrypted.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. Your Rights under Indian Law</h2>
           <p>In compliance with the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong>, you as a Data Principal have the following rights regarding your personal data:</p>

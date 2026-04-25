@@ -1,0 +1,34 @@
+# Bloom - The Privacy-First Pregnancy Companion for Indian Mothers
+
+## Introduction
+Bloom is a comprehensive, privacy-focused pregnancy tracking and planning application designed specifically for the unique needs of expecting mothers in India. It combines essential medical tracking with localized cultural context, government scheme guides, and AI-powered assistance.
+
+## Key Features & Tools
+- **Pregnancy Tracker:** Week-by-week size and milestone tracking.
+- **Medical Tools:** Kick Counter, Contraction Timer, Blood Pressure & Vitals Tracker.
+- **Wellness:** Mood Logger, Hydration Tracker, Nutrition & Symptom Tracking.
+- **Planning:** Birth Plan Builder, Hospital Bag Checklist.
+- **Localized Indian Context:** Comprehensive guides on Indian government maternity schemes (JSY, PMMVY, JSSK), Indian foods safety database, and localized emergency contacts (108, 112).
+- **AI Integration (Premium):** 
+  - **AskBloom:** An AI assistant providing WHO-grounded pregnancy advice.
+  - **AI Food Scanner:** An AI tool to photograph meals for instant safety ratings based on Indian diets.
+  - **AI Name Generator:** A cultural and personalized baby name suggestion engine.
+- **Partner Sync:** Securely link accounts with a partner to share the pregnancy journey in real-time.
+
+## Data & Privacy Policy
+Bloom is built with a "local-first" architecture. All sensitive health data is encrypted and stored securely. The application uses data to train its LLM models strictly for the purpose of improving its helpful, expert-level AI companion tools, without compromising user anonymity or security.
+
+## Pricing Plans
+Bloom operates on a transparent, 3-tier freemium model:
+1. **Free Forever (₹0/mo):** Includes core health trackers (Kick, BP, Contractions), Birth Plan Builder, Wellness Trackers, and Government Scheme guides.
+2. **Bloom Plus (₹99/mo):** Includes everything in Free, plus Partner Sync, PDF Export for health reports, and unlimited custom notes.
+3. **Bloom Premium (₹299/mo):** Includes everything in Plus, along with full access to the AI suite (AskBloom Assistant, AI Food Scanner, AI Name Generator).
+
+## Target Audience
+Expecting mothers residing in India, or anyone navigating a pregnancy looking for a beautifully designed, ad-free, secure application that understands Indian cultural contexts and diets.
+
+## Technical Context
+Built with React, Vite, and Tailwind CSS. The AI functionality is powered by the Google Gemini API (@google/genai).
+
+---
+*This file is intended to provide context to Large Language Models (LLMs) indexing or interacting with the Bloom application.*

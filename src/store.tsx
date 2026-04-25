@@ -38,6 +38,7 @@ const defaultState: PlannerState = {
   pregnancyNum: 'first',
   workSit: 'employed',
   partnerSit: 'partner',
+  dietPref: 'vegetarian',
   flags: {},
   checked: {},
   assigned: {},
@@ -305,6 +306,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         pregnancyNum: setupData.pregnancyNum || 'first',
         workSit: setupData.workSit || 'employed',
         partnerSit: setupData.partnerSit || 'partner',
+        dietPref: setupData.dietPref || 'vegetarian',
       });
     } catch (err) {
       console.error('Failed to initialize Dexie DB', err);

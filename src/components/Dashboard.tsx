@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { Sidebar } from './Sidebar';
@@ -38,6 +38,11 @@ import { FloatingChatbot } from './FloatingChatbot';
 export const Dashboard: React.FC = () => {
   const { state, updateState } = usePlanner();
   const [activePage, setActivePage] = useState('tracker');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [activePage]);
 
   // Calculate progress
   const allTasks: Task[] = [
@@ -68,22 +73,30 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-white border-b border-border px-6 sticky top-0 z-50 shadow-sm no-print">
-        <div className="max-w-[1000px] mx-auto flex items-stretch min-h-[60px]">
-          <button 
-            onClick={() => updateState({ isSetup: false })}
-            className="font-serif text-[20px] font-medium text-sage flex items-center gap-3 pr-6 border-r border-border mr-5 tracking-[2px] italic cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
-          >
-            <img src="/logo.png" alt="Bloom Logo" className="w-8 h-8 object-contain" />
-            bloom
-          </button>
+      <header className="bg-white border-b border-border px-4 md:px-6 sticky top-0 z-50 shadow-sm no-print">
+        <div className="max-w-[1000px] mx-auto flex items-center justify-between min-h-[60px]">
+          <div className="flex items-center">
+            <button 
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden mr-3 p-1.5 text-sage hover:bg-sage-pale rounded-md transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+            <button 
+              onClick={() => updateState({ isSetup: false })}
+              className="font-serif text-[20px] font-medium text-sage flex items-center gap-2 md:gap-3 md:pr-6 md:border-r border-border md:mr-5 tracking-[2px] italic cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
+            >
+              <img src="/logo.png" alt="Bloom Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
+              bloom
+            </button>
+          </div>
           
           {state.isCalmModeActive ? (
-            <div className="flex-1 flex items-center text-[14px] text-medium italic">
+            <div className="hidden md:flex flex-1 items-center text-[14px] text-medium italic">
               Taking it one day at a time.
             </div>
           ) : (
-            <div className="flex items-center gap-5 flex-wrap flex-1">
+            <div className="hidden md:flex items-center gap-5 flex-wrap flex-1">
               <div className="text-center">
                 <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
                 <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
@@ -103,7 +116,7 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-4 pl-5 border-l border-border">
+          <div className="hidden md:flex items-center gap-4 pl-5 border-l border-border">
             {!state.isCalmModeActive && (
               <div className="flex items-center gap-2.5">
                 <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
@@ -128,7 +141,7 @@ export const Dashboard: React.FC = () => {
                 ${state.isCalmModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
               title="Toggle Calm Mode (reduces visual clutter and hides timers)"
             >
-              {state.isCalmModeActive ? '🌿 Calm Mode On' : '🌿 Calm Mode'}
+              {state.isCalmModeActive ? '🌿 Calm Mode' : '🌿 Calm Mode'}
             </button>
             <button 
               onClick={() => updateState({ isDarkModeActive: !state.isDarkModeActive })}
@@ -136,44 +149,48 @@ export const Dashboard: React.FC = () => {
                 ${state.isDarkModeActive ? 'border-charcoal text-white bg-charcoal' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
               title="Toggle Dark Mode"
             >
-              {state.isDarkModeActive ? '🌙 Dark Mode On' : '☀️ Dark Mode'}
+              {state.isDarkModeActive ? '🌙 Dark Mode' : '☀️ Dark Mode'}
             </button>
           </div>
         </div>
       </header>
 
       {/* Body */}
-      <div className="max-w-[1000px] mx-auto px-6 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-8 items-start w-full">
-        <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
+      <div className="max-w-[1000px] mx-auto px-4 md:px-6 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full">
+        <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-auto`}>
+          <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
+        </div>
         
-        <main className="pt-8 print:pt-0">
-          {activePage === 'tracker' && <PregnancyTracker />}
-          {activePage === 'dev' && <Development filterTasks={filterTasks} />}
-          {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
-          {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
-          {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
-          {activePage === 'decisions' && <Decisions />}
-          {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
-          {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
-          {activePage === 'symptoms' && <SymptomLogger />}
-          {activePage === 'readiness' && <LaborReadiness />}
-          {activePage === 'foodscanner' && <FoodScanner />}
-          {activePage === 'askbloom' && <AskBloom />}
-          {activePage === 'kickcounter' && <KickCounter />}
-          {activePage === 'contractions' && <ContractionTimer />}
-          {activePage === 'vitals' && <VitalsTracker />}
-          {activePage === 'mood' && <MoodTracker />}
-          {activePage === 'hydration' && <HydrationTracker />}
-          {activePage === 'nutrition' && <NutritionTracker />}
-          {activePage === 'hospitalbag' && <HospitalBag />}
-          {activePage === 'birthplan' && <BirthPlanBuilder />}
-          {activePage === 'schemes' && <GovernmentSchemes />}
-          {activePage === 'babynames' && <BabyNames />}
-          {activePage === 'partnersync' && <PartnerSync />}
-          {activePage === 'feedback' && <Feedback />}
-          {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
-          {activePage === 'notes' && <Notes />}
-          {activePage === 'profile' && <Profile />}
+        <main className={`pt-6 md:pt-8 print:pt-0 ${isMobileMenuOpen ? 'hidden md:block' : 'block'}`}>
+          <div key={activePage} className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out fill-mode-both">
+            {activePage === 'tracker' && <PregnancyTracker />}
+            {activePage === 'dev' && <Development filterTasks={filterTasks} />}
+            {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
+            {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
+            {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
+            {activePage === 'decisions' && <Decisions />}
+            {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
+            {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
+            {activePage === 'symptoms' && <SymptomLogger />}
+            {activePage === 'readiness' && <LaborReadiness />}
+            {activePage === 'foodscanner' && <FoodScanner />}
+            {activePage === 'askbloom' && <AskBloom />}
+            {activePage === 'kickcounter' && <KickCounter />}
+            {activePage === 'contractions' && <ContractionTimer />}
+            {activePage === 'vitals' && <VitalsTracker />}
+            {activePage === 'mood' && <MoodTracker />}
+            {activePage === 'hydration' && <HydrationTracker />}
+            {activePage === 'nutrition' && <NutritionTracker />}
+            {activePage === 'hospitalbag' && <HospitalBag />}
+            {activePage === 'birthplan' && <BirthPlanBuilder />}
+            {activePage === 'schemes' && <GovernmentSchemes />}
+            {activePage === 'babynames' && <BabyNames />}
+            {activePage === 'partnersync' && <PartnerSync />}
+            {activePage === 'feedback' && <Feedback />}
+            {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
+            {activePage === 'notes' && <Notes />}
+            {activePage === 'profile' && <Profile />}
+          </div>
         </main>
       </div>
 
