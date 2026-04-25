@@ -26,7 +26,7 @@ import {
 import { FloatingChatbot } from '../components/FloatingChatbot';
 
 export const LandingPage: React.FC = () => {
-  const { state, updateState } = usePlanner();
+  const { state, updateState, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
 
@@ -47,6 +47,7 @@ export const LandingPage: React.FC = () => {
       setIsLoggingIn(true);
       const user = await signInWithGoogle();
       if (user) {
+        setShowEmailModal(false);
         if (!state.isSetup) {
           updateState({ hasStartedOnboarding: true, isSetup: false });
           window.location.hash = '#setup';
@@ -119,50 +120,50 @@ export const LandingPage: React.FC = () => {
               <X size={20} />
             </button>
             
-            <div className="w-12 h-12 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-6 shadow-sm">
-              <Mail size={24} />
+            <div className="w-10 h-10 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm">
+              <Mail size={20} />
             </div>
             
-            <h2 className="font-serif text-[24px] font-bold text-charcoal mb-2">
+            <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">
               {otpSent ? 'Check your email' : (isRegistering ? 'Create your account' : 'Welcome back')}
             </h2>
-            <p className="text-[14px] text-medium mb-6 leading-relaxed">
+            <p className="text-[13px] text-medium mb-5 leading-relaxed">
               {otpSent ? `We've sent a 6-digit security code to ${emailInput}.` : (isRegistering ? 'Enter your details to receive a secure one-time password (OTP).' : 'Enter your email address to log in securely with an OTP.')}
             </p>
             
             {!otpSent ? (
-              <form onSubmit={handleSendOtp} className="flex flex-col gap-4">
+              <form onSubmit={handleSendOtp} className="flex flex-col gap-3">
                 {isRegistering && (
                   <>
                     <div>
-                      <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Full Name</label>
+                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Full Name</label>
                       <input 
                         type="text" 
                         value={nameInput}
                         onChange={(e) => setNameInput(e.target.value)}
                         placeholder="Jane Doe"
-                        className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
                         required
                       />
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex gap-3">
                       <div className="flex-1">
-                        <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Age</label>
+                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Age</label>
                         <input 
                           type="number" 
                           value={ageInput}
                           onChange={(e) => setAgeInput(e.target.value)}
                           placeholder="28"
-                          className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                          className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
                           required={isRegistering}
                         />
                       </div>
                       <div className="flex-1">
-                        <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Gender</label>
+                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Gender</label>
                         <select 
                           value={genderInput}
                           onChange={(e) => setGenderInput(e.target.value)}
-                          className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow bg-white"
+                          className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow bg-white"
                           required={isRegistering}
                         >
                           <option value="" disabled>Select</option>
@@ -173,42 +174,60 @@ export const LandingPage: React.FC = () => {
                       </div>
                     </div>
                     <div>
-                      <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-1 block">Partner Code <span className="text-medium normal-case font-normal">(Optional)</span></label>
-                      <p className="text-[11px] text-medium mb-2 leading-tight">Can be collected from the Partner Sync option of an existing user.</p>
+                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end block">
+                        <span>Partner Code</span>
+                        <span className="text-[10px] text-medium normal-case font-normal">(Optional, find in Partner Sync)</span>
+                      </label>
                       <input 
                         type="text" 
                         value={partnerCodeInput}
                         onChange={(e) => setPartnerCodeInput(e.target.value)}
                         placeholder="e.g. A1B2C3"
-                        className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow uppercase"
+                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow uppercase"
                       />
                     </div>
                   </>
                 )}
                 <div>
-                  <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">Email Address</label>
+                  <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
                   <input 
                     type="email" 
                     value={emailInput}
                     onChange={(e) => setEmailInput(e.target.value)}
                     placeholder="you@example.com"
-                    className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[15px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                    className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
                     required
                   />
                 </div>
                 {otpError && <div className="text-[13px] text-critical font-medium">{otpError}</div>}
-                <button type="submit" className="w-full bg-charcoal text-white rounded-[12px] font-bold py-3.5 hover:bg-gray-800 transition-colors mt-2 shadow-sm">
+                <button type="submit" className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px]">
                   Send OTP Code
                 </button>
-                <div className="text-center mt-2">
+                <div className="text-center mt-1.5 mb-1.5">
                   <button 
                     type="button" 
                     onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-[13px] text-medium font-semibold hover:text-charcoal transition-colors"
+                    className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
                   >
                     {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
                   </button>
                 </div>
+
+                <div className="relative flex py-1 items-center">
+                  <div className="flex-grow border-t border-border"></div>
+                  <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
+                  <div className="flex-grow border-t border-border"></div>
+                </div>
+                
+                <button 
+                  type="button"
+                  onClick={handleStart} 
+                  disabled={isLoggingIn} 
+                  className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                >
+                  {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
+                  Continue with Google
+                </button>
               </form>
             ) : (
               <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
@@ -241,26 +260,35 @@ export const LandingPage: React.FC = () => {
         </div>
       )}
       {/* Navigation */}
-      <nav className="w-full max-w-[1200px] mx-auto px-6 py-4 flex items-center justify-between">
-        <div className="font-serif text-[24px] font-medium text-sage italic tracking-wider flex items-center gap-3">
-          <img src="/logo.png" alt="Bloom Logo" className="w-10 h-10 object-contain" />
+      <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
+        <div className="font-serif text-[20px] md:text-[24px] font-medium text-sage italic tracking-wider flex items-center gap-2 md:gap-3 shrink-0 mr-4">
+          <img src="/logo.png" alt="Bloom Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
           bloom
         </div>
-        <div className="flex gap-4">
-          {!isSetupComplete && (
+        <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
+          <button 
+            onClick={toggleDarkMode}
+            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2"
+            title="Toggle Dark Mode"
+            aria-label="Toggle Dark Mode"
+          >
+            <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
+          </button>
+          {!isSetupComplete ? (
             <>
-              <button onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-cream transition-colors">
+              <button onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
                 Log In
               </button>
-              <button onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-white border border-border text-charcoal rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-cream transition-colors shadow-sm">
+              <button onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
                 Sign Up
               </button>
             </>
+          ) : (
+            <button onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+              {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : null}
+              Open Dashboard
+            </button>
           )}
-          <button onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[14px] font-semibold px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center gap-2 disabled:opacity-50">
-            {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            {isSetupComplete ? "Open Dashboard" : "Continue with Google"}
-          </button>
         </div>
       </nav>
 
@@ -288,7 +316,7 @@ export const LandingPage: React.FC = () => {
           
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
             Track kicks, time contractions, monitor blood pressure, and get AI-powered answers. 
-            <strong className="text-charcoal font-semibold"> Securely backed up to the cloud.</strong> No ads. No data sharing.
+            <strong className="text-charcoal font-semibold"> Securely backed up to the cloud.</strong> No ads. Your data is used to train our LLM model, and is encrypted.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
@@ -351,7 +379,7 @@ export const LandingPage: React.FC = () => {
       <section className="border-y border-border bg-white px-6 py-6">
         <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4">
           {[
-            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "100% Private" },
+            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Data is Encrypted" },
             { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works Offline" },
             { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for India" },
             { icon: <Stethoscope className="w-5 h-5 text-sage" />, text: "Clinically Informed" },
@@ -432,25 +460,54 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* India Section */}
-      <section className="bg-sage text-white px-6 py-24">
-        <div className="max-w-[1200px] mx-auto text-center">
-          <h2 className="font-serif text-4xl mb-16">Made for Indian mothers 🇮🇳</h2>
+      <section className="relative bg-sage text-white px-6 py-24 md:py-32 overflow-hidden">
+        {/* Decorative Background Elements */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-white/10 blur-[120px]"></div>
+          <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-charcoal/10 blur-[120px]"></div>
+        </div>
+
+        <div className="max-w-[1200px] mx-auto relative z-10">
+          <div className="text-center mb-16 md:mb-20">
+            <span className="bg-white/20 text-white border border-white/30 px-4 py-1.5 rounded-full text-[13px] font-bold tracking-[2px] uppercase mb-6 inline-block shadow-sm backdrop-blur-md">
+              Localized Care
+            </span>
+            <h2 className="font-serif text-4xl md:text-5xl mb-6">Made for Indian mothers 🇮🇳</h2>
+            <p className="text-white/90 text-[16px] md:text-[18px] max-w-2xl mx-auto font-medium">
+              Because a pregnancy in India means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.
+            </p>
+          </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            <div className="bg-white/10 p-8 rounded-[20px] backdrop-blur-sm border border-white/20">
-              <div className="text-3xl mb-4">🥗</div>
+            {/* Card 1 */}
+            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
+              <div className="w-16 h-16 bg-sage-pale text-sage rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
+                🥗
+              </div>
               <h3 className="font-bold text-[20px] mb-3">Indian Foods Database</h3>
-              <p className="text-white/90 text-[15px] leading-relaxed">Know exactly what's safe. Covers dal, ragi, paneer, amla, and flags risks like raw papaya or street food.</p>
+              <p className="text-medium text-[15px] leading-relaxed">
+                Know exactly what's safe. Comprehensive coverage for dal, ragi, paneer, amla, and accurate risk flags for items like raw papaya or street food.
+              </p>
             </div>
-            <div className="bg-white/10 p-8 rounded-[20px] backdrop-blur-sm border border-white/20">
-              <div className="text-3xl mb-4">🏥</div>
+            {/* Card 2 */}
+            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
+              <div className="w-16 h-16 bg-blush-pale text-blush rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm -rotate-3 group-hover:rotate-0">
+                🏥
+              </div>
               <h3 className="font-bold text-[20px] mb-3">Govt Scheme Guide</h3>
-              <p className="text-white/90 text-[15px] leading-relaxed">Don't miss out on free benefits. Clear guides for JSY, PMMVY (₹5,000 cash), and JSSK (free delivery).</p>
+              <p className="text-medium text-[15px] leading-relaxed">
+                Don't miss out on free benefits. Clear, actionable guides for JSY, PMMVY (₹5,000 cash assistance), and JSSK (free hospital delivery).
+              </p>
             </div>
-            <div className="bg-white/10 p-8 rounded-[20px] backdrop-blur-sm border border-white/20">
-              <div className="text-3xl mb-4">📞</div>
+            {/* Card 3 */}
+            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
+              <div className="w-16 h-16 bg-gold-pale text-gold rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
+                📞
+              </div>
               <h3 className="font-bold text-[20px] mb-3">Emergency Ready</h3>
-              <p className="text-white/90 text-[15px] leading-relaxed">108 Ambulance, 112 National Emergency, and iCall psychosocial support — always one tap away.</p>
+              <p className="text-medium text-[15px] leading-relaxed">
+                Critical helplines at your fingertips. 108 Ambulance, 112 National Emergency, and iCall psychosocial support — always one tap away.
+              </p>
             </div>
           </div>
         </div>
@@ -463,57 +520,87 @@ export const LandingPage: React.FC = () => {
           <p className="text-medium text-[16px] max-w-2xl mx-auto">Core health features are always free. Upgrade for AI-powered peace of mind.</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[900px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1100px] mx-auto items-stretch">
           {/* Free Tier */}
-          <div className="bg-white border-[1.5px] border-border rounded-[24px] p-8 sm:p-10 flex flex-col hover:shadow-md transition-shadow">
-            <h3 className="font-bold text-[24px] text-charcoal mb-2">Free Forever</h3>
-            <div className="font-serif text-[40px] text-charcoal mb-6">₹0 <span className="text-[16px] text-medium font-sans font-normal">/ month</span></div>
-            <p className="text-[14px] text-medium mb-8">Everything you need for a healthy pregnancy journey.</p>
+          <div className="bg-white border-[1.5px] border-border rounded-[24px] p-8 flex flex-col hover:shadow-md transition-shadow">
+            <h3 className="font-bold text-[22px] text-charcoal mb-2">Free Forever</h3>
+            <div className="font-serif text-[36px] text-charcoal mb-6">₹0 <span className="text-[14px] text-medium font-sans font-normal">/ month</span></div>
+            <p className="text-[13px] text-medium mb-8 min-h-[40px]">Everything you need for a healthy pregnancy journey.</p>
             
             <ul className="space-y-4 mb-8 flex-1">
-              {['Kick Counter & BP Tracker', 'Contraction Timer', 'Birth Plan Builder', 'Mood & Hydration Trackers', 'Hospital Bag Checklist', 'Govt Schemes Guide'].map((item, i) => (
-                <li key={i} className="flex items-center gap-3 text-[15px] text-charcoal font-medium">
-                  <CheckCircle2 className="w-5 h-5 text-sage shrink-0" /> {item}
+              {['Kick Counter & BP Tracker', 'Contraction Timer', 'Birth Plan Builder', 'Mood & Hydration Trackers', 'Hospital Bag & Govt Schemes'].map((item, i) => (
+                <li key={i} className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
+                  <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>{item}</span>
                 </li>
               ))}
             </ul>
             
-            <button onClick={handleStart} className="w-full py-4 rounded-full border-[1.5px] border-sage text-sage font-bold text-[16px] hover:bg-sage-pale transition-colors">
+            <button onClick={handleStart} className="w-full py-3.5 rounded-full border-[1.5px] border-sage text-sage font-bold text-[15px] hover:bg-sage-pale transition-colors mt-auto">
               Get Started Free
             </button>
           </div>
 
-          {/* Premium Tier */}
-          <div className="bg-charcoal border-[2px] border-gold rounded-[24px] p-8 sm:p-10 flex flex-col relative transform md:-translate-y-4 shadow-xl">
-            <div className="absolute top-0 right-8 -translate-y-1/2 bg-gold text-white text-[12px] uppercase font-bold tracking-wider px-4 py-1 rounded-full shadow-lg">
-              Most Popular
+          {/* Plus Tier */}
+          <div className="bg-white border-[2px] border-sage rounded-[24px] p-8 flex flex-col relative shadow-lg">
+            <div className="absolute top-0 right-6 -translate-y-1/2 bg-sage text-white text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full shadow-sm">
+              Recommended
             </div>
-            
-            <h3 className="font-bold text-[24px] text-white mb-2 flex items-center gap-2">Bloom Premium <Bot className="w-6 h-6 text-gold" /></h3>
-            <div className="font-serif text-[40px] text-white mb-6">₹299 <span className="text-[16px] text-light font-sans font-normal">/ month</span></div>
-            <p className="text-[14px] text-light mb-8">24/7 AI-powered support tailored for Indian clinics.</p>
+            <h3 className="font-bold text-[22px] text-charcoal mb-2">Bloom Plus</h3>
+            <div className="font-serif text-[36px] text-charcoal mb-6">₹99 <span className="text-[14px] text-medium font-sans font-normal">/ month</span></div>
+            <p className="text-[13px] text-medium mb-8 min-h-[40px]">Enhanced tools to coordinate with your partner and doctor.</p>
             
             <ul className="space-y-4 mb-8 flex-1">
-              <li className="flex items-center gap-3 text-[15px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0" /> Everything in Free, plus:
+              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
+                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>Everything in Free, plus:</span>
               </li>
-              <li className="flex items-start gap-3 text-[15px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
-                <span><strong className="text-gold">AskBloom AI Assistant:</strong> Get instant, WHO-grounded answers to any pregnancy question.</span>
+              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
+                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span><strong className="text-sage-dark">Partner Sync:</strong> Share your journey in real-time.</span>
               </li>
-              <li className="flex items-start gap-3 text-[15px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
-                <span><strong className="text-gold">AI Food Scanner:</strong> Photograph any meal for an instant safety rating.</span>
+              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
+                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span><strong className="text-sage-dark">PDF Export:</strong> Generate detailed health reports.</span>
               </li>
-              <li className="flex items-center gap-3 text-[15px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0" /> Priority new features
+              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
+                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>Unlimited Custom Notes</span>
               </li>
             </ul>
             
-            <button onClick={handleStart} className="w-full py-4 rounded-full bg-gold text-charcoal font-bold text-[16px] hover:bg-yellow-400 transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2">
-              Start 7-Day Free Trial <ArrowRight className="w-5 h-5" />
+            <button onClick={handleStart} className="w-full py-3.5 rounded-full bg-sage text-white font-bold text-[15px] hover:bg-sage-dark transition-colors shadow-sm mt-auto">
+              Choose Plus
             </button>
-            <p className="text-center text-[12px] text-light mt-4 opacity-70">Cancel anytime. Billed annually at ₹1,999/yr.</p>
+          </div>
+
+          {/* Premium Tier */}
+          <div className="bg-charcoal border-[2px] border-gold rounded-[24px] p-8 flex flex-col relative transform lg:-translate-y-4 shadow-xl">
+            <div className="absolute top-0 right-6 -translate-y-1/2 bg-gold text-white text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full shadow-lg">
+              Full AI Access
+            </div>
+            
+            <h3 className="font-bold text-[22px] text-white mb-2 flex items-center gap-2">Bloom Premium <Bot className="w-5 h-5 text-gold" /></h3>
+            <div className="font-serif text-[36px] text-white mb-6">₹299 <span className="text-[14px] text-light font-sans font-normal">/ month</span></div>
+            <p className="text-[13px] text-light mb-8 min-h-[40px]">24/7 AI-powered support tailored for Indian clinics.</p>
+            
+            <ul className="space-y-4 mb-8 flex-1">
+              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
+                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> <span>Everything in Plus, plus:</span>
+              </li>
+              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
+                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
+                <span><strong className="text-gold">AskBloom AI:</strong> Instant answers to pregnancy questions.</span>
+              </li>
+              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
+                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
+                <span><strong className="text-gold">AI Food Scanner:</strong> Instant safety rating.</span>
+              </li>
+              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
+                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
+                <span><strong className="text-gold">AI Name Generator:</strong> Cultural name suggestions.</span>
+              </li>
+            </ul>
+            
+            <button onClick={handleStart} className="w-full py-3.5 rounded-full bg-gold text-charcoal font-bold text-[15px] hover:bg-yellow-400 transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2 mt-auto">
+              Start 7-Day Trial <ArrowRight className="w-4 h-4" />
+            </button>
+            <p className="text-center text-[11px] text-light mt-3 opacity-70">Cancel anytime. Billed annually.</p>
           </div>
         </div>
       </section>
@@ -527,7 +614,7 @@ export const LandingPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { review: "Finally an app that doesn't sell my pregnancy data to advertisers. The privacy first approach is a relief.", author: "Priya M.", loc: "Mumbai" },
+              { review: "The app's AI has been an incredible companion. It feels like having an expert right in my pocket during this amazing journey.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
               { review: "AskBloom answered my 2am panic questions much better than Googling. Highly recommend the premium plan.", author: "Anjali S.", loc: "Delhi" }
             ].map((t, i) => (
@@ -568,7 +655,7 @@ export const LandingPage: React.FC = () => {
         
         <div className="flex justify-center items-center gap-2 text-[13px] text-light/70">
           <Lock className="w-4 h-4" />
-          Your data never leaves your device.
+          Your data is used to train our LLM model, and is encrypted.
         </div>
       </footer>
 

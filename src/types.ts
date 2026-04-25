@@ -102,6 +102,7 @@ export type PlannerState = {
   pregnancyNum: string;
   workSit: string;
   partnerSit: string;
+  dietPref: string;
   flags: Record<string, boolean>;
   checked: Record<string, boolean>;
   assigned: Record<string, boolean>;

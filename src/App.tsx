@@ -45,33 +45,25 @@ const AppContent: React.FC = () => {
     return () => unsubscribe();
   }, [state.hasStartedOnboarding, state.isSetup, updateState]);
 
+  let content = <LandingPage />;
+
   if (currentHash === '#privacy') {
-    return <PrivacyPolicy />;
+    content = <PrivacyPolicy />;
+  } else if (currentHash === '#terms') {
+    content = <TermsOfService />;
+  } else if (!isAuthReady || !splashFinished) {
+    content = <SplashScreen />;
+  } else if (currentHash === '#dashboard' && state.isSetup) {
+    content = <Dashboard />;
+  } else if (currentHash === '#setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
+    content = <SetupScreen />;
   }
 
-  if (currentHash === '#terms') {
-    return <TermsOfService />;
-  }
-
-  if (!isAuthReady || !splashFinished) {
-    return <SplashScreen />;
-  }
-
-  if (currentHash === '' || currentHash === '#landing') {
-    return <LandingPage />;
-  }
-
-  // If hash is #dashboard, and user is setup, show dashboard
-  if (currentHash === '#dashboard' && state.isSetup) {
-    return <Dashboard />;
-  }
-
-  // If hash is #setup or user is going through onboarding flow
-  if (currentHash === '#setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
-    return <SetupScreen />;
-  }
-
-  return <LandingPage />;
+  return (
+    <div key={currentHash + (isAuthReady ? '1' : '0') + (splashFinished ? '1' : '0')} className="animate-in fade-in duration-700 ease-in-out h-full w-full">
+      {content}
+    </div>
+  );
 };
 
 export default function App() {
