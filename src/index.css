@@ -60,6 +60,55 @@
   color: var(--color-charcoal);
 }
 
+/* Calm Mode Accessibility & Aesthetic Overrides */
+body.calm-mode {
+  /* A beautiful, spa-like, ultra-soothing palette */
+  --color-sage: #8b9d90;
+  --color-sage-light: #b9c7bc;
+  --color-sage-pale: #f4f7f5;
+  --color-blush: #bda8a5;
+  --color-blush-light: #dbcdcb;
+  --color-blush-pale: #fcfafa;
+  --color-gold: #b5aa99;
+  --color-gold-pale: #fcfbfa;
+  --color-cream: #fbfbf9;
+  --color-charcoal: #63615f;
+  --color-border: #f0efed;
+  --color-critical: #b59f9f;
+  --color-critical-bg: #fdfaf9;
+  --color-optional: #8b9d90;
+  --color-optional-bg: #f4f7f5;
+
+  /* Dyslexia-friendly typography */
+  --font-serif: 'Lexend', sans-serif;
+  --font-sans: 'Lexend', sans-serif;
+  
+  background-color: var(--color-cream);
+  color: var(--color-charcoal);
+  line-height: 1.85;
+  letter-spacing: 0.03em;
+}
+
+/* Gentle, floating component feel */
+body.calm-mode * {
+  --tw-shadow: 0 10px 40px rgba(0,0,0,0.02) !important;
+  --tw-shadow-colored: 0 10px 40px var(--tw-shadow-color) !important;
+}
+
+/* Make all entry animations drift in slowly and peacefully */
+body.calm-mode .animate-in {
+  animation-duration: 1.2s !important;
+  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1) !important;
+}
+
+/* Prevent harsh color changes on hover, create a soothing transition */
+body.calm-mode .transition-colors, 
+body.calm-mode .transition-all,
+body.calm-mode .transition-opacity {
+  transition-duration: 0.6s !important;
+  transition-timing-function: ease-in-out !important;
+}
+
 /* Page Transition Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
