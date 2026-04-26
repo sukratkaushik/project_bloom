@@ -3,23 +3,23 @@
 
 @theme {
   --color-white: #ffffff;
-  --color-border: #e4e0d8;
-  --color-medium: #7a7a7a;
-  --color-light: #a3a3a3;
-  --color-sage: #6b9278;
-  --color-sage-light: #9ab8a4;
-  --color-sage-pale: #e5eeea;
-  --color-blush: #c8857a;
-  --color-blush-light: #e0ada5;
-  --color-blush-pale: #f9eeec;
-  --color-gold: #b8965a;
-  --color-gold-pale: #f5edde;
-  --color-cream: #fdf8f1;
-  --color-charcoal: #28282a;
-  --color-critical: #b5342a;
-  --color-critical-bg: #fdf0ee;
-  --color-optional: #6b9278;
-  --color-optional-bg: #e5eeea;
+  --color-border: #e2e4e6;
+  --color-medium: #78858f;
+  --color-light: #a4b0b8;
+  --color-sage: #5a8b95;
+  --color-sage-light: #8ebbc4;
+  --color-sage-pale: #eef4f5;
+  --color-blush: #c27e73;
+  --color-blush-light: #e0aba3;
+  --color-blush-pale: #faefed;
+  --color-gold: #c8a366;
+  --color-gold-pale: #fcf6eb;
+  --color-cream: #f8f6f4;
+  --color-charcoal: #1e2a32;
+  --color-critical: #c04b4b;
+  --color-critical-bg: #faefef;
+  --color-optional: #5a8b95;
+  --color-optional-bg: #eef4f5;
   
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'DM Sans', sans-serif;
@@ -37,24 +37,24 @@
 
 /* Dark Mode Overrides */
 .dark {
-  --color-white: #28282a;
-  --color-border: #3f3f46;
-  --color-medium: #a1a1aa;
-  --color-light: #71717a;
-  --color-sage: #8bb89b;
-  --color-sage-light: #6b9278;
-  --color-sage-pale: #2a3a31;
-  --color-blush: #e0ada5;
-  --color-blush-light: #c8857a;
-  --color-blush-pale: #3a2522;
-  --color-gold: #d4b175;
-  --color-gold-pale: #3d311d;
-  --color-cream: #1a1a1c;
-  --color-charcoal: #e5e5e5;
+  --color-white: #1e2a32;
+  --color-border: #3b4952;
+  --color-medium: #8d9ba6;
+  --color-light: #5f6e78;
+  --color-sage: #8ebbc4;
+  --color-sage-light: #5a8b95;
+  --color-sage-pale: #25393f;
+  --color-blush: #e0aba3;
+  --color-blush-light: #c27e73;
+  --color-blush-pale: #3d2522;
+  --color-gold: #e2c496;
+  --color-gold-pale: #3d301b;
+  --color-cream: #141d24;
+  --color-charcoal: #e2e8ec;
   --color-critical: #e57373;
-  --color-critical-bg: #3d1b1a;
-  --color-optional: #8bb89b;
-  --color-optional-bg: #2a3a31;
+  --color-critical-bg: #401b1b;
+  --color-optional: #8ebbc4;
+  --color-optional-bg: #25393f;
   
   background-color: var(--color-cream);
   color: var(--color-charcoal);

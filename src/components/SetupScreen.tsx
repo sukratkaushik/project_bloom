@@ -117,7 +117,7 @@ const CONSIDERATIONS = [
 ];
 
 export const SetupScreen: React.FC = () => {
-  const { generatePlan, resetPlan } = usePlanner();
+  const { generatePlan, resetPlan, state, toggleDarkMode } = usePlanner();
   const [dueDate, setDueDate] = useState('');
   const [pregnancyNum, setPregnancyNum] = useState('first');
   const [workSit, setWorkSit] = useState('employed');
@@ -161,7 +161,18 @@ export const SetupScreen: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-gold-pale via-sage-pale to-blush-pale flex flex-col items-center justify-center p-5 pb-16 relative overflow-hidden">
       <div className="absolute -top-[100px] -right-[100px] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,var(--color-blush)_0%,transparent_65%)] opacity-20 pointer-events-none" />
       <div className="absolute -bottom-[80px] -left-[80px] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,var(--color-sage)_0%,transparent_65%)] opacity-20 pointer-events-none" />
-      
+
+      <div className="absolute top-6 right-6 z-20">
+        <button
+          onClick={toggleDarkMode}
+          className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center"
+          title="Toggle Dark Mode"
+          aria-label="Toggle Dark Mode"
+        >
+          <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
+        </button>
+      </div>
+
       <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-4 z-10">Bloom</div>
       <h1 className="font-serif text-[clamp(38px,7vw,68px)] font-light leading-[1.08] text-center text-charcoal mb-3.5 z-10">
         Your <em className="italic text-blush">Pregnancy</em><br />Planning Companion
@@ -222,11 +233,12 @@ export const SetupScreen: React.FC = () => {
 
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Dietary preference</span>
-            <select 
+            <select
               value={dietPref}
               onChange={(e) => setDietPref(e.target.value)}
               className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
             >
+              <option value="nopreference">No Preference</option>
               <option value="vegetarian">Vegetarian</option>
               <option value="nonveg">Non-Vegetarian</option>
               <option value="vegan">Vegan</option>

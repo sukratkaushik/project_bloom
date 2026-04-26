@@ -315,8 +315,8 @@ export const LandingPage: React.FC = () => {
           </h1>
           
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
-            Track kicks, time contractions, monitor blood pressure, and get AI-powered answers. 
-            <strong className="text-charcoal font-semibold"> Securely backed up to the cloud.</strong> No ads. Your data is used to train our LLM model, and is encrypted.
+            Track kicks, time contractions, monitor blood pressure, and get AI-powered answers.
+            <strong className="text-charcoal font-semibold"> Securely backed up to the cloud.</strong>
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
