@@ -248,7 +248,7 @@ Always include the standard medical disclaimer in the app footer and inside all 
 
 Below is the official brand logo sheet showing the primary logo and all approved variations.
 
-*(Refer to the attached `logo-options.png` or `bloom-brand-reference.png` for visual representations of the variations: Full Logo, App Icon, and Monochrome.)*
+*(Refer to the newly uploaded logo image in the `logos` directory for the visual representation of the mark.)*
 
 ---
 
