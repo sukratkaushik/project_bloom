@@ -52,7 +52,6 @@ const defaultState: PlannerState = {
   customTasks: {},
   notes: {},
   critFilter: false,
-  // isCalmModeActive is deprecated but kept for backwards compatibility parsing
   isCalmModeActive: false,
   isDarkModeActive: false,
   isPremium: false,
@@ -76,7 +75,7 @@ const getInitialState = (): PlannerState => {
     const savedUi = localStorage.getItem('bloom_planner_ui');
     if (savedUi) {
       const parsed = JSON.parse(savedUi);
-      return { ...defaultState, isCalmModeActive: false, isDarkModeActive: parsed.isDarkModeActive || false };
+      return { ...defaultState, isCalmModeActive: parsed.isCalmModeActive || false, isDarkModeActive: parsed.isDarkModeActive || false };
     }
   } catch (e) {
     // Ignore error
@@ -375,7 +374,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const toggleCalmMode = () => {
-    // Deprecated
+    setState((prev) => ({ ...prev, isCalmModeActive: !prev.isCalmModeActive }));
   };
 
   const toggleDarkMode = () => {
@@ -401,6 +400,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return { ...prev, favoritePages: [...current, id] };
     });
   };
+
+  useEffect(() => {
+    if (state.isCalmModeActive) {
+      document.body.classList.add('calm-mode');
+    } else {
+      document.body.classList.remove('calm-mode');
+    }
+  }, [state.isCalmModeActive]);
 
   useEffect(() => {
     if (state.isDarkModeActive) {

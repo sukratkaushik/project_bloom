@@ -91,41 +91,57 @@ export const Dashboard: React.FC = () => {
             </button>
           </div>
           
-          <div className="hidden md:flex items-center gap-5 flex-wrap flex-1">
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
+          {state.isCalmModeActive ? (
+            <div className="hidden md:flex flex-1 items-center text-[14px] text-medium italic">
+              Taking it one day at a time.
             </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T1 ends</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t1End)}</div>
+          ) : (
+            <div className="hidden md:flex items-center gap-5 flex-wrap flex-1">
+              <div className="text-center">
+                <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
+                <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T1 ends</div>
+                <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t1End)}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T2 ends</div>
+                <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t2End)}</div>
+              </div>
+              <div className="text-center">
+                <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">Due date</div>
+                <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.dueDate)}</div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T2 ends</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t2End)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">Due date</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.dueDate)}</div>
-            </div>
-          </div>
+          )}
 
           <div className="hidden md:flex items-center gap-4 pl-5 border-l border-border">
-            <div className="flex items-center gap-2.5">
-              <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
-                <div 
-                  className="h-full bg-gradient-to-r from-sage to-sage-light rounded-[3px] transition-all duration-400"
-                  style={{ width: `${progressPct}%` }}
-                />
+            {!state.isCalmModeActive && (
+              <div className="flex items-center gap-2.5">
+                <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-sage to-sage-light rounded-[3px] transition-all duration-400"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+                <div className="text-[12px] font-semibold text-sage whitespace-nowrap">{progressPct}% done</div>
               </div>
-              <div className="text-[12px] font-semibold text-sage whitespace-nowrap">{progressPct}% done</div>
-            </div>
+            )}
             <button 
               onClick={() => updateState({ critFilter: !state.critFilter })}
               className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
                 ${state.critFilter ? 'border-critical text-critical bg-critical-bg' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
             >
               {state.critFilter ? '✓ Critical only' : 'Critical only'}
+            </button>
+            <button 
+              onClick={() => updateState({ isCalmModeActive: !state.isCalmModeActive })}
+              className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
+                ${state.isCalmModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
+              title="Toggle Calm Mode (reduces visual clutter and hides timers)"
+            >
+              {state.isCalmModeActive ? '🌿 Calm Mode' : '🌿 Calm Mode'}
             </button>
             <button 
               onClick={() => updateState({ isDarkModeActive: !state.isDarkModeActive })}
