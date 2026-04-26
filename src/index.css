@@ -1,28 +1,35 @@
-@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lexend:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
 @theme {
   --color-white: #ffffff;
-  --color-border: #e2e4e6;
-  --color-medium: #78858f;
-  --color-light: #a4b0b8;
-  --color-sage: #5a8b95;
-  --color-sage-light: #8ebbc4;
-  --color-sage-pale: #eef4f5;
-  --color-blush: #c27e73;
-  --color-blush-light: #e0aba3;
-  --color-blush-pale: #faefed;
-  --color-gold: #c8a366;
-  --color-gold-pale: #fcf6eb;
-  --color-cream: #f8f6f4;
-  --color-charcoal: #1e2a32;
-  --color-critical: #c04b4b;
-  --color-critical-bg: #faefef;
-  --color-optional: #5a8b95;
-  --color-optional-bg: #eef4f5;
+  --color-border: #e8e6e1;
+  --color-medium: #6b7a87;
+  --color-light: #9ba7b0;
   
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-sans: 'DM Sans', sans-serif;
+  /* Sage is now referencing Tulsi Mint family */
+  --color-sage: #8ab6a3; /* Darker mint for accessible white text */
+  --color-sage-light: #b5d5c7;
+  --color-sage-pale: #E9F5E9; /* Official Tulsi Mint */
+  
+  /* Blush is now referencing Lotus Pink family */
+  --color-blush: #F9C7D2; /* Official Lotus Pink */
+  --color-blush-light: #fce1e8;
+  --color-blush-pale: #fef5f7;
+  
+  /* Gold is now referencing Soft Saffron family */
+  --color-gold: #F4A261; /* Official Soft Saffron */
+  --color-gold-pale: #fcf1e8;
+  
+  --color-cream: #FDFBF7; /* Official Sandalwood Neutral */
+  --color-charcoal: #2C3E50; /* Official Deep Charcoal */
+  --color-critical: #d97777;
+  --color-critical-bg: #fdf5f5;
+  --color-optional: #F4A261;
+  --color-optional-bg: #fcf1e8;
+  
+  --font-serif: 'Playfair Display', serif;
+  --font-sans: 'Nunito', 'Inter', sans-serif;
 }
 
 @layer base {
@@ -37,24 +44,29 @@
 
 /* Dark Mode Overrides */
 .dark {
-  --color-white: #1e2a32;
-  --color-border: #3b4952;
-  --color-medium: #8d9ba6;
-  --color-light: #5f6e78;
-  --color-sage: #8ebbc4;
-  --color-sage-light: #5a8b95;
-  --color-sage-pale: #25393f;
-  --color-blush: #e0aba3;
-  --color-blush-light: #c27e73;
-  --color-blush-pale: #3d2522;
-  --color-gold: #e2c496;
-  --color-gold-pale: #3d301b;
-  --color-cream: #141d24;
-  --color-charcoal: #e2e8ec;
-  --color-critical: #e57373;
-  --color-critical-bg: #401b1b;
-  --color-optional: #8ebbc4;
-  --color-optional-bg: #25393f;
+  --color-white: #2C3E50;
+  --color-border: #3A4F63;
+  --color-medium: #8096A8;
+  --color-light: #52687A;
+  
+  --color-sage: #96C1AE;
+  --color-sage-light: #6E9484;
+  --color-sage-pale: #1E2E25;
+  
+  --color-blush: #E8A8B7;
+  --color-blush-light: #D48496;
+  --color-blush-pale: #3B2A2E;
+  
+  --color-gold: #EDB785;
+  --color-gold-pale: #3D2D1E;
+  
+  --color-cream: #1B2936;
+  --color-charcoal: #EAE6DB;
+  
+  --color-critical: #E88E8E;
+  --color-critical-bg: #4A2929;
+  --color-optional: #96C1AE;
+  --color-optional-bg: #1E2E25;
   
   background-color: var(--color-cream);
   color: var(--color-charcoal);
@@ -63,21 +75,25 @@
 /* Calm Mode Accessibility & Aesthetic Overrides */
 body.calm-mode {
   /* A beautiful, spa-like, ultra-soothing palette */
-  --color-sage: #8b9d90;
-  --color-sage-light: #b9c7bc;
-  --color-sage-pale: #f4f7f5;
-  --color-blush: #bda8a5;
-  --color-blush-light: #dbcdcb;
-  --color-blush-pale: #fcfafa;
-  --color-gold: #b5aa99;
-  --color-gold-pale: #fcfbfa;
+  --color-sage: #8ab6a3;
+  --color-sage-light: #b5d5c7;
+  --color-sage-pale: #f2f7f2;
+  
+  --color-blush: #f4d0d9;
+  --color-blush-light: #fae6ec;
+  --color-blush-pale: #fdfafb;
+  
+  --color-gold: #f2ba8f;
+  --color-gold-pale: #fcf6f0;
+  
   --color-cream: #fbfbf9;
-  --color-charcoal: #63615f;
-  --color-border: #f0efed;
-  --color-critical: #b59f9f;
+  --color-charcoal: #5c6c7a;
+  --color-border: #f0f0ed;
+  
+  --color-critical: #d49898;
   --color-critical-bg: #fdfaf9;
-  --color-optional: #8b9d90;
-  --color-optional-bg: #f4f7f5;
+  --color-optional: #8ab6a3;
+  --color-optional-bg: #f2f7f2;
 
   /* Dyslexia-friendly typography */
   --font-serif: 'Lexend', sans-serif;
