@@ -3,7 +3,7 @@ import { Bot, MessageCircle, Send, X } from 'lucide-react';
 
 export const FloatingChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState<{ role: 'user' | 'ai', text: string }[]>([
+  const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string}[]>([
     { role: 'ai', text: "Hi! I'm Bloom AI ✨ How can I help you with your pregnancy journey today?" }
   ]);
   const [input, setInput] = useState('');
@@ -11,11 +11,11 @@ export const FloatingChatbot: React.FC = () => {
   const handleSend = (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim()) return;
-
+    
     const userMsg = input;
     setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setInput('');
-
+    
     setTimeout(() => {
       setMessages(prev => [...prev, { role: 'ai', text: "That's a great question! I am here to help you navigate your journey. Feel free to use the AskBloom feature in the dashboard for a full-screen, in-depth conversation grounded in WHO guidelines." }]);
     }, 1000);
@@ -39,7 +39,7 @@ export const FloatingChatbot: React.FC = () => {
               <X size={20} />
             </button>
           </div>
-
+          
           <div className="h-[320px] p-4 overflow-y-auto bg-cream flex flex-col gap-3">
             {messages.map((msg, i) => (
               <div key={i} className={`max-w-[85%] p-3 rounded-[16px] text-[14px] leading-relaxed ${msg.role === 'ai' ? 'bg-white border border-border text-charcoal rounded-tl-sm self-start shadow-sm' : 'bg-sage text-white rounded-tr-sm self-end shadow-sm'}`}>
@@ -47,13 +47,13 @@ export const FloatingChatbot: React.FC = () => {
               </div>
             ))}
           </div>
-
+          
           <form onSubmit={handleSend} className="p-3 bg-white border-t border-border flex items-center gap-2">
-            <input
-              type="text"
+            <input 
+              type="text" 
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask a question..."
+              placeholder="Ask a question..." 
               className="flex-1 bg-cream border border-border rounded-full px-4 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
             />
             <button type="submit" disabled={!input.trim()} className="w-10 h-10 rounded-full bg-sage text-white flex items-center justify-center disabled:opacity-50 hover:bg-sage-dark transition-colors shrink-0">
@@ -62,8 +62,8 @@ export const FloatingChatbot: React.FC = () => {
           </form>
         </div>
       )}
-
-      <button
+      
+      <button 
         onClick={() => setIsOpen(!isOpen)}
         className={`w-14 h-14 rounded-full shadow-[0_8px_25px_rgba(107,146,120,0.5)] flex items-center justify-center text-white transition-all duration-300 hover:scale-110 ${isOpen ? 'bg-charcoal rotate-90' : 'bg-sage hover:bg-sage-dark'}`}
       >

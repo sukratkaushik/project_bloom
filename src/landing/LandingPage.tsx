@@ -58,7 +58,12 @@ export const LandingPage: React.FC = () => {
     } catch (error: any) {
       if (error?.code !== 'auth/popup-closed-by-user') {
         console.error("Login failed", error);
-        alert("Failed to log in with Google. Please try again.");
+        
+        if (error?.code === 'auth/network-request-failed') {
+          alert("Network request failed. This often happens if third-party cookies are blocked, or an ad blocker is preventing the login popup. Please disable your ad blocker or allow third-party cookies for this site, then try again.");
+        } else {
+          alert(`Failed to log in with Google: ${error?.message || "Please try again."}`);
+        }
       }
     } finally {
       setIsLoggingIn(false);
@@ -362,7 +367,7 @@ export const LandingPage: React.FC = () => {
           
           {/* Inner Core (The Mama/Baby Connection) */}
           <div className="relative w-36 h-36 md:w-56 md:h-56 bg-white/60 backdrop-blur-sm rounded-full shadow-[0_0_50px_rgba(242,166,166,0.2)] flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] border border-white/60">
-            <img src="/logo.png" alt="Bloom Logo" className="w-28 h-28 md:w-88 md:h-88 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
+            <img src="/logo.png" alt="Bloom Logo" className="w-28 h-28 md:w-44 md:h-44 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
           </div>
 
           {/* Floating Accents */}
