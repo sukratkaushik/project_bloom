@@ -89,6 +89,7 @@ export interface PregnancyJourney {
   pregnancyNum: string;
   workSit: string;
   partnerSit: string;
+  dietPref?: string;
 }
 
 export interface DbTask {
@@ -206,6 +207,12 @@ export interface FoodScanLog {
   imagePreview?: string;
 }
 
+export interface AppStateRecord {
+  id: string; // Will just be 'global'
+  stateJSON: string;
+  updatedAt: number;
+}
+
 export class PregnancyTrackerDB extends Dexie {
   users!: Table<User, string>;
   journeys!: Table<PregnancyJourney, string>;
@@ -220,6 +227,7 @@ export class PregnancyTrackerDB extends Dexie {
   hydrationLogs!: Table<HydrationLog, string>;
   supplementLogs!: Table<SupplementLog, string>;
   foodScanLogs!: Table<FoodScanLog, string>;
+  appState!: Table<AppStateRecord, string>;
 
   constructor() {
     super('PregnancyTrackerDB');
@@ -240,6 +248,10 @@ export class PregnancyTrackerDB extends Dexie {
       hydrationLogs: 'id, journeyId, date, timestamp, [journeyId+date]',
       supplementLogs: 'id, journeyId, date, [journeyId+date]',
       foodScanLogs: 'id, journeyId, timestamp, [journeyId+timestamp]'
+    });
+
+    this.version(3).stores({
+      appState: 'id'
     });
   }
 }

@@ -52,6 +52,7 @@ const defaultState: PlannerState = {
   customTasks: {},
   notes: {},
   critFilter: false,
+  // isCalmModeActive is deprecated but kept for backwards compatibility parsing
   isCalmModeActive: false,
   isDarkModeActive: false,
   isPremium: false,
@@ -70,20 +71,47 @@ const defaultState: PlannerState = {
   },
 };
 
+const getInitialState = (): PlannerState => {
+  try {
+    const savedUi = localStorage.getItem('bloom_planner_ui');
+    if (savedUi) {
+      const parsed = JSON.parse(savedUi);
+      return { ...defaultState, isCalmModeActive: false, isDarkModeActive: parsed.isDarkModeActive || false };
+    }
+  } catch (e) {
+    // Ignore error
+  }
+  return defaultState;
+};
+
 const PlannerContext = createContext<PlannerContextType | undefined>(undefined);
 
 export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [state, setState] = useState<PlannerState>(() => {
-    const saved = localStorage.getItem('bloom_planner');
-    if (saved) {
+  const [state, setState] = useState<PlannerState>(getInitialState);
+  const [isDbLoaded, setIsDbLoaded] = useState(false);
+
+  // 1. Load state asynchronously from Dexie on mount
+  useEffect(() => {
+    const loadState = async () => {
       try {
-        return { ...defaultState, ...JSON.parse(saved) };
+        const record = await db.appState.get('global');
+        if (record) {
+          setState({ ...defaultState, ...JSON.parse(record.stateJSON) });
+        } else {
+          // Fallback to localStorage just in case of migration
+          const saved = localStorage.getItem('bloom_planner');
+          if (saved) {
+            setState({ ...defaultState, ...JSON.parse(saved) });
+          }
+        }
       } catch (e) {
-        console.error('Failed to parse saved state', e);
+        console.error('Failed to load state from Dexie', e);
+      } finally {
+        setIsDbLoaded(true);
       }
-    }
-    return defaultState;
-  });
+    };
+    loadState();
+  }, []);
 
   // Listen for auth state and load cloud data if available
   useEffect(() => {
@@ -104,9 +132,26 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => unsubscribe();
   }, [state.activeJourneyId]);
 
-  // Sync to localStorage and Firestore
+  // Sync to Dexie, localStorage and Firestore
   useEffect(() => {
-    localStorage.setItem('bloom_planner', JSON.stringify(state));
+    // Save minimal UI preferences to local storage for instant loading on refresh
+    try {
+      localStorage.setItem('bloom_planner_ui', JSON.stringify({
+        isCalmModeActive: state.isCalmModeActive,
+        isDarkModeActive: state.isDarkModeActive,
+      }));
+    } catch(e) {}
+
+    // Only save the full state to Dexie AFTER we have finished loading it from Dexie
+    if (isDbLoaded) {
+      db.appState.put({
+        id: 'global',
+        stateJSON: JSON.stringify(state),
+        updatedAt: Date.now(),
+      }).catch(err => {
+        console.error('Failed to sync state to Dexie:', err);
+      });
+    }
     
     if (auth.currentUser && state.activeJourneyId && state.isSetup) {
       const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
@@ -330,7 +375,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const toggleCalmMode = () => {
-    setState((prev) => ({ ...prev, isCalmModeActive: !prev.isCalmModeActive }));
+    // Deprecated
   };
 
   const toggleDarkMode = () => {
@@ -356,14 +401,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return { ...prev, favoritePages: [...current, id] };
     });
   };
-
-  useEffect(() => {
-    if (state.isCalmModeActive) {
-      document.body.classList.add('calm-mode');
-    } else {
-      document.body.classList.remove('calm-mode');
-    }
-  }, [state.isCalmModeActive]);
 
   useEffect(() => {
     if (state.isDarkModeActive) {
