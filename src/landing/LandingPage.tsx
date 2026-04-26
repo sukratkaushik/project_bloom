@@ -313,7 +313,7 @@ export const LandingPage: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sage opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-sage"></span>
             </span>
-            New: Cloud Sync Available
+            Trusted by 10,000+ Indian mothers 🇮🇳
           </div>
           
           <h1 className="font-serif text-[clamp(40px,6vw,72px)] leading-[1.1] text-charcoal mb-6 mt-2">
