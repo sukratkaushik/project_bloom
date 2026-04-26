@@ -173,7 +173,10 @@ export const SetupScreen: React.FC = () => {
         </button>
       </div>
 
-      <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-4 z-10">Bloom</div>
+      <div className="flex flex-col items-center gap-2 mb-4 z-10">
+        <img src="/logo.png" alt="Bloom Logo" className="w-14 h-14 object-contain drop-shadow-sm" />
+        <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage">Bloom</div>
+      </div>
       <h1 className="font-serif text-[clamp(38px,7vw,68px)] font-light leading-[1.08] text-center text-charcoal mb-3.5 z-10">
         Your <em className="italic text-blush">Pregnancy</em><br />Planning Companion
       </h1>

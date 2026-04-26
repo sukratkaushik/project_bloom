@@ -139,7 +139,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   ];
 
   return (
-    <div className="sticky top-[80px] pt-8 no-print">
+    <div className="sticky top-[80px] pt-4 no-print">
+      {/* Branding */}
+      <div className="flex items-center gap-2 px-3 mb-6">
+        <img src="/logo.png" alt="Bloom Logo" className="w-8 h-8 object-contain" />
+        <span className="font-serif text-[20px] italic text-sage tracking-wide">bloom</span>
+      </div>
+
       <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
       <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
       
