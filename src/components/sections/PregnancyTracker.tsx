@@ -63,11 +63,11 @@ export const PregnancyTracker: React.FC = () => {
       const diffTime = Math.abs(today.getTime() - lmp.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       let currentWeek = Math.floor(diffDays / 7) + 1;
-
+      
       // Clamp between 1 and 40
       if (currentWeek < 1) currentWeek = 1;
       if (currentWeek > 40) currentWeek = 40;
-
+      
       setSelectedWeek(currentWeek);
     }
   }, [state.dueDate]);
@@ -100,20 +100,20 @@ export const PregnancyTracker: React.FC = () => {
             <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Follow your baby's journey week by week.</p>
           )}
         </div>
-
+        
         <div className="bg-white border-[1.5px] border-border rounded-[12px] p-3 shadow-sm flex items-center gap-3">
           <div className="w-8 h-8 rounded-full bg-sage-pale flex items-center justify-center text-sage shrink-0">
             <Calendar size={16} />
           </div>
           {isEditingDate ? (
             <div className="flex items-center gap-2">
-              <input
-                type="date"
+              <input 
+                type="date" 
                 value={tempDate}
                 onChange={(e) => setTempDate(e.target.value)}
                 className="text-[13px] font-sans border-[1.5px] border-border rounded-[6px] px-2 py-1 focus:outline-none focus:border-sage"
               />
-              <button
+              <button 
                 onClick={handleSaveDate}
                 className="text-[11px] font-semibold tracking-[0.5px] uppercase bg-sage text-white px-3 py-1.5 rounded-[6px] hover:opacity-90 transition-opacity"
               >
@@ -127,7 +127,7 @@ export const PregnancyTracker: React.FC = () => {
                 <span className="text-[14px] font-medium text-charcoal">
                   {state.dueDate ? new Date(state.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : 'Not set'}
                 </span>
-                <button
+                <button 
                   onClick={() => setIsEditingDate(true)}
                   className="text-[11px] text-sage hover:underline"
                 >
@@ -142,22 +142,22 @@ export const PregnancyTracker: React.FC = () => {
       {/* Week Navigation & Progress */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] p-5 shadow-sm mb-6">
         <div className="flex items-center justify-between mb-6">
-          <button
+          <button 
             onClick={handlePrevWeek}
             disabled={selectedWeek === 1}
             className="w-10 h-10 rounded-full border-[1.5px] border-border flex items-center justify-center text-charcoal hover:border-sage hover:text-sage disabled:opacity-30 disabled:hover:border-border disabled:hover:text-charcoal transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
-
+          
           <div className="text-center">
             <h3 className="font-serif text-[24px] font-medium text-charcoal">Week {selectedWeek}</h3>
             <span className="text-[12px] font-semibold tracking-[1px] uppercase text-medium">
               Trimester {selectedWeek <= 13 ? '1' : selectedWeek <= 27 ? '2' : '3'}
             </span>
           </div>
-
-          <button
+          
+          <button 
             onClick={handleNextWeek}
             disabled={selectedWeek === 40}
             className="w-10 h-10 rounded-full border-[1.5px] border-border flex items-center justify-center text-charcoal hover:border-sage hover:text-sage disabled:opacity-30 disabled:hover:border-border disabled:hover:text-charcoal transition-colors"
@@ -165,7 +165,7 @@ export const PregnancyTracker: React.FC = () => {
             <ChevronRight size={20} />
           </button>
         </div>
-
+        
         <input
           type="range"
           min={1}
@@ -217,7 +217,7 @@ export const PregnancyTracker: React.FC = () => {
             {weekData.babyDev}
           </p>
         </div>
-
+        
         <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-full bg-gold-pale flex items-center justify-center text-gold">

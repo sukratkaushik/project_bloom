@@ -239,19 +239,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <div className="h-px bg-border my-4" />
 
       <button 
-        onClick={toggleCalmMode}
-        className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white border-border text-charcoal hover:border-sage-light'}`}
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-[16px]">🌿</span> Calm Mode
-        </span>
-        <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
-          <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isCalmModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
-        </div>
-      </button>
-
-      <button 
         onClick={toggleDarkMode}
         className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
           ${state.isDarkModeActive ? 'bg-charcoal border-charcoal text-white' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
