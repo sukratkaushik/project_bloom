@@ -274,6 +274,14 @@ export const LandingPage: React.FC = () => {
                     required
                   />
                 </div>
+                {/* DEV MODE: Show OTP in UI since no email service is connected yet */}
+                {generatedOtp && (
+                  <div className="bg-sage-pale border border-sage/30 rounded-[10px] px-4 py-3 text-center">
+                    <p className="text-[10px] font-bold tracking-[1.5px] uppercase text-sage mb-1">Your Code (Dev Mode)</p>
+                    <p className="text-[28px] font-bold tracking-[10px] text-charcoal font-mono">{generatedOtp}</p>
+                    <p className="text-[10px] text-medium mt-1">Remove this once email sending is live</p>
+                  </div>
+                )}
                 {otpError && <div className="text-[13px] text-critical font-medium text-center">{otpError}</div>}
                 <button type="submit" className="w-full bg-sage text-white rounded-[12px] font-bold py-3.5 hover:bg-sage-dark transition-colors mt-2 shadow-sm">
                   Verify & Continue
