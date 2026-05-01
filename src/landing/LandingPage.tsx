@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { auth, signInWithGoogle } from '../firebase';
+import { CustomSelect } from '../components/CustomSelect';
 import { 
   ShieldCheck, 
   WifiOff, 
@@ -165,17 +166,17 @@ export const LandingPage: React.FC = () => {
                       </div>
                       <div className="flex-1">
                         <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Gender</label>
-                        <select 
+                        <CustomSelect
                           value={genderInput}
-                          onChange={(e) => setGenderInput(e.target.value)}
-                          className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow bg-white"
-                          required={isRegistering}
-                        >
-                          <option value="" disabled>Select</option>
-                          <option value="female">Female</option>
-                          <option value="male">Male</option>
-                          <option value="other">Other</option>
-                        </select>
+                          onChange={(val) => setGenderInput(val)}
+                          className="w-full relative z-10"
+                          options={[
+                            { label: 'Female', value: 'female' },
+                            { label: 'Male', value: 'male' },
+                            { label: 'Other', value: 'other' }
+                          ]}
+                          placeholder="Select"
+                        />
                       </div>
                     </div>
                     <div>

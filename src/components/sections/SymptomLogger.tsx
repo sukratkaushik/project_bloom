@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Activity, Plus, Trash2 } from 'lucide-react';
 import { auth, db as firestoreDb, handleFirestoreError, OperationType } from '../../firebase';
 import { doc, setDoc, deleteDoc } from 'firebase/firestore';
+import { CustomSelect } from '../CustomSelect';
 
 export const SymptomLogger: React.FC = () => {
   const { state } = usePlanner();
@@ -98,28 +99,26 @@ export const SymptomLogger: React.FC = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Symptom Type</span>
-            <select 
+            <CustomSelect
               value={symptomType}
-              onChange={(e) => setSymptomType(e.target.value as SymptomType)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              {Object.values(SymptomType).map(type => (
-                <option key={type} value={type}>{type.replace('_', ' ')}</option>
-              ))}
-            </select>
+              onChange={(value) => setSymptomType(value as SymptomType)}
+              options={Object.values(SymptomType).map(type => ({
+                label: type.replace('_', ' '),
+                value: type
+              }))}
+            />
           </div>
           
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Severity</span>
-            <select 
+            <CustomSelect
               value={severity}
-              onChange={(e) => setSeverity(e.target.value as Severity)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              {Object.values(Severity).map(sev => (
-                <option key={sev} value={sev}>{sev}</option>
-              ))}
-            </select>
+              onChange={(value) => setSeverity(value as Severity)}
+              options={Object.values(Severity).map(sev => ({
+                label: sev,
+                value: sev
+              }))}
+            />
           </div>
         </div>
 

@@ -9,6 +9,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { GoogleGenAI } from '@google/genai';
+import { CustomSelect } from '../CustomSelect';
 
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
@@ -98,18 +99,19 @@ export const BabyNames: React.FC = () => {
 
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Origin / Style</label>
-              <select 
+              <CustomSelect 
                 value={origin} 
-                onChange={e => setOrigin(e.target.value)}
-                className="w-full p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none"
-              >
-                <option value="Modern Indian">Modern Indian (Short, easy to pronounce globally)</option>
-                <option value="Traditional Sanskrit">Traditional Sanskrit</option>
-                <option value="Islamic / Arabic">Islamic / Arabic</option>
-                <option value="Sikh / Punjabi">Sikh / Punjabi</option>
-                <option value="Nature Inspired">Nature Inspired</option>
-                <option value="Global / Western">Global / Western</option>
-              </select>
+                onChange={(val) => setOrigin(val)}
+                className="w-full relative z-10"
+                options={[
+                  { label: 'Modern Indian (Short, easy to pronounce globally)', value: 'Modern Indian' },
+                  { label: 'Traditional Sanskrit', value: 'Traditional Sanskrit' },
+                  { label: 'Islamic / Arabic', value: 'Islamic / Arabic' },
+                  { label: 'Sikh / Punjabi', value: 'Sikh / Punjabi' },
+                  { label: 'Nature Inspired', value: 'Nature Inspired' },
+                  { label: 'Global / Western', value: 'Global / Western' }
+                ]}
+              />
             </div>
 
             <div className="flex flex-col">
