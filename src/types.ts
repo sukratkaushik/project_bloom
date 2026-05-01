@@ -60,6 +60,12 @@ export type HospitalBagItem = {
   isCustom: boolean;
 };
 
+export type CustomSupplement = {
+  id: string;
+  name: string;
+  dose: string;
+};
+
 export type SyncPermissions = {
   mode?: 'edit' | 'read';
   excludedTaskIds?: string[];
@@ -136,4 +142,5 @@ export type PlannerState = {
   isPartnerReadOnly?: boolean;
   dailyKnowledgeStreak?: number;
   lastKnowledgeDropDate?: string;
+  customSupplements?: CustomSupplement[];
 };
