@@ -8,8 +8,7 @@ import {
   RefreshCw, 
   AlertCircle
 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
-import { CustomSelect } from '../CustomSelect';
+import { generateAIContent } from '../../utils/aiService';
 
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
@@ -27,29 +26,25 @@ export const BabyNames: React.FC = () => {
     setError('');
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `You are a helpful assistant for expecting parents in India. Generate 6 beautiful, meaningful baby names based on these preferences:
+      const systemInstruction = `You are a helpful assistant for expecting parents in India. Generate 6 beautiful, meaningful baby names. 
+      Respond STRICTLY in valid JSON format with an array of objects. Do not use markdown backticks around the json. 
+      Schema: [{"name": "...", "meaning": "...", "origin": "..."}]`;
+      
+      const prompt = `Generate names for:
       - Gender: ${gender}
       - Origin/Style: ${origin}
       ${startingLetter ? `- Must start with the letter: ${startingLetter}` : ''}
-      ${keywords ? `- Themes/Keywords: ${keywords}` : ''}
-      
-      Respond STRICTLY in valid JSON format with an array of objects. Do not use markdown backticks around the json. Do not explain anything. 
-      Schema:
-      [
-        {"name": "...", "meaning": "...", "origin": "..."}
-      ]`;
+      ${keywords ? `- Themes/Keywords: ${keywords}` : ''}`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.7,
-        }
+      const response = await generateAIContent(prompt, {
+        systemInstruction,
+        temperature: 0.7,
+        jsonMode: true
       });
+
+      if (response.error) throw new Error(response.error);
       
-      const text = response.text || '';
-      const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const cleanText = response.text.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleanText);
       
       if (Array.isArray(parsed)) {
@@ -99,19 +94,18 @@ export const BabyNames: React.FC = () => {
 
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Origin / Style</label>
-              <CustomSelect 
+              <select 
                 value={origin} 
-                onChange={(val) => setOrigin(val)}
-                className="w-full relative z-10"
-                options={[
-                  { label: 'Modern Indian (Short, easy to pronounce globally)', value: 'Modern Indian' },
-                  { label: 'Traditional Sanskrit', value: 'Traditional Sanskrit' },
-                  { label: 'Islamic / Arabic', value: 'Islamic / Arabic' },
-                  { label: 'Sikh / Punjabi', value: 'Sikh / Punjabi' },
-                  { label: 'Nature Inspired', value: 'Nature Inspired' },
-                  { label: 'Global / Western', value: 'Global / Western' }
-                ]}
-              />
+                onChange={e => setOrigin(e.target.value)}
+                className="w-full p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none"
+              >
+                <option value="Modern Indian">Modern Indian (Short, easy to pronounce globally)</option>
+                <option value="Traditional Sanskrit">Traditional Sanskrit</option>
+                <option value="Islamic / Arabic">Islamic / Arabic</option>
+                <option value="Sikh / Punjabi">Sikh / Punjabi</option>
+                <option value="Nature Inspired">Nature Inspired</option>
+                <option value="Global / Western">Global / Western</option>
+              </select>
             </div>
 
             <div className="flex flex-col">

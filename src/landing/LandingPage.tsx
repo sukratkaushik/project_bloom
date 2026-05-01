@@ -81,6 +81,7 @@ export const LandingPage: React.FC = () => {
   const [otpInput, setOtpInput] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpError, setOtpError] = useState('');
+  const [generatedOtp, setGeneratedOtp] = useState(''); // Store the real OTP here
 
   const handleEmailLoginClick = () => {
     if (isSetupComplete) {
@@ -90,7 +91,7 @@ export const LandingPage: React.FC = () => {
     setShowEmailModal(true);
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
+  const handleSendOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput.includes('@')) {
       setOtpError('Please enter a valid email address.');
@@ -98,18 +99,42 @@ export const LandingPage: React.FC = () => {
     }
     
     setOtpError('');
-    setOtpSent(true);
+    setIsLoggingIn(true);
+
+    try {
+      // 1. Generate a random 6-digit OTP
+      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+      setGeneratedOtp(newOtp);
+
+      // 2. LOGIC TO SEND EMAIL:
+      // In a real production app, you would call your backend or an email service here.
+      // Example with EmailJS:
+      // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
+      //   to_email: emailInput,
+      //   otp_code: newOtp,
+      // }, 'YOUR_PUBLIC_KEY');
+
+      console.log(`%c[OTP DEBUG] Code for ${emailInput}: ${newOtp}`, "color: #7a9e87; font-weight: bold; font-size: 14px;");
+      
+      setOtpSent(true);
+    } catch (err) {
+      setOtpError('Failed to send OTP. Please try again.');
+      console.error(err);
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate OTP verification (accepting 123456 as standard mockup)
-    if (otpInput === '123456') {
+    
+    // Verify the input against the generated OTP
+    if (otpInput === generatedOtp) {
       setShowEmailModal(false);
       updateState({ hasStartedOnboarding: true, isSetup: false });
       window.location.hash = '#setup';
     } else {
-      setOtpError('Invalid code. For this demo, please use 123456.');
+      setOtpError('Invalid security code. Please check your email and try again.');
     }
   };
 
