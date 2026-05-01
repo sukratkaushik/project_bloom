@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { usePlanner } from '../store';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
+import { CustomSelect } from './CustomSelect';
 
 // Custom Apple-style Wheel Picker Component
 const WheelPicker = ({ options, value, onChange, label }: { options: string[], value: string, onChange: (v: string) => void, label: string }) => {
@@ -193,57 +194,57 @@ export const SetupScreen: React.FC = () => {
           
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Which pregnancy is this?</span>
-            <select 
+            <CustomSelect
               value={pregnancyNum}
-              onChange={(e) => setPregnancyNum(e.target.value)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              <option value="first">First pregnancy</option>
-              <option value="subsequent">Second or more</option>
-            </select>
+              onChange={(value) => setPregnancyNum(value)}
+              options={[
+                { label: 'First pregnancy', value: 'first' },
+                { label: 'Second or more', value: 'subsequent' }
+              ]}
+            />
           </div>
           
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Work situation</span>
-            <select 
+            <CustomSelect
               value={workSit}
-              onChange={(e) => setWorkSit(e.target.value)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              <option value="employed">Employed (office / hybrid)</option>
-              <option value="remote">Fully remote</option>
-              <option value="demanding">Demanding / shift work</option>
-              <option value="selfemployed">Self-employed / freelance</option>
-              <option value="notworking">Not currently working</option>
-            </select>
+              onChange={(value) => setWorkSit(value)}
+              options={[
+                { label: 'Employed (office / hybrid)', value: 'employed' },
+                { label: 'Fully remote', value: 'remote' },
+                { label: 'Demanding / shift work', value: 'demanding' },
+                { label: 'Self-employed / freelance', value: 'selfemployed' },
+                { label: 'Not currently working', value: 'notworking' }
+              ]}
+            />
           </div>
           
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Support situation</span>
-            <select 
+            <CustomSelect
               value={partnerSit}
-              onChange={(e) => setPartnerSit(e.target.value)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              <option value="partner">Partner present</option>
-              <option value="solo">Going solo</option>
-              <option value="family">Family support network</option>
-            </select>
+              onChange={(value) => setPartnerSit(value)}
+              options={[
+                { label: 'Partner present', value: 'partner' },
+                { label: 'Going solo', value: 'solo' },
+                { label: 'Family support network', value: 'family' }
+              ]}
+            />
           </div>
 
           <div className="flex flex-col gap-1.5">
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium">Dietary preference</span>
-            <select
+            <CustomSelect
               value={dietPref}
-              onChange={(e) => setDietPref(e.target.value)}
-              className="p-[11px_14px] border-[1.5px] border-border rounded-[10px] font-sans text-[14px] text-charcoal bg-cream transition-all focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 w-full"
-            >
-              <option value="nopreference">No Preference</option>
-              <option value="vegetarian">Vegetarian</option>
-              <option value="nonveg">Non-Vegetarian</option>
-              <option value="vegan">Vegan</option>
-              <option value="eggetarian">Eggetarian</option>
-            </select>
+              onChange={(value) => setDietPref(value)}
+              options={[
+                { label: 'No Preference', value: 'nopreference' },
+                { label: 'Vegetarian', value: 'vegetarian' },
+                { label: 'Non-Vegetarian', value: 'nonveg' },
+                { label: 'Vegan', value: 'vegan' },
+                { label: 'Eggetarian', value: 'eggetarian' }
+              ]}
+            />
           </div>
         </div>
 
