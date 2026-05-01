@@ -15,7 +15,9 @@ import {
   Square,
   EyeOff,
   Droplets,
-  Heart
+  Heart,
+  Plus,
+  Trash2
 } from 'lucide-react';
 
 const SUPPLEMENTS = [
@@ -51,8 +53,11 @@ const FOOD_DATABASE = [
 ];
 
 export const NutritionTracker: React.FC = () => {
-  const { state } = usePlanner();
+  const { state, addCustomSupplement, deleteCustomSupplement } = usePlanner();
   const [search, setSearch] = useState('');
+  const [showAddSupp, setShowAddSupp] = useState(false);
+  const [newSuppName, setNewSuppName] = useState('');
+  const [newSuppDose, setNewSuppDose] = useState('');
   const [hiddenSupps, setHiddenSupps] = useState<string[]>(() => {
     const saved = localStorage.getItem('bloom_hidden_supps');
     return saved ? JSON.parse(saved) : [];
@@ -110,7 +115,7 @@ export const NutritionTracker: React.FC = () => {
 
   const isHighRisk = state.flags['highRisk'] === true;
 
-  const activeSupplements = SUPPLEMENTS.filter(s => {
+  const baseSupplements = SUPPLEMENTS.filter(s => {
     if (hiddenSupps.includes(s.id)) return false;
     if (currentTrimester === 1 && s.t1) return true;
     if (currentTrimester === 2 && s.t2) return true;
@@ -119,6 +124,32 @@ export const NutritionTracker: React.FC = () => {
     if (s.id === 'iron' && isHighRisk) return true;
     return false;
   });
+
+  const activeSupplements = useMemo(() => {
+    const combined = [...baseSupplements];
+    if (state.customSupplements) {
+      state.customSupplements.forEach(cs => {
+        combined.push({
+          id: cs.id,
+          name: cs.name,
+          dose: cs.dose,
+          tooltip: 'Custom added supplement',
+          t1: true, t2: true, t3: true
+        });
+      });
+    }
+    return combined;
+  }, [baseSupplements, state.customSupplements]);
+
+  const handleAddCustom = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newSuppName.trim() && newSuppDose.trim()) {
+      addCustomSupplement(newSuppName.trim(), newSuppDose.trim());
+      setNewSuppName('');
+      setNewSuppDose('');
+      setShowAddSupp(false);
+    }
+  };
 
   const filteredFood = useMemo(() => {
     if (!search.trim()) return FOOD_DATABASE;
@@ -160,14 +191,17 @@ export const NutritionTracker: React.FC = () => {
 
       {/* Supplement Checklist */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
-          <h3 className="font-semibold text-charcoal text-[17px]">Daily Supplements</h3>
-          <span className="text-[13px] text-medium">{takenList.length} / {activeSupplements.length} taken</span>
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex flex-col sm:flex-row gap-3 sm:gap-0 justify-between sm:items-center">
+          <div className="flex justify-between items-center w-full">
+            <h3 className="font-semibold text-charcoal text-[17px]">Daily Supplements</h3>
+            <span className="text-[13px] text-medium">{takenList.length} / {activeSupplements.length} taken</span>
+          </div>
         </div>
         
         <div className="p-4 sm:p-6 space-y-3">
           {activeSupplements.map(supp => {
             const isTaken = takenList.includes(supp.id);
+            const isCustom = supp.id.startsWith('custom_');
             return (
               <div key={supp.id} className="flex justify-between flex-wrap gap-4 items-center p-4 border border-border rounded-[12px] bg-white hover:border-sage transition-colors group">
                 <div className="flex items-center gap-3">
@@ -185,15 +219,68 @@ export const NutritionTracker: React.FC = () => {
                   </div>
                 </div>
                 
-                <button onClick={() => hideSupplement(supp.id)} className="text-medium hover:bg-gray-100 p-2 rounded-lg transition-colors flex items-center gap-2 text-[12px] font-medium" title="I don't take this">
-                  <EyeOff className="w-4 h-4" /> <span className="hidden sm:inline">Hide</span>
-                </button>
+                {isCustom ? (
+                  <button onClick={() => deleteCustomSupplement(supp.id)} className="text-medium hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center gap-2 text-[12px] font-medium" title="Delete custom supplement">
+                    <Trash2 className="w-4 h-4" /> <span className="hidden sm:inline">Delete</span>
+                  </button>
+                ) : (
+                  <button onClick={() => hideSupplement(supp.id)} className="text-medium hover:text-red-500 hover:bg-red-50 p-2 rounded-lg transition-colors flex items-center gap-2 text-[12px] font-medium" title="Delete supplement">
+                    <Trash2 className="w-4 h-4" /> <span className="hidden sm:inline">Delete</span>
+                  </button>
+                )}
               </div>
             )
           })}
           {activeSupplements.length === 0 && (
             <div className="text-center p-4 text-medium text-[14px]">No active supplements for your current stage.</div>
           )}
+
+          {!showAddSupp ? (
+            <button 
+              onClick={() => setShowAddSupp(true)}
+              className="w-full mt-2 flex items-center justify-center gap-2 p-3 border-2 border-dashed border-border rounded-[12px] text-medium hover:text-sage hover:border-sage hover:bg-sage-pale/20 transition-all text-[14px] font-semibold"
+            >
+              <Plus className="w-4 h-4" /> Add Custom Supplement
+            </button>
+          ) : (
+            <form onSubmit={handleAddCustom} className="p-4 border-[1.5px] border-sage rounded-[12px] bg-sage-pale/10 mt-4 animate-in fade-in slide-in-from-top-2">
+              <h4 className="font-semibold text-[14px] text-charcoal mb-3">Add Custom Supplement</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+                <input
+                  type="text"
+                  placeholder="Name (e.g. Iron)"
+                  required
+                  value={newSuppName}
+                  onChange={e => setNewSuppName(e.target.value)}
+                  className="w-full p-2.5 border-[1.5px] border-border rounded-[8px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-[14px] outline-none"
+                />
+                <input
+                  type="text"
+                  placeholder="Dose (e.g. 1 Tablet)"
+                  required
+                  value={newSuppDose}
+                  onChange={e => setNewSuppDose(e.target.value)}
+                  className="w-full p-2.5 border-[1.5px] border-border rounded-[8px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-[14px] outline-none"
+                />
+              </div>
+              <div className="flex gap-2 justify-end">
+                <button 
+                  type="button" 
+                  onClick={() => setShowAddSupp(false)}
+                  className="px-4 py-2 font-semibold text-[13px] text-charcoal hover:bg-gray-100 rounded-[8px] transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 font-semibold text-[13px] text-white bg-sage hover:bg-sage-dark rounded-[8px] shadow-sm transition-colors"
+                >
+                  Save Supplement
+                </button>
+              </div>
+            </form>
+          )}
+
         </div>
       </div>
 

@@ -19,6 +19,8 @@ type PlannerContextType = {
   setBudgetAct: (id: string, value: string) => void;
   addCustomBudgetItem: (label: string) => void;
   addCustomTask: (section: string, text: string) => void;
+  addCustomSupplement: (name: string, dose: string) => void;
+  deleteCustomSupplement: (id: string) => void;
   setNote: (id: string, value: string) => void;
   generatePlan: (setupData: Partial<PlannerState>) => void;
   resetPlan: () => void;
@@ -304,6 +306,27 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  const addCustomSupplement = (name: string, dose: string) => {
+    const id = `custom_supp_${Date.now()}`;
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        customSupplements: [...(prev.customSupplements || []), { id, name, dose }],
+      };
+    });
+  };
+
+  const deleteCustomSupplement = (id: string) => {
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        customSupplements: (prev.customSupplements || []).filter(s => s.id !== id),
+      };
+    });
+  };
+
   const setNote = (id: string, value: string) => {
     setState((prev) => {
       if (prev.isPartnerReadOnly) return prev;
@@ -432,6 +455,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setBudgetAct,
         addCustomBudgetItem,
         addCustomTask,
+        addCustomSupplement,
+        deleteCustomSupplement,
         setNote,
         generatePlan,
         resetPlan,
