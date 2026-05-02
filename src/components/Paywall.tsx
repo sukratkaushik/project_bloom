@@ -39,7 +39,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     <div className="animate-in fade-in duration-300">
       <div className="mb-8">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-          <Sparkles className="text-gold" size={32} /> {featureName === 'AskBloom' ? 'AskBloom AI' : 'Food Scanner'}
+          <Sparkles className="text-gold" size={32} /> {featureName === 'AskBloom' ? 'AskBloom AI' : 'AI Food Guide'}
         </h2>
         <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
           Unlock our advanced AI tools specifically designed for Indian pregnancies.
@@ -60,7 +60,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
           <h3 className="font-serif text-[28px] text-charcoal mb-4">
             {featureName === 'AskBloom' 
               ? 'Your 24/7 Pregnancy Companion ✨' 
-              : 'Instant Pregnancy Safety Checks ✨'}
+              : 'Instant Pregnancy Safety & Indian Food Guide ✨'}
           </h3>
           
           <p className="text-[16px] text-charcoal/80 mb-8 leading-relaxed">

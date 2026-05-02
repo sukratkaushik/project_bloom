@@ -81,7 +81,6 @@ export const LandingPage: React.FC = () => {
   const [otpInput, setOtpInput] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otpError, setOtpError] = useState('');
-  const [generatedOtp, setGeneratedOtp] = useState(''); // Store the real OTP here
 
   const handleEmailLoginClick = () => {
     if (isSetupComplete) {
@@ -91,7 +90,7 @@ export const LandingPage: React.FC = () => {
     setShowEmailModal(true);
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
+  const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!emailInput.includes('@')) {
       setOtpError('Please enter a valid email address.');
@@ -99,42 +98,18 @@ export const LandingPage: React.FC = () => {
     }
     
     setOtpError('');
-    setIsLoggingIn(true);
-
-    try {
-      // 1. Generate a random 6-digit OTP
-      const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(newOtp);
-
-      // 2. LOGIC TO SEND EMAIL:
-      // In a real production app, you would call your backend or an email service here.
-      // Example with EmailJS:
-      // await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', {
-      //   to_email: emailInput,
-      //   otp_code: newOtp,
-      // }, 'YOUR_PUBLIC_KEY');
-
-      console.log(`%c[OTP DEBUG] Code for ${emailInput}: ${newOtp}`, "color: #7a9e87; font-weight: bold; font-size: 14px;");
-      
-      setOtpSent(true);
-    } catch (err) {
-      setOtpError('Failed to send OTP. Please try again.');
-      console.error(err);
-    } finally {
-      setIsLoggingIn(false);
-    }
+    setOtpSent(true);
   };
 
   const handleVerifyOtp = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // Verify the input against the generated OTP
-    if (otpInput === generatedOtp) {
+    // Simulate OTP verification (accepting 123456 as standard mockup)
+    if (otpInput === '123456') {
       setShowEmailModal(false);
       updateState({ hasStartedOnboarding: true, isSetup: false });
       window.location.hash = '#setup';
     } else {
-      setOtpError('Invalid security code. Please check your email and try again.');
+      setOtpError('Invalid code. For this demo, please use 123456.');
     }
   };
 
@@ -274,14 +249,6 @@ export const LandingPage: React.FC = () => {
                     required
                   />
                 </div>
-                {/* DEV MODE: Show OTP in UI since no email service is connected yet */}
-                {generatedOtp && (
-                  <div className="bg-sage-pale border border-sage/30 rounded-[10px] px-4 py-3 text-center">
-                    <p className="text-[10px] font-bold tracking-[1.5px] uppercase text-sage mb-1">Your Code (Dev Mode)</p>
-                    <p className="text-[28px] font-bold tracking-[10px] text-charcoal font-mono">{generatedOtp}</p>
-                    <p className="text-[10px] text-medium mt-1">Remove this once email sending is live</p>
-                  </div>
-                )}
                 {otpError && <div className="text-[13px] text-critical font-medium text-center">{otpError}</div>}
                 <button type="submit" className="w-full bg-sage text-white rounded-[12px] font-bold py-3.5 hover:bg-sage-dark transition-colors mt-2 shadow-sm">
                   Verify & Continue
@@ -346,16 +313,16 @@ export const LandingPage: React.FC = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-sage opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-sage"></span>
             </span>
-            Trusted by 10,000+ Indian mothers 🇮🇳
+            New: Cloud Sync Available
           </div>
           
           <h1 className="font-serif text-[clamp(40px,6vw,72px)] leading-[1.1] text-charcoal mb-6 mt-2">
-            Your pregnancy companion — <span className="italic text-sage">secure & synced.</span>
+            Your free pregnancy companion — <span className="italic text-sage">secure & synced.</span>
           </h1>
           
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
-            Track kicks, time contractions, monitor blood pressure, and get AI-powered answers.
-            <strong className="text-charcoal font-semibold"> Securely backed up to the cloud.</strong>
+            Track symptoms, count kicks, pack your hospital bag, and monitor blood pressure.
+            <strong className="text-charcoal font-semibold"> All your data, entirely free.</strong>
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
@@ -365,7 +332,7 @@ export const LandingPage: React.FC = () => {
               className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isSetupComplete ? "Go to Dashboard" : "Continue with Google"}
+              {isSetupComplete ? "Go to Dashboard" : "Start Tracking — It's Free"}
               {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
             </button>
             {!isSetupComplete && (
@@ -418,11 +385,10 @@ export const LandingPage: React.FC = () => {
       <section className="border-y border-border bg-white px-6 py-6">
         <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4">
           {[
-            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Data is Encrypted" },
-            { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works Offline" },
-            { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for India" },
-            { icon: <Stethoscope className="w-5 h-5 text-sage" />, text: "Clinically Informed" },
-            { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "₹0 Always Free" }
+            { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for Indian mothers 🇮🇳" },
+            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Your data stays on your device" },
+            { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "No payment required" },
+            { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works offline" }
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-[14px] font-semibold text-charcoal">
               {item.icon}
@@ -448,7 +414,7 @@ export const LandingPage: React.FC = () => {
               {[
                 { step: "1", title: "Quick Setup", desc: "Enter your due date. No account required to start tracking.", icon: <Calendar className="w-6 h-6 text-sage" /> },
                 { step: "2", title: "Track Daily", desc: "Log vitals, kick counts, and contractions right on your phone.", icon: <Activity className="w-6 h-6 text-sage" /> },
-                { step: "3", title: "Ask AI", desc: "Get WHO-verified answers to your pregnancy questions instantly.", icon: <Bot className="w-6 h-6 text-sage" /> },
+                { step: "3", title: "Prepare", desc: "Build your hospital bag checklist and track symptoms.", icon: <Heart className="w-6 h-6 text-sage" /> },
                 { step: "4", title: "Sync & Share", desc: "Securely sync to the cloud or share progress with your partner.", icon: <Cloud className="w-6 h-6 text-sage" /> }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center text-center relative group">
@@ -477,12 +443,12 @@ export const LandingPage: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[
-            { icon: <Activity className="w-6 h-6 text-sage" />, title: "Kick Counter", desc: "Count fetal movements daily from 28 weeks. Auto-alerts if count is low." },
+            { icon: <Activity className="w-6 h-6 text-sage" />, title: "Vitals Tracker", desc: "Log blood pressure with preeclampsia threshold alerts. Free at PHCs." },
+            { icon: <Heart className="w-6 h-6 text-sage" />, title: "Kick Counter", desc: "Count fetal movements daily from 28 weeks. Auto-alerts if count is low." },
+            { icon: <ShieldCheck className="w-6 h-6 text-sage" />, title: "Hospital Bag Checklist", desc: "Prepare essentials for delivery day with our curated list." },
             { icon: <Timer className="w-6 h-6 text-sage" />, title: "Contraction Timer", desc: "Time contractions and get the 5-1-1 hospital rule calculated automatically." },
-            { icon: <Heart className="w-6 h-6 text-sage" />, title: "BP Tracker", desc: "Log blood pressure with preeclampsia threshold alerts. Free at PHCs." },
-            { icon: <Bot className="w-6 h-6 text-gold" />, title: "AskBloom AI", desc: "Ask anything about your pregnancy at 2am. Grounded in WHO guidelines.", premium: true },
-            { icon: <Sparkles className="w-6 h-6 text-gold" />, title: "Name Boutique", desc: "AI-powered baby name generator based on style, origin, and cultural meanings.", premium: true },
-            { icon: <Landmark className="w-6 h-6 text-sage" />, title: "Govt Schemes", desc: "JSY, PMMVY, PMSMA, JSSK — know your entitlements." }
+            { icon: <Calendar className="w-6 h-6 text-sage" />, title: "Pregnancy Timeline", desc: "Track weekly changes, milestones, and what to expect." },
+            { icon: <Cloud className="w-6 h-6 text-sage" />, title: "Calm/Dark Mode", desc: "Soothing dark mode for tracking during those 3 AM wake-ups." }
           ].map((feature, i) => (
             <div key={i} className="bg-white border-[1.5px] border-border rounded-[16px] p-6 sm:p-8 hover:shadow-md transition-shadow group">
               <div className="w-12 h-12 rounded-[12px] bg-cream flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
@@ -490,11 +456,23 @@ export const LandingPage: React.FC = () => {
               </div>
               <h3 className="font-bold text-[18px] text-charcoal mb-2 flex items-center gap-2">
                 {feature.title}
-                {feature.premium && <span className="bg-gold-pale text-gold text-[10px] uppercase font-bold px-2 py-0.5 rounded shadow-sm">Premium</span>}
               </h3>
               <p className="text-[14px] text-medium leading-relaxed">{feature.desc}</p>
             </div>
           ))}
+        </div>
+
+        {/* Coming Soon AI Teaser */}
+        <div className="mt-12 max-w-2xl mx-auto bg-sage-pale/20 border border-sage-light/30 rounded-2xl p-6 text-center">
+          <div className="inline-block bg-white text-sage text-[11px] font-bold tracking-wider uppercase px-3 py-1 rounded-full mb-3 border border-sage-light/30">
+            Coming Soon
+          </div>
+          <h3 className="text-lg font-bold text-charcoal mb-2 flex items-center justify-center gap-2">
+            🤖 AI Pregnancy Companion
+          </h3>
+          <p className="text-medium text-[14px]">
+            Get personalized insights powered by AI. We are building the next generation of intelligent support for Indian mothers.
+          </p>
         </div>
       </section>
 
@@ -552,96 +530,13 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="max-w-[1200px] mx-auto px-6 py-24">
-        <div className="text-center mb-16">
-          <h2 className="font-serif text-4xl text-charcoal mb-4">Simple, transparent pricing.</h2>
-          <p className="text-medium text-[16px] max-w-2xl mx-auto">Core health features are always free. Upgrade for AI-powered peace of mind.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-[1100px] mx-auto items-stretch">
-          {/* Free Tier */}
-          <div className="bg-white border-[1.5px] border-border rounded-[24px] p-8 flex flex-col hover:shadow-md transition-shadow">
-            <h3 className="font-bold text-[22px] text-charcoal mb-2">Free Forever</h3>
-            <div className="font-serif text-[36px] text-charcoal mb-6">₹0 <span className="text-[14px] text-medium font-sans font-normal">/ month</span></div>
-            <p className="text-[13px] text-medium mb-8 min-h-[40px]">Everything you need for a healthy pregnancy journey.</p>
-            
-            <ul className="space-y-4 mb-8 flex-1">
-              {['Kick Counter & BP Tracker', 'Contraction Timer', 'Birth Plan Builder', 'Mood & Hydration Trackers', 'Hospital Bag & Govt Schemes'].map((item, i) => (
-                <li key={i} className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
-                  <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-            
-            <button onClick={handleStart} className="w-full py-3.5 rounded-full border-[1.5px] border-sage text-sage font-bold text-[15px] hover:bg-sage-pale transition-colors mt-auto">
-              Get Started Free
-            </button>
-          </div>
-
-          {/* Plus Tier */}
-          <div className="bg-white border-[2px] border-sage rounded-[24px] p-8 flex flex-col relative shadow-lg">
-            <div className="absolute top-0 right-6 -translate-y-1/2 bg-sage text-white text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full shadow-sm">
-              Recommended
-            </div>
-            <h3 className="font-bold text-[22px] text-charcoal mb-2">Bloom Plus</h3>
-            <div className="font-serif text-[36px] text-charcoal mb-6">₹99 <span className="text-[14px] text-medium font-sans font-normal">/ month</span></div>
-            <p className="text-[13px] text-medium mb-8 min-h-[40px]">Enhanced tools to coordinate with your partner and doctor.</p>
-            
-            <ul className="space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
-                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>Everything in Free, plus:</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
-                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span><strong className="text-sage-dark">Partner Sync:</strong> Share your journey in real-time.</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
-                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span><strong className="text-sage-dark">PDF Export:</strong> Generate detailed health reports.</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-charcoal font-medium">
-                <CheckCircle2 className="w-5 h-5 text-sage shrink-0 mt-0.5" /> <span>Unlimited Custom Notes</span>
-              </li>
-            </ul>
-            
-            <button onClick={handleStart} className="w-full py-3.5 rounded-full bg-sage text-white font-bold text-[15px] hover:bg-sage-dark transition-colors shadow-sm mt-auto">
-              Choose Plus
-            </button>
-          </div>
-
-          {/* Premium Tier */}
-          <div className="bg-charcoal border-[2px] border-gold rounded-[24px] p-8 flex flex-col relative transform lg:-translate-y-4 shadow-xl">
-            <div className="absolute top-0 right-6 -translate-y-1/2 bg-gold text-white text-[11px] uppercase font-bold tracking-wider px-3 py-1 rounded-full shadow-lg">
-              Full AI Access
-            </div>
-            
-            <h3 className="font-bold text-[22px] text-white mb-2 flex items-center gap-2">Bloom Premium <Bot className="w-5 h-5 text-gold" /></h3>
-            <div className="font-serif text-[36px] text-white mb-6">₹299 <span className="text-[14px] text-light font-sans font-normal">/ month</span></div>
-            <p className="text-[13px] text-light mb-8 min-h-[40px]">24/7 AI-powered support tailored for Indian clinics.</p>
-            
-            <ul className="space-y-4 mb-8 flex-1">
-              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> <span>Everything in Plus, plus:</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
-                <span><strong className="text-gold">AskBloom AI:</strong> Instant answers to pregnancy questions.</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
-                <span><strong className="text-gold">AI Food Scanner:</strong> Instant safety rating.</span>
-              </li>
-              <li className="flex items-start gap-3 text-[14px] text-white font-medium">
-                <CheckCircle2 className="w-5 h-5 text-gold shrink-0 mt-0.5" /> 
-                <span><strong className="text-gold">AI Name Generator:</strong> Cultural name suggestions.</span>
-              </li>
-            </ul>
-            
-            <button onClick={handleStart} className="w-full py-3.5 rounded-full bg-gold text-charcoal font-bold text-[15px] hover:bg-yellow-400 transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2 mt-auto">
-              Start 7-Day Trial <ArrowRight className="w-4 h-4" />
-            </button>
-            <p className="text-center text-[11px] text-light mt-3 opacity-70">Cancel anytime. Billed annually.</p>
-          </div>
-        </div>
+      {/* Free Section */}
+      <section className="max-w-[800px] mx-auto px-6 py-24 text-center">
+        <h2 className="font-serif text-4xl text-charcoal mb-4">No hidden costs. Completely Free.</h2>
+        <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful.</p>
+        <button onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
+          Start Tracking Now
+        </button>
       </section>
 
       {/* Testimonials */}
@@ -653,9 +548,9 @@ export const LandingPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { review: "The app's AI has been an incredible companion. It feels like having an expert right in my pocket during this amazing journey.", author: "Priya M.", loc: "Mumbai" },
+              { review: "I love how it feels so secure. I don't need an account to just start using the features.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
-              { review: "AskBloom answered my 2am panic questions much better than Googling. Highly recommend the premium plan.", author: "Anjali S.", loc: "Delhi" }
+              { review: "Everything is free and offline, which is such a blessing when travelling. Highly recommend it.", author: "Anjali S.", loc: "Delhi" }
             ].map((t, i) => (
               <div key={i} className="bg-cream p-8 rounded-[20px] relative">
                 <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
@@ -694,11 +589,10 @@ export const LandingPage: React.FC = () => {
         
         <div className="flex justify-center items-center gap-2 text-[13px] text-light/70">
           <Lock className="w-4 h-4" />
-          Your data is used to train our LLM model, and is encrypted.
+          Your data is encrypted and securely stored locally.
         </div>
       </footer>
 
-      <FloatingChatbot />
     </div>
   );
 };
