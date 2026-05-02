@@ -81,7 +81,7 @@ export const PartnerSync: React.FC = () => {
      items: [
        { key: 'babynames', label: 'Name Generator', desc: 'Favorite baby names' },
        { key: 'askbloom', label: 'AskBloom AI', desc: 'Allow partner to interact' },
-       { key: 'foodscanner', label: 'Food Scanner', desc: 'Sharing logs' }
+       { key: 'foodscanner', label: 'AI Food Guide', desc: 'Sharing logs' }
      ]
    },
    {

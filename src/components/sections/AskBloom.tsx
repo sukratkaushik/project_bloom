@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePlanner } from '../../store';
 import { db } from '../../db';
-import { generateAIContent } from '../../utils/aiService';
+import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { Paywall } from '../Paywall';
@@ -9,9 +9,9 @@ import { Paywall } from '../Paywall';
 export const AskBloom: React.FC = () => {
   const { state } = usePlanner();
   const [input, setInput] = useState('');
+  const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [history, setHistory] = useState<{ role: 'user' | 'model', text: string }[]>([]);
-  const systemInstructionRef = useRef('');
+  const [chatSession, setChatSession] = useState<any>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -99,46 +99,49 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
 > *   Chest pain or severe shortness of breath
 > *   Fluid leaking from your vagina
 
+---
+**USER CONTEXT FOR THIS SESSION:**
 - **Current Pregnancy Trimester:** ${trimester} (${weeks})
 - **Pre-existing Medical Conditions:** ${conditions}
 - **Current/Logged Symptoms:** ${recentSymptoms}
 `;
 
-      systemInstructionRef.current = systemInstruction;
-
-      setHistory([{
-        role: 'model',
-        text: "Hello! I'm AskBloom, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?"
-      }]);
+      try {
+        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+        const chat = ai.chats.create({
+          model: 'gemini-3.1-pro-preview',
+          config: {
+            systemInstruction,
+            temperature: 0.2,
+          }
+        });
+        setChatSession(chat);
+        setMessages([{
+          role: 'model',
+          text: "Hello! I'm AskBloom, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?"
+        }]);
+      } catch (err) {
+        console.error("Failed to initialize chat", err);
+      }
     };
 
     initChat();
   }, [state.activeJourneyId, state.dueDate, state.flags]);
 
   const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+    if (!input.trim() || !chatSession || isLoading) return;
 
     const userMsg = input.trim();
     setInput('');
-    const newMessages = [...history, { role: 'user', text: userMsg }];
-    setHistory(newMessages);
+    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsLoading(true);
 
     try {
-      // Build full conversation prompt for fallback support
-      const prompt = newMessages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.text}`).join('\n');
-      
-      const response = await generateAIContent(prompt, {
-        systemInstruction: systemInstructionRef.current,
-        temperature: 0.2
-      });
-
-      if (response.error) throw new Error(response.error);
-
-      setHistory(prev => [...prev, { role: 'model', text: response.text }]);
-    } catch (error: any) {
+      const response = await chatSession.sendMessage({ message: userMsg });
+      setMessages(prev => [...prev, { role: 'model', text: response.text }]);
+    } catch (error) {
       console.error("Chat error:", error);
-      setHistory(prev => [...prev, { role: 'model', text: `I'm sorry, I encountered an error: ${error.message}. Please try again.` }]);
+      setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error processing your request. Please try again." }]);
     } finally {
       setIsLoading(false);
     }
@@ -168,7 +171,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
 
       <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
-          {history.map((msg, i) => (
+          {messages.map((msg, i) => (
             <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[85%] rounded-[16px] p-4 ${
                 msg.role === 'user' 

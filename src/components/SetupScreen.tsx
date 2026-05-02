@@ -125,6 +125,8 @@ export const SetupScreen: React.FC = () => {
   const [partnerSit, setPartnerSit] = useState('partner');
   const [dietPref, setDietPref] = useState('vegetarian');
   const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [hasConsented, setHasConsented] = useState(false);
+  const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   const toggleFlag = (id: string) => {
     setFlags((prev) => ({ ...prev, [id]: !prev[id] }));
@@ -264,9 +266,26 @@ export const SetupScreen: React.FC = () => {
           </div>
         </div>
 
+        <div className="mt-8">
+          <label className="flex items-start gap-3 cursor-pointer p-3 border-[1.5px] border-border rounded-[12px] hover:border-sage-light transition-colors bg-white">
+            <div className="pt-0.5">
+              <input 
+                type="checkbox" 
+                checked={hasConsented}
+                onChange={(e) => setHasConsented(e.target.checked)}
+                className="w-4 h-4 text-sage rounded border-border focus:ring-sage focus:ring-2"
+              />
+            </div>
+            <span className="text-[13px] text-charcoal leading-snug">
+              I agree to the <a href="#/privacy" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Privacy Policy</a> and <a href="#/terms" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Terms of Service</a>. I understand that my data will be securely processed to personalise my plan.
+            </span>
+          </label>
+        </div>
+
         <button 
           onClick={handleGenerate}
-          className="w-full mt-8 p-[17px] bg-gradient-to-br from-sage to-sage-light text-white border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] cursor-pointer transition-all hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]"
+          disabled={!hasConsented}
+          className={`w-full mt-6 p-[17px] border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
           ✦ Generate My Personalised Plan
         </button>
@@ -278,6 +297,26 @@ export const SetupScreen: React.FC = () => {
           Not right now (Logout)
         </button>
       </div>
+
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] p-8 max-w-[480px] w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="w-12 h-12 bg-sage-pale rounded-full flex items-center justify-center mb-5 mx-auto">
+              <span className="text-sage text-2xl">⚕️</span>
+            </div>
+            <h3 className="font-serif text-[24px] text-charcoal font-medium text-center mb-3">Important Disclaimer</h3>
+            <p className="text-[15px] text-medium leading-relaxed text-center mb-6">
+              Bloom is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
+            </p>
+            <button
+              onClick={() => setShowDisclaimer(false)}
+              className="w-full p-4 bg-sage text-white rounded-[12px] font-semibold hover:bg-sage-dark transition-colors"
+            >
+              I Understand
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

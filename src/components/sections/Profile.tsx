@@ -7,6 +7,7 @@ export const Profile: React.FC = () => {
   const { state, updateState } = usePlanner();
   
   const [userName, setUserName] = useState(state.userName || '');
+  const [showDisclaimer, setShowDisclaimer] = useState(false);
   
   const handleNameSave = () => {
     updateState({ userName });
@@ -136,6 +137,10 @@ export const Profile: React.FC = () => {
           </div>
           
           <div className="space-y-3">
+            <button onClick={() => setShowDisclaimer(true)} className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group text-left">
+              <span className="font-medium text-charcoal group-hover:text-sage">Medical Disclaimer</span>
+              <span className="text-sage">→</span>
+            </button>
             <a href="#privacy" onClick={() => window.location.hash = '#privacy'} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Privacy Policy</span>
               <span className="text-sage">→</span>
@@ -152,6 +157,26 @@ export const Profile: React.FC = () => {
         </section>
 
       </div>
+
+      {showDisclaimer && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[24px] p-8 max-w-[480px] w-full shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div className="w-12 h-12 bg-sage-pale rounded-full flex items-center justify-center mb-5 mx-auto">
+              <span className="text-sage text-2xl">⚕️</span>
+            </div>
+            <h3 className="font-serif text-[24px] text-charcoal font-medium text-center mb-3">Important Disclaimer</h3>
+            <p className="text-[15px] text-medium leading-relaxed text-center mb-6">
+              Bloom is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
+            </p>
+            <button
+              onClick={() => setShowDisclaimer(false)}
+              className="w-full p-4 bg-sage text-white rounded-[12px] font-semibold hover:bg-sage-dark transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
