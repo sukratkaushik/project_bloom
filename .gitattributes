@@ -1,8 +1,13 @@
-# Mark image files as binary to prevent corruption
+# Ensure all PNG/image files are treated as binary — never text-encoded
 *.png binary
 *.jpg binary
 *.jpeg binary
 *.gif binary
-*.ico binary
 *.svg text
 *.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
