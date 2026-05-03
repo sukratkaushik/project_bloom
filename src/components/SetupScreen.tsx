@@ -176,7 +176,7 @@ export const SetupScreen: React.FC = () => {
         </button>
       </div>
 
-      <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-4 z-10">Bloom</div>
+      <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-4 z-10">Our Pregnancy</div>
       <h1 className="font-serif text-[clamp(38px,7vw,68px)] font-light leading-[1.08] text-center text-charcoal mb-3.5 z-10">
         Your <em className="italic text-blush">Pregnancy</em><br />Planning Companion
       </h1>
@@ -306,7 +306,7 @@ export const SetupScreen: React.FC = () => {
             </div>
             <h3 className="font-serif text-[24px] text-charcoal font-medium text-center mb-3">Important Disclaimer</h3>
             <p className="text-[15px] text-medium leading-relaxed text-center mb-6">
-              Bloom is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
+              Our Pregnancy is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
             </p>
             <button
               onClick={() => setShowDisclaimer(false)}

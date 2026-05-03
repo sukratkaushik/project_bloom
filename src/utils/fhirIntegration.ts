@@ -1,8 +1,8 @@
 /**
- * Bloom Health - FHIR Interoperability Module
+ * Our Pregnancy Health - FHIR Interoperability Module
  * 
  * This module provides production-ready data mapping utilities to convert local
- * Bloom app health data into HL7 FHIR R4 compliant Observation resources.
+ * Our Pregnancy app health data into HL7 FHIR R4 compliant Observation resources.
  * It also includes an OAuth 2.0 client for securely POSTing this data to 
  * enterprise EHR systems (e.g., Epic, Cerner).
  */
@@ -11,7 +11,7 @@
 // 1. TYPE DEFINITIONS
 // ============================================================================
 
-// --- Bloom App Local Data Types ---
+// --- Our Pregnancy App Local Data Types ---
 
 export interface BloomBloodPressure {
   id: string;
@@ -80,7 +80,7 @@ const LOINC_SYSTEM = "http://loinc.org";
 const UCUM_SYSTEM = "http://unitsofmeasure.org";
 
 /**
- * Maps a Bloom Blood Pressure reading to a FHIR R4 Observation.
+ * Maps a Our Pregnancy Blood Pressure reading to a FHIR R4 Observation.
  * Uses LOINC 85354-9 (Blood pressure panel) with systolic and diastolic components.
  */
 export function mapBloodPressureToFHIR(data: BloomBloodPressure): FHIRObservation {
@@ -118,7 +118,7 @@ export function mapBloodPressureToFHIR(data: BloomBloodPressure): FHIRObservatio
 }
 
 /**
- * Maps a Bloom Weight measurement to a FHIR R4 Observation.
+ * Maps a Our Pregnancy Weight measurement to a FHIR R4 Observation.
  * Uses LOINC 29463-7 (Body weight).
  */
 export function mapWeightToFHIR(data: BloomWeight): FHIRObservation {
@@ -148,7 +148,7 @@ export function mapWeightToFHIR(data: BloomWeight): FHIRObservation {
 }
 
 /**
- * Maps a Bloom Fetal Kick Count to a FHIR R4 Observation.
+ * Maps a Our Pregnancy Fetal Kick Count to a FHIR R4 Observation.
  * Uses LOINC 57083-8 (Fetal movement count).
  */
 export function mapFetalKickCountToFHIR(data: BloomFetalKick): FHIRObservation {
@@ -289,7 +289,7 @@ export async function syncBloomDataToEHR() {
     fhirBaseUrl: process.env.EHR_FHIR_BASE_URL || 'https://fhir.epic.com/interconnect-fhir-oauth/api/FHIR/R4'
   });
 
-  // 2. Sample local Bloom data
+  // 2. Sample local Our Pregnancy data
   const sampleBP: BloomBloodPressure = {
     id: 'bp-123',
     patientId: 'eq081-VQEgP8drUUqCWzHfw3', // Epic FHIR ID example

@@ -27,15 +27,15 @@ export const ContractionTimer: React.FC = () => {
 
   // Initialize or load current session
   useEffect(() => {
-    let currentSession = localStorage.getItem('bloom_active_contraction_session');
+    let currentSession = localStorage.getItem('ourpregnancy_active_contraction_session');
     if (!currentSession) {
       currentSession = uuidv4();
-      localStorage.setItem('bloom_active_contraction_session', currentSession);
+      localStorage.setItem('ourpregnancy_active_contraction_session', currentSession);
     }
     setSessionId(currentSession);
     
     // Check if there was an active contraction we navigated away from
-    const activeStart = localStorage.getItem('bloom_active_contraction_start');
+    const activeStart = localStorage.getItem('ourpregnancy_active_contraction_start');
     if (activeStart) {
       setActiveStartedAt(parseInt(activeStart, 10));
     }
@@ -122,7 +122,7 @@ export const ContractionTimer: React.FC = () => {
     if (activeStartedAt) return; // Prevent double start
     const now = Date.now();
     setActiveStartedAt(now);
-    localStorage.setItem('bloom_active_contraction_start', now.toString());
+    localStorage.setItem('ourpregnancy_active_contraction_start', now.toString());
   };
 
   const handleEnd = async () => {
@@ -150,7 +150,7 @@ export const ContractionTimer: React.FC = () => {
 
     setActiveStartedAt(null);
     setElapsedSeconds(0);
-    localStorage.removeItem('bloom_active_contraction_start');
+    localStorage.removeItem('ourpregnancy_active_contraction_start');
   };
 
   const handleClearSession = async () => {
@@ -170,10 +170,10 @@ export const ContractionTimer: React.FC = () => {
     // Start fresh
     const newSession = uuidv4();
     setSessionId(newSession);
-    localStorage.setItem('bloom_active_contraction_session', newSession);
+    localStorage.setItem('ourpregnancy_active_contraction_session', newSession);
     setActiveStartedAt(null);
     setElapsedSeconds(0);
-    localStorage.removeItem('bloom_active_contraction_start');
+    localStorage.removeItem('ourpregnancy_active_contraction_start');
   };
 
   // 5-1-1 Rule calculations
@@ -391,7 +391,7 @@ export const ContractionTimer: React.FC = () => {
           </div>
           <div className="grid grid-cols-7 gap-1">
             {days.map((d, i) => {
-              if (d === null) return <div key={`empty-${i}`} className="aspect-square" />;
+              if (d === null) return <div key={`empty-${i}`} className="w-8 h-8 sm:w-10 sm:h-10 mx-auto" />;
               
               const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
               const hasLog = logDates.has(dateStr);
