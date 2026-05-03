@@ -56,7 +56,7 @@ export const NutritionTracker: React.FC = () => {
   const [newSuppName, setNewSuppName] = useState('');
   const [newSuppDose, setNewSuppDose] = useState('');
   const [hiddenSupps, setHiddenSupps] = useState<string[]>(() => {
-    const saved = localStorage.getItem('ourpregnancy_hidden_supps');
+    const saved = localStorage.getItem('bloom_hidden_supps');
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -97,7 +97,7 @@ export const NutritionTracker: React.FC = () => {
   const hideSupplement = (id: string) => {
     const newHidden = [...hiddenSupps, id];
     setHiddenSupps(newHidden);
-    localStorage.setItem('ourpregnancy_hidden_supps', JSON.stringify(newHidden));
+    localStorage.setItem('bloom_hidden_supps', JSON.stringify(newHidden));
   };
 
   // Trimester focus logic

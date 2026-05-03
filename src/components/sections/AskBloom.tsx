@@ -6,7 +6,7 @@ import Markdown from 'react-markdown';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { Paywall } from '../Paywall';
 
-export const AskOurPregnancy: React.FC = () => {
+export const AskBloom: React.FC = () => {
   const { state } = usePlanner();
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([]);
@@ -53,9 +53,9 @@ export const AskOurPregnancy: React.FC = () => {
         .join(', ') || 'None reported';
 
       const systemInstruction = `
-# SYSTEM INSTRUCTIONS: AskOur Pregnancy AI Prenatal Assistant
+# SYSTEM INSTRUCTIONS: AskBloom AI Prenatal Assistant
 
-You are "AskOurPregnancy," an expert, empathetic, and highly secure AI prenatal assistant. Your primary function is to provide supportive, accurate, and safe prenatal health information to expectant parents. 
+You are "AskBloom," an expert, empathetic, and highly secure AI prenatal assistant. Your primary function is to provide supportive, accurate, and safe prenatal health information to expectant parents. 
 
 You operate under strict clinical, operational, and ethical constraints. You must adhere to the following protocols in every interaction without exception.
 
@@ -89,7 +89,7 @@ Before providing any clinical or symptom-related information, you must possess t
 You MUST append the following hard clinical disclaimer to the very end of EVERY single response you generate. It must appear exactly as formatted below, using markdown blockquotes and bold text to ensure it is visually distinct. Do not alter the wording of this disclaimer.
 
 > **⚠️ IMPORTANT CLINICAL NOTICE**
-> AskOurPregnancy is an AI informational assistant and does not provide medical advice, diagnosis, or treatment. Always consult your OB-GYN or midwife regarding your specific health needs. 
+> AskBloom is an AI informational assistant and does not provide medical advice, diagnosis, or treatment. Always consult your OB-GYN or midwife regarding your specific health needs. 
 >
 > **Seek IMMEDIATE emergency medical care (call 911 or go to the nearest emergency department) if you experience any of the following red-flag symptoms:**
 > *   Vaginal bleeding or spotting
@@ -118,7 +118,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
         setChatSession(chat);
         setMessages([{
           role: 'model',
-          text: "Hello! I'm AskOurPregnancy, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?"
+          text: "Hello! I'm AskBloom, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?"
         }]);
       } catch (err) {
         console.error("Failed to initialize chat", err);
@@ -150,17 +150,17 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
   if (!state.activeJourneyId) {
     return (
       <div className="text-center p-10 text-light italic">
-        Please generate a new plan to use AskOurPregnancy.
+        Please generate a new plan to use AskBloom.
       </div>
     );
   }
 
   return (
-    <Paywall featureName="AskOurPregnancy">
+    <Paywall featureName="AskBloom">
       <div className="animate-in fade-in duration-300 flex flex-col h-[calc(100vh-140px)]">
         <div className="mb-5 shrink-0">
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-            <Sparkles className="text-sage" size={32} /> AskOur Pregnancy AI
+            <Sparkles className="text-sage" size={32} /> AskBloom AI
           </h2>
           {!state.isCalmModeActive && (
             <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
@@ -223,7 +223,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
             </button>
           </div>
           <div className="text-center mt-2 text-[10px] text-light">
-            AskOurPregnancy uses AI and may make mistakes. Always verify medical information with your healthcare provider.
+            AskBloom uses AI and may make mistakes. Always verify medical information with your healthcare provider.
           </div>
         </div>
       </div>

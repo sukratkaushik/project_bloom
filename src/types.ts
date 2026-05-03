@@ -78,7 +78,7 @@ export type SyncPermissions = {
   nutrition: boolean;
   symptoms: boolean;
 
-  askourpregnancy: boolean;
+  askbloom: boolean;
   foodscanner: boolean;
   babynames: boolean;
 
