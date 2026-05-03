@@ -27,7 +27,7 @@ import {
 import { FloatingChatbot } from '../components/FloatingChatbot';
 
 export const LandingPage: React.FC = () => {
-  const { state, updateState, toggleDarkMode } = usePlanner();
+  const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
 
@@ -49,11 +49,21 @@ export const LandingPage: React.FC = () => {
       const user = await signInWithGoogle();
       if (user) {
         setShowEmailModal(false);
-        if (!state.isSetup) {
+        
+        // Check if there is an active journey locally
+        if (state.isSetup && state.activeJourneyId) {
+          window.location.hash = '#dashboard';
+          return;
+        }
+
+        // Try to restore from cloud
+        const restored = await restoreJourney(user.uid);
+        
+        if (restored) {
+          window.location.hash = '#dashboard';
+        } else {
           updateState({ hasStartedOnboarding: true, isSetup: false });
           window.location.hash = '#setup';
-        } else {
-          window.location.hash = '#dashboard';
         }
       }
     } catch (error: any) {
@@ -267,9 +277,9 @@ export const LandingPage: React.FC = () => {
       )}
       {/* Navigation */}
       <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        <div className="font-serif text-[20px] md:text-[24px] font-medium text-sage italic tracking-wider flex items-center gap-2 md:gap-3 shrink-0 mr-4">
-          <img src="/logo.png?v=2" alt="Bloom Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
-          bloom
+        <div className="flex items-center gap-3 shrink-0 mr-4">
+          <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
+          <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
         </div>
         <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
           <button 
@@ -299,7 +309,7 @@ export const LandingPage: React.FC = () => {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative px-6 pt-16 pb-20 md:pt-32 md:pb-40 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
+      <section className="relative px-6 pt-8 pb-16 md:pt-16 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
         
         {/* Animated Background Blobs */}
         <div className="absolute top-0 -left-12 md:-left-24 w-72 h-72 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob -z-10"></div>
@@ -349,7 +359,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Side: Visual/Animation (The Bloom/Womb Concept) */}
+        {/* Right Side: Visual/Animation (The Our Pregnancy/Womb Concept) */}
         <div className="flex-1 relative w-full max-w-[500px] aspect-square flex items-center justify-center -z-10 mt-10 md:mt-0">
           {/* Ambient Glow */}
           <div className="absolute inset-0 bg-sage-pale/80 rounded-full filter blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
@@ -367,8 +377,8 @@ export const LandingPage: React.FC = () => {
           </div>
           
           {/* Inner Core (The Mama/Baby Connection) */}
-          <div className="relative w-36 h-36 md:w-56 md:h-56 bg-white/60 backdrop-blur-sm rounded-full shadow-[0_0_50px_rgba(242,166,166,0.2)] flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] border border-white/60">
-            <img src="/logo.png?v=2" alt="Bloom Logo" className="w-28 h-28 md:w-44 md:h-44 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
+          <div className="relative w-44 h-44 md:w-64 md:h-64 bg-white/60 backdrop-blur-sm rounded-full shadow-[0_0_50px_rgba(242,166,166,0.2)] flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] border border-white/60">
+            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-36 h-36 md:w-52 md:h-52 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
           </div>
 
           {/* Floating Accents */}
@@ -399,10 +409,10 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Flowchart Section */}
-      <section className="bg-sage-pale/20 py-24 px-6 overflow-hidden">
+      <section className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
         <div className="max-w-[1000px] mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl text-charcoal mb-4">How Bloom Works</h2>
+            <h2 className="font-serif text-4xl text-charcoal mb-4">How Our Pregnancy Works</h2>
             <p className="text-medium text-[16px] max-w-2xl mx-auto">A seamless, private journey from your first trimester to delivery day.</p>
           </div>
 
@@ -435,7 +445,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Features Grid */}
-      <section id="features" className="max-w-[1200px] mx-auto px-6 py-24">
+      <section id="features" className="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
         <div className="text-center mb-16">
           <h2 className="font-serif text-4xl text-charcoal mb-4">Everything you need, nothing you don't.</h2>
           <p className="text-medium text-[16px] max-w-2xl mx-auto">Thoughtfully designed tools that put your peace of mind first.</p>
@@ -477,7 +487,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* India Section */}
-      <section className="relative bg-sage text-white px-6 py-24 md:py-32 overflow-hidden">
+      <section className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-white/10 blur-[120px]"></div>
@@ -531,7 +541,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Free Section */}
-      <section className="max-w-[800px] mx-auto px-6 py-24 text-center">
+      <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
         <h2 className="font-serif text-4xl text-charcoal mb-4">No hidden costs. Completely Free.</h2>
         <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful.</p>
         <button onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
@@ -540,7 +550,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Testimonials */}
-      <section className="border-t border-border bg-white px-6 py-24">
+      <section className="border-t border-border bg-white px-6 py-16 md:py-24">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
@@ -574,8 +584,9 @@ export const LandingPage: React.FC = () => {
       <footer className="bg-charcoal text-white px-6 py-12 text-center md:text-left">
         <div className="max-w-[1200px] mx-auto grid grid-cols-1 md:grid-cols-2 gap-8 items-center border-b border-light/20 pb-8 mb-8">
           <div>
-            <div className="font-serif text-[24px] font-medium text-sage italic tracking-wider mb-2">
-              bloom
+            <div className="flex items-center gap-2 mb-4 justify-center md:justify-start">
+              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 object-contain" />
+              <span className="font-serif text-[24px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
             </div>
             <p className="text-[14px] text-light">Made with ❤️ for Indian mothers</p>
           </div>
@@ -583,7 +594,7 @@ export const LandingPage: React.FC = () => {
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
             <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="mailto:hello@bloompregnancy.in" className="hover:text-white transition-colors">hello@bloompregnancy.in</a>
+            <a href="mailto:hello@ourpregnancy.in" className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
           </div>
         </div>
         

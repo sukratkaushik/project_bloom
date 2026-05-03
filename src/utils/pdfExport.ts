@@ -95,7 +95,7 @@ export const exportToPDF = async (state: PlannerState) => {
   doc.setFont('times', 'bold');
   doc.setFontSize(32);
   doc.setTextColor(107, 146, 120);
-  doc.text('Bloom', margin, 24);
+  doc.text('Our Pregnancy', margin, 24);
   
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(14);
@@ -324,8 +324,8 @@ export const exportToPDF = async (state: PlannerState) => {
     doc.setLineWidth(0.5);
     doc.line(margin, pageHeight - 15, pageWidth - margin, pageHeight - 15);
     
-    doc.text(`Bloom App • Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+    doc.text(`Our Pregnancy App • Page ${i} of ${totalPages}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
   }
 
-  doc.save('bloom-pregnancy-plan.pdf');
+  doc.save('our-pregnancy-plan.pdf');
 };

@@ -160,7 +160,7 @@ Specifically, you MUST detect and flag the following hazards:
       <div className="animate-in fade-in duration-300">
         <div className="mb-7">
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-            <Bot className="text-sage" size={32} /> Bloom AI Food Guide
+            <Bot className="text-sage" size={32} /> Our Pregnancy AI Food Guide
           </h2>
           {!state.isCalmModeActive && (
             <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
@@ -207,7 +207,7 @@ Specifically, you MUST detect and flag the following hazards:
                   </>
                 ) : (
                   <>
-                    <Bot size={18} /> Analyze Food with Bloom AI
+                    <Bot size={18} /> Analyze Food with Our Pregnancy AI
                   </>
                 )}
               </button>
