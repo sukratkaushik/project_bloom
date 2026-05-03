@@ -346,7 +346,7 @@ export const BirthPlanBuilder: React.FC = () => {
           </div>
 
           <div className="mt-12 text-center text-[11px] text-light border-t border-border pt-4 print:mt-16 print:border-t-2">
-            Created privately on Our Pregnancy Planner
+            Created privately on Bloom Pregnancy Planner
           </div>
         </div>
       </div>

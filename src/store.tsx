@@ -4,7 +4,7 @@ import { db, JourneyStatus, CalculationMethod } from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, addWeeks } from './utils';
 import { auth, db as firestoreDb, handleFirestoreError, OperationType } from './firebase';
-import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -24,7 +24,6 @@ type PlannerContextType = {
   setNote: (id: string, value: string) => void;
   generatePlan: (setupData: Partial<PlannerState>) => void;
   resetPlan: () => void;
-  restoreJourney: (uid: string) => Promise<boolean>;
   toggleCalmMode: () => void;
   toggleDarkMode: () => void;
   toggleFavoriteName: (name: string) => void;
@@ -65,7 +64,7 @@ const defaultState: PlannerState = {
   calendarStartDay: 'monday',
   syncPermissions: {
     kickcounter: true, contractions: true, vitals: true, mood: true, hydration: true, nutrition: true, symptoms: true,
-    askourpregnancy: true, foodscanner: true, babynames: true,
+    askbloom: true, foodscanner: true, babynames: true,
     dev: true, prep: true, finance: true, deadlines: true,
     medical: true, schemes: true,
     readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
@@ -397,43 +396,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setState(defaultState);
   };
 
-  const restoreJourney = async (uid: string): Promise<boolean> => {
-    try {
-      const journeysRef = collection(firestoreDb, 'journeys');
-      const q = query(
-        journeysRef, 
-        where('uid', '==', uid), 
-        orderBy('updatedAt', 'desc'), 
-        limit(1)
-      );
-      
-      const snapshot = await getDocs(q);
-      
-      if (!snapshot.empty) {
-        const cloudData = snapshot.docs[0].data() as Partial<PlannerState>;
-        
-        setState((prev) => {
-          const newState = { ...prev, ...cloudData, isSetup: true };
-          // Immediately persist to Dexie to avoid race conditions
-          if (isDbLoaded) {
-            db.appState.put({
-              id: 'global',
-              stateJSON: JSON.stringify(newState),
-              updatedAt: Date.now(),
-            }).catch(console.error);
-          }
-          return newState;
-        });
-        
-        return true;
-      }
-      return false;
-    } catch (err) {
-      console.error('Failed to restore journey from cloud:', err);
-      return false;
-    }
-  };
-
   const toggleCalmMode = () => {
     setState((prev) => ({ ...prev, isCalmModeActive: !prev.isCalmModeActive }));
   };
@@ -498,7 +460,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setNote,
         generatePlan,
         resetPlan,
-        restoreJourney,
         toggleCalmMode,
         toggleDarkMode,
         toggleFavoriteName,

@@ -4,7 +4,7 @@ import { Bot, MessageCircle, Send, X } from 'lucide-react';
 export const FloatingChatbot: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'user' | 'ai', text: string}[]>([
-    { role: 'ai', text: "Hi! I'm Our Pregnancy AI ✨ How can I help you with your pregnancy journey today?" }
+    { role: 'ai', text: "Hi! I'm Bloom AI ✨ How can I help you with your pregnancy journey today?" }
   ]);
   const [input, setInput] = useState('');
 
@@ -17,7 +17,7 @@ export const FloatingChatbot: React.FC = () => {
     setInput('');
     
     setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'ai', text: "That's a great question! I am here to help you navigate your journey. Feel free to use the AskOurPregnancy feature in the dashboard for a full-screen, in-depth conversation grounded in WHO guidelines." }]);
+      setMessages(prev => [...prev, { role: 'ai', text: "That's a great question! I am here to help you navigate your journey. Feel free to use the AskBloom feature in the dashboard for a full-screen, in-depth conversation grounded in WHO guidelines." }]);
     }, 1000);
   };
 
@@ -31,7 +31,7 @@ export const FloatingChatbot: React.FC = () => {
                 <Bot size={20} />
               </div>
               <div>
-                <h3 className="font-bold text-[15px]">Our Pregnancy AI</h3>
+                <h3 className="font-bold text-[15px]">Bloom AI</h3>
                 <p className="text-[11px] opacity-80">Quick answers anytime</p>
               </div>
             </div>

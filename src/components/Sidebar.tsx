@@ -120,7 +120,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'hydration', icon: '💧', label: 'Hydration' },
     { id: 'nutrition', icon: '🥗', label: 'Nutrition & Supplements' },
     { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
-    { id: 'askourpregnancy', icon: '✨', label: 'AskOur Pregnancy AI' },
+    { id: 'askbloom', icon: '✨', label: 'AskBloom AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
     { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },
@@ -174,7 +174,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <SectionHeader id="smart" label="Smart Tools" />
       {expandedSections['smart'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="askourpregnancy" icon="✨" label="AskOur Pregnancy AI" />
+          <NavItem id="askbloom" icon="✨" label="AskBloom AI" />
           <NavItem id="foodscanner" icon="🤖" label="AI Food Guide" />
           <NavItem id="babynames" icon="🌟" label="Name Generator" />
         </div>
