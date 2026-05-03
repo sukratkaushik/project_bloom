@@ -9,8 +9,6 @@ import {
   AlertTriangle, 
   CheckCircle, 
   Info, 
-  Search, 
-  X,
   CheckSquare,
   Square,
   EyeOff,
@@ -54,7 +52,6 @@ const FOOD_DATABASE = [
 
 export const NutritionTracker: React.FC = () => {
   const { state, addCustomSupplement, deleteCustomSupplement } = usePlanner();
-  const [search, setSearch] = useState('');
   const [showAddSupp, setShowAddSupp] = useState(false);
   const [newSuppName, setNewSuppName] = useState('');
   const [newSuppDose, setNewSuppDose] = useState('');
@@ -150,12 +147,6 @@ export const NutritionTracker: React.FC = () => {
       setShowAddSupp(false);
     }
   };
-
-  const filteredFood = useMemo(() => {
-    if (!search.trim()) return FOOD_DATABASE;
-    const lower = search.toLowerCase();
-    return FOOD_DATABASE.filter(f => f.name.toLowerCase().includes(lower) || f.desc.toLowerCase().includes(lower));
-  }, [search]);
 
   if (!state.activeJourneyId) {
     return (
@@ -290,21 +281,9 @@ export const NutritionTracker: React.FC = () => {
           <h3 className="font-semibold text-charcoal text-[17px]">Indian Food Guide</h3>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="relative mb-6">
-            <Search className="w-5 h-5 text-medium absolute left-3 top-1/2 -translate-y-1/2" />
-            <input 
-              type="text" 
-              placeholder="Search foods (e.g. paneer, papaya)" 
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              className="w-full pl-10 p-3 border border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 outline-none text-[14px]"
-            />
-            {search && <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-medium"><X className="w-4 h-4" /></button>}
-          </div>
-
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {['AVOID', 'CAUTION', 'SAFE'].map(tier => {
-              const tierFoods = filteredFood.filter(f => f.type === tier);
+              const tierFoods = FOOD_DATABASE.filter(f => f.type === tier);
               if (tierFoods.length === 0) return null;
 
               let icon, color, bg;
@@ -331,6 +310,7 @@ export const NutritionTracker: React.FC = () => {
           </div>
         </div>
       </div>
+
     </div>
   );
 };
