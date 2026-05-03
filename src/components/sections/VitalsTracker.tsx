@@ -342,7 +342,7 @@ export const VitalsTracker: React.FC = () => {
           </div>
           <div className="grid grid-cols-7 gap-1">
             {days.map((d, i) => {
-              if (d === null) return <div key={`empty-${i}`} className="aspect-square" />;
+              if (d === null) return <div key={`empty-${i}`} className="w-8 h-8 sm:w-10 sm:h-10 mx-auto" />;
               
               const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
               const hasLog = logDates.has(dateStr);

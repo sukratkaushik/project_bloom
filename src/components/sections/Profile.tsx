@@ -149,7 +149,7 @@ export const Profile: React.FC = () => {
               <span className="font-medium text-charcoal group-hover:text-sage">Terms of Service</span>
               <span className="text-sage">→</span>
             </a>
-            <a href="mailto:grievance@bloompregnancy.in" className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+            <a href="mailto:grievance@ourpregnancy.in" className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Contact Support / Grievance Officer</span>
               <span className="text-sage">→</span>
             </a>
@@ -166,7 +166,7 @@ export const Profile: React.FC = () => {
             </div>
             <h3 className="font-serif text-[24px] text-charcoal font-medium text-center mb-3">Important Disclaimer</h3>
             <p className="text-[15px] text-medium leading-relaxed text-center mb-6">
-              Bloom is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
+              Our Pregnancy is an informational tool only. <strong className="font-semibold text-charcoal">It is not a substitute for professional medical advice, diagnosis, or treatment.</strong> Always consult your doctor or midwife for any health concerns or before making medical decisions.
             </p>
             <button
               onClick={() => setShowDisclaimer(false)}
