@@ -74,8 +74,8 @@ export const Dashboard: React.FC = () => {
     <div className="flex flex-col min-h-screen bg-cream">
       {/* Header */}
       <header className="bg-white border-b border-border px-4 md:px-6 sticky top-0 z-50 shadow-sm no-print">
-        <div className="max-w-[1000px] mx-auto flex items-center justify-between min-h-[60px]">
-          <div className="flex items-center">
+        <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px]">
+          <div className="flex items-center shrink-0">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               className="md:hidden mr-3 p-1.5 text-sage hover:bg-sage-pale rounded-md transition-colors"
@@ -86,17 +86,17 @@ export const Dashboard: React.FC = () => {
               onClick={() => updateState({ isSetup: false })}
               className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage"
             >
-              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
-              <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide">Our Pregnancy</span>
+              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain shrink-0" />
+              <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide whitespace-nowrap">Our Pregnancy</span>
             </button>
           </div>
           
           {state.isCalmModeActive ? (
-            <div className="hidden md:flex flex-1 items-center text-[14px] text-medium italic">
+            <div className="hidden md:flex flex-1 items-center justify-center text-[14px] text-medium italic">
               Taking it one day at a time.
             </div>
           ) : (
-            <div className="hidden md:flex items-center gap-5 flex-wrap flex-1">
+            <div className="hidden md:flex items-center justify-center gap-6 flex-1 px-4 min-w-max">
               <div className="text-center">
                 <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
                 <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
@@ -116,7 +116,7 @@ export const Dashboard: React.FC = () => {
             </div>
           )}
 
-          <div className="hidden md:flex items-center gap-4 pl-5 border-l border-border">
+          <div className="hidden md:flex items-center gap-4 pl-5 border-l border-border shrink-0">
             {!state.isCalmModeActive && (
               <div className="flex items-center gap-2.5">
                 <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
