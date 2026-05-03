@@ -13,7 +13,7 @@ import { Notes } from './sections/Notes';
 import { SymptomLogger } from './sections/SymptomLogger';
 import { LaborReadiness } from './sections/LaborReadiness';
 import { FoodScanner } from './sections/FoodScanner';
-import { AskBloom } from './sections/AskBloom';
+import { AskOurPregnancy } from './sections/AskOurPregnancy';
 import { KickCounter } from './sections/KickCounter';
 import { ContractionTimer } from './sections/ContractionTimer';
 import { VitalsTracker } from './sections/VitalsTracker';
@@ -84,10 +84,10 @@ export const Dashboard: React.FC = () => {
             </button>
             <button 
               onClick={() => updateState({ isSetup: false })}
-              className="font-serif text-[20px] font-medium text-sage flex items-center gap-2 md:gap-3 md:pr-6 md:border-r border-border md:mr-5 tracking-[2px] italic cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity"
+              className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage"
             >
-              <img src="/logo.png" alt="Bloom Logo" className="w-7 h-7 md:w-8 md:h-8 object-contain" />
-              bloom
+              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain" />
+              <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide">Our Pregnancy</span>
             </button>
           </div>
           
@@ -174,7 +174,7 @@ export const Dashboard: React.FC = () => {
             {activePage === 'symptoms' && <SymptomLogger />}
             {activePage === 'readiness' && <LaborReadiness />}
             {activePage === 'foodscanner' && <FoodScanner />}
-            {activePage === 'askbloom' && <AskBloom />}
+            {activePage === 'askourpregnancy' && <AskOurPregnancy />}
             {activePage === 'kickcounter' && <KickCounter />}
             {activePage === 'contractions' && <ContractionTimer />}
             {activePage === 'vitals' && <VitalsTracker />}
@@ -198,7 +198,7 @@ export const Dashboard: React.FC = () => {
       <footer className="mt-auto border-t border-border bg-cream py-8 px-6 no-print w-full z-10 relative">
         <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-medium">
           <div className="flex items-center gap-2">
-            <span className="font-serif text-[18px] text-sage italic tracking-wider">bloom</span>
+            <span className="font-serif text-[18px] text-sage font-semibold tracking-wide">Our Pregnancy</span>
             <span className="opacity-60 hidden sm:inline">|</span>
             <span className="opacity-80">Made with ❤️ for Indian mothers</span>
           </div>
@@ -206,7 +206,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex items-center gap-6">
             <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
-            <a href="mailto:hello@bloompregnancy.in" className="hover:text-sage transition-colors">Support</a>
+            <a href="mailto:hello@ourpregnancy.in" className="hover:text-sage transition-colors">Support</a>
           </div>
         </div>
       </footer>

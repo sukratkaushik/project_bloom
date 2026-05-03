@@ -80,7 +80,7 @@ export const PartnerSync: React.FC = () => {
      title: 'Smart Tools',
      items: [
        { key: 'babynames', label: 'Name Generator', desc: 'Favorite baby names' },
-       { key: 'askbloom', label: 'AskBloom AI', desc: 'Allow partner to interact' },
+       { key: 'askourpregnancy', label: 'AskOur Pregnancy AI', desc: 'Allow partner to interact' },
        { key: 'foodscanner', label: 'AI Food Guide', desc: 'Sharing logs' }
      ]
    },

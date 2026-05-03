@@ -165,7 +165,7 @@ export const BabyNames: React.FC = () => {
               {!suggestions.length && !isGenerating ? (
                 <div className="h-full flex flex-col items-center justify-center text-center text-medium space-y-3">
                   <Baby className="w-12 h-12 text-sage/40" />
-                  <p className="text-[15px] max-w-[200px]">Tell AskBloom what you're looking for to unveil beautiful names.</p>
+                  <p className="text-[15px] max-w-[200px]">Tell AskOurPregnancy what you're looking for to unveil beautiful names.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
