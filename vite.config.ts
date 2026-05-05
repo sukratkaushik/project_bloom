@@ -13,6 +13,9 @@ export default defineConfig(({mode}) => {
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: ['**/*'],
+        workbox: {
+          navigateFallbackDenylist: [/^\/__\/.*/],  // Don't intercept Firebase reserved URLs (auth handler, etc.)
+        },
         manifest: {
           name: 'Bloom Pregnancy Planner',
           short_name: 'Bloom',

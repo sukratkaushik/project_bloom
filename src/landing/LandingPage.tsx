@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
-import { auth, signInWithGoogle } from '../firebase';
+import { auth, signInWithGoogle, handleRedirectResult } from '../firebase';
 import { CustomSelect } from '../components/CustomSelect';
 import { 
   ShieldCheck, 
@@ -34,6 +34,21 @@ export const LandingPage: React.FC = () => {
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
     return () => unsubscribe();
+  }, []);
+
+  // Handle redirect result from Google sign-in (when popup was blocked)
+  React.useEffect(() => {
+    handleRedirectResult().then(async (redirectUser) => {
+      if (redirectUser) {
+        const restored = await restoreJourney(redirectUser.uid);
+        if (restored) {
+          window.location.hash = '#dashboard';
+        } else {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+          window.location.hash = '#setup';
+        }
+      }
+    });
   }, []);
 
   const isSetupComplete = state.isSetup;
