@@ -2,11 +2,14 @@
 
 > A comprehensive, offline-capable pregnancy companion that helps expectant parents track milestones, health vitals, tasks, and decisions — all while keeping data private and local.
 
+🌐 **Live at [ourpregnancy.in](https://ourpregnancy.in)**
+
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![React](https://img.shields.io/badge/React-19-61dafb.svg)](https://react.dev)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178c6.svg)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.x-646cff.svg)](https://vitejs.dev/)
 [![PWA](https://img.shields.io/badge/PWA-Installable-brightgreen.svg)]()
+[![Firebase](https://img.shields.io/badge/Firebase-Hosted-FFCA28.svg)](https://ourpregnancy.in)
 
 ---
 
@@ -30,13 +33,14 @@
 
 ## Overview
 
-**Bloom** is a React + TypeScript Progressive Web App (PWA) designed as an all-in-one pregnancy planner. It guides users through all three trimesters with curated checklists, medical appointment tracking, financial planning, health logging, and AI-powered tools — all while prioritising **data privacy** through local-first storage with IndexedDB (Dexie.js).
+**Bloom** (branded as **Our Pregnancy**) is a React + TypeScript Progressive Web App (PWA) designed as an all-in-one pregnancy planner. It guides users through all three trimesters with curated checklists, medical appointment tracking, financial planning, health logging, and AI-powered tools — all while prioritising **data privacy** through local-first storage with IndexedDB (Dexie.js).
 
-The app supports:
+The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 
 - **Offline operation** via PWA service workers
 - **Peer-to-peer partner sync** via WebRTC (PeerJS) — no central server needed for sharing
-- **Google Authentication** via Firebase Auth for optional cloud persistence
+- **Google Authentication** via Firebase Auth with custom domain branding
+- **Firebase Hosting** on custom domain (`ourpregnancy.in`) with SSL
 - **Gemini AI integration** for food safety scanning, a pregnancy Q&A chatbot, and baby name suggestions
 - **FHIR R4 interoperability** for exporting health data to enterprise EHR systems (Epic, Cerner)
 - **PDF export** of the entire pregnancy care plan via jsPDF
@@ -378,22 +382,30 @@ The app uses two storage layers: **Dexie.js (IndexedDB)** for time-series health
 
 ```
 Project_Bloom/
-├── index.html                    # HTML entry point
+├── index.html                    # HTML entry point (SEO meta tags)
 ├── package.json                  # Dependencies & scripts
 ├── vite.config.ts                # Vite + PWA + Tailwind config
 ├── tsconfig.json                 # TypeScript config
 ├── metadata.json                 # App metadata
-├── public/                       # Static assets (PWA icons)
+├── firebase.json                 # Firebase Hosting config (SPA rewrites)
+├── .firebaserc                   # Firebase project binding
+├── firebase-applet-config.json   # Firebase project credentials
+├── firestore.rules               # Firestore security rules
+├── AGENTS.md                     # AI agent instructions
+├── public/                       # Static assets (PWA icons, logo)
+│   ├── logo.png
 │   ├── pwa-192x192.svg
 │   └── pwa-512x512.svg
+├── branding/                     # Brand assets (protected — do not modify)
+│   └── logos/
 └── src/
     ├── index.css                 # Tailwind imports + custom theme
     ├── main.tsx                  # React entry point
-    ├── App.tsx                   # Root component (routing by state)
+    ├── App.tsx                   # Root component (hash-based routing)
     ├── types.ts                  # TypeScript interfaces & types
     ├── store.tsx                 # PlannerProvider (Context + Firestore)
     ├── db.ts                     # Dexie.js database schema (BloomDB v3)
-    ├── firebase.ts               # Firebase init, Auth, Firestore helpers
+    ├── firebase.ts               # Firebase init, Auth (popup + redirect), Firestore
     ├── syncEngine.ts             # PeerJS WebRTC sync engine
     ├── data.ts                   # Static task/decision/budget data
     ├── weeklyData.ts             # Week-by-week pregnancy development data
@@ -403,14 +415,16 @@ Project_Bloom/
     │   ├── laborPrediction.ts    # Predictive labor readiness algorithm
     │   └── pdfExport.ts          # jsPDF pregnancy plan export
     ├── landing/
-    │   └── LandingPage.tsx       # Marketing landing page with auth
+    │   └── LandingPage.tsx       # Marketing landing page with Google Auth
     └── components/
         ├── SetupScreen.tsx       # Multi-step onboarding wizard
         ├── Dashboard.tsx         # Main dashboard shell
         ├── Sidebar.tsx           # Navigation sidebar
         ├── TaskCard.tsx          # Reusable task checklist card
         ├── LegalPages.tsx        # Privacy Policy & Terms of Service
-        └── sections/             # Feature-specific pages
+        ├── FloatingChatbot.tsx   # AI chatbot overlay
+        ├── SplashScreen.tsx      # Loading splash screen
+        └── sections/             # Feature-specific pages (29 sections)
             ├── PregnancyTracker.tsx
             ├── Development.tsx
             ├── Medical.tsx
@@ -422,7 +436,7 @@ Project_Bloom/
             ├── SymptomLogger.tsx
             ├── LaborReadiness.tsx
             ├── FoodScanner.tsx
-            ├── AskBloom.tsx
+            ├── AskOurPregnancy.tsx
             ├── KickCounter.tsx
             ├── ContractionTimer.tsx
             ├── VitalsTracker.tsx
@@ -434,8 +448,10 @@ Project_Bloom/
             ├── GovernmentSchemes.tsx
             ├── BabyNames.tsx
             ├── PartnerSync.tsx
+            ├── DailyKnowledgeDrop.tsx
             ├── Notes.tsx
-            └── Profile.tsx
+            ├── Profile.tsx
+            └── Feedback.tsx
 ```
 
 ---
@@ -491,6 +507,43 @@ The app runs on `http://localhost:5173` by default.
 
 ---
 
+## Deployment
+
+The app is deployed on **Firebase Hosting** at [ourpregnancy.in](https://ourpregnancy.in).
+
+### Deploy Commands
+
+```bash
+# Build production bundle
+npm run build
+
+# Deploy to Firebase Hosting
+firebase deploy --only hosting
+
+# Deploy Firestore security rules
+firebase deploy --only firestore:rules
+
+# Deploy everything
+firebase deploy
+```
+
+### Custom Domain Setup
+
+- **Domain:** `ourpregnancy.in` (registered on GoDaddy)
+- **DNS:** A record → `199.36.158.100` (Firebase Hosting IP)
+- **SSL:** Automatically provisioned by Firebase
+- **Auth Domain:** `ourpregnancy.in` (Google sign-in shows branded domain)
+
+### Firebase Services Used
+
+| Service | Purpose |
+|---|---|
+| **Hosting** | Serves the SPA with CDN, custom domain, and SSL |
+| **Authentication** | Google Sign-In (popup with redirect fallback) |
+| **Firestore** | Cloud persistence for planner state and journey data |
+
+---
+
 ## Environment Variables
 
 | Variable | Required | Description |
@@ -501,7 +554,7 @@ The app runs on `http://localhost:5173` by default.
 | `EHR_TOKEN_ENDPOINT` | No | OAuth 2.0 token endpoint URL |
 | `EHR_FHIR_BASE_URL` | No | FHIR R4 base URL for the EHR server |
 
-Firebase configuration is hardcoded in `src/firebase.ts` and should be updated with your own project credentials.
+Firebase configuration is stored in `firebase-applet-config.json` and imported by `src/firebase.ts`.
 
 ---
 
