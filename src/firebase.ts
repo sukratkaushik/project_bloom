@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import firebaseConfig from '../firebase-applet-config.json';
@@ -16,13 +16,33 @@ export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
   try {
+    // Try popup first (works on most browsers)
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
   } catch (error: any) {
+    // If popup is blocked, fall back to redirect
+    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/cancelled-popup-request') {
+      await signInWithRedirect(auth, googleProvider);
+      return null; // Page will redirect, result captured on return
+    }
     if (error?.code !== 'auth/popup-closed-by-user') {
       console.error("Error signing in with Google", error);
     }
     throw error;
+  }
+};
+
+// Handle redirect result when the page loads after a Google sign-in redirect
+export const handleRedirectResult = async () => {
+  try {
+    const result = await getRedirectResult(auth);
+    if (result) {
+      return result.user;
+    }
+    return null;
+  } catch (error) {
+    console.error("Error handling redirect result", error);
+    return null;
   }
 };
 
