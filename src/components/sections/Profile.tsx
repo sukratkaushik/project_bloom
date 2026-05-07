@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
 import { auth } from '../../firebase';
-import { User, Settings, FileText, Weight, Calendar } from 'lucide-react';
+import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck } from 'lucide-react';
 
 export const Profile: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -124,6 +124,35 @@ export const Profile: React.FC = () => {
               </div>
             </div>
             
+          </div>
+        </section>
+
+        {/* Cloud Sync & Privacy */}
+        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-border">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-500">
+              <Cloud className="w-5 h-5" />
+            </div>
+            <h3 className="font-serif text-2xl text-charcoal">Data Privacy & Cloud Sync</h3>
+          </div>
+
+          <div className="space-y-4 max-w-xl">
+            <div className="flex items-start gap-4 p-4 bg-blue-50/30 rounded-[16px] border border-blue-100">
+              <ShieldCheck className="w-6 h-6 text-blue-500 shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-semibold text-charcoal mb-1">Your Data is Secure</h4>
+                <p className="text-medium text-sm leading-relaxed">
+                  Tracking data (kicks, vitals, mood) is encrypted and synced to your private cloud profile. This allows you to access your journey from any device.
+                </p>
+              </div>
+            </div>
+
+            <div className="p-4 bg-gray-50 rounded-[16px] border border-border">
+              <h4 className="text-[12px] font-semibold tracking-wide uppercase text-light mb-2">Retention Policy</h4>
+              <p className="text-medium text-sm leading-relaxed">
+                To protect your privacy, we follow a strict **2-year retention policy**. Tracking logs are automatically deleted from our cloud servers after 2 years of inactivity. We recommend exporting your data as a PDF before this period if you wish to keep a permanent record.
+              </p>
+            </div>
           </div>
         </section>
 

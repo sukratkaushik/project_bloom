@@ -143,4 +143,5 @@ export type PlannerState = {
   dailyKnowledgeStreak?: number;
   lastKnowledgeDropDate?: string;
   customSupplements?: CustomSupplement[];
+  isRestoring?: boolean;
 };

@@ -51,7 +51,7 @@ const AppContent: React.FC = () => {
     content = <PrivacyPolicy />;
   } else if (currentHash === '#terms') {
     content = <TermsOfService />;
-  } else if (!isAuthReady || !splashFinished) {
+  } else if (!isAuthReady || !splashFinished || state.isRestoring) {
     content = <SplashScreen />;
   } else if (currentHash === '#dashboard' && state.isSetup) {
     content = <Dashboard />;
