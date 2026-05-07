@@ -153,7 +153,6 @@ export const SetupScreen: React.FC = () => {
       if (auth.currentUser) {
         await signOut(auth);
       }
-      resetPlan();
       window.location.hash = '#';
     } catch (error) {
       console.error("Logout failed", error);
