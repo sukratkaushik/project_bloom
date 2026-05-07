@@ -119,12 +119,12 @@ const CONSIDERATIONS = [
 
 export const SetupScreen: React.FC = () => {
   const { generatePlan, resetPlan, state, toggleDarkMode } = usePlanner();
-  const [dueDate, setDueDate] = useState('');
-  const [pregnancyNum, setPregnancyNum] = useState('first');
-  const [workSit, setWorkSit] = useState('employed');
-  const [partnerSit, setPartnerSit] = useState('partner');
-  const [dietPref, setDietPref] = useState('vegetarian');
-  const [flags, setFlags] = useState<Record<string, boolean>>({});
+  const [dueDate, setDueDate] = useState(state.dueDate ? state.dueDate.split('T')[0] : '');
+  const [pregnancyNum, setPregnancyNum] = useState(state.pregnancyNum || 'first');
+  const [workSit, setWorkSit] = useState(state.workSit || 'employed');
+  const [partnerSit, setPartnerSit] = useState(state.partnerSit || 'partner');
+  const [dietPref, setDietPref] = useState(state.dietPref || 'vegetarian');
+  const [flags, setFlags] = useState<Record<string, boolean>>(state.flags || {});
   const [hasConsented, setHasConsented] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
@@ -185,7 +185,7 @@ export const SetupScreen: React.FC = () => {
       </p>
 
       <div className="bg-white rounded-[22px] p-10 w-full max-w-[700px] shadow-lg z-10 relative">
-        <h2 className="font-serif text-[26px] font-medium mb-7 text-charcoal text-center">Let's get started</h2>
+        <h2 className="font-serif text-[26px] font-medium mb-7 text-charcoal text-center">Setup</h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-[18px] items-start">
           <div className="flex flex-col gap-1.5 sm:col-span-2 mb-2">

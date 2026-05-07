@@ -398,7 +398,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const t1End = addWeeks(lmp, 12);
     const t2End = addWeeks(lmp, 27);
 
-    const journeyId = uuidv4();
+    const journeyId = state.activeJourneyId || uuidv4();
     
     // Execute Dexie Schema: Create User and Journey (Local fallback)
     try {
