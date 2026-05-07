@@ -462,33 +462,28 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const restoreJourney = async (uid: string): Promise<boolean> => {
     try {
-      const journeysRef = collection(firestoreDb, 'journeys');
-      const q = query(
-        journeysRef, 
-        where('uid', '==', uid), 
-        orderBy('updatedAt', 'desc'), 
-        limit(1)
-      );
-      
-      const snapshot = await getDocs(q);
-      
-      if (!snapshot.empty) {
-        const cloudData = snapshot.docs[0].data() as Partial<PlannerState>;
+      const profile = await getUserProfile(uid);
+      if (profile && profile.activeJourneyId) {
+        const journeyRef = doc(firestoreDb, 'journeys', profile.activeJourneyId);
+        const snapshot = await getDoc(journeyRef);
         
-        setState((prev) => {
-          const newState = { ...prev, ...cloudData, isSetup: true };
-          // Immediately persist to Dexie to avoid race conditions
-          if (isDbLoaded) {
-            db.appState.put({
-              id: 'global',
-              stateJSON: JSON.stringify(newState),
-              updatedAt: Date.now(),
-            }).catch(console.error);
-          }
-          return newState;
-        });
-        
-        return true;
+        if (snapshot.exists()) {
+          const cloudData = snapshot.data() as Partial<PlannerState>;
+          
+          setState((prev) => {
+            const newState = { ...prev, ...cloudData, isSetup: true, activeJourneyId: profile.activeJourneyId };
+            if (isDbLoaded) {
+              db.appState.put({
+                id: 'global',
+                stateJSON: JSON.stringify(newState),
+                updatedAt: Date.now(),
+              }).catch(console.error);
+            }
+            return newState;
+          });
+          
+          return true;
+        }
       }
       return false;
     } catch (err) {
