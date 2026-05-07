@@ -3,8 +3,9 @@ import { PlannerState, BudgetItem } from './types';
 import { db, JourneyStatus, CalculationMethod } from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, addWeeks } from './utils';
-import { auth, db as firestoreDb, handleFirestoreError, OperationType } from './firebase';
+import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserProfile, saveUserProfile } from './firebase';
 import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { cloudSync } from './cloudSync';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -71,6 +72,7 @@ const defaultState: PlannerState = {
     readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
     notes: true,
   },
+  isRestoring: false,
 };
 
 const getInitialState = (): PlannerState => {
@@ -118,21 +120,62 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   // Listen for auth state and load cloud data if available
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      if (user && state.activeJourneyId) {
+      if (user) {
+        setState(prev => ({ ...prev, isRestoring: true }));
         try {
-          const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
-          const docSnap = await getDoc(journeyRef);
-          if (docSnap.exists()) {
-            const cloudData = docSnap.data();
-            setState(prev => ({ ...prev, ...cloudData }));
+          // 1. Check for cloud user profile first
+          const profile = await getUserProfile(user.uid);
+          
+          if (profile && profile.isSetup && profile.activeJourneyId) {
+            // 2. If already setup in cloud, fetch that journey
+            const journeyRef = doc(firestoreDb, 'journeys', profile.activeJourneyId);
+            const docSnap = await getDoc(journeyRef);
+            
+            if (docSnap.exists()) {
+              const cloudData = docSnap.data();
+              
+              // 3. Restore all tracking data (logs, vitals, etc.)
+              const trackingRef = collection(firestoreDb, 'journeys', profile.activeJourneyId, 'trackingData');
+              const trackingSnap = await getDocs(trackingRef);
+              const cloudRecords = trackingSnap.docs.map(d => d.data());
+              await cloudSync.restoreJourneyData(profile.activeJourneyId, cloudRecords);
+
+              setState(prev => ({ 
+                ...prev, 
+                ...cloudData, 
+                isSetup: true, 
+                activeJourneyId: profile.activeJourneyId,
+                isRestoring: false
+              }));
+              
+              // Immediately persist state to Dexie
+              if (isDbLoaded) {
+                db.appState.put({
+                  id: 'global',
+                  stateJSON: JSON.stringify({ 
+                    ...state, 
+                    ...cloudData, 
+                    isSetup: true, 
+                    activeJourneyId: profile.activeJourneyId,
+                    isRestoring: false 
+                  }),
+                  updatedAt: Date.now(),
+                }).catch(console.error);
+              }
+            } else {
+              setState(prev => ({ ...prev, isRestoring: false }));
+            }
+          } else {
+            setState(prev => ({ ...prev, isRestoring: false }));
           }
         } catch (error) {
-          handleFirestoreError(error, OperationType.GET, `journeys/${state.activeJourneyId}`);
+          console.error("Error restoring session from cloud:", error);
+          setState(prev => ({ ...prev, isRestoring: false }));
         }
       }
     });
     return () => unsubscribe();
-  }, [state.activeJourneyId]);
+  }, [isDbLoaded]); // We need to know when Dexie is ready before we start writing to it
 
   // Sync to Dexie, localStorage and Firestore
   useEffect(() => {
@@ -168,6 +211,15 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         updatedAt: Date.now()
       }, { merge: true }).catch(err => {
         handleFirestoreError(err, OperationType.WRITE, `journeys/${state.activeJourneyId}`);
+      });
+
+      // Also ensure user profile is synced with the active journey
+      saveUserProfile(auth.currentUser.uid, {
+        isSetup: true,
+        activeJourneyId: state.activeJourneyId,
+        email: auth.currentUser.email,
+        displayName: auth.currentUser.displayName,
+        createdAt: state.createdAt || Date.now()
       });
     }
   }, [state]);
@@ -391,6 +443,17 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       activeJourneyId: journeyId,
       createdAt: Date.now()
     }));
+
+    // Save to Firestore User Profile immediately
+    if (auth.currentUser) {
+      saveUserProfile(auth.currentUser.uid, {
+        isSetup: true,
+        activeJourneyId: journeyId,
+        email: auth.currentUser.email,
+        displayName: auth.currentUser.displayName,
+        createdAt: Date.now()
+      });
+    }
   };
 
   const resetPlan = () => {

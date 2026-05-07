@@ -1,92 +1,10 @@
 rules_version = '2';
-
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // ===============================================================
-    // Assumed Data Model
-    // ===============================================================
-    //
-    // Collection: users
-    // Document ID: {userId} (matches auth.uid)
-    // Fields:
-    //   - uid: string (required)
-    //   - email: string (required)
-    //   - displayName: string (optional)
-    //   - createdAt: number (required)
-    //   - updatedAt: number (optional)
-    //   - preferences: map (optional)
-    //
-    // Collection: journeys
-    // Document ID: {journeyId}
-    // Fields:
-    //   - uid: string (required)
-    //   - status: string (required)
-    //   - calculationMethod: string (required)
-    //   - referenceDate: number (required)
-    //   - estimatedDueDate: number (required)
-    //   - actualEndDate: number (optional)
-    //   - createdAt: number (required)
-    //   - updatedAt: number (optional)
-    //   - setupFlags: map (optional)
-    //   - pregnancyNum: string (optional)
-    //   - workSit: string (optional)
-    //   - partnerSit: string (optional)
-    //
-    // Collection: tasks
-    // Document ID: {taskId}
-    // Fields:
-    //   - uid: string (required)
-    //   - journeyId: string (required)
-    //   - category: string (required)
-    //   - title: string (required)
-    //   - description: string (optional)
-    //   - targetGestationalWeek: number (required)
-    //   - status: string (required)
-    //   - completedAt: number (optional)
-    //   - createdAt: number (required)
-    //   - updatedAt: number (optional)
-    //   - assignedToPartner: boolean (optional)
-    //   - isCritical: boolean (optional)
-    //
-    // Collection: symptoms
-    // Document ID: {symptomId}
-    // Fields:
-    //   - uid: string (required)
-    //   - journeyId: string (required)
-    //   - timestamp: number (required)
-    //   - symptomType: string (required)
-    //   - severity: string (required)
-    //   - notes: string (optional)
-    //   - createdAt: number (required)
-    //   - updatedAt: number (optional)
-    //
-    // Collection: vitals
-    // Document ID: {vitalId}
-    // Fields:
-    //   - uid: string (required)
-    //   - journeyId: string (required)
-    //   - timestamp: number (required)
-    //   - type: string (required)
-    //   - systolic: number (optional)
-    //   - diastolic: number (optional)
-    //   - pulse: number (optional)
-    //   - weight: number (optional)
-    //   - unit: string (optional)
-    //   - notes: string (optional)
-    //
-    // ===============================================================
-
-    // ===============================================================
     // Helper Functions
-    // ===============================================================
-    
     function isAuthenticated() {
       return request.auth != null;
-    }
-
-    function isAdmin() {
-      return isAuthenticated() && request.auth.token.email == 'sukrat.kaushik@gmail.com';
     }
 
     function isOwner(userId) {
@@ -97,129 +15,25 @@ service cloud.firestore {
       return isAuthenticated() && (resource == null || request.auth.uid == resource.data.uid);
     }
 
-    function uidUnchanged() {
-      return !('uid' in request.resource.data) || request.resource.data.uid == request.auth.uid;
-    }
-
-    function uidNotModified() {
-      return !('uid' in request.resource.data) || request.resource.data.uid == resource.data.uid;
-    }
-
-    function hasRequiredFields(fields) {
-      return request.resource.data.keys().hasAll(fields);
-    }
-
-    function isValidStringLength(field, minLen, maxLen) {
-      return request.resource.data[field] is string &&
-        request.resource.data[field].size() >= minLen &&
-        request.resource.data[field].size() <= maxLen;
-    }
-
-    function isValidOptionalString(field, minLen, maxLen) {
-      return !(field in request.resource.data) ||
-             (request.resource.data[field] is string &&
-              request.resource.data[field].size() >= minLen &&
-              request.resource.data[field].size() <= maxLen);
-    }
-
-    // ===============================================================
-    // Domain Validators
-    // ===============================================================
-
-    function isValidUser() {
-      return hasRequiredFields(['uid', 'email', 'createdAt']) &&
-             request.resource.data.uid == request.auth.uid &&
-             request.resource.data.email is string &&
-             request.resource.data.createdAt is number &&
-             isValidOptionalString('displayName', 0, 100);
-    }
-
-    function isValidJourney() {
-      return hasRequiredFields(['uid', 'status', 'calculationMethod', 'referenceDate', 'estimatedDueDate', 'createdAt']) &&
-             request.resource.data.uid == request.auth.uid &&
-             request.resource.data.status in ["ACTIVE", "COMPLETED_BIRTH", "COMPLETED_LOSS", "ARCHIVED"] &&
-             request.resource.data.calculationMethod in ["LMP", "CONCEPTION", "ULTRASOUND", "IVF_TRANSFER"] &&
-             request.resource.data.referenceDate is number &&
-             request.resource.data.estimatedDueDate is number &&
-             request.resource.data.createdAt is number;
-    }
-
-    function isValidTask() {
-      return hasRequiredFields(['uid', 'journeyId', 'category', 'title', 'targetGestationalWeek', 'status', 'createdAt']) &&
-             request.resource.data.uid == request.auth.uid &&
-             request.resource.data.journeyId is string &&
-             request.resource.data.category is string &&
-             isValidStringLength('title', 1, 500) &&
-             request.resource.data.targetGestationalWeek is number &&
-             request.resource.data.status in ["PENDING", "COMPLETED", "SKIPPED"] &&
-             request.resource.data.createdAt is number &&
-             isValidOptionalString('description', 0, 2000);
-    }
-
-    function isValidSymptom() {
-      return hasRequiredFields(['uid', 'journeyId', 'timestamp', 'symptomType', 'severity', 'createdAt']) &&
-             request.resource.data.uid == request.auth.uid &&
-             request.resource.data.journeyId is string &&
-             request.resource.data.timestamp is number &&
-             request.resource.data.symptomType is string &&
-             request.resource.data.severity in ["MILD", "MODERATE", "SEVERE"] &&
-             request.resource.data.createdAt is number &&
-             isValidOptionalString('notes', 0, 2000);
-    }
-
-    function isValidVital() {
-      return hasRequiredFields(['uid', 'journeyId', 'timestamp', 'type']) &&
-             request.resource.data.uid == request.auth.uid &&
-             request.resource.data.journeyId is string &&
-             request.resource.data.timestamp is number &&
-             request.resource.data.type in ["BP", "WEIGHT"] &&
-             isValidOptionalString('notes', 0, 2000);
-    }
-
-    // ===============================================================
-    // Rules
-    // ===============================================================
-
+    // Rules for User Profiles
     match /users/{userId} {
-      allow read: if isOwner(userId);
-      allow create: if isOwner(userId) && isValidUser() && uidUnchanged();
-      allow update: if isOwner(userId) && isValidUser() && uidNotModified();
-      allow delete: if isOwner(userId);
+      allow read, write: if isOwner(userId);
     }
 
+    // Rules for Pregnancy Journeys
     match /journeys/{journeyId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated() && isValidJourney() && uidUnchanged();
-      allow update: if isDocOwner() && isValidJourney() && uidNotModified();
-      allow delete: if isDocOwner();
+      allow read, write: if isAuthenticated() && (resource == null || resource.data.uid == request.auth.uid);
+      
+      // Rules for Tracking Data (Kicks, Vitals, etc.)
+      match /trackingData/{docId} {
+        allow read, write: if isAuthenticated();
+      }
     }
 
-    match /tasks/{taskId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated() && isValidTask() && uidUnchanged();
-      allow update: if isDocOwner() && isValidTask() && uidNotModified();
-      allow delete: if isDocOwner();
-    }
-
-    match /symptoms/{symptomId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated() && isValidSymptom() && uidUnchanged();
-      allow update: if isDocOwner() && isValidSymptom() && uidNotModified();
-      allow delete: if isDocOwner();
-    }
-
-    match /vitals/{vitalId} {
-      allow read: if isDocOwner();
-      allow create: if isAuthenticated() && isValidVital() && uidUnchanged();
-      allow update: if isDocOwner() && isValidVital() && uidNotModified();
-      allow delete: if isDocOwner();
-    }
+    // Rules for Feedback
     match /feedbacks/{feedbackId} {
-      allow create: if isAuthenticated() && 
-                   request.resource.data.uid == request.auth.uid &&
-                   request.resource.data.message is string &&
-                   request.resource.data.createdAt is number;
-      allow read: if isAdmin() || (isAuthenticated() && resource.data.uid == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
+      allow read: if isAuthenticated() && (resource.data.uid == request.auth.uid || request.auth.token.email == 'sukrat.kaushik@gmail.com');
     }
   }
 }

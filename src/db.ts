@@ -1,4 +1,5 @@
 import Dexie, { Table } from 'dexie';
+import { cloudSync, TrackingType } from './cloudSync';
 
 // Enums
 export enum JourneyStatus {
@@ -257,3 +258,25 @@ export class PregnancyTrackerDB extends Dexie {
 }
 
 export const db = new PregnancyTrackerDB();
+
+// --- Cloud Sync Hooks ---
+const setupSyncHooks = (table: Table<any, any>, type: TrackingType) => {
+  table.hook('creating', (primaryKey, obj) => {
+    // Wait for the next tick to ensure the record is actually in the DB
+    setTimeout(() => cloudSync.queueSync(obj.journeyId, type, obj), 0);
+  });
+
+  table.hook('updating', (modifications, primKey, obj) => {
+    const updatedObj = { ...obj, ...modifications };
+    setTimeout(() => cloudSync.queueSync(updatedObj.journeyId, type, updatedObj), 0);
+  });
+};
+
+setupSyncHooks(db.kickSessions, 'kick');
+setupSyncHooks(db.contractionSessions, 'contraction');
+setupSyncHooks(db.vitalsLogs, 'vitals');
+setupSyncHooks(db.moodLogs, 'mood');
+setupSyncHooks(db.hydrationLogs, 'hydration');
+setupSyncHooks(db.supplementLogs, 'supplement');
+setupSyncHooks(db.symptomLogs, 'symptom');
+
