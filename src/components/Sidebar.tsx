@@ -14,7 +14,6 @@ type SidebarProps = {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks }) => {
   const { state, toggleCalmMode, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
-  const [toast, setToast] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     daily: true,
     smart: true,
@@ -52,11 +51,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const devTasks = [...DEV_TASKS.t1, ...DEV_TASKS.t2, ...DEV_TASKS.t3];
   const medTasks = [...MED_TASKS.t1, ...MED_TASKS.t2, ...MED_TASKS.t3, ...VACC_TASKS];
   const prepTasks = [...PREP_TASKS.t1, ...PREP_TASKS.t2, ...PREP_TASKS.t3];
-
-  const handleSave = () => {
-    setToast(true);
-    setTimeout(() => setToast(false), 2500);
-  };
 
   const handleLogout = async () => {
     try {
@@ -266,13 +260,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       </button>
 
       <button 
-        onClick={handleSave}
-        className="w-full mt-2 p-2.5 bg-gold-pale border-[1.5px] border-gold rounded-[10px] font-sans text-[13px] font-semibold text-gold cursor-pointer transition-all hover:bg-gold hover:text-white"
-      >
-        💾 Save Progress
-      </button>
-
-      <button 
         onClick={() => { window.location.hash = '#setup'; }}
         className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-white"
       >
@@ -297,11 +284,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         🚪 Log Out
       </button>
 
-      {/* Toast */}
-      <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 bg-charcoal text-white px-5 py-3 rounded-full text-[13px] font-medium transition-all duration-300 z-[999] shadow-lg
-        ${toast ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0 pointer-events-none'}`}>
-        Progress saved ✓
-      </div>
     </div>
   );
 };
