@@ -63,6 +63,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       if (auth.currentUser) {
         await signOut(auth);
       }
+      resetPlan();
       window.location.hash = '#';
     } catch (error) {
       console.error("Logout failed", error);
