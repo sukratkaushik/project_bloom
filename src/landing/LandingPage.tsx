@@ -394,15 +394,15 @@ export const LandingPage: React.FC = () => {
           </button>
           {!isSetupComplete ? (
             <>
-              <button onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
+              <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
                 Log In
               </button>
-              <button onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
+              <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
                 Sign Up
               </button>
             </>
           ) : (
-            <button onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+            <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
               {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : null}
               Open Dashboard
             </button>
@@ -439,6 +439,7 @@ export const LandingPage: React.FC = () => {
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
             <button 
+              type="button"
               onClick={handleStart}
               disabled={isLoggingIn}
               className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70"
@@ -449,6 +450,7 @@ export const LandingPage: React.FC = () => {
             </button>
             {!isSetupComplete && (
               <button
+                type="button"
                 onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }}
                 className="inline-flex items-center justify-center gap-2 bg-white border-[1.5px] border-sage text-sage rounded-full font-semibold px-8 py-4 text-[17px] hover:bg-sage-pale transition-colors w-full sm:w-auto"
               >
@@ -646,7 +648,7 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
         <h2 className="font-serif text-4xl text-charcoal mb-4">No hidden costs. Completely Free.</h2>
         <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful.</p>
-        <button onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
+        <button type="button" onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
           Start Tracking Now
         </button>
       </section>
