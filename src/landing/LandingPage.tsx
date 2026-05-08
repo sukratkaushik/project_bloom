@@ -30,6 +30,12 @@ export const LandingPage: React.FC = () => {
   const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [twoFactorType, setTwoFactorType] = useState<'otp' | 'authenticator'>('otp');
+  const [twoFactorInput, setTwoFactorInput] = useState('');
+  const [pendingUser, setPendingUser] = useState<any>(null);
+  const [is2FAVerifying, setIs2FAVerifying] = useState(false);
+  const [twoFactorError, setTwoFactorError] = useState('');
 
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
@@ -40,13 +46,8 @@ export const LandingPage: React.FC = () => {
   React.useEffect(() => {
     handleRedirectResult().then(async (redirectUser) => {
       if (redirectUser) {
-        const restored = await restoreJourney(redirectUser.uid);
-        if (restored) {
-          window.location.hash = '#dashboard';
-        } else {
-          updateState({ hasStartedOnboarding: true, isSetup: false });
-          window.location.hash = '#setup';
-        }
+        setPendingUser(redirectUser);
+        setShow2FAModal(true);
       }
     });
   }, []);
@@ -64,22 +65,8 @@ export const LandingPage: React.FC = () => {
       const user = await signInWithGoogle();
       if (user) {
         setShowEmailModal(false);
-        
-        // Check if there is an active journey locally
-        if (state.isSetup && state.activeJourneyId) {
-          window.location.hash = '#dashboard';
-          return;
-        }
-
-        // Try to restore from cloud
-        const restored = await restoreJourney(user.uid);
-        
-        if (restored) {
-          window.location.hash = '#dashboard';
-        } else {
-          updateState({ hasStartedOnboarding: true, isSetup: false });
-          window.location.hash = '#setup';
-        }
+        setPendingUser(user);
+        setShow2FAModal(true);
       }
     } catch (error: any) {
       if (error?.code !== 'auth/popup-closed-by-user') {
@@ -140,153 +127,106 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
-      {/* Email OTP Modal */}
-      {showEmailModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[24px] p-8 w-full max-w-[400px] shadow-2xl relative animate-in zoom-in-95 duration-200">
+      {/* 2FA Modal */}
+      {show2FAModal && (
+        <div className="fixed inset-0 z-[110] flex items-center justify-center bg-charcoal/70 backdrop-blur-md p-4">
+          <div className="bg-white rounded-[28px] p-8 w-full max-w-[420px] shadow-2xl relative animate-in zoom-in-95 duration-300 border border-white/20">
             <button 
-              onClick={() => { setShowEmailModal(false); setOtpSent(false); setOtpError(''); setOtpInput(''); setNameInput(''); setAgeInput(''); setGenderInput(''); setPartnerCodeInput(''); setIsRegistering(false); }}
-              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
+              onClick={() => { setShow2FAModal(false); setTwoFactorInput(''); setTwoFactorError(''); setPendingUser(null); }}
+              className="absolute top-5 right-5 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
             >
               <X size={20} />
             </button>
             
-            <div className="w-10 h-10 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm">
-              <Mail size={20} />
-            </div>
-            
-            <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">
-              {otpSent ? 'Check your email' : (isRegistering ? 'Create your account' : 'Welcome back')}
-            </h2>
-            <p className="text-[13px] text-medium mb-5 leading-relaxed">
-              {otpSent ? `We've sent a 6-digit security code to ${emailInput}.` : (isRegistering ? 'Enter your details to receive a secure one-time password (OTP).' : 'Enter your email address to log in securely with an OTP.')}
-            </p>
-            
-            {!otpSent ? (
-              <form onSubmit={handleSendOtp} className="flex flex-col gap-3">
-                {isRegistering && (
-                  <>
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Full Name</label>
-                      <input 
-                        type="text" 
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        placeholder="Jane Doe"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                        required
-                      />
-                    </div>
-                    <div className="flex gap-3">
-                      <div className="flex-1">
-                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Age</label>
-                        <input 
-                          type="number" 
-                          value={ageInput}
-                          onChange={(e) => setAgeInput(e.target.value)}
-                          placeholder="28"
-                          className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                          required={isRegistering}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Gender</label>
-                        <CustomSelect
-                          value={genderInput}
-                          onChange={(val) => setGenderInput(val)}
-                          className="w-full relative z-10"
-                          options={[
-                            { label: 'Female', value: 'female' },
-                            { label: 'Male', value: 'male' },
-                            { label: 'Other', value: 'other' }
-                          ]}
-                          placeholder="Select"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end block">
-                        <span>Partner Code</span>
-                        <span className="text-[10px] text-medium normal-case font-normal">(Optional, find in Partner Sync)</span>
-                      </label>
-                      <input 
-                        type="text" 
-                        value={partnerCodeInput}
-                        onChange={(e) => setPartnerCodeInput(e.target.value)}
-                        placeholder="e.g. A1B2C3"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow uppercase"
-                      />
-                    </div>
-                  </>
-                )}
-                <div>
-                  <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                  <input 
-                    type="email" 
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                    required
-                  />
-                </div>
-                {otpError && <div className="text-[13px] text-critical font-medium">{otpError}</div>}
-                <button type="submit" className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px]">
-                  Send OTP Code
+            <div className="flex flex-col items-center text-center">
+              <div className="w-16 h-16 bg-sage-pale text-sage rounded-2xl flex items-center justify-center mb-6 shadow-sm rotate-3">
+                <ShieldCheck size={32} />
+              </div>
+              
+              <h2 className="font-serif text-[26px] font-bold text-charcoal mb-2">Two-Factor Auth</h2>
+              <p className="text-[14px] text-medium mb-8 leading-relaxed px-4">
+                To keep your pregnancy journey private, please verify your identity.
+              </p>
+
+              <div className="w-full flex p-1 bg-cream rounded-[14px] mb-8 border border-border">
+                <button 
+                  onClick={() => setTwoFactorType('otp')}
+                  className={`flex-1 py-2.5 rounded-[10px] text-[13px] font-bold transition-all ${twoFactorType === 'otp' ? 'bg-white text-sage shadow-sm' : 'text-medium hover:text-charcoal'}`}
+                >
+                  Email OTP
                 </button>
-                <div className="text-center mt-1.5 mb-1.5">
-                  <button 
-                    type="button" 
-                    onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
-                  >
-                    {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
-                  </button>
+                <button 
+                  onClick={() => setTwoFactorType('authenticator')}
+                  className={`flex-1 py-2.5 rounded-[10px] text-[13px] font-bold transition-all ${twoFactorType === 'authenticator' ? 'bg-white text-sage shadow-sm' : 'text-medium hover:text-charcoal'}`}
+                >
+                  Authenticator
+                </button>
+              </div>
+
+              <div className="w-full space-y-6">
+                <div>
+                  <label className="text-[11px] font-bold tracking-[1.5px] uppercase text-charcoal mb-3 block text-left">
+                    {twoFactorType === 'otp' ? 'Enter 6-digit Email Code' : 'Enter Authenticator Code'}
+                  </label>
+                  <div className="relative">
+                    <input 
+                      type="text" 
+                      value={twoFactorInput}
+                      onChange={(e) => setTwoFactorInput(e.target.value.replace(/[^0-9]/g, '').slice(0, 6))}
+                      placeholder="······"
+                      className="w-full border-[1.5px] border-border rounded-[16px] px-6 py-4 text-[24px] tracking-[8px] text-center font-serif font-bold focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all placeholder:text-light"
+                    />
+                  </div>
+                  {twoFactorError && <p className="text-critical text-[13px] font-medium mt-3">{twoFactorError}</p>}
                 </div>
 
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-border"></div>
-                  <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
-                  <div className="flex-grow border-t border-border"></div>
-                </div>
-                
                 <button 
-                  type="button"
-                  onClick={handleStart} 
-                  disabled={isLoggingIn} 
-                  className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                  onClick={async () => {
+                    if (twoFactorInput.length < 6) {
+                      setTwoFactorError('Please enter the full 6-digit code.');
+                      return;
+                    }
+                    setIs2FAVerifying(true);
+                    setTwoFactorError('');
+                    
+                    // Mock verification delay
+                    await new Promise(r => setTimeout(r, 1000));
+                    
+                    // In this demo, 123456 is always the valid code
+                    if (twoFactorInput === '123456') {
+                      const user = pendingUser;
+                      setShow2FAModal(false);
+                      
+                      // Continue original login flow
+                      if (state.isSetup && state.activeJourneyId) {
+                        window.location.hash = '#dashboard';
+                      } else {
+                        const restored = await restoreJourney(user.uid);
+                        if (restored) {
+                          window.location.hash = '#dashboard';
+                        } else {
+                          updateState({ hasStartedOnboarding: true, isSetup: false });
+                          window.location.hash = '#setup';
+                        }
+                      }
+                    } else {
+                      setTwoFactorError('Invalid security code. Try 123456 for demo.');
+                      setIs2FAVerifying(false);
+                    }
+                  }}
+                  disabled={is2FAVerifying}
+                  className="w-full bg-charcoal text-white rounded-[16px] font-bold py-4 hover:bg-gray-800 transition-all shadow-lg flex items-center justify-center gap-3 disabled:opacity-50"
                 >
-                  {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                  Continue with Google
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-                <div>
-                  <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">6-Digit Code</label>
-                  <input 
-                    type="text" 
-                    maxLength={6}
-                    value={otpInput}
-                    onChange={(e) => setOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="123456"
-                    className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[20px] tracking-[8px] text-center font-bold focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                    required
-                  />
-                </div>
-                {otpError && <div className="text-[13px] text-critical font-medium text-center">{otpError}</div>}
-                <button type="submit" className="w-full bg-sage text-white rounded-[12px] font-bold py-3.5 hover:bg-sage-dark transition-colors mt-2 shadow-sm">
+                  {is2FAVerifying ? <Loader2 className="w-5 h-5 animate-spin" /> : <Lock size={18} />}
                   Verify & Continue
                 </button>
-                <button 
-                  type="button" 
-                  onClick={() => { setOtpSent(false); setOtpError(''); setOtpInput(''); }}
-                  className="text-[13px] text-medium font-semibold hover:text-charcoal mt-2 transition-colors"
-                >
-                  Wrong email? Change address
-                </button>
-              </form>
-            )}
+
+                <p className="text-[12px] text-medium">
+                  {twoFactorType === 'otp' ? "Didn't get the email? Check spam or " : "App lost? Use recovery or "}
+                  <button className="text-sage font-bold hover:underline">Resend Code</button>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       )}
