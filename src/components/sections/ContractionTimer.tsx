@@ -273,7 +273,7 @@ export const ContractionTimer: React.FC = () => {
                 ? 'bg-sage text-white shadow-md hover:bg-sage-dark active:scale-95' 
                 : 'bg-sage-pale/50 text-sage/50 cursor-not-allowed border-[1.5px] border-transparent'}`}
           >
-            Contraction Started
+            START
           </button>
           
           <button
@@ -284,7 +284,7 @@ export const ContractionTimer: React.FC = () => {
                 ? 'bg-red-200 text-red-800 shadow-md hover:bg-red-300 active:scale-95' 
                 : 'bg-red-50 text-red-300 cursor-not-allowed border-[1.5px] border-transparent'}`}
           >
-            Contraction Ended
+            END
           </button>
         </div>
       </div>
