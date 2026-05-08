@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
-import { auth, signInWithGoogle, handleRedirectResult } from '../firebase';
-import { CustomSelect } from '../components/CustomSelect';
+import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword } from '../firebase';
 import { 
   ShieldCheck, 
   WifiOff, 
@@ -99,13 +98,14 @@ export const LandingPage: React.FC = () => {
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [nameInput, setNameInput] = useState('');
-  const [ageInput, setAgeInput] = useState('');
-  const [genderInput, setGenderInput] = useState('');
-  const [partnerCodeInput, setPartnerCodeInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
-  const [otpInput, setOtpInput] = useState('');
-  const [otpSent, setOtpSent] = useState(false);
-  const [otpError, setOtpError] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [authError, setAuthError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleEmailLoginClick = () => {
     if (isSetupComplete) {
@@ -115,37 +115,98 @@ export const LandingPage: React.FC = () => {
     setShowEmailModal(true);
   };
 
-  const handleSendOtp = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!emailInput.includes('@')) {
-      setOtpError('Please enter a valid email address.');
-      return;
-    }
-    
-    setOtpError('');
-    setOtpSent(true);
+  const clearModal = () => {
+    setShowEmailModal(false);
+    setIsRegistering(false);
+    setNameInput('');
+    setEmailInput('');
+    setPasswordInput('');
+    setConfirmPasswordInput('');
+    setAuthError('');
+    setIsSubmitting(false);
+    setShowForgotPassword(false);
+    setResetSent(false);
+    setShowPassword(false);
   };
 
-  const handleVerifyOtp = (e: React.FormEvent) => {
+  const getFirebaseErrorMessage = (code: string) => {
+    switch (code) {
+      case 'auth/email-already-in-use': return 'This email is already registered. Try logging in instead.';
+      case 'auth/invalid-email': return 'Please enter a valid email address.';
+      case 'auth/weak-password': return 'Password must be at least 6 characters.';
+      case 'auth/user-not-found': return 'No account found with this email. Sign up first.';
+      case 'auth/wrong-password': return 'Incorrect password. Try again or reset it.';
+      case 'auth/invalid-credential': return 'Incorrect email or password. Please try again.';
+      case 'auth/too-many-requests': return 'Too many attempts. Please wait a moment and try again.';
+      case 'auth/network-request-failed': return 'Network error. Please check your connection.';
+      default: return 'Something went wrong. Please try again.';
+    }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate OTP verification (accepting 123456 as standard mockup)
-    if (otpInput === '123456') {
-      setShowEmailModal(false);
-      updateState({ hasStartedOnboarding: true, isSetup: false });
-      window.location.hash = '#setup';
-    } else {
-      setOtpError('Invalid code. For this demo, please use 123456.');
+    setAuthError('');
+    setIsSubmitting(true);
+
+    try {
+      if (isRegistering) {
+        if (passwordInput !== confirmPasswordInput) {
+          setAuthError('Passwords do not match.');
+          setIsSubmitting(false);
+          return;
+        }
+        if (passwordInput.length < 6) {
+          setAuthError('Password must be at least 6 characters.');
+          setIsSubmitting(false);
+          return;
+        }
+        const newUser = await signUpWithEmail(emailInput, passwordInput, nameInput);
+        clearModal();
+        // New user — go to setup
+        updateState({ hasStartedOnboarding: true, isSetup: false });
+        window.location.hash = '#setup';
+      } else {
+        const existingUser = await signInWithEmail(emailInput, passwordInput);
+        clearModal();
+        // Try to restore existing journey
+        const restored = await restoreJourney(existingUser.uid);
+        if (restored) {
+          window.location.hash = '#dashboard';
+        } else {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+          window.location.hash = '#setup';
+        }
+      }
+    } catch (error: any) {
+      setAuthError(getFirebaseErrorMessage(error?.code || ''));
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setAuthError('');
+    if (!emailInput.includes('@')) {
+      setAuthError('Please enter your email address first.');
+      return;
+    }
+    try {
+      await resetPassword(emailInput);
+      setResetSent(true);
+    } catch (error: any) {
+      setAuthError(getFirebaseErrorMessage(error?.code || ''));
     }
   };
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
-      {/* Email OTP Modal */}
+      {/* Auth Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[24px] p-8 w-full max-w-[400px] shadow-2xl relative animate-in zoom-in-95 duration-200">
             <button 
-              onClick={() => { setShowEmailModal(false); setOtpSent(false); setOtpError(''); setOtpInput(''); setNameInput(''); setAgeInput(''); setGenderInput(''); setPartnerCodeInput(''); setIsRegistering(false); }}
+              onClick={clearModal}
               className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
             >
               <X size={20} />
@@ -155,17 +216,58 @@ export const LandingPage: React.FC = () => {
               <Mail size={20} />
             </div>
             
-            <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">
-              {otpSent ? 'Check your email' : (isRegistering ? 'Create your account' : 'Welcome back')}
-            </h2>
-            <p className="text-[13px] text-medium mb-5 leading-relaxed">
-              {otpSent ? `We've sent a 6-digit security code to ${emailInput}.` : (isRegistering ? 'Enter your details to receive a secure one-time password (OTP).' : 'Enter your email address to log in securely with an OTP.')}
-            </p>
-            
-            {!otpSent ? (
-              <form onSubmit={handleSendOtp} className="flex flex-col gap-3">
-                {isRegistering && (
-                  <>
+            {showForgotPassword ? (
+              /* Forgot Password View */
+              <>
+                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">Reset password</h2>
+                <p className="text-[13px] text-medium mb-5 leading-relaxed">
+                  {resetSent 
+                    ? `We've sent a password reset link to ${emailInput}. Check your inbox.` 
+                    : "Enter your email and we'll send you a link to reset your password."}
+                </p>
+                {!resetSent ? (
+                  <form onSubmit={handleForgotPassword} className="flex flex-col gap-3">
+                    <div>
+                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
+                      <input 
+                        type="email" 
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                        required
+                      />
+                    </div>
+                    {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
+                    <button type="submit" className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px]">
+                      Send Reset Link
+                    </button>
+                  </form>
+                ) : (
+                  <div className="flex items-center gap-2 p-3 bg-sage-pale rounded-[10px] text-sage text-[13px] font-medium">
+                    <CheckCircle2 size={16} /> Check your inbox for the reset link.
+                  </div>
+                )}
+                <button 
+                  type="button" 
+                  onClick={() => { setShowForgotPassword(false); setResetSent(false); setAuthError(''); }}
+                  className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors mt-4 block text-center w-full"
+                >
+                  ← Back to Log In
+                </button>
+              </>
+            ) : (
+              /* Login / Sign Up View */
+              <>
+                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">
+                  {isRegistering ? 'Create your account' : 'Welcome back'}
+                </h2>
+                <p className="text-[13px] text-medium mb-5 leading-relaxed">
+                  {isRegistering ? 'Sign up with your email to get started.' : 'Log in to access your pregnancy dashboard.'}
+                </p>
+                
+                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
+                  {isRegistering && (
                     <div>
                       <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Full Name</label>
                       <input 
@@ -177,115 +279,100 @@ export const LandingPage: React.FC = () => {
                         required
                       />
                     </div>
-                    <div className="flex gap-3">
-                      <div className="flex-1">
-                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Age</label>
-                        <input 
-                          type="number" 
-                          value={ageInput}
-                          onChange={(e) => setAgeInput(e.target.value)}
-                          placeholder="28"
-                          className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                          required={isRegistering}
-                        />
-                      </div>
-                      <div className="flex-1">
-                        <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Gender</label>
-                        <CustomSelect
-                          value={genderInput}
-                          onChange={(val) => setGenderInput(val)}
-                          className="w-full relative z-10"
-                          options={[
-                            { label: 'Female', value: 'female' },
-                            { label: 'Male', value: 'male' },
-                            { label: 'Other', value: 'other' }
-                          ]}
-                          placeholder="Select"
-                        />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end block">
-                        <span>Partner Code</span>
-                        <span className="text-[10px] text-medium normal-case font-normal">(Optional, find in Partner Sync)</span>
-                      </label>
+                  )}
+                  <div>
+                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
+                    <input 
+                      type="email" 
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                      placeholder="you@example.com"
+                      className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end">
+                      <span>Password</span>
+                      {!isRegistering && (
+                        <button 
+                          type="button" 
+                          onClick={() => setShowForgotPassword(true)} 
+                          className="text-[10px] text-sage normal-case font-semibold hover:text-sage-dark transition-colors"
+                        >
+                          Forgot password?
+                        </button>
+                      )}
+                    </label>
+                    <div className="relative">
                       <input 
-                        type="text" 
-                        value={partnerCodeInput}
-                        onChange={(e) => setPartnerCodeInput(e.target.value)}
-                        placeholder="e.g. A1B2C3"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow uppercase"
+                        type={showPassword ? 'text' : 'password'}
+                        value={passwordInput}
+                        onChange={(e) => setPasswordInput(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow pr-12"
+                        required
+                        minLength={6}
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => setShowPassword(!showPassword)} 
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-medium hover:text-charcoal transition-colors"
+                      >
+                        {showPassword ? 'Hide' : 'Show'}
+                      </button>
+                    </div>
+                  </div>
+                  {isRegistering && (
+                    <div>
+                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Confirm Password</label>
+                      <input 
+                        type={showPassword ? 'text' : 'password'}
+                        value={confirmPasswordInput}
+                        onChange={(e) => setConfirmPasswordInput(e.target.value)}
+                        placeholder="••••••••"
+                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
+                        required
+                        minLength={6}
                       />
                     </div>
-                  </>
-                )}
-                <div>
-                  <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                  <input 
-                    type="email" 
-                    value={emailInput}
-                    onChange={(e) => setEmailInput(e.target.value)}
-                    placeholder="you@example.com"
-                    className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                    required
-                  />
-                </div>
-                {otpError && <div className="text-[13px] text-critical font-medium">{otpError}</div>}
-                <button type="submit" className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px]">
-                  Send OTP Code
-                </button>
-                <div className="text-center mt-1.5 mb-1.5">
+                  )}
+                  {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
                   <button 
-                    type="button" 
-                    onClick={() => setIsRegistering(!isRegistering)}
-                    className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
+                    type="submit" 
+                    disabled={isSubmitting}
+                    className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
-                    {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
+                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
+                    {isRegistering ? 'Create Account' : 'Log In'}
                   </button>
-                </div>
+                  <div className="text-center mt-1.5 mb-1.5">
+                    <button 
+                      type="button" 
+                      onClick={() => { setIsRegistering(!isRegistering); setAuthError(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
+                      className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
+                    >
+                      {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
+                    </button>
+                  </div>
 
-                <div className="relative flex py-1 items-center">
-                  <div className="flex-grow border-t border-border"></div>
-                  <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
-                  <div className="flex-grow border-t border-border"></div>
-                </div>
-                
-                <button 
-                  type="button"
-                  onClick={handleStart} 
-                  disabled={isLoggingIn} 
-                  className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
-                >
-                  {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                  Continue with Google
-                </button>
-              </form>
-            ) : (
-              <form onSubmit={handleVerifyOtp} className="flex flex-col gap-4">
-                <div>
-                  <label className="text-[12px] font-bold tracking-[1px] uppercase text-charcoal mb-2 block">6-Digit Code</label>
-                  <input 
-                    type="text" 
-                    maxLength={6}
-                    value={otpInput}
-                    onChange={(e) => setOtpInput(e.target.value.replace(/[^0-9]/g, ''))}
-                    placeholder="123456"
-                    className="w-full border-[1.5px] border-border rounded-[12px] px-4 py-3 text-[20px] tracking-[8px] text-center font-bold focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                    required
-                  />
-                </div>
-                {otpError && <div className="text-[13px] text-critical font-medium text-center">{otpError}</div>}
-                <button type="submit" className="w-full bg-sage text-white rounded-[12px] font-bold py-3.5 hover:bg-sage-dark transition-colors mt-2 shadow-sm">
-                  Verify & Continue
-                </button>
-                <button 
-                  type="button" 
-                  onClick={() => { setOtpSent(false); setOtpError(''); setOtpInput(''); }}
-                  className="text-[13px] text-medium font-semibold hover:text-charcoal mt-2 transition-colors"
-                >
-                  Wrong email? Change address
-                </button>
-              </form>
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t border-border"></div>
+                    <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
+                    <div className="flex-grow border-t border-border"></div>
+                  </div>
+                  
+                  <button 
+                    type="button"
+                    onClick={handleStart} 
+                    disabled={isLoggingIn} 
+                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                  >
+                    {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
+                    Continue with Google
+                  </button>
+                </form>
+              </>
             )}
           </div>
         </div>
