@@ -29,6 +29,13 @@
 2. **Follow-up:** Monitor the reputation status and provide templates for communication with corporate IT departments if manual whitelisting is required.
 3. **SEO/Reputation Building:** Suggest technical SEO or metadata improvements that might help automated crawlers categorize the site faster.
 
+## Status Updates
+
+### 2026-05-08
+- Domain `ourpregnancy.in` is approaching 32 days old — the typical threshold at which Palo Alto Networks lifts the `Newly-Registered-Domain` flag automatically.
+- SEO metadata (title tags, meta descriptions, Open Graph tags, structured data) was deployed on May 7 to help crawlers categorize the site as `Health-and-Medicine`.
+- No new dispute submissions have been made yet. Continue monitoring via the links below.
+
 ## Key Links for Dispute
 - **Cisco Talos:** [talosintelligence.com/reputation_center](https://www.talosintelligence.com/reputation_center)
 - **Palo Alto:** [urlfiltering.paloaltonetworks.com](https://urlfiltering.paloaltonetworks.com/)
