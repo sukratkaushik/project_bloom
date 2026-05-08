@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import firebaseConfig from '../firebase-applet-config.json';
@@ -81,6 +81,24 @@ export const handleRedirectResult = async () => {
     console.error("Error handling redirect result", error);
     return null;
   }
+};
+
+// Email/Password authentication
+export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
+  const result = await createUserWithEmailAndPassword(auth, email, password);
+  await updateProfile(result.user, { displayName });
+  // Send verification email (non-blocking — user can proceed immediately)
+  sendEmailVerification(result.user).catch(console.error);
+  return result.user;
+};
+
+export const signInWithEmail = async (email: string, password: string) => {
+  const result = await signInWithEmailAndPassword(auth, email, password);
+  return result.user;
+};
+
+export const resetPassword = async (email: string) => {
+  await sendPasswordResetEmail(auth, email);
 };
 
 export const logout = async () => {
