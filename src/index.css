@@ -134,6 +134,61 @@ body.calm-mode .transition-opacity {
   transition-timing-function: ease-in-out !important;
 }
 
+/* --- JUICY MICRO-ANIMATIONS --- */
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-sage-light);
+  border-radius: 10px;
+  opacity: 0.5;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-sage);
+}
+
+/* Button "Juicy" Pop Effect */
+button:active {
+  transform: scale(0.96);
+  transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1);
+}
+
+/* Premium Card Hover Lift */
+.premium-card {
+  @apply transition-all duration-300 ease-out border border-border bg-white rounded-[24px];
+  box-shadow: 0 4px 20px -4px rgba(44, 62, 80, 0.05);
+}
+
+.premium-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px -10px rgba(138, 182, 163, 0.15);
+  border-color: var(--color-sage-light);
+}
+
+/* Glassmorphism Polish */
+.glass-panel {
+  @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
+}
+
+/* Logo Interactive Glow */
+.logo-interact:hover img {
+  filter: drop-shadow(0 0 8px rgba(138, 182, 163, 0.4));
+  transform: scale(1.05) rotate(2deg);
+}
+
+.logo-interact img {
+  @apply transition-all duration-500 ease-out;
+}
+
 /* Page Transition Animations */
 @keyframes fadeIn {
   from { opacity: 0; }

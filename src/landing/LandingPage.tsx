@@ -292,7 +292,7 @@ export const LandingPage: React.FC = () => {
       )}
       {/* Navigation */}
       <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 shrink-0 mr-4">
+        <div className="flex items-center gap-3 shrink-0 mr-4 logo-interact">
           <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
           <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
         </div>
