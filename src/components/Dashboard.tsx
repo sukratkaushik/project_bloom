@@ -225,7 +225,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </footer>
 
-      <FloatingChatbot />
+      <FloatingChatbot activePage={activePage} />
     </div>
   );
 };
