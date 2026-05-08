@@ -139,7 +139,8 @@ export const LandingPage: React.FC = () => {
       case 'auth/invalid-credential': return 'Incorrect email or password. Please try again.';
       case 'auth/too-many-requests': return 'Too many attempts. Please wait a moment and try again.';
       case 'auth/network-request-failed': return 'Network error. Please check your connection.';
-      default: return 'Something went wrong. Please try again.';
+      case 'auth/operation-not-allowed': return 'Email/Password sign-in is not enabled in your Firebase Console. Please enable it in Authentication > Sign-in method.';
+      default: return `Something went wrong (${code || 'Unknown Error'}). Please try again.`;
     }
   };
 
