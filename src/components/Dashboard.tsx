@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { Sidebar } from './Sidebar';
@@ -84,7 +85,7 @@ export const Dashboard: React.FC = () => {
             </button>
             <button 
               onClick={() => updateState({ isSetup: false })}
-              className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage"
+              className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage logo-interact"
             >
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain shrink-0" />
               <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide whitespace-nowrap">Our Pregnancy</span>
@@ -162,35 +163,48 @@ export const Dashboard: React.FC = () => {
         </div>
         
         <main className={`pt-6 md:pt-8 print:pt-0 ${isMobileMenuOpen ? 'hidden md:block' : 'block'}`}>
-          <div key={activePage} className="animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out fill-mode-both">
-            {activePage === 'tracker' && <PregnancyTracker />}
-            {activePage === 'dev' && <Development filterTasks={filterTasks} />}
-            {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
-            {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
-            {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
-            {activePage === 'decisions' && <Decisions />}
-            {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
-            {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
-            {activePage === 'symptoms' && <SymptomLogger />}
-            {activePage === 'readiness' && <LaborReadiness />}
-            {activePage === 'foodscanner' && <FoodScanner />}
-            {activePage === 'askourpregnancy' && <AskOurPregnancy />}
-            {activePage === 'kickcounter' && <KickCounter />}
-            {activePage === 'contractions' && <ContractionTimer />}
-            {activePage === 'vitals' && <VitalsTracker />}
-            {activePage === 'mood' && <MoodTracker />}
-            {activePage === 'hydration' && <HydrationTracker />}
-            {activePage === 'nutrition' && <NutritionTracker />}
-            {activePage === 'hospitalbag' && <HospitalBag />}
-            {activePage === 'birthplan' && <BirthPlanBuilder />}
-            {activePage === 'schemes' && <GovernmentSchemes />}
-            {activePage === 'babynames' && <BabyNames />}
-            {activePage === 'partnersync' && <PartnerSync />}
-            {activePage === 'feedback' && <Feedback />}
-            {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
-            {activePage === 'notes' && <Notes />}
-            {activePage === 'profile' && <Profile />}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key={activePage}
+              initial={{ opacity: 0, y: 15, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -10, scale: 0.99 }}
+              transition={{ 
+                duration: 0.4, 
+                ease: [0.22, 1, 0.36, 1], // Custom "lush" cubic bezier
+                staggerChildren: 0.1
+              }}
+              className="fill-mode-both"
+            >
+              {activePage === 'tracker' && <PregnancyTracker />}
+              {activePage === 'dev' && <Development filterTasks={filterTasks} />}
+              {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
+              {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
+              {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
+              {activePage === 'decisions' && <Decisions />}
+              {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
+              {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
+              {activePage === 'symptoms' && <SymptomLogger />}
+              {activePage === 'readiness' && <LaborReadiness />}
+              {activePage === 'foodscanner' && <FoodScanner />}
+              {activePage === 'askourpregnancy' && <AskOurPregnancy />}
+              {activePage === 'kickcounter' && <KickCounter />}
+              {activePage === 'contractions' && <ContractionTimer />}
+              {activePage === 'vitals' && <VitalsTracker />}
+              {activePage === 'mood' && <MoodTracker />}
+              {activePage === 'hydration' && <HydrationTracker />}
+              {activePage === 'nutrition' && <NutritionTracker />}
+              {activePage === 'hospitalbag' && <HospitalBag />}
+              {activePage === 'birthplan' && <BirthPlanBuilder />}
+              {activePage === 'schemes' && <GovernmentSchemes />}
+              {activePage === 'babynames' && <BabyNames />}
+              {activePage === 'partnersync' && <PartnerSync />}
+              {activePage === 'feedback' && <Feedback />}
+              {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
+              {activePage === 'notes' && <Notes />}
+              {activePage === 'profile' && <Profile />}
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
 
@@ -211,7 +225,7 @@ export const Dashboard: React.FC = () => {
         </div>
       </footer>
 
-      <FloatingChatbot />
+      <FloatingChatbot activePage={activePage} />
     </div>
   );
 };
