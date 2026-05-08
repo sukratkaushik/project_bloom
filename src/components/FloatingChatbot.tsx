@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Bot, MessageCircle, Send, X, Sparkles, ChevronRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { usePlanner } from '../store';
 
 interface FloatingChatbotProps {
@@ -152,14 +153,29 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
-            <X key="close" size={24} />
+            <motion.div
+              key="close"
+              initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+              transition={{ duration: 0.2 }}
+            >
+              <X size={24} />
+            </motion.div>
           ) : (
-            <div className="relative" key="open">
+            <motion.div 
+              key="open" 
+              className="relative"
+              initial={{ opacity: 0, scale: 0.5, rotate: 90 }}
+              animate={{ opacity: 1, scale: 1, rotate: 0 }}
+              exit={{ opacity: 0, scale: 0.5, rotate: -90 }}
+              transition={{ duration: 0.2 }}
+            >
               <MessageCircle size={28} />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center border-2 border-sage">
                  <span className="w-1 h-1 bg-sage rounded-full animate-pulse" />
               </span>
-            </div>
+            </motion.div>
           )}
         </AnimatePresence>
       </button>
