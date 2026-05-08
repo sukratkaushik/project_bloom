@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'motion/react';
 import { usePlanner } from '../../store';
 import { WEEKLY_DATA } from '../../weeklyData';
 import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
@@ -57,14 +58,12 @@ export const PregnancyTracker: React.FC = () => {
   useEffect(() => {
     if (state.dueDate) {
       const due = new Date(state.dueDate);
-      const today = new Date();
-      // Due date is 40 weeks (280 days) from LMP
       const lmp = new Date(due.getTime() - 280 * 24 * 60 * 60 * 1000);
+      const today = new Date();
       const diffTime = Math.abs(today.getTime() - lmp.getTime());
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       let currentWeek = Math.floor(diffDays / 7) + 1;
       
-      // Clamp between 1 and 40
       if (currentWeek < 1) currentWeek = 1;
       if (currentWeek > 40) currentWeek = 40;
       
@@ -91,9 +90,15 @@ export const PregnancyTracker: React.FC = () => {
   const progressPercent = (selectedWeek / 40) * 100;
 
   return (
-    <div className="animate-in fade-in duration-300">
+    <div className="space-y-6">
       <DailyKnowledgeDrop />
-      <div className="mb-7 flex flex-col md:flex-row md:items-end justify-between gap-4">
+      
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-4"
+      >
         <div>
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Pregnancy Tracker</h2>
           {!state.isCalmModeActive && (
@@ -137,10 +142,15 @@ export const PregnancyTracker: React.FC = () => {
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
       {/* Week Navigation & Progress */}
-      <div className="bg-white border-[1.5px] border-border rounded-[16px] p-5 shadow-sm mb-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="premium-card p-5"
+      >
         <div className="flex items-center justify-between mb-6">
           <button 
             onClick={handlePrevWeek}
@@ -180,14 +190,25 @@ export const PregnancyTracker: React.FC = () => {
           <span>Week 1</span>
           <span>Week 40</span>
         </div>
-      </div>
+      </motion.div>
 
       {/* Baby Size Visuals */}
-      <div className="bg-gradient-to-br from-sage-pale to-cream border-[1.5px] border-sage-light rounded-[16px] p-8 shadow-sm mb-6 flex flex-col items-center text-center relative overflow-hidden">
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+        className="bg-gradient-to-br from-sage-pale to-cream border-[1.5px] border-sage-light rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden"
+      >
         <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-4">Baby Size</div>
-        <div className="text-[80px] leading-none mb-4 animate-in zoom-in duration-500 delay-100">
+        <motion.div 
+          key={selectedWeek}
+          initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
+          animate={{ scale: 1, rotate: 0, opacity: 1 }}
+          transition={{ type: "spring", damping: 12 }}
+          className="text-[80px] leading-none mb-4"
+        >
           {weekData.babyEmoji}
-        </div>
+        </motion.div>
         <h3 className="font-serif text-[32px] font-medium text-charcoal mb-1">
           {weekData.length}
         </h3>
@@ -202,11 +223,16 @@ export const PregnancyTracker: React.FC = () => {
             <span className="text-[16px] font-medium text-charcoal bg-white px-4 py-1.5 rounded-full border border-border shadow-sm">{weekData.weight}</span>
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Development & Body Changes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.4 }}
+          className="premium-card p-6"
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-full bg-blush-pale flex items-center justify-center text-blush">
               👶
@@ -216,9 +242,14 @@ export const PregnancyTracker: React.FC = () => {
           <p className="text-[14px] text-medium leading-[1.7]">
             {weekData.babyDev}
           </p>
-        </div>
+        </motion.div>
         
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
+        <motion.div 
+          initial={{ opacity: 0, x: 10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.5 }}
+          className="premium-card p-6"
+        >
           <div className="flex items-center gap-3 mb-4">
             <div className="w-8 h-8 rounded-full bg-gold-pale flex items-center justify-center text-gold">
               🤰
@@ -228,7 +259,7 @@ export const PregnancyTracker: React.FC = () => {
           <p className="text-[14px] text-medium leading-[1.7]">
             {weekData.bodyChanges}
           </p>
-        </div>
+        </motion.div>
       </div>
     </div>
   );
