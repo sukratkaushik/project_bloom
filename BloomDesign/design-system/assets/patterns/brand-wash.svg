@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Sandalwood-to-mint brand wash">
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FDFBF7"/>
+      <stop offset="100%" stop-color="#E9F5E9"/>
+    </linearGradient>
+    <radialGradient id="blob1" cx="0.2" cy="0.3" r="0.5">
+      <stop offset="0%" stop-color="#F9C7D2" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#F9C7D2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="blob2" cx="0.85" cy="0.7" r="0.5">
+      <stop offset="0%" stop-color="#F4A261" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#F4A261" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="800" fill="url(#wash)"/>
+  <rect width="1200" height="800" fill="url(#blob1)"/>
+  <rect width="1200" height="800" fill="url(#blob2)"/>
+</svg>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240" role="img" aria-label="Soft dotted grid pattern">
+  <defs>
+    <pattern id="dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="12" cy="12" r="1" fill="#8AB6A3" opacity="0.18"/>
+    </pattern>
+  </defs>
+  <rect width="240" height="240" fill="url(#dots)"/>
+</svg>

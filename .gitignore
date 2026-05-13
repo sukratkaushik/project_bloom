@@ -1,0 +1,19 @@
+# This branch holds design assets only. Keep raw extraction outputs and
+# local tool caches out of git.
+
+.claude/
+.extract-design-system/
+brands/
+node_modules/
+
+# macOS noise
+.DS_Store
+
+# Editor noise
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*

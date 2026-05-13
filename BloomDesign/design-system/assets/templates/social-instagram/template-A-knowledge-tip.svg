@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1350" role="img" aria-label="Instagram knowledge tip template — Week 9">
+  <!-- Sandalwood background -->
+  <rect width="1080" height="1350" fill="#FDFBF7"/>
+
+  <!-- Mehndi watermark at low opacity, top-right -->
+  <g opacity="0.08" transform="translate(780,80) scale(0.65)">
+    <g fill="none" stroke="#8AB6A3" stroke-width="1.5">
+      <circle cx="200" cy="200" r="44"/>
+      <circle cx="200" cy="200" r="22"/>
+      <circle cx="200" cy="200" r="6"/>
+      <path d="M200 156 C 215 130, 215 110, 200 84 C 185 110, 185 130, 200 156 Z"/>
+      <path d="M200 244 C 215 270, 215 290, 200 316 C 185 290, 185 270, 200 244 Z"/>
+      <path d="M156 200 C 130 215, 110 215, 84 200 C 110 185, 130 185, 156 200 Z"/>
+      <path d="M244 200 C 270 215, 290 215, 316 200 C 290 185, 270 185, 244 200 Z"/>
+    </g>
+  </g>
+
+  <!-- Header: small lotus mark + wordmark -->
+  <g transform="translate(96,96)">
+    <g transform="scale(0.13)">
+      <g fill="#F4B47E">
+        <path d="M126 360 C 96 286, 116 218, 196 224 C 220 290, 220 360, 196 412 C 162 414, 132 396, 126 360 Z"/>
+        <path d="M386 360 C 416 286, 396 218, 316 224 C 292 290, 292 360, 316 412 C 350 414, 380 396, 386 360 Z"/>
+      </g>
+      <path fill="#F4A261" d="M196 240 C 220 312, 220 372, 256 410 C 292 372, 292 312, 316 240 C 296 218, 256 210, 256 210 Z"/>
+      <g fill="#F9C7D2">
+        <path d="M178 200 C 142 168, 144 124, 188 100 C 218 132, 230 168, 218 208 C 202 214, 188 210, 178 200 Z"/>
+        <path d="M334 200 C 370 168, 368 124, 324 100 C 294 132, 282 168, 294 208 C 310 214, 324 210, 334 200 Z"/>
+      </g>
+      <path fill="#F4B0BD" d="M218 200 C 222 142, 240 88, 256 60 C 272 88, 290 142, 294 200 Z"/>
+    </g>
+    <text x="86" y="50" font-family="'Playfair Display', Georgia, serif" font-style="italic" font-weight="500" font-size="42" fill="#2C3E50">Our Pregnancy</text>
+  </g>
+
+  <!-- Overline -->
+  <text x="540" y="280" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="700" font-size="24" letter-spacing="3"
+        fill="#8AB6A3">WEEK 9 · DAILY KNOWLEDGE DROP</text>
+
+  <!-- Big stat -->
+  <text x="540" y="500" text-anchor="middle"
+        font-family="'Playfair Display', Georgia, serif" font-style="italic" font-weight="500" font-size="180"
+        fill="#2C3E50">2.3 cm</text>
+
+  <!-- Label -->
+  <text x="540" y="560" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="600" font-size="32"
+        fill="#6B7A87">Your baby this week</text>
+
+  <!-- Body card -->
+  <rect x="120" y="660" width="840" height="440" rx="24" fill="#E9F5E9"/>
+  <text x="540" y="750" text-anchor="middle"
+        font-family="'Playfair Display', Georgia, serif" font-weight="500" font-size="46"
+        fill="#2C3E50">From a cell to a brain</text>
+  <text x="540" y="800" text-anchor="middle"
+        font-family="'Playfair Display', Georgia, serif" font-weight="500" font-size="46"
+        fill="#2C3E50">in 9 weeks.</text>
+  <text x="540" y="900" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="400" font-size="28"
+        fill="#2C3E50">The heart is now fully formed</text>
+  <text x="540" y="940" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="400" font-size="28"
+        fill="#2C3E50">with four chambers — and you</text>
+  <text x="540" y="980" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="400" font-size="28"
+        fill="#2C3E50">might be feeling the changes too.</text>
+
+  <!-- Footer -->
+  <text x="540" y="1230" text-anchor="middle"
+        font-family="'Nunito', sans-serif" font-weight="600" font-size="22"
+        fill="#6B7A87">ourpregnancy.in · Made for Indian mothers 🇮🇳</text>
+</svg>
