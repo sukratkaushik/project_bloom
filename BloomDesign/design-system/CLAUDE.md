@@ -27,6 +27,14 @@
 
 ## Non-negotiables — never violate
 
+### Logo — read this first
+1. **The Our Pregnancy logo is ONLY `logo/logo.png`.** There is no SVG version, no flat-vector version, no hand-drawn alternative. Period.
+2. **Never recreate, redraw, trace, or approximate the lotus.** It's a soft painted PNG with gradient blends. Any vector recreation will be wrong.
+3. **When you need the logo in any asset, embed the actual `logo.png` file** — via `<image href>` in SVG, `<img src>` in HTML, file-place in design tools, or by importing it as an asset. Never paint petal shapes yourself.
+4. **Pre-made lockups are in `logo/`:** `mark.png`, `lockup-horizontal.png`, `lockup-stacked.png`, `favicon.png`. Use these directly. They were composed by embedding `logo.png` — no recreation involved.
+5. **If the user asks for a new logo asset** (e.g., a Twitter banner, a new social size), compose it by embedding `logo.png`. Do not synthesize a new lotus drawing. If the size or framing isn't yet in `logo/`, extend `build-logo-assets.mjs` to add it.
+6. Full logo rules — clear space, sizes, banned backgrounds — are in [`logo/usage.md`](logo/usage.md).
+
 ### Color
 1. **One workhorse accent:** Sage `#8AB6A3`. Use it for primary CTAs, links, active states, progress.
 2. **One emotional accent:** Lotus Pink `#F9C7D2`. Use it for journals, memories, partner-sharing, "first-time" moments.

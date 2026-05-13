@@ -13,7 +13,7 @@ The single source of truth for everything **Our Pregnancy** ships: the live web 
 | `CLAUDE.md` | Load order + non-negotiables for any LLM consuming this system. |
 | `foundations/` | Brand foundations: voice, vocabulary, color, typography, spacing, motion, imagery. |
 | `tokens/` | Machine-readable tokens — JSON, CSS custom properties, Tailwind preset. |
-| `logo/` | Logo SVGs + rasters + usage rules. |
+| `logo/` | **Canonical logo PNG** (`logo.png`) + composed PNG lockups + strict usage rules. No SVG — the painted lotus is canonical only as the PNG. |
 | `components/` | React + Tailwind component starters. |
 | `voice/` | Voice examples and drop-in homepage copy. |
 | `applications/` | Per-surface guidance — web, decks, IG, LinkedIn, email, infographics, ads. |
