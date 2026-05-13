@@ -250,7 +250,7 @@ export const PartnerSync: React.FC = () => {
        <div className="bg-sage-pale/20 border border-sage/30 rounded-xl p-4 flex gap-4">  
          <ShieldCheck className="w-6 h-6 text-sage shrink-0" />  
          <div className="text-[14px] text-charcoal leading-relaxed">  
-           <strong>End-to-End Encrypted.</strong> Partner Sync uses direct peer-to-peer WebRTC connections. Your data never touches a centralized database, ensuring total privacy.  
+           <strong>End-to-End Encrypted.</strong> Partner Sync uses direct peer-to-peer WebRTC connections for real-time sharing between you and your partner.
          </div>  
        </div>  
      )}

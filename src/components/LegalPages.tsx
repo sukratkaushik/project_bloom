@@ -27,10 +27,10 @@ export const PrivacyPolicy: React.FC = () => {
           </ul>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">2. How We Store Your Data</h2>
-          <p>Our Pregnancy uses a "local-first" architecture combined with secure cloud syncing:</p>
+          <p>Our Pregnancy stores your data in your browser's local storage for offline access, and automatically syncs it to secure cloud storage (Firebase Firestore) when you are signed in — so you can access it across devices.</p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Local Storage:</strong> Your data is primarily stored locally on your device for fast, offline access.</li>
-            <li><strong>Cloud Sync:</strong> Data is securely synced to our cloud database (Firebase) to ensure it is backed up and accessible across your devices.</li>
+            <li><strong>Browser Storage:</strong> Data is saved locally in your browser (IndexedDB) so the app works even without an internet connection. Note: clearing your browser data will erase locally stored data.</li>
+            <li><strong>Cloud Sync:</strong> When signed in, data is securely synced to Firebase Firestore, backed up and accessible from any device.</li>
             <li><strong>Security:</strong> We use strict security rules to ensure that only you (the authenticated user) can read or modify your personal data.</li>
           </ul>
 
