@@ -430,12 +430,12 @@ export const LandingPage: React.FC = () => {
           </div>
           
           <h1 className="font-serif text-[clamp(40px,6vw,72px)] leading-[1.1] text-charcoal mb-6 mt-2">
-            Your free pregnancy companion — <span className="italic text-sage">secure & synced.</span>
+            Your pregnancy companion — <span className="italic text-sage">secure & synced.</span>
           </h1>
           
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
             Track symptoms, count kicks, pack your hospital bag, and monitor blood pressure.
-            <strong className="text-charcoal font-semibold"> All your data, entirely free.</strong>
+            <strong className="text-charcoal font-semibold"> Core features free. AI tools coming soon.</strong>
           </p>
           
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
@@ -446,7 +446,7 @@ export const LandingPage: React.FC = () => {
               className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isSetupComplete ? "Go to Dashboard" : "Start Tracking — It's Free"}
+              {isSetupComplete ? "Go to Dashboard" : "Start Tracking"}
               {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
             </button>
             {!isSetupComplete && (
@@ -647,8 +647,8 @@ export const LandingPage: React.FC = () => {
 
       {/* Free Section */}
       <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
-        <h2 className="font-serif text-4xl text-charcoal mb-4">No hidden costs. Completely Free.</h2>
-        <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful.</p>
+        <h2 className="font-serif text-4xl text-charcoal mb-4">Core features, always free.</h2>
+        <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful. Tracking, vitals, tasks, and more — free, always.</p>
         <button type="button" onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
           Start Tracking Now
         </button>
