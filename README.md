@@ -1,6 +1,6 @@
-# 🌸 Bloom — Privacy-First Pregnancy Planner
+# 🌸 Bloom — Pregnancy Companion App
 
-> A comprehensive, offline-capable pregnancy companion that helps expectant parents track milestones, health vitals, tasks, and decisions — all while keeping data private and local.
+> A comprehensive pregnancy companion that helps expectant parents track milestones, health vitals, tasks, and decisions — securely synced across devices via Firebase, with offline support via IndexedDB.
 
 🌐 **Live at [ourpregnancy.in](https://ourpregnancy.in)**
 
