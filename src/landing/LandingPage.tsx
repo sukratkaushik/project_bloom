@@ -501,7 +501,7 @@ export const LandingPage: React.FC = () => {
         <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4">
           {[
             { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for Indian mothers 🇮🇳" },
-            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Your data stays on your device" },
+            { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Your data is private & secure" },
             { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "No payment required" },
             { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works offline" }
           ].map((item, i) => (
@@ -663,9 +663,9 @@ export const LandingPage: React.FC = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { review: "I love how it feels so secure. I don't need an account to just start using the features.", author: "Priya M.", loc: "Mumbai" },
+              { review: "I love how personal it feels — everything is tailored to my pregnancy week and my situation.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
-              { review: "Everything is free and offline, which is such a blessing when travelling. Highly recommend it.", author: "Anjali S.", loc: "Delhi" }
+              { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" }
             ].map((t, i) => (
               <div key={i} className="bg-cream p-8 rounded-[20px] relative">
                 <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
@@ -705,7 +705,7 @@ export const LandingPage: React.FC = () => {
         
         <div className="flex justify-center items-center gap-2 text-[13px] text-light/70">
           <Lock className="w-4 h-4" />
-          Your data is encrypted and securely stored locally.
+          Your data is encrypted and only accessible by you.
         </div>
       </footer>
 
