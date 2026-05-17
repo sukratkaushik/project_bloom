@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Bot, MessageCircle, Send, X, Sparkles, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePlanner } from '../store';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../firebase';
 
 interface FloatingChatbotProps {
   activePage?: string;
@@ -58,66 +60,24 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     setMessages(prev => [...prev, { role: 'user', text: textToSend }]);
     setInput('');
     
-    // 1. Grab the API Key from the .env.local file
-    const apiKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
-    
-    if (!apiKey) {
-      setMessages(prev => [...prev, { role: 'ai', text: "API Key is missing. Please add VITE_HUGGINGFACE_API_KEY to your .env.local file." }]);
-      return;
-    }
-
     // Add a temporary typing indicator
     setMessages(prev => [...prev, { role: 'ai', text: "Thinking..." }]);
 
     try {
-      // 2. Send the request to Hugging Face
-      // We are using the new Hugging Face Router API with Qwen 2.5 72B (a highly capable model)
-      const response = await fetch(
-        "https://router.huggingface.co/v1/chat/completions",
-        {
-          headers: {
-            Authorization: `Bearer ${apiKey}`,
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: JSON.stringify({ 
-            model: "Qwen/Qwen2.5-72B-Instruct",
-            messages: [
-              {
-                role: "system",
-                content: "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor."
-              },
-              {
-                role: "user",
-                content: textToSend
-              }
-            ],
-            max_tokens: 150,
-            temperature: 0.7
-          }),
-        }
-      );
-
-      const result = await response.json();
-      
-      let aiText = "I'm having trouble connecting right now. Please try again.";
-      
-      // Parse the OpenAI-compatible response format
-      if (result.choices && result.choices.length > 0 && result.choices[0].message) {
-        aiText = result.choices[0].message.content.trim();
-      } else if (result.error) {
-        aiText = `Error: ${result.error.message || result.error}`;
-      }
+      // 2. Call the secure Firebase Cloud Function instead of HF directly
+      const chatWithAI = httpsCallable(functions, 'chatWithAI');
+      const response = await chatWithAI({ message: textToSend });
+      const result = response.data as { reply: string };
 
       // Replace the "Thinking..." message with the actual response
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = { role: 'ai', text: aiText };
+        newMessages[newMessages.length - 1] = { role: 'ai', text: result.reply };
         return newMessages;
       });
 
     } catch (error: any) {
-      console.error("AI Fetch Error:", error);
+      console.error("AI Cloud Function Error:", error);
       setMessages(prev => {
         const newMessages = [...prev];
         newMessages[newMessages.length - 1] = { role: 'ai', text: `Sorry, there was an error: ${error?.message || "Unknown error"}` };
