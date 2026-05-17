@@ -49,20 +49,81 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     }
   }, [activePage]);
 
-  const handleSend = (e: React.FormEvent | string) => {
+  const handleSend = async (e: React.FormEvent | string) => {
     if (typeof e !== 'string') e.preventDefault();
     const textToSend = typeof e === 'string' ? e : input;
     if (!textToSend.trim()) return;
     
+    // Add the user's message to the chat
     setMessages(prev => [...prev, { role: 'user', text: textToSend }]);
     setInput('');
     
-    setTimeout(() => {
-      setMessages(prev => [...prev, { 
-        role: 'ai', 
-        text: `That's a great question about ${textToSend}! For an in-depth, AI-powered answer grounded in medical guidelines, check out the 'Ask Our Pregnancy' tab in the sidebar. I'm here for quick support!` 
-      }]);
-    }, 800);
+    // 1. Grab the API Key from the .env.local file
+    const apiKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
+    
+    if (!apiKey) {
+      setMessages(prev => [...prev, { role: 'ai', text: "API Key is missing. Please add VITE_HUGGINGFACE_API_KEY to your .env.local file." }]);
+      return;
+    }
+
+    // Add a temporary typing indicator
+    setMessages(prev => [...prev, { role: 'ai', text: "Thinking..." }]);
+
+    try {
+      // 2. Send the request to Hugging Face
+      // We are using the new Hugging Face Router API with Qwen 2.5 72B (a highly capable model)
+      const response = await fetch(
+        "https://router.huggingface.co/v1/chat/completions",
+        {
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: JSON.stringify({ 
+            model: "Qwen/Qwen2.5-72B-Instruct",
+            messages: [
+              {
+                role: "system",
+                content: "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor."
+              },
+              {
+                role: "user",
+                content: textToSend
+              }
+            ],
+            max_tokens: 150,
+            temperature: 0.7
+          }),
+        }
+      );
+
+      const result = await response.json();
+      
+      let aiText = "I'm having trouble connecting right now. Please try again.";
+      
+      // Parse the OpenAI-compatible response format
+      if (result.choices && result.choices.length > 0 && result.choices[0].message) {
+        aiText = result.choices[0].message.content.trim();
+      } else if (result.error) {
+        aiText = `Error: ${result.error.message || result.error}`;
+      }
+
+      // Replace the "Thinking..." message with the actual response
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = { role: 'ai', text: aiText };
+        return newMessages;
+      });
+
+    } catch (error: any) {
+      console.error("AI Fetch Error:", error);
+      setMessages(prev => {
+        const newMessages = [...prev];
+        newMessages[newMessages.length - 1] = { role: 'ai', text: `Sorry, there was an error: ${error?.message || "Unknown error"}` };
+        return newMessages;
+      });
+    }
   };
 
   return (
