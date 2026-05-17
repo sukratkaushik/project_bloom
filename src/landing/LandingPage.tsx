@@ -21,7 +21,8 @@ import {
   Calendar,
   Sparkles,
   Mail,
-  X
+  X,
+  Moon
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 
@@ -502,8 +503,8 @@ export const LandingPage: React.FC = () => {
           {[
             { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for Indian mothers 🇮🇳" },
             { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Your data is private & secure" },
-            { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "No payment required" },
-            { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works offline" }
+            { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "Core features are free" },
+            { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works offline via PWA" }
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-[14px] font-semibold text-charcoal">
               {item.icon}
@@ -549,45 +550,122 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Features Grid */}
+      {/* Features Bento Grid */}
       <section id="features" className="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
         <div className="text-center mb-16">
-          <h2 className="font-serif text-4xl text-charcoal mb-4">Everything you need, nothing you don't.</h2>
-          <p className="text-medium text-[16px] max-w-2xl mx-auto">Thoughtfully designed tools that put your peace of mind first.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { icon: <Activity className="w-6 h-6 text-sage" />, title: "Vitals Tracker", desc: "Log blood pressure with preeclampsia threshold alerts. Free at PHCs." },
-            { icon: <Heart className="w-6 h-6 text-sage" />, title: "Kick Counter", desc: "Count fetal movements daily from 28 weeks. Auto-alerts if count is low." },
-            { icon: <ShieldCheck className="w-6 h-6 text-sage" />, title: "Hospital Bag Checklist", desc: "Prepare essentials for delivery day with our curated list." },
-            { icon: <Timer className="w-6 h-6 text-sage" />, title: "Contraction Timer", desc: "Time contractions and get the 5-1-1 hospital rule calculated automatically." },
-            { icon: <Calendar className="w-6 h-6 text-sage" />, title: "Pregnancy Timeline", desc: "Track weekly changes, milestones, and what to expect." },
-            { icon: <Cloud className="w-6 h-6 text-sage" />, title: "Calm/Dark Mode", desc: "Soothing dark mode for tracking during those 3 AM wake-ups." }
-          ].map((feature, i) => (
-            <div key={i} className="bg-white border-[1.5px] border-border rounded-[16px] p-6 sm:p-8 hover:shadow-md transition-shadow group">
-              <div className="w-12 h-12 rounded-[12px] bg-cream flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                {feature.icon}
-              </div>
-              <h3 className="font-bold text-[18px] text-charcoal mb-2 flex items-center gap-2">
-                {feature.title}
-              </h3>
-              <p className="text-[14px] text-medium leading-relaxed">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Coming Soon AI Teaser */}
-        <div className="mt-12 max-w-2xl mx-auto bg-sage-pale/20 border border-sage-light/30 rounded-2xl p-6 text-center">
-          <div className="inline-block bg-white text-sage text-[11px] font-bold tracking-wider uppercase px-3 py-1 rounded-full mb-3 border border-sage-light/30">
-            Coming Soon
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-pale text-[12px] font-bold text-sage uppercase tracking-wider mb-4 border border-sage/20">
+            <Sparkles size={14} /> Comprehensive Toolkit
           </div>
-          <h3 className="text-lg font-bold text-charcoal mb-2 flex items-center justify-center gap-2">
-            🤖 AI Pregnancy Companion
-          </h3>
-          <p className="text-medium text-[14px]">
-            Get personalized insights powered by AI. We are building the next generation of intelligent support for Indian mothers.
-          </p>
+          <h2 className="font-serif text-[clamp(32px,5vw,48px)] text-charcoal mb-4 leading-tight">Everything you need,<br />beautifully organized.</h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          
+          {/* Feature 1: AI Food Scanner (Large) */}
+          <div className="md:col-span-2 bg-gradient-to-br from-cream to-white border border-border rounded-[32px] overflow-hidden flex flex-col md:flex-row group hover:shadow-xl transition-all duration-500">
+            <div className="p-8 md:p-10 flex-1 flex flex-col justify-center">
+              <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-6 text-sage">
+                <Camera size={24} />
+              </div>
+              <h3 className="font-serif text-[28px] font-bold text-charcoal mb-3">AI Food Safety Scanner</h3>
+              <p className="text-[16px] text-medium leading-relaxed mb-6">
+                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our Gemini-powered AI verify it against Indian food safety guidelines instantly.
+              </p>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Detects harmful ingredients</li>
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Tailored for Indian cuisine</li>
+              </ul>
+            </div>
+            <div className="flex-1 min-h-[300px] relative overflow-hidden bg-sage-pale/30">
+              <img src="/food_scanner_updated_1779026987896.png" alt="Food Scanner UI" className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+            </div>
+          </div>
+
+          {/* Feature 2: Partner Sync (Tall) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 md:p-10 flex flex-col relative overflow-hidden group hover:shadow-xl transition-all duration-500">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-sage/10 rounded-full filter blur-[60px] -z-0"></div>
+            <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-6 text-sage relative z-10">
+              <Cloud size={24} />
+            </div>
+            <h3 className="font-serif text-[24px] font-bold text-charcoal mb-3 relative z-10">Real-Time Partner Sync</h3>
+            <p className="text-[15px] text-medium leading-relaxed mb-8 relative z-10">
+              Enjoy secure storage in the cloud. Securely link devices via WebRTC to share the journey with your partner while maintaining granular privacy controls.
+            </p>
+            <div className="mt-auto relative z-10 space-y-3">
+              <div className="bg-cream rounded-xl p-4 border border-border flex items-center justify-between">
+                <span className="text-[13px] font-bold text-charcoal">Sync Mode</span>
+                <span className="text-[12px] bg-sage text-white px-2 py-1 rounded font-bold">Encrypted</span>
+              </div>
+              <div className="bg-cream rounded-xl p-4 border border-border flex items-center justify-between">
+                <span className="text-[13px] font-bold text-charcoal">Cloud Storage</span>
+                <span className="text-[12px] bg-charcoal text-white px-2 py-1 rounded font-bold">Secure</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Feature 3: Biometrics (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Activity size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Labor Readiness Score</h4>
+            <p className="text-[14px] text-medium">Predictive biometrics analyzing your HRV, RHR, and Braxton Hicks frequency.</p>
+          </div>
+
+          {/* Feature 4: EHR Export (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-gold-pale text-gold flex items-center justify-center mb-4"><Stethoscope size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">FHIR R4 EHR Export</h4>
+            <p className="text-[14px] text-medium">Instantly export your entire care plan and vitals to major hospital systems like Epic.</p>
+          </div>
+
+          {/* Feature 5: AI Chatbot (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Bot size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Ask Bloom 24/7</h4>
+            <p className="text-[14px] text-medium">Get immediate answers to your pregnancy questions with our fine-tuned AI companion.</p>
+          </div>
+
+          {/* Feature 6: Vitals Tracker (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Heart size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Vitals Tracker</h4>
+            <p className="text-[14px] text-medium">Log blood pressure with preeclampsia threshold alerts.</p>
+          </div>
+
+          {/* Feature 7: Kick Counter (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Activity size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Kick Counter</h4>
+            <p className="text-[14px] text-medium">Count fetal movements daily from 28 weeks with auto-alerts if count is low.</p>
+          </div>
+
+          {/* Feature 8: Checklists (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-gold-pale text-gold flex items-center justify-center mb-4"><CheckCircle2 size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Multiple Checklists</h4>
+            <p className="text-[14px] text-medium">Prepare essentials for delivery day with our curated hospital bag lists.</p>
+          </div>
+
+          {/* Feature 9: Contraction Timer (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Timer size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Contraction Timer</h4>
+            <p className="text-[14px] text-medium">Time contractions and get the 5-1-1 hospital rule calculated automatically.</p>
+          </div>
+
+          {/* Feature 10: Pregnancy Timeline (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Calendar size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Pregnancy Timeline</h4>
+            <p className="text-[14px] text-medium">Track weekly changes, milestones, and what to expect along your journey.</p>
+          </div>
+
+          {/* Feature 11: Dark Mode (Small) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
+            <div className="w-10 h-10 rounded-full bg-charcoal text-white flex items-center justify-center mb-4"><Moon size={20} /></div>
+            <h4 className="font-bold text-[18px] text-charcoal mb-2">Calm/Dark Mode</h4>
+            <p className="text-[14px] text-medium">Soothing dark mode for tracking during those 3 AM wake-ups.</p>
+          </div>
+
         </div>
       </section>
 
@@ -661,13 +739,15 @@ export const LandingPage: React.FC = () => {
             <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="columns-1 md:columns-3 gap-6 space-y-6">
             {[
               { review: "I love how personal it feels — everything is tailored to my pregnancy week and my situation.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
-              { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" }
+              { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" },
+              { review: "The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!", author: "Sneha P.", loc: "Goa" },
+              { review: "Finally an app that understands Indian contexts and government schemes.", author: "Divya K.", loc: "Chennai" }
             ].map((t, i) => (
-              <div key={i} className="bg-cream p-8 rounded-[20px] relative">
+              <div key={i} className="bg-cream p-8 rounded-[20px] relative break-inside-avoid shadow-sm hover:shadow-md transition-shadow">
                 <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
                 <p className="text-[15px] text-charcoal leading-relaxed mb-6 italic relative z-10">"{t.review}"</p>
                 <div className="flex items-center gap-3">
