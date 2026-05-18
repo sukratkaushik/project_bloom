@@ -5,7 +5,7 @@ const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 // Define the secure secret that we will store in Firebase Secret Manager
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
-exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey] }, async (request) => {
+exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1" }, async (request) => {
     const { message } = request.data;
     if (!message) {
         throw new https_1.HttpsError("invalid-argument", "Message is required.");

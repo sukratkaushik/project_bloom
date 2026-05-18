@@ -64,3 +64,30 @@ export const chatWithAI = onCall(
     }
   }
 );
+
+export const parseDocument = onCall(
+  { region: "asia-south1", memory: "512MiB" },
+  async (request) => {
+    const { base64Data, fileName } = request.data;
+    
+    if (!base64Data) {
+      throw new HttpsError("invalid-argument", "No document data provided.");
+    }
+
+    try {
+      const buffer = Buffer.from(base64Data, "base64");
+      
+      // We only support PDFs via this endpoint for now
+      if (fileName.toLowerCase().endsWith('.pdf')) {
+        const pdfParse = require('pdf-parse');
+        const data = await pdfParse(buffer);
+        return { text: data.text };
+      } else {
+        throw new HttpsError("invalid-argument", "Only PDF files are supported by this parser.");
+      }
+    } catch (error) {
+      console.error("Document Parse Error:", error);
+      throw new HttpsError("internal", "Failed to parse document.");
+    }
+  }
+);

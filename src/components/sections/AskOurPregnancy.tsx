@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { usePlanner } from '../../store';
 import { db } from '../../db';
 import Markdown from 'react-markdown';
-import { Send, Loader2, Sparkles } from 'lucide-react';
+import { Send, Loader2, Sparkles, Paperclip, X } from 'lucide-react';
 import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
@@ -10,12 +10,15 @@ import { functions } from '../../firebase';
 export const AskOurPregnancy: React.FC = () => {
   const { state } = usePlanner();
   const [input, setInput] = useState('');
+  const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
     { role: 'model', text: "Hello! I'm AskOurPregnancy, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Consulting guidelines...");
   const [systemContext, setSystemContext] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -116,25 +119,86 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
     gatherContext();
   }, [state.activeJourneyId, state.dueDate, state.flags]);
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (file.type === "application/pdf" || file.type === "text/plain") {
+        setAttachedFile(file);
+      } else {
+        alert("Please select a PDF or Text file.");
+      }
+    }
+  };
 
-    const userMsg = input.trim();
+  const readBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const result = reader.result as string;
+        // Strip the data:application/pdf;base64, prefix
+        const base64 = result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const readText = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+  };
+
+  const handleSend = async () => {
+    if ((!input.trim() && !attachedFile) || isLoading) return;
+
+    let userMsg = input.trim() || "Please analyze this document.";
+    
+    // Optimistically show user message (without huge text dump)
+    setMessages(prev => [...prev, { 
+      role: 'user', 
+      text: attachedFile ? \`📎 \${attachedFile.name}\n\n\${userMsg}\` : userMsg 
+    }]);
+    
     setInput('');
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
     setIsLoading(true);
 
     try {
+      let finalPrompt = userMsg;
+
+      if (attachedFile) {
+        setLoadingText("Reading document...");
+        let documentText = "";
+        
+        if (attachedFile.type === "application/pdf") {
+          const base64Data = await readBase64(attachedFile);
+          const parseDocument = httpsCallable(functions, 'parseDocument');
+          const parseResponse = await parseDocument({ base64Data, fileName: attachedFile.name });
+          documentText = (parseResponse.data as any).text;
+        } else {
+          documentText = await readText(attachedFile);
+        }
+
+        finalPrompt = \`\${userMsg}\n\n--- ATTACHED DOCUMENT: \${attachedFile.name} ---\n\n\${documentText}\`;
+        setAttachedFile(null); // Clear attachment after reading
+      }
+
+      setLoadingText("Consulting guidelines...");
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: userMsg, systemPrompt: systemContext });
+      const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext });
       const result = response.data as { reply: string };
       
       setMessages(prev => [...prev, { role: 'model', text: result.reply }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Chat error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error connecting to the AI. Please try again." }]);
+      setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error connecting to the AI. " + (error?.message || "Please try again.") }]);
     } finally {
       setIsLoading(false);
+      setLoadingText("Consulting guidelines...");
     }
   };
 
@@ -163,12 +227,12 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
       <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-[16px] p-4 ${
+            <div key={i} className={\`flex \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}>
+              <div className={\`max-w-[85%] rounded-[16px] p-4 \${
                 msg.role === 'user' 
                   ? 'bg-sage text-white rounded-tr-[4px]' 
                   : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
-              }`}>
+              }\`}>
                 {msg.role === 'model' ? (
                   <div className="markdown-body text-[14px] leading-[1.6]">
                     <Markdown>{msg.text}</Markdown>
@@ -183,7 +247,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
             <div className="flex justify-start">
               <div className="bg-cream border-[1.5px] border-border text-charcoal rounded-[16px] rounded-tl-[4px] p-4 flex items-center gap-2">
                 <Loader2 size={16} className="animate-spin text-sage" />
-                <span className="text-[14px] text-medium">Consulting guidelines...</span>
+                <span className="text-[14px] text-medium">{loadingText}</span>
               </div>
             </div>
           )}
@@ -191,7 +255,36 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
         </div>
 
         <div className="p-4 bg-white border-t border-border shrink-0">
+          {/* File Attachment Indicator */}
+          {attachedFile && (
+            <div className="mb-2 inline-flex items-center gap-2 bg-sage-pale text-sage px-3 py-1.5 rounded-full text-[12px] font-medium border border-sage/20">
+              <Paperclip size={14} />
+              <span className="truncate max-w-[200px]">{attachedFile.name}</span>
+              <button onClick={() => setAttachedFile(null)} className="hover:text-red-500 transition-colors">
+                <X size={14} />
+              </button>
+            </div>
+          )}
+          
           <div className="relative flex items-center">
+            {/* Hidden File Input */}
+            <input 
+              type="file" 
+              ref={fileInputRef} 
+              onChange={handleFileSelect}
+              accept=".pdf,.txt" 
+              className="hidden" 
+            />
+            
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading}
+              className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
+              title="Attach Document (PDF or Text)"
+            >
+              <Paperclip size={18} />
+            </button>
+            
             <textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
@@ -201,13 +294,14 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
                   handleSend();
                 }
               }}
-              placeholder="Ask about symptoms, guidelines, or preparation..."
-              className="w-full pl-4 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
+              placeholder="Ask about symptoms, or attach a document..."
+              className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
               rows={1}
             />
+            
             <button
               onClick={handleSend}
-              disabled={!input.trim() || isLoading}
+              disabled={(!input.trim() && !attachedFile) || isLoading}
               className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
             >
               <Send size={18} />
