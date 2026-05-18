@@ -1,17 +1,20 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { usePlanner } from '../../store';
 import { db } from '../../db';
-import { GoogleGenAI } from '@google/genai';
 import Markdown from 'react-markdown';
 import { Send, Loader2, Sparkles } from 'lucide-react';
 import { Paywall } from '../Paywall';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../firebase';
 
 export const AskOurPregnancy: React.FC = () => {
   const { state } = usePlanner();
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([]);
+  const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
+    { role: 'model', text: "Hello! I'm AskOurPregnancy, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?" }
+  ]);
   const [isLoading, setIsLoading] = useState(false);
-  const [chatSession, setChatSession] = useState<any>(null);
+  const [systemContext, setSystemContext] = useState<string>("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -19,7 +22,7 @@ export const AskOurPregnancy: React.FC = () => {
   }, [messages]);
 
   useEffect(() => {
-    const initChat = async () => {
+    const gatherContext = async () => {
       if (!state.activeJourneyId) return;
 
       // Gather context
@@ -106,30 +109,14 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
 - **Current/Logged Symptoms:** ${recentSymptoms}
 `;
 
-      try {
-        const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-        const chat = ai.chats.create({
-          model: 'gemini-3.1-pro-preview',
-          config: {
-            systemInstruction,
-            temperature: 0.2,
-          }
-        });
-        setChatSession(chat);
-        setMessages([{
-          role: 'model',
-          text: "Hello! I'm AskOurPregnancy, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?"
-        }]);
-      } catch (err) {
-        console.error("Failed to initialize chat", err);
-      }
+      setSystemContext(systemInstruction);
     };
 
-    initChat();
+    gatherContext();
   }, [state.activeJourneyId, state.dueDate, state.flags]);
 
   const handleSend = async () => {
-    if (!input.trim() || !chatSession || isLoading) return;
+    if (!input.trim() || isLoading) return;
 
     const userMsg = input.trim();
     setInput('');
@@ -137,11 +124,14 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
     setIsLoading(true);
 
     try {
-      const response = await chatSession.sendMessage({ message: userMsg });
-      setMessages(prev => [...prev, { role: 'model', text: response.text }]);
+      const chatWithAI = httpsCallable(functions, 'chatWithAI');
+      const response = await chatWithAI({ message: userMsg, systemPrompt: systemContext });
+      const result = response.data as { reply: string };
+      
+      setMessages(prev => [...prev, { role: 'model', text: result.reply }]);
     } catch (error) {
       console.error("Chat error:", error);
-      setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error processing your request. Please try again." }]);
+      setMessages(prev => [...prev, { role: 'model', text: "I'm sorry, I encountered an error connecting to the AI. Please try again." }]);
     } finally {
       setIsLoading(false);
     }

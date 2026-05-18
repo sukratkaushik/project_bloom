@@ -5,7 +5,7 @@ import { defineSecret } from "firebase-functions/params";
 const hfApiKey = defineSecret("HUGGINGFACE_API_KEY");
 
 export const chatWithAI = onCall(
-  { secrets: [hfApiKey] }, 
+  { secrets: [hfApiKey], region: "asia-south1" }, 
   async (request) => {
     const { message } = request.data;
     
