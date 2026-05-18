@@ -161,7 +161,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
     // Optimistically show user message (without huge text dump)
     setMessages(prev => [...prev, { 
       role: 'user', 
-      text: attachedFile ? \`📎 \${attachedFile.name}\n\n\${userMsg}\` : userMsg 
+      text: attachedFile ? `📎 ${attachedFile.name}\n\n${userMsg}` : userMsg 
     }]);
     
     setInput('');
@@ -183,7 +183,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
           documentText = await readText(attachedFile);
         }
 
-        finalPrompt = \`\${userMsg}\n\n--- ATTACHED DOCUMENT: \${attachedFile.name} ---\n\n\${documentText}\`;
+        finalPrompt = `${userMsg}\n\n--- ATTACHED DOCUMENT: ${attachedFile.name} ---\n\n${documentText}`;
         setAttachedFile(null); // Clear attachment after reading
       }
 
@@ -227,12 +227,12 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
       <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">
         <div className="flex-1 overflow-y-auto p-5 space-y-6">
           {messages.map((msg, i) => (
-            <div key={i} className={\`flex \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}>
-              <div className={\`max-w-[85%] rounded-[16px] p-4 \${
+            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div className={`max-w-[85%] rounded-[16px] p-4 ${
                 msg.role === 'user' 
                   ? 'bg-sage text-white rounded-tr-[4px]' 
                   : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
-              }\`}>
+              }`}>
                 {msg.role === 'model' ? (
                   <div className="markdown-body text-[14px] leading-[1.6]">
                     <Markdown>{msg.text}</Markdown>
