@@ -1,8 +1,9 @@
 import React, { useState, useRef } from 'react';
 import { usePlanner } from '../../store';
-import { GoogleGenAI, Type } from '@google/genai';
 import { Upload, AlertTriangle, CheckCircle, Loader2, Bot, Sparkles } from 'lucide-react';
 import { Paywall } from '../Paywall';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../firebase';
 
 interface ScanResult {
   identifiedItems: string[];
@@ -54,102 +55,13 @@ export const FoodScanner: React.FC = () => {
       const base64Data = imagePreview.split(',')[1];
       const mimeType = imageFile.type;
 
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: [
-          {
-            parts: [
-              {
-                inlineData: {
-                  data: base64Data,
-                  mimeType: mimeType,
-                },
-              },
-              {
-                text: "Analyze this food image and provide the nutritional breakdown and pregnancy safety assessment.",
-              }
-            ],
-          },
-        ],
-        config: {
-          systemInstruction: `You are an expert prenatal nutritionist and clinical AI assistant. Your task is to analyze images of food, meals, or ingredient labels and provide a detailed, structured nutritional assessment specifically tailored for a pregnant user.
-
-**CORE OBJECTIVES:**
-1. Identify all visible food items, ingredients, or components in the provided image.
-2. Calculate or estimate macronutrients (protein, carbohydrates, fats, fiber) based on standard portion sizes if exact label data is not visible.
-3. Calculate or estimate three pregnancy-critical micronutrients: Folate (mcg), Iron (mg), and Calcium (mg).
-4. Evaluate the food for pregnancy safety and flag any potential hazards.
-
-**PREGNANCY SAFETY PROTOCOL:**
-You must default to caution. If an item is ambiguous (e.g., a soft cheese that might be unpasteurized, or sushi where the fish type is unclear), assume the higher risk and flag it. 
-Specifically, you MUST detect and flag the following hazards:
-- Unpasteurized (raw) dairy products
-- High-mercury fish species (e.g., shark, swordfish, king mackerel, tilefish, bigeye tuna)
-- Raw or undercooked meat, poultry, eggs, or seafood (including most sushi)
-- Raw sprouts (alfalfa, clover, radish, mung bean)
-- Excessive caffeine content (anything exceeding 200mg per serving)
-- Alcohol
-
-**TONE & COMMUNICATION:**
-- Maintain clinical accuracy while being reassuring and non-alarmist. 
-- If a hazard is detected, explain *why* it is a risk in a calm, educational manner.
-- If the food is safe, leave the hazard warning empty.`,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              identifiedItems: {
-                type: Type.ARRAY,
-                items: { type: Type.STRING },
-                description: "List of all visible food items or ingredients.",
-              },
-              macronutrients: {
-                type: Type.OBJECT,
-                properties: {
-                  protein_g: { type: Type.NUMBER },
-                  carbs_g: { type: Type.NUMBER },
-                  fats_g: { type: Type.NUMBER },
-                  fiber_g: { type: Type.NUMBER },
-                },
-                required: ["protein_g", "carbs_g", "fats_g", "fiber_g"],
-              },
-              pregnancyCriticalMicronutrients: {
-                type: Type.OBJECT,
-                properties: {
-                  folate_mcg: { type: Type.NUMBER },
-                  iron_mg: { type: Type.NUMBER },
-                  calcium_mg: { type: Type.NUMBER },
-                },
-                required: ["folate_mcg", "iron_mg", "calcium_mg"],
-              },
-              isSafeForPregnancy: {
-                type: Type.BOOLEAN,
-                description: "True if safe to consume during pregnancy, false if hazards are detected.",
-              },
-              hazardWarning: {
-                type: Type.STRING,
-                description: "Detailed warning if hazards are detected. Empty string if safe.",
-              },
-            },
-            required: [
-              "identifiedItems",
-              "macronutrients",
-              "pregnancyCriticalMicronutrients",
-              "isSafeForPregnancy",
-              "hazardWarning"
-            ],
-          },
-          temperature: 0.2,
-        },
-      });
-
-      const resultText = response.text || "{}";
-      const parsedResult = JSON.parse(resultText) as ScanResult;
+      const analyzeFood = httpsCallable(functions, 'analyzeFood');
+      const response = await analyzeFood({ base64Data, mimeType });
+      const parsedResult = response.data as ScanResult;
       setResult(parsedResult);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error analyzing image:", err);
-      setError("Failed to analyze the image. Please try again.");
+      setError(err?.message || "Failed to analyze the image. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
