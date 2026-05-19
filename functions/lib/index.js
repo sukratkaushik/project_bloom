@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.chatWithAI = void 0;
+exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 // Define the secure secret that we will store in Firebase Secret Manager
@@ -51,6 +51,28 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
     catch (error) {
         console.error("Fetch Error:", error);
         throw new https_1.HttpsError("internal", "Unable to connect to AI.");
+    }
+});
+exports.parseDocument = (0, https_1.onCall)({ region: "asia-south1", memory: "512MiB" }, async (request) => {
+    const { base64Data, fileName } = request.data;
+    if (!base64Data) {
+        throw new https_1.HttpsError("invalid-argument", "No document data provided.");
+    }
+    try {
+        const buffer = Buffer.from(base64Data, "base64");
+        // We only support PDFs via this endpoint for now
+        if (fileName.toLowerCase().endsWith('.pdf')) {
+            const pdfParse = require('pdf-parse');
+            const data = await pdfParse(buffer);
+            return { text: data.text };
+        }
+        else {
+            throw new https_1.HttpsError("invalid-argument", "Only PDF files are supported by this parser.");
+        }
+    }
+    catch (error) {
+        console.error("Document Parse Error:", error);
+        throw new https_1.HttpsError("internal", "Failed to parse document.");
     }
 });
 //# sourceMappingURL=index.js.map

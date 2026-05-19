@@ -4,6 +4,19 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 
 ---
 
+## 📅 2026-05-19
+
+### **Task: AskOurPregnancy AI Multimodal Integration & Backend Migration**
+*   **Details:**
+    *   **Secure Backend Proxy (`functions/src/index.ts`):** Transitioned the AI backend from an insecure client-side Gemini SDK to a highly secure Firebase Cloud Function (`chatWithAI`), proxying requests to a Qwen2.5-72B-Instruct model on Hugging Face.
+    *   **Regional Optimization:** Migrated the cloud functions to `asia-south1` (Mumbai) to minimize latency for Indian users and reduce operational costs.
+    *   **Native App Context Injection:** Rewrote the AI's System Instructions to enforce clinical constraints and explicitly instruct the AI to act as the built-in "Project Bloom" assistant, preventing it from incorrectly referring users to other apps.
+    *   **Document Parsing Service:** Implemented a new `parseDocument` Cloud Function using `pdf-parse@1.1.1` to process uploaded PDF documents on the backend securely.
+    *   **Frontend Multimodal UI (`AskOurPregnancy.tsx`):** Added a paperclip attachment UI supporting `.pdf`, `.txt`, and `.md` files. Extracted text is invisibly injected into the AI context, allowing users to safely query clinical documents and diet plans.
+    *   **Deployment:** Configured CORS and IAM policies ("Allow unauthenticated invocations") for both functions in Google Cloud Console. All code deployed successfully to Firebase Hosting and Functions.
+
+---
+
 ## 📅 2026-05-08
 
 ### **Task: Feature-by-Feature Refinement Phase**
