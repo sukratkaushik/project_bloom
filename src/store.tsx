@@ -121,7 +121,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
-        setState(prev => ({ ...prev, isRestoring: true }));
         try {
           // 1. Check for cloud user profile first
           const profile = await getUserProfile(user.uid);
@@ -144,8 +143,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 ...prev, 
                 ...cloudData, 
                 isSetup: true, 
-                activeJourneyId: profile.activeJourneyId,
-                isRestoring: false
+                activeJourneyId: profile.activeJourneyId
               }));
               
               // Immediately persist state to Dexie
@@ -156,21 +154,15 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     ...state, 
                     ...cloudData, 
                     isSetup: true, 
-                    activeJourneyId: profile.activeJourneyId,
-                    isRestoring: false 
+                    activeJourneyId: profile.activeJourneyId
                   }),
                   updatedAt: Date.now(),
                 }).catch(console.error);
               }
-            } else {
-              setState(prev => ({ ...prev, isRestoring: false }));
             }
-          } else {
-            setState(prev => ({ ...prev, isRestoring: false }));
           }
         } catch (error) {
           console.error("Error restoring session from cloud:", error);
-          setState(prev => ({ ...prev, isRestoring: false }));
         }
       }
     });
