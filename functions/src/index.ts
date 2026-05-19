@@ -132,7 +132,7 @@ Return ONLY the JSON object.`;
           },
           method: "POST",
           body: JSON.stringify({
-            model: "Qwen/Qwen2.5-VL-7B-Instruct",
+            model: "Qwen/Qwen2.5-VL-72B-Instruct",
             messages: [
               {
                 role: "user",
