@@ -6,7 +6,7 @@ const params_1 = require("firebase-functions/params");
 // Define the secure secret that we will store in Firebase Secret Manager
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
 exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1" }, async (request) => {
-    const { message } = request.data;
+    const { message, systemPrompt, maxTokens } = request.data;
     if (!message) {
         throw new https_1.HttpsError("invalid-argument", "Message is required.");
     }
@@ -15,6 +15,7 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
         console.error("Missing Hugging Face API Key");
         throw new https_1.HttpsError("internal", "Server configuration error.");
     }
+    const defaultSystemPrompt = "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor.";
     try {
         const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
             headers: {
@@ -27,14 +28,14 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
                 messages: [
                     {
                         role: "system",
-                        content: "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor."
+                        content: systemPrompt || defaultSystemPrompt
                     },
                     {
                         role: "user",
                         content: message
                     }
                 ],
-                max_tokens: 150,
+                max_tokens: maxTokens || 500,
                 temperature: 0.7
             }),
         });

@@ -291,45 +291,47 @@ export const PartnerSync: React.FC = () => {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">  
                <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-border -translate-x-1/2" />  
                 
-               <div className="space-y-4">  
-                 <h4 className="font-semibold text-charcoal text-[15px]">1. Generate Sync Code</h4>  
-                 <p className="text-[13px] text-medium leading-relaxed">Create a secure WebRTC channel and share the code below with your partner.</p>  
-                  
-                 {hostId ? (  
-                   <div className="mt-4">  
-                     <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Your Sync Code</label>  
-                     <div className="flex gap-2">  
-                         <input type="text" readOnly value={hostId} className="flex-1 p-3 bg-cream border border-border rounded-xl font-mono text-[13px] text-charcoal outline-none" />  
-                         <button onClick={copyToClipboard} className="p-3 bg-sage-pale border border-sage text-sage rounded-xl hover:bg-sage hover:text-white transition-colors">  
-                             {copied ? <Check size={18} /> : <Copy size={18} />}  
-                         </button>  
-                     </div>  
-                   </div>  
-                 ) : (  
-                   <button onClick={handleHost} className="w-full py-3 bg-sage text-white font-medium text-[14px] rounded-xl hover:bg-sage-dark transition-colors mt-2">  
-                     Start Hosting  
-                   </button>  
-                 )}  
-               </div>
-  
-               <div className="space-y-4">  
-                 <h4 className="font-semibold text-charcoal text-[15px]">2. Connect to Partner</h4>  
-                 <p className="text-[13px] text-medium leading-relaxed">If your partner already generated a sync code, enter it below to join their session.</p>  
-                  
-                 <div className="mt-4">  
-                   <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Partner's Code</label>  
-                   <input  
-                     type="text"  
-                     value={partnerIdInput}  
-                     onChange={e => setPartnerIdInput(e.target.value)}  
-                     placeholder="Enter partner code..."  
-                     className="w-full p-3 border border-border rounded-xl font-mono text-[13px] text-charcoal focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/20 transition-all mb-3"  
-                   />  
-                   <button onClick={handleConnect} disabled={!partnerIdInput.trim() || status.includes('Connecting')} className="w-full py-3 bg-charcoal text-white font-medium text-[14px] rounded-xl hover:bg-black disabled:opacity-50 transition-colors">  
-                     Connect  
-                   </button>  
-                 </div>  
-               </div>  
+               <div className="flex flex-col">  
+                <h4 className="font-semibold text-charcoal text-[15px]">1. Generate Sync Code</h4>  
+                <p className="text-[13px] text-medium leading-relaxed mt-2">Create a secure WebRTC channel and share the code below with your partner.</p>  
+                 
+                {hostId ? (  
+                  <div className="mt-auto pt-4">  
+                    <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Your Sync Code</label>  
+                    <div className="flex gap-2">  
+                        <input type="text" readOnly value={hostId} className="flex-1 p-3 bg-cream border border-border rounded-xl font-mono text-[13px] text-charcoal outline-none" />  
+                        <button onClick={copyToClipboard} className="p-3 bg-sage-pale border border-sage text-sage rounded-xl hover:bg-sage hover:text-white transition-colors">  
+                            {copied ? <Check size={18} /> : <Copy size={18} />}  
+                        </button>  
+                    </div>  
+                  </div>  
+                ) : (  
+                  <div className="mt-auto pt-4">
+                    <button onClick={handleHost} className="w-full py-3 bg-sage text-white font-medium text-[14px] rounded-xl hover:bg-sage-dark transition-colors">  
+                      Start Hosting  
+                    </button>
+                  </div>  
+                )}  
+              </div>
+ 
+              <div className="flex flex-col">  
+                <h4 className="font-semibold text-charcoal text-[15px]">2. Connect to Partner</h4>  
+                <p className="text-[13px] text-medium leading-relaxed mt-2">If your partner already generated a sync code, enter it below to join their session.</p>  
+                 
+                <div className="mt-auto pt-4">  
+                  <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Partner's Code</label>  
+                  <input  
+                    type="text"  
+                    value={partnerIdInput}  
+                    onChange={e => setPartnerIdInput(e.target.value)}  
+                    placeholder="Enter partner code..."  
+                    className="w-full p-3 border border-border rounded-xl font-mono text-[13px] text-charcoal focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/20 transition-all mb-3"  
+                  />  
+                  <button onClick={handleConnect} disabled={!partnerIdInput.trim() || status.includes('Connecting')} className="w-full py-3 bg-charcoal text-white font-medium text-[14px] rounded-xl hover:bg-black disabled:opacity-50 transition-colors">  
+                    Connect  
+                  </button>  
+                </div>  
+              </div>  
              </div>
              
              {/* Pre-connection Permissions Settings */}
