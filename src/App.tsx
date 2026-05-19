@@ -51,7 +51,7 @@ const AppContent: React.FC = () => {
     content = <PrivacyPolicy />;
   } else if (currentHash === '#terms') {
     content = <TermsOfService />;
-  } else if (!isAuthReady || !splashFinished || state.isRestoring) {
+  } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
   } else if (currentHash === '#dashboard' && state.isSetup) {
     content = <Dashboard />;
@@ -60,7 +60,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div key={currentHash + (isAuthReady ? '1' : '0') + (splashFinished ? '1' : '0')} className="animate-in fade-in duration-700 ease-in-out h-full w-full">
+    <div className="animate-in fade-in duration-700 ease-in-out h-full w-full">
       {content}
     </div>
   );
