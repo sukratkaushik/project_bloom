@@ -8,8 +8,9 @@ import {
   RefreshCw, 
   AlertCircle
 } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import { CustomSelect } from '../CustomSelect';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../firebase';
 
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
@@ -27,8 +28,7 @@ export const BabyNames: React.FC = () => {
     setError('');
     
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-      const prompt = `You are a helpful assistant for expecting parents in India. Generate 6 beautiful, meaningful baby names based on these preferences:
+      const prompt = `Generate 6 beautiful, meaningful baby names based on these preferences:
       - Gender: ${gender}
       - Origin/Style: ${origin}
       ${startingLetter ? `- Must start with the letter: ${startingLetter}` : ''}
@@ -40,16 +40,13 @@ export const BabyNames: React.FC = () => {
         {"name": "...", "meaning": "...", "origin": "..."}
       ]`;
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-2.5-flash',
-        contents: prompt,
-        config: {
-          temperature: 0.7,
-        }
-      });
+      const systemPrompt = `You are a helpful assistant for expecting parents in India. You suggest beautiful, culturally appropriate baby names. Always respond with ONLY valid JSON — no markdown, no explanation, no extra text.`;
+
+      const chatWithAI = httpsCallable(functions, 'chatWithAI');
+      const response = await chatWithAI({ message: prompt, systemPrompt });
+      const result = response.data as { reply: string };
       
-      const text = response.text || '';
-      const cleanText = text.replace(/```json/g, '').replace(/```/g, '').trim();
+      const cleanText = result.reply.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleanText);
       
       if (Array.isArray(parsed)) {
@@ -60,7 +57,7 @@ export const BabyNames: React.FC = () => {
       
     } catch (err) {
       console.error(err);
-      setError('Something went wrong. Please securely try again.');
+      setError('Something went wrong. Please try again.');
     } finally {
       setIsGenerating(false);
     }

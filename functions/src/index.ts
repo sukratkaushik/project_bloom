@@ -7,7 +7,7 @@ const hfApiKey = defineSecret("HUGGINGFACE_API_KEY");
 export const chatWithAI = onCall(
   { secrets: [hfApiKey], region: "asia-south1" }, 
   async (request) => {
-    const { message } = request.data;
+    const { message, systemPrompt, maxTokens } = request.data;
     
     if (!message) {
       throw new HttpsError("invalid-argument", "Message is required.");
@@ -19,6 +19,8 @@ export const chatWithAI = onCall(
       console.error("Missing Hugging Face API Key");
       throw new HttpsError("internal", "Server configuration error.");
     }
+
+    const defaultSystemPrompt = "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor.";
 
     try {
       const response = await fetch(
@@ -34,14 +36,14 @@ export const chatWithAI = onCall(
             messages: [
               {
                 role: "system",
-                content: "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor."
+                content: systemPrompt || defaultSystemPrompt
               },
               {
                 role: "user",
                 content: message
               }
             ],
-            max_tokens: 150,
+            max_tokens: maxTokens || 500,
             temperature: 0.7
           }),
         }
