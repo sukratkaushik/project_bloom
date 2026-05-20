@@ -291,22 +291,27 @@ export const PartnerSync: React.FC = () => {
              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 relative">  
                <div className="hidden md:block absolute left-1/2 top-4 bottom-4 w-px bg-border -translate-x-1/2" />  
                 
-               <div className="flex flex-col">  
+               <div className="flex flex-col h-full">  
                 <h4 className="font-semibold text-charcoal text-[15px]">1. Generate Sync Code</h4>  
                 <p className="text-[13px] text-medium leading-relaxed mt-2">Create a secure WebRTC channel and share the code below with your partner.</p>  
                  
                 {hostId ? (  
                   <div className="mt-auto pt-4">  
                     <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Your Sync Code</label>  
-                    <div className="flex gap-2">  
+                    <div className="flex gap-2 mb-3">  
                         <input type="text" readOnly value={hostId} className="flex-1 p-3 bg-cream border border-border rounded-xl font-mono text-[13px] text-charcoal outline-none" />  
                         <button onClick={copyToClipboard} className="p-3 bg-sage-pale border border-sage text-sage rounded-xl hover:bg-sage hover:text-white transition-colors">  
                             {copied ? <Check size={18} /> : <Copy size={18} />}  
                         </button>  
                     </div>  
+                    <button onClick={handleDisconnect} className="w-full py-3 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-medium text-[14px] rounded-xl transition-colors">  
+                      Stop Hosting  
+                    </button>
                   </div>  
                 ) : (  
                   <div className="mt-auto pt-4">
+                    <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">&nbsp;</label>
+                    <div className="p-3 mb-3 border border-dashed border-border rounded-xl text-[13px] text-light text-center">Code will appear here</div>
                     <button onClick={handleHost} className="w-full py-3 bg-sage text-white font-medium text-[14px] rounded-xl hover:bg-sage-dark transition-colors">  
                       Start Hosting  
                     </button>
@@ -314,7 +319,7 @@ export const PartnerSync: React.FC = () => {
                 )}  
               </div>
  
-              <div className="flex flex-col">  
+              <div className="flex flex-col h-full">  
                 <h4 className="font-semibold text-charcoal text-[15px]">2. Connect to Partner</h4>  
                 <p className="text-[13px] text-medium leading-relaxed mt-2">If your partner already generated a sync code, enter it below to join their session.</p>  
                  
