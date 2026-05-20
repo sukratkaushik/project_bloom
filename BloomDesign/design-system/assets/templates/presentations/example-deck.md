@@ -9,7 +9,7 @@ paginate: true
 
 # Our Pregnancy
 
-*Your free pregnancy companion — secure & synced.*
+*Your pregnancy companion — secure & synced.*
 
 ---
 
@@ -27,13 +27,14 @@ So we built one for here.
 
 ---
 
-# Three things, free forever.
+# Four things. Core features always free.
 
-1. **Track** — vitals, kicks, contractions, mood, food.
+1. **Track** — vitals, kicks, contractions, mood, hydration, food.
 2. **Plan** — hospital bag, birth plan, government schemes.
-3. **Stay calm** — Calm Mode for 3am, dark mode for tired eyes.
+3. **Sync** — Real-Time Partner Sync over WebRTC + encrypted cloud.
+4. **AI tools (coming soon)** — Food Safety Scanner, Ask Bloom 24/7, Name Generator.
 
-No account needed. Data stays on your device.
+Your data is encrypted and only accessible by you.
 
 ---
 
@@ -48,6 +49,30 @@ No account needed. Data stays on your device.
 
 <div class="big">₹5,000</div>
 <div class="label">PMMVY pays first-time mothers. Most people don't claim it. We remind them.</div>
+
+---
+
+<!-- _class: divider -->
+
+# AI in service of safety
+
+---
+
+# AI Food Safety Scanner
+
+Snap a thali. Get a safety check in seconds.
+
+Tailored for **Indian cuisine** — biryani, dal, paneer, raw papaya, street water.
+
+Powered by Gemini + Qwen2.5-VL.
+
+---
+
+<!-- _class: quote -->
+
+> "The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!"
+
+<div class="attrib">— Sneha P., Goa</div>
 
 ---
 

@@ -69,10 +69,10 @@ Common structure:
 ## Carousel content ideas
 
 - *6 things we learned launching a pregnancy app in India.*
-- *Why we're free forever for the basics.*
+- *Why core features are always free — and how we'll fund the AI tier.*
 - *The 4 government schemes every Indian mother should know.*
-- *Why we don't ask for an account on signup.*
-- *Local-first vs cloud-first: how we built sync that respects privacy.*
+- *Building an AI Food Safety Scanner for Indian cuisine — what's hard about ghee, raw papaya, and street water.*
+- *How we built encrypted Partner Sync over WebRTC + Firebase.*
 
 ## Hashtags
 
@@ -86,5 +86,5 @@ Never use: #motivation #entrepreneurship #leadership (generic).
 
 - **Logo:** lotus mark on Sandalwood, 300×300 — use `design-system/logo/mark.png`.
 - **Cover:** 1584×396 — use `lockup-horizontal` lockup with Mehndi watermark on right side at 8% opacity.
-- **Tagline:** *A privacy-first pregnancy companion for Indian mothers.*
+- **Tagline:** *A pregnancy companion for Indian mothers — secure, synced, and culturally rooted.*
 - **About:** First paragraph = elevator pitch (see `foundations/brand.md`).

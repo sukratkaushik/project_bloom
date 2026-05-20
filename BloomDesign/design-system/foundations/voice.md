@@ -100,6 +100,33 @@ The audience reads English fluently. We do **not** code-switch into Devanagari o
 - Don't assume religious context. *Festivals* > *Hindu festivals*. List Diwali, Eid, Christmas, Pongal, Onam, Karwa Chauth equally.
 - Don't lecture on choices. Inform, don't moralise — say *some women choose…* not *the right choice is…*.
 
+### 11. How to talk about AI
+
+The product now ships real AI: **Ask Bloom 24/7** (chatbot), **AI Food Safety Scanner**, **AI Name Generator**, **Labor Readiness Score**. Talk about each AI feature as a careful safety tool, not a magic wand.
+
+| ❌ Don't | ✅ Do |
+|---|---|
+| Revolutionary AI for pregnancy | AI Food Safety Scanner — tailored for Indian cuisine |
+| Our AI knows everything | Ask Bloom answers pregnancy questions; always verify with your OB or midwife |
+| Powered by next-gen LLMs | Gemini-powered AI Food Safety Scanner (only name providers already on the site) |
+| AI will track everything for you | The AI scanner flags risky ingredients in items like raw papaya or street food |
+| AI-driven personalised insights | "Auto-alerts if your kick count drops below 10 in 2 hours" |
+
+**Rule of thumb:** every AI claim names the *specific* feature, the *specific* user problem it solves, and includes a *safety disclaimer* (when relevant). Never sell AI as a magic helper.
+
+### 12. Don't reintroduce retired claims
+
+In May 2026 the brand walked back several absolutes. Never reintroduce them in any new copy:
+
+- ❌ "Free forever / Pay nothing / All entirely free" → ✅ "Core features, always free"
+- ❌ "Privacy-first" → ✅ "Private & secure"
+- ❌ "Your data stays on your device" → ✅ "Your data is private & secure"
+- ❌ "Stored locally / Local-first" → ✅ "Encrypted and only accessible by you"
+- ❌ "No account needed" → (omit — modal flow now requires sign-in for sync)
+- ❌ "Never touches a centralized database" → (omit — Firebase Firestore is in use)
+
+If you spot any of these in older marketing files or templates, replace with the current equivalent.
+
 ## When the voice changes by surface
 
 | Surface | Adjustment |
@@ -107,7 +134,7 @@ The audience reads English fluently. We do **not** code-switch into Devanagari o
 | **In-app tracking** | Tighter, more functional — "Kick count: 7" not "You've felt 7 little kicks!" |
 | **Knowledge tips / Articles** | Warmer, more conversational — "Did you know…" |
 | **Errors / Empty states** | Warmest — recovery-oriented, never alarm |
-| **Marketing site** | Confident, claim-backed — "100% free" not "We try to keep things free" |
+| **Marketing site** | Confident, claim-backed — "Core features, always free" not "100% free" (retired May 2026); always specific over absolute |
 | **Social / IG / LinkedIn** | Slightly more poetic — Playfair Display quotes shine |
 | **Email — transactional** | Clear, calm, never hype |
 | **Email — newsletter** | Closest to a friend writing — first-name openers, P.S. lines |

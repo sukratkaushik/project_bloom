@@ -80,10 +80,22 @@ Use patterns as **background watermarks**, never as a foreground element.
 | Dimensions | 1200 × 630 px |
 | Background | Sandalwood `#FDFBF7` |
 | Centerpiece | Lotus logo + "Our Pregnancy" wordmark |
-| Below logo | Tagline in Deep Charcoal Playfair: *Your free pregnancy companion — secure & synced.* |
+| Below logo | Tagline in Deep Charcoal Playfair: *Your pregnancy companion — secure & synced.* |
 | Corner ornament | Optional rangoli line-art at 8% opacity, bottom-right |
 
 Don't add product screenshots, feature lists, or CTAs to the OG image — keep it brand-only.
+
+## Real product imagery (shipped May 2026)
+
+Three canonical product mockups are now in `assets/templates/web/shipped-mockups/`. Use these instead of generating synthetic substitutes:
+
+| File | What it is | Use |
+|---|---|---|
+| `dashboard-mockup.png` | The dashboard view (1024×1024) | Hero in decks, product overview slides, app-store-style screenshots |
+| `food-scanner-mockup-v1.png` | First iteration of the AI Food Safety Scanner promo | Reference only — superseded by v2 |
+| `food-scanner-mockup-v2.png` | **Current shipped iteration** — Indian thali with AI overlay, "SAFE TO EAT" verdict (1024×1024) | All AI food scanner content: hero of feature pages, IG carousels, LinkedIn posts, ads |
+
+The food scanner mockup features a real thali — biryani, chana masala, butter chicken, raita, naan, papad — with a glassmorphic AI overlay showing "99% CONFIDENCE", "FOOD COMPOSITION OK", "SAFE TO EAT". This is the brand's flagship AI feature visual. Use it directly; don't recreate it.
 
 ## Indian context cues in imagery
 

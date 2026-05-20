@@ -25,25 +25,30 @@ An ad has one job and 1.5 seconds to do it. Rules:
 
 ## Approved headline patterns (Meta + Google)
 
-### Pattern 1 — The free claim
-- "Free pregnancy tracker. No account needed."
-- "Track kicks, BP, contractions — free, forever."
-- "₹0/month. Forever. For everything you actually need."
+### Pattern 1 — The "core features free" claim (refreshed May 2026)
+- "Core features always free. Pregnancy tracker for Indian mothers."
+- "Track kicks, BP, contractions — core features free."
+- "Free pregnancy tracker. Cloud sync, encrypted, only accessible by you."
 
-### Pattern 2 — The privacy claim
-- "Your pregnancy data stays on your device."
-- "Track your pregnancy without an account."
-- "No data brokering. No ads. Just tracking."
+### Pattern 2 — The privacy + security claim (refreshed — softened from absolutes)
+- "Your data is encrypted and only accessible by you."
+- "Pregnancy tracker, securely synced across your devices."
+- "Private & secure. Cloud sync optional, granular controls."
 
 ### Pattern 3 — The India claim
 - "Pregnancy tracker that knows ragi and JSY."
 - "Track your pregnancy — and don't miss ₹5,000 from PMMVY."
-- "200+ Indian foods, scheme guides, 108 helpline. Free."
+- "Scheme guides, 108 helpline, AI food scanner for Indian cuisine."
 
 ### Pattern 4 — The specific feature
-- "Kick counter with auto-alerts. Free."
-- "Time contractions. Get the 5-1-1 rule automatically."
-- "Hospital bag checklist for Indian mothers."
+- "Kick counter with auto-alerts. 5-1-1 contraction timer. Free."
+- "AI Food Safety Scanner — tailored for Indian cuisine."
+- "FHIR R4 export to Epic / Cerner. Built into the free tier."
+
+### Pattern 5 — The AI claim (new in May 2026)
+- "Snap your thali — get an AI safety check in seconds."
+- "Ask Bloom 24/7 — pregnancy questions answered, any hour."
+- "AI tools coming soon. Free core features today."
 
 ## Visual rules in ad creative
 
@@ -52,41 +57,41 @@ An ad has one job and 1.5 seconds to do it. Rules:
 | Background | Sandalwood. Never pure white. Never a stock photo unless it's of a real Indian mother in a real space (see `foundations/imagery.md`). |
 | Headline | Playfair Display, sentence case, max 8 words. |
 | Subhead | Nunito 18pt, max 14 words. |
-| CTA button | Pill, Sage, white text, "Try free" or "Open app." |
+| CTA button | Pill, Sage, white text. "Start Tracking" (mirror the homepage), "Try the AI Scanner", or "Open the app". Never "Try free" (retired claim). |
 | Logo | Small lotus mark + wordmark, top-left or bottom-right, never centered with the content. |
 | Disclaimer text | Below CTA, 12pt Medium, only if the ad makes a medical claim. |
 
-## Google Search RSA — headline set
+## Google Search RSA — headline set (refreshed May 2026)
 
-15 headlines, ≤30 chars each. Don't pack all keywords into one — Google rotates.
+15 headlines, ≤30 chars each. Don't pack all keywords into one — Google rotates. All claims softened to match the live site copy.
 
 ```
-Free Pregnancy Tracker India
-Track Kicks, BP, Contractions
 Indian Pregnancy Companion
-Privacy-First Pregnancy App
-₹0 Pregnancy Tracker
+Pregnancy Tracker for India
+Track Kicks, BP, Contractions
+Core Features Always Free
+AI Food Scanner for India
 PMMVY Reminder + Tracker
-Pregnancy App for Indians
+Pregnancy App, Built for India
 Free Hospital Bag Checklist
 Contraction Timer 5-1-1
-Pregnancy Tracker, No Account
+Secure & Synced Pregnancy App
 Kick Counter with Alerts
 Government Scheme Tracker
 JSY PMMVY JSSK Guide
-Indian Foods Safety Database
-Track Pregnancy — Free Forever
+Indian Foods Safety Scanner
+Ask Bloom — Pregnancy AI
 ```
 
-## Google Search RSA — descriptions
+## Google Search RSA — descriptions (refreshed May 2026)
 
-4 descriptions, ≤90 chars each.
+4 descriptions, ≤90 chars each. All claims softened.
 
 ```
-Free pregnancy tracker built for Indian mothers. Track kicks, BP, contractions — no account.
-Indian foods safety database, JSY/PMMVY scheme reminders, hospital bag — all free, all private.
-Privacy-first pregnancy companion. Data stays on your device. No ads, no payment required.
-Built for Indian mothers 🇮🇳. Free forever for the basics. Try ourpregnancy.in now.
+Pregnancy companion for Indian mothers. Track kicks, BP, contractions. Core features free.
+Indian foods AI scanner, JSY/PMMVY scheme guides, hospital bag — core features always free.
+A beautifully designed pregnancy companion, securely synced across your devices.
+Built for Indian mothers 🇮🇳. Core features free. AI tools coming soon. ourpregnancy.in
 ```
 
 ## Negative keywords (Google Search)
@@ -105,12 +110,14 @@ Send each ad to a **dedicated landing page** that mirrors the ad's claim. Don't 
 
 | Ad claim | Landing page |
 |---|---|
-| Free pregnancy tracker | `/free` |
+| Core features free | `/free-tracker` |
 | PMMVY scheme tracker | `/schemes` |
 | Kick counter | `/kick-counter` |
 | Hospital bag checklist | `/hospital-bag` |
+| AI Food Safety Scanner | `/food-scanner` |
+| Ask Bloom AI | `/ask-bloom` |
 
-Each landing page: hero with the claim, 3 trust signals (free, private, offline), one CTA, one screenshot.
+Each landing page: hero with the claim, the 4-chip trust bar (Made for Indian mothers 🇮🇳 · Private & secure · Core features free · Works offline via PWA), one CTA, one screenshot.
 
 ## Performance budgets
 

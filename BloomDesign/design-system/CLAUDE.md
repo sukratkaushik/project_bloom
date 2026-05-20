@@ -17,11 +17,13 @@
 
 ## Identity in one line
 
-> A privacy-first pregnancy companion for Indian mothers — empathetic older sister, not strict doctor.
+> A pregnancy companion app for Indian mothers — empathetic older sister, not strict doctor. Core features free; AI tools coming soon.
 
 **Product name:** Our Pregnancy (always — never "Project Bloom" externally).
 **Domain:** ourpregnancy.in
-**Tagline:** *Your free pregnancy companion — secure & synced.*
+**Tagline:** *Your pregnancy companion — secure & synced.*
+**Pricing line:** *Core features, always free. AI tools coming soon.*
+**AI chatbot product name:** *Ask Bloom* (the only sanctioned external use of "Bloom").
 
 ---
 
@@ -51,10 +53,28 @@
 
 ### Voice
 1. Second person: "you / your", not "users / mothers / they."
-2. Use the user's nouns: *baby, kicks, contractions, due date, nausea, ladoo, dal, midwife, hospital bag, JSY, PMMVY*. Not ours: *platform, pipeline, AI, LLM, ingestion*.
+2. Use the user's nouns: *baby, kicks, contractions, due date, nausea, ladoo, dal, midwife, hospital bag, JSY, PMMVY, biryani, ragi, paneer*. Not ours: *platform, pipeline, LLM, ingestion*.
 3. **No hype vocabulary.** Banned everywhere: *revolutionary, game-changing, 10x, cutting-edge, supercharge, unleash, leverage, transform, synergy, seamless, robust, AI-powered (as a bare adjective).*
 4. Contractions are welcome (we're, you'll, let's). They feel warm.
 5. **No clinical alarm language.** Never "ERROR" or "FAILED" — use "Hmm, let's try that again."
+
+### Retired claims (May 2026) — never use
+These phrases were live on the homepage and have since been walked back. If you find them in older marketing, replace with the current equivalent. Never reintroduce.
+
+| ❌ Never say | ✅ Say instead |
+|---|---|
+| Free forever / Pay nothing / All entirely free | Core features, always free |
+| No hidden costs. Completely Free. | Core features, always free |
+| Privacy-first | Private & secure |
+| Your data stays on your device | Your data is private & secure |
+| Stored locally / Local-first | Encrypted and only accessible by you |
+| No account needed | (omit — modal flow does require sign-in for sync) |
+| Never touches a centralized database | (omit — we use Firebase Firestore) |
+
+### AI talk
+1. The product has real AI: **Ask Bloom 24/7** (chatbot, fine-tuned), **AI Food Safety Scanner** (Gemini-powered, Qwen2.5-VL backend), **AI Name Generator**, **Labor Readiness Score** (HRV/RHR/Braxton Hicks biometrics). These are Premium tier — "AI tools coming soon" on marketing.
+2. Talk about AI as a careful safety feature, not a magic trick. *"Gemini-powered AI Food Safety Scanner, tailored for Indian cuisine"* > *"AI-powered insights"*.
+3. Don't name underlying model providers unless they're already on the site (Gemini is OK; Qwen/Hugging Face stays internal).
 
 ### Imagery
 1. **Real Indian women** in soft cotton kurtas, light sarees, or modern everyday wear. Warm morning light. Comfortable, real spaces — home, garden, kitchen, balcony.
@@ -76,7 +96,7 @@
 1. Medical disclaimer in any health/medical article footer:
    > *Our Pregnancy provides general guidance and cultural wisdom. Always consult your gynecologist or healthcare provider for medical advice.*
 2. Privacy statement somewhere visible:
-   > *Your data stays on your device. No payment required. Works offline.*
+   > *Your data is private & secure. Core features are free. Works offline via PWA.*
 
 ---
 

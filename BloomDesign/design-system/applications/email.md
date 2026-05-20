@@ -60,7 +60,7 @@ BODY          Cloud sync is on. Your tracking now stays consistent between your 
 
 CODE BLOCK    XXXX-XXXX-XXXX
 
-OUTRO         Your data is still encrypted on your device. Sync just means an encrypted copy lives on our server as a backup. You can turn this off anytime in Settings.
+OUTRO         Your data is encrypted and only accessible by you. Cloud sync keeps an encrypted copy on our server as a backup. You can turn this off anytime in Settings.
 ```
 
 ### 3. Password reset

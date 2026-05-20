@@ -106,7 +106,7 @@ function svgLockupStacked({ width = 1200, height = 1200 }) {
       font-size="${wordSize}" fill="${COLORS.charcoal}" letter-spacing="-0.5">Our Pregnancy</text>
     <text x="${wordX}" y="${tagY}" text-anchor="middle"
       font-family="'Nunito', sans-serif" font-weight="400"
-      font-size="${tagSize}" fill="${COLORS.medium}" letter-spacing="0.02em">Your free pregnancy companion</text>`;
+      font-size="${tagSize}" fill="${COLORS.medium}" letter-spacing="0.02em">Your pregnancy companion</text>`;
   return svgWrap({ width, height, body });
 }
 
@@ -196,7 +196,7 @@ function svgOgImage({ width = 1200, height = 630 }) {
       font-size="60" fill="${COLORS.charcoal}" letter-spacing="-0.5">Our Pregnancy</text>
     <text x="${wordX}" y="${tagY}" text-anchor="middle"
       font-family="'Nunito', sans-serif" font-weight="400"
-      font-size="24" fill="${COLORS.medium}">Your free pregnancy companion — secure &amp; synced.</text>
+      font-size="24" fill="${COLORS.medium}">Your pregnancy companion — secure &amp; synced.</text>
     <rect x="${pillX}" y="${pillY}" width="${pillW}" height="${pillH}" rx="${pillH/2}" fill="${COLORS.sage}"/>
     <text x="${wordX}" y="${pillY + 32}" text-anchor="middle"
       font-family="'Nunito', sans-serif" font-weight="700"

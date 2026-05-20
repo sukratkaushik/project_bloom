@@ -70,11 +70,26 @@ ATTRIB          — Kavitha R., Bangalore
 ### Template D — Single bold statement
 
 ```
-H1 ONLY         Your data stays on your device.
-SUB             That's it. That's the whole stance.
+H1 ONLY         Your pregnancy. Encrypted & only accessible by you.
+SUB             That's the whole stance.
 FOOTER          ourpregnancy.in
 ```
 **Background:** Sage-pale, full bleed. **Mark:** Top-right.
+
+### Template E — AI feature showcase (new May 2026)
+
+For the AI Food Safety Scanner and Ask Bloom launches.
+
+```
+HERO IMAGE      Real Indian thali photo (biryani, chana masala, raita, naan)
+                or shipped food-scanner mockup from assets/templates/web/shipped-mockups/
+OVERLINE        AI FOOD SAFETY SCANNER
+H1              Snap your thali. Get a safety check in seconds.
+BODY            Tailored for Indian cuisine — biryani, dal, paneer,
+                raw papaya, street water.
+FOOTER          ourpregnancy.in · Always consult your OB or midwife.
+```
+**Background:** Sandalwood with the food photo as the centerpiece. **Disclaimer:** required.
 
 ## Caption rules
 
@@ -97,11 +112,11 @@ FOOTER          ourpregnancy.in
 
 ## Profile
 
-- **Avatar:** lotus mark only (no wordmark) on Sandalwood. Use `design-system/logo/mark.svg` at 320×320.
+- **Avatar:** lotus mark only (no wordmark) on Sandalwood. Use `design-system/logo/mark.png` at 320×320 (the canonical PNG, never an SVG recreation).
 - **Bio:**
   ```
-  🌸 Free pregnancy companion for Indian mothers
-  🇮🇳 Track. Plan. Stay calm.
-  ↓ Try it free — no account needed
+  🌸 A pregnancy companion for Indian mothers
+  🇮🇳 Track · Plan · Stay calm
+  ↓ Core features always free
   ```
 - **Link:** `ourpregnancy.in`
