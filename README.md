@@ -41,7 +41,7 @@ The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 - **Peer-to-peer partner sync** via WebRTC (PeerJS) — no central server needed for sharing
 - **Google Authentication** via Firebase Auth with custom domain branding
 - **Firebase Hosting** on custom domain (`ourpregnancy.in`) with SSL
-- **Gemini AI integration** for food safety scanning, a pregnancy Q&A chatbot, and baby name suggestions
+- **AI integration** via secure Firebase Cloud Functions proxying Hugging Face models (Qwen2.5-72B for text, Qwen2.5-VL-72B for vision) — no API keys exposed client-side
 - **FHIR R4 interoperability** for exporting health data to enterprise EHR systems (Epic, Cerner)
 - **PDF export** of the entire pregnancy care plan via jsPDF
 
@@ -54,7 +54,7 @@ The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 | **Pregnancy Tracker** | Week-by-week baby development with fruit-size comparisons, body changes, trimester progress |
 | **Task Management** | Curated checklists for Development milestones, Medical appointments, Preparation, Financial tasks, Deadlines, Postpartum — filterable by trimester, work situation, and pregnancy flags (high-risk, multiples, IVF, mental health) |
 | **Health Tracking** | Kick counter, Contraction timer, Vitals tracker (BP & weight), Mood tracker, Hydration tracker, Nutrition/supplement tracker, Symptom logger |
-| **AI-Powered Tools** | Food safety scanner (Gemini Vision), Ask Bloom chatbot, Baby name generator with cultural/meaning filters |
+| **AI-Powered Tools** | Food safety scanner (Qwen VL-72B Vision), AskOurPregnancy chatbot, Baby name generator with cultural/meaning filters, PDF/TXT document parsing |
 | **Planning Tools** | Birth plan builder, Hospital bag checklist, Government schemes finder, Decision tracker (birth setting, pain relief, feeding, etc.) |
 | **Labor Readiness** | Predictive labor readiness score using biometrics (HRV, RHR, BBT, Braxton Hicks frequency) |
 | **Partner Sync** | Real-time P2P data sync via WebRTC with granular permission controls (read-only / edit, per-section exclusions) |
@@ -75,7 +75,7 @@ The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 | **Local Database** | Dexie.js (IndexedDB wrapper) — 7 object stores |
 | **Authentication** | Firebase Auth (Google Sign-In) |
 | **Cloud Persistence** | Firebase Firestore (optional, for state backup) |
-| **AI / ML** | Google Gemini API (`gemini-2.0-flash`) for food scanning, chatbot, name generation |
+| **AI / ML** | Hugging Face Inference API via Firebase Cloud Functions — `Qwen/Qwen2.5-72B-Instruct` (text), `Qwen/Qwen2.5-VL-72B-Instruct` (vision) |
 | **P2P Sync** | PeerJS (WebRTC) for real-time partner data sync |
 | **PDF Export** | jsPDF |
 | **EHR Interop** | Custom FHIR R4 mapper + OAuth 2.0 client |
@@ -116,13 +116,19 @@ The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 │                                 └──────────────────────────────┘   │
 └───────────────────────┬─────────────────────────────────────────────┘
                         │
-         ┌──────────────┼──────────────┐
-         ▼              ▼              ▼
-  ┌─────────────┐ ┌──────────┐ ┌────────────┐
-  │  Firebase   │ │  Gemini  │ │  EHR/FHIR  │
-  │  Auth       │ │  AI API  │ │  Server    │
-  │  (Google)   │ │ (Google) │ │ (Epic etc) │
-  └─────────────┘ └──────────┘ └────────────┘
+         ┌──────────────┼──────────────────────────┐
+         ▼              ▼                          ▼
+  ┌─────────────┐ ┌──────────────────────────┐ ┌────────────┐
+  │  Firebase   │ │  Firebase Cloud Functions │ │  EHR/FHIR  │
+  │  Auth       │ │  (asia-south1 / Mumbai)  │ │  Server    │
+  │  (Google)   │ │  ├─ chatWithAI           │ │ (Epic etc) │
+  └─────────────┘ │  ├─ analyzeFood          │ └────────────┘
+                  │  └─ parseDocument         │
+                  │         │                  │
+                  │         ▼                  │
+                  │  Hugging Face Inference    │
+                  │  (Qwen2.5-72B / VL-72B)   │
+                  └──────────────────────────┘
 ```
 
 ### Component Hierarchy (UML Component Diagram)
@@ -391,7 +397,13 @@ Project_Bloom/
 ├── .firebaserc                   # Firebase project binding
 ├── firebase-applet-config.json   # Firebase project credentials
 ├── firestore.rules               # Firestore security rules
+├── OPstatus.md                   # Project status log (changelog)
 ├── AGENTS.md                     # AI agent instructions
+├── functions/                    # Firebase Cloud Functions (backend)
+│   ├── package.json              # Backend dependencies (pdf-parse, etc.)
+│   ├── tsconfig.json
+│   └── src/
+│       └── index.ts              # chatWithAI, analyzeFood, parseDocument
 ├── public/                       # Static assets (PWA icons, logo)
 │   ├── logo.png
 │   ├── pwa-192x192.svg
@@ -461,8 +473,8 @@ Project_Bloom/
 ### Prerequisites
 
 - **Node.js** 18+ and **npm**
-- A **Firebase project** with Authentication (Google provider) and Firestore enabled
-- A **Google Gemini API key** for AI features
+- A **Firebase project** with Authentication (Google provider), Firestore, and Cloud Functions enabled
+- A **Hugging Face API key** stored in Firebase Secret Manager (for AI features)
 
 ### Installation
 
@@ -477,16 +489,19 @@ npm install
 
 ### Configuration
 
-Create a `.env` file in the project root:
+Firebase configuration is stored in `firebase-applet-config.json`. AI keys are managed via Firebase Secret Manager:
+
+```bash
+# Set your Hugging Face API key in Firebase Secret Manager
+firebase functions:secrets:set HUGGINGFACE_API_KEY
+
+# Firebase project credentials are in firebase-applet-config.json
+# Update with your project's values
+```
+
+For EHR integration (optional):
 
 ```env
-# Google Gemini AI
-GEMINI_API_KEY=your_gemini_api_key
-
-# Firebase (configured in src/firebase.ts)
-# Update the firebaseConfig object with your project credentials
-
-# EHR Integration (optional)
 EHR_CLIENT_ID=your_ehr_client_id
 EHR_CLIENT_SECRET=your_ehr_client_secret
 EHR_TOKEN_ENDPOINT=https://authorization.epic.com/oauth2/token
@@ -517,13 +532,16 @@ The app is deployed on **Firebase Hosting** at [ourpregnancy.in](https://ourpreg
 # Build production bundle
 npm run build
 
-# Deploy to Firebase Hosting
+# Deploy to Firebase Hosting only
 firebase deploy --only hosting
+
+# Deploy Cloud Functions only
+firebase deploy --only functions
 
 # Deploy Firestore security rules
 firebase deploy --only firestore:rules
 
-# Deploy everything
+# Deploy everything (hosting + functions + firestore rules)
 firebase deploy
 ```
 
@@ -541,20 +559,22 @@ firebase deploy
 | **Hosting** | Serves the SPA with CDN, custom domain, and SSL |
 | **Authentication** | Google Sign-In (popup with redirect fallback) |
 | **Firestore** | Cloud persistence for planner state and journey data |
+| **Cloud Functions (2nd Gen)** | Secure AI backend (`chatWithAI`, `analyzeFood`, `parseDocument`) deployed in `asia-south1` |
+| **Secret Manager** | Stores `HUGGINGFACE_API_KEY` — never exposed to the client |
 
 ---
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|---|---|---|
-| `GEMINI_API_KEY` | Yes | Google Gemini API key for AI features (food scanner, chatbot, baby names) |
-| `EHR_CLIENT_ID` | No | OAuth 2.0 client ID for EHR FHIR integration |
-| `EHR_CLIENT_SECRET` | No | OAuth 2.0 client secret for EHR FHIR integration |
-| `EHR_TOKEN_ENDPOINT` | No | OAuth 2.0 token endpoint URL |
-| `EHR_FHIR_BASE_URL` | No | FHIR R4 base URL for the EHR server |
+| Variable | Location | Required | Description |
+|---|---|---|---|
+| `HUGGINGFACE_API_KEY` | Firebase Secret Manager | Yes | Hugging Face API key for AI features (chatbot, food scanner, name generator) |
+| `EHR_CLIENT_ID` | `.env` | No | OAuth 2.0 client ID for EHR FHIR integration |
+| `EHR_CLIENT_SECRET` | `.env` | No | OAuth 2.0 client secret for EHR FHIR integration |
+| `EHR_TOKEN_ENDPOINT` | `.env` | No | OAuth 2.0 token endpoint URL |
+| `EHR_FHIR_BASE_URL` | `.env` | No | FHIR R4 base URL for the EHR server |
 
-Firebase configuration is stored in `firebase-applet-config.json` and imported by `src/firebase.ts`.
+Firebase configuration is stored in `firebase-applet-config.json` and imported by `src/firebase.ts`. AI keys are **never** bundled into the frontend — they are stored in Secret Manager and accessed only by Cloud Functions.
 
 ---
 
