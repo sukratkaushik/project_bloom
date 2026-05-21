@@ -4,16 +4,43 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 
 ---
 
+## 📅 2026-05-20
+
+### **Task: Partner Sync UI Polish**
+*   **Details:**
+    *   **Symmetric Column Layout (`PartnerSync.tsx`):** Restructured the "Generate Sync Code" and "Connect to Partner" columns using `flex flex-col` with `mt-auto` alignment. Added a matching placeholder input ("Code will appear here") on the left column so both buttons ("Start Hosting" / "Connect") render at the exact same vertical position.
+    *   **Deployment:** Frontend deployed to Firebase Hosting.
+
+---
+
 ## 📅 2026-05-19
 
-### **Task: AskOurPregnancy AI Multimodal Integration & Backend Migration**
+### **Task 1: AskOurPregnancy AI Multimodal Integration & Backend Migration**
 *   **Details:**
     *   **Secure Backend Proxy (`functions/src/index.ts`):** Transitioned the AI backend from an insecure client-side Gemini SDK to a highly secure Firebase Cloud Function (`chatWithAI`), proxying requests to a Qwen2.5-72B-Instruct model on Hugging Face.
     *   **Regional Optimization:** Migrated the cloud functions to `asia-south1` (Mumbai) to minimize latency for Indian users and reduce operational costs.
-    *   **Native App Context Injection:** Rewrote the AI's System Instructions to enforce clinical constraints and explicitly instruct the AI to act as the built-in "Project Bloom" assistant, preventing it from incorrectly referring users to other apps.
+    *   **Native App Context Injection:** Rewrote the AI's System Instructions to enforce clinical constraints and explicitly instruct the AI to act as the built-in "AskOurPregnancy" assistant, preventing it from recommending competitor apps.
     *   **Document Parsing Service:** Implemented a new `parseDocument` Cloud Function using `pdf-parse@1.1.1` to process uploaded PDF documents on the backend securely.
     *   **Frontend Multimodal UI (`AskOurPregnancy.tsx`):** Added a paperclip attachment UI supporting `.pdf`, `.txt`, and `.md` files. Extracted text is invisibly injected into the AI context, allowing users to safely query clinical documents and diet plans.
-    *   **Deployment:** Configured CORS and IAM policies ("Allow unauthenticated invocations") for both functions in Google Cloud Console. All code deployed successfully to Firebase Hosting and Functions.
+    *   **Deployment:** Configured CORS and IAM policies ("Allow unauthenticated invocations") for all functions in Google Cloud Console. All code deployed successfully to Firebase Hosting and Functions.
+
+### **Task 2: AI Food Scanner Migration**
+*   **Details:**
+    *   **New Cloud Function (`analyzeFood`):** Created a new 2nd Gen Cloud Function that uses the `Qwen/Qwen2.5-VL-72B-Instruct` Vision-Language model via Hugging Face to analyze food images server-side.
+    *   **Frontend Migration (`FoodScanner.tsx`):** Removed the broken client-side `GoogleGenAI` SDK and rewired the component to call the secure `analyzeFood` function via `httpsCallable`.
+    *   **Model Fix:** Initially deployed with `Qwen2.5-VL-7B` which wasn't available on the user's HF tier; switched to the `72B` variant to match the existing text model access.
+
+### **Task 3: Baby Name Generator Migration**
+*   **Details:**
+    *   **Frontend Migration (`BabyNames.tsx`):** Removed the client-side `GoogleGenAI` SDK import and rewired the component to use the existing `chatWithAI` Cloud Function with a custom `systemPrompt` for JSON-only name generation.
+    *   **Backend Enhancement (`chatWithAI`):** Made the function accept optional `systemPrompt` and `maxTokens` parameters from callers, allowing it to serve both the chatbot (medical prompt, 500 tokens) and the Name Generator (JSON prompt, 500 tokens). Previously hardcoded to 150 tokens.
+    *   **Bundle Size Reduction:** Removing the `@google/genai` SDK from the frontend reduced the production bundle by ~273 KB.
+
+### **Task 4: App Reload Fix**
+*   **Details:**
+    *   **Root Cause:** The app was visibly "reloading" 3-4 times on startup/login due to two issues: (1) A `key` prop on the main `<div>` in `App.tsx` that included `currentHash`, `isAuthReady`, and `splashFinished` — causing React to destroy and recreate the entire DOM tree on every state change, triggering repeated 700ms fade-in animations. (2) An `isRestoring` state flag in `store.tsx` that briefly forced the Splash Screen to re-appear during cloud data restoration.
+    *   **Fix (`App.tsx`):** Removed the composite `key` prop so React can smoothly transition between components without full DOM unmounting.
+    *   **Fix (`store.tsx`):** Removed all `isRestoring` state mutations so the auth flow completes without flashing the Splash Screen mid-login.
 
 ---
 
