@@ -210,6 +210,7 @@ export const LandingPage: React.FC = () => {
             <button 
               onClick={clearModal}
               className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
+              aria-label="Close authentication modal"
             >
               <X size={20} />
             </button>
