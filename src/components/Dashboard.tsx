@@ -41,6 +41,36 @@ export const Dashboard: React.FC = () => {
   const { state, updateState } = usePlanner();
   const [activePage, setActivePage] = useState('tracker');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleEmailClick = (email: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    // Attempt standard mailto redirect
+    window.location.href = `mailto:${email}`;
+    
+    // Copy to clipboard fallback
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(() => {
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      }).catch((err) => {
+        console.error("Could not copy email: ", err);
+      });
+    } else {
+      try {
+        const tempInput = document.createElement("input");
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      } catch (err) {
+        console.error("Fallback copy failed: ", err);
+      }
+    }
+  };
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
@@ -224,10 +254,16 @@ export const Dashboard: React.FC = () => {
           <div className="flex items-center gap-6">
             <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
-            <a href="mailto:hello@ourpregnancy.in" className="hover:text-sage transition-colors">Support</a>
+            <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-sage transition-colors">Support</a>
           </div>
         </div>
       </footer>
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
+          <span>📋</span> {toastMessage}
+        </div>
+      )}
 
       <FloatingChatbot activePage={activePage} />
     </div>

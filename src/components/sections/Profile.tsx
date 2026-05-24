@@ -8,6 +8,36 @@ export const Profile: React.FC = () => {
   
   const [userName, setUserName] = useState(state.userName || '');
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleEmailClick = (email: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    // Attempt standard mailto redirect
+    window.location.href = `mailto:${email}`;
+    
+    // Copy to clipboard fallback
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(() => {
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      }).catch((err) => {
+        console.error("Could not copy email: ", err);
+      });
+    } else {
+      try {
+        const tempInput = document.createElement("input");
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      } catch (err) {
+        console.error("Fallback copy failed: ", err);
+      }
+    }
+  };
   
   const handleNameSave = () => {
     updateState({ userName });
@@ -178,7 +208,7 @@ export const Profile: React.FC = () => {
               <span className="font-medium text-charcoal group-hover:text-sage">Terms of Service</span>
               <span className="text-sage">→</span>
             </a>
-            <a href="mailto:grievance@ourpregnancy.in" className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+            <a href="mailto:grievance@ourpregnancy.in" onClick={(e) => handleEmailClick("grievance@ourpregnancy.in", e)} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Contact Support / Grievance Officer</span>
               <span className="text-sage">→</span>
             </a>
@@ -204,6 +234,11 @@ export const Profile: React.FC = () => {
               Close
             </button>
           </div>
+        </div>
+      )}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
+          <span>📋</span> {toastMessage}
         </div>
       )}
     </div>
