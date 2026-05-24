@@ -60,13 +60,9 @@ const AppContent: React.FC = () => {
   }
 
   return (
-<<<<<<< HEAD
-    <div className="animate-in fade-in duration-700 ease-in-out h-full w-full">
-=======
-    <div key={currentHash + (isAuthReady ? '1' : '0') + (splashFinished ? '1' : '0')} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
->>>>>>> f66a3ba (CHanges)
+    <div key={currentHash} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
       {content}
-      <div id="google_translate_element" className="fixed bottom-4 left-4 z-50 bg-white/90 backdrop-blur-md p-1.5 rounded-lg shadow-lg border border-border/50 scale-[0.85] origin-bottom-left"></div>
+      <div id="google_translate_element" className="hidden"></div>
     </div>
   );
 };

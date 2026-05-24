@@ -6,6 +6,7 @@ import { Send, Loader2, Sparkles, Paperclip, X } from 'lucide-react';
 import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
+import { isPregnancyRelated } from '../../utils/pregnancyClassifier';
 
 export const AskOurPregnancy: React.FC = () => {
   const { state } = usePlanner();
@@ -31,7 +32,7 @@ export const AskOurPregnancy: React.FC = () => {
       // Gather context
       const logs = await db.symptomLogs.where('journeyId').equals(state.activeJourneyId).reverse().sortBy('timestamp');
       const recentSymptoms = logs.slice(0, 5).map(l => `${l.symptomType} (${l.severity})`).join(', ') || 'None reported recently';
-      
+
       let trimester = 'Unknown';
       let weeks = 'Unknown';
       if (state.dueDate) {
@@ -157,14 +158,21 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
     if ((!input.trim() && !attachedFile) || isLoading) return;
 
     let userMsg = input.trim() || "Please analyze this document.";
-    
+
     // Optimistically show user message (without huge text dump)
-    setMessages(prev => [...prev, { 
-      role: 'user', 
-      text: attachedFile ? `📎 ${attachedFile.name}\n\n${userMsg}` : userMsg 
+    setMessages(prev => [...prev, {
+      role: 'user',
+      text: attachedFile ? `📎 ${attachedFile.name}\n\n${userMsg}` : userMsg
     }]);
-    
+
     setInput('');
+
+    // Fast-path client-side check to limit chatbot to pregnancy-related topics
+    if (!isPregnancyRelated(userMsg)) {
+      setMessages(prev => [...prev, { role: 'model', text: "I can not help with this, please ask me something related to what I am meant for..." }]);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -173,7 +181,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
       if (attachedFile) {
         setLoadingText("Reading document...");
         let documentText = "";
-        
+
         if (attachedFile.type === "application/pdf") {
           const base64Data = await readBase64(attachedFile);
           const parseDocument = httpsCallable(functions, 'parseDocument');
@@ -191,7 +199,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
       const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext });
       const result = response.data as { reply: string };
-      
+
       setMessages(prev => [...prev, { role: 'model', text: result.reply }]);
     } catch (error: any) {
       console.error("Chat error:", error);
@@ -224,95 +232,94 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
           )}
         </div>
 
-      <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">
-        <div className="flex-1 overflow-y-auto p-5 space-y-6">
-          {messages.map((msg, i) => (
-            <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[85%] rounded-[16px] p-4 ${
-                msg.role === 'user' 
-                  ? 'bg-sage text-white rounded-tr-[4px]' 
-                  : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
-              }`}>
-                {msg.role === 'model' ? (
-                  <div className="markdown-body text-[14px] leading-[1.6]">
-                    <Markdown>{msg.text}</Markdown>
-                  </div>
-                ) : (
-                  <div className="text-[14px] leading-[1.6] whitespace-pre-wrap">{msg.text}</div>
-                )}
+        <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">
+          <div className="flex-1 overflow-y-auto p-5 space-y-6">
+            {messages.map((msg, i) => (
+              <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                <div className={`max-w-[85%] rounded-[16px] p-4 ${msg.role === 'user'
+                    ? 'bg-sage text-white rounded-tr-[4px]'
+                    : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
+                  }`}>
+                  {msg.role === 'model' ? (
+                    <div className="markdown-body text-[14px] leading-[1.6]">
+                      <Markdown>{msg.text}</Markdown>
+                    </div>
+                  ) : (
+                    <div className="text-[14px] leading-[1.6] whitespace-pre-wrap">{msg.text}</div>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-cream border-[1.5px] border-border text-charcoal rounded-[16px] rounded-tl-[4px] p-4 flex items-center gap-2">
-                <Loader2 size={16} className="animate-spin text-sage" />
-                <span className="text-[14px] text-medium">{loadingText}</span>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-cream border-[1.5px] border-border text-charcoal rounded-[16px] rounded-tl-[4px] p-4 flex items-center gap-2">
+                  <Loader2 size={16} className="animate-spin text-sage" />
+                  <span className="text-[14px] text-medium">{loadingText}</span>
+                </div>
               </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
 
-        <div className="p-4 bg-white border-t border-border shrink-0">
-          {/* File Attachment Indicator */}
-          {attachedFile && (
-            <div className="mb-2 inline-flex items-center gap-2 bg-sage-pale text-sage px-3 py-1.5 rounded-full text-[12px] font-medium border border-sage/20">
-              <Paperclip size={14} />
-              <span className="truncate max-w-[200px]">{attachedFile.name}</span>
-              <button onClick={() => setAttachedFile(null)} className="hover:text-red-500 transition-colors">
-                <X size={14} />
+          <div className="p-4 bg-white border-t border-border shrink-0">
+            {/* File Attachment Indicator */}
+            {attachedFile && (
+              <div className="mb-2 inline-flex items-center gap-2 bg-sage-pale text-sage px-3 py-1.5 rounded-full text-[12px] font-medium border border-sage/20">
+                <Paperclip size={14} />
+                <span className="truncate max-w-[200px]">{attachedFile.name}</span>
+                <button onClick={() => setAttachedFile(null)} className="hover:text-red-500 transition-colors">
+                  <X size={14} />
+                </button>
+              </div>
+            )}
+
+            <div className="relative flex items-center">
+              {/* Hidden File Input */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                accept=".pdf,.txt"
+                className="hidden"
+              />
+
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isLoading}
+                className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
+                title="Attach Document (PDF or Text)"
+              >
+                <Paperclip size={18} />
+              </button>
+
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSend();
+                  }
+                }}
+                placeholder="Ask about symptoms, or attach a document..."
+                className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
+                rows={1}
+              />
+
+              <button
+                onClick={handleSend}
+                disabled={(!input.trim() && !attachedFile) || isLoading}
+                className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
+              >
+                <Send size={18} />
               </button>
             </div>
-          )}
-          
-          <div className="relative flex items-center">
-            {/* Hidden File Input */}
-            <input 
-              type="file" 
-              ref={fileInputRef} 
-              onChange={handleFileSelect}
-              accept=".pdf,.txt" 
-              className="hidden" 
-            />
-            
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isLoading}
-              className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
-              title="Attach Document (PDF or Text)"
-            >
-              <Paperclip size={18} />
-            </button>
-            
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  handleSend();
-                }
-              }}
-              placeholder="Ask about symptoms, or attach a document..."
-              className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
-              rows={1}
-            />
-            
-            <button
-              onClick={handleSend}
-              disabled={(!input.trim() && !attachedFile) || isLoading}
-              className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
-            >
-              <Send size={18} />
-            </button>
-          </div>
-          <div className="text-center mt-2 text-[10px] text-light">
-            AskOurPregnancy uses AI and may make mistakes. Always verify medical information with your healthcare provider.
+            <div className="text-center mt-2 text-[10px] text-light">
+              AskOurPregnancy uses AI and may make mistakes. Always verify medical information with your healthcare provider.
+            </div>
           </div>
         </div>
       </div>
-    </div>
     </Paywall>
   );
 };

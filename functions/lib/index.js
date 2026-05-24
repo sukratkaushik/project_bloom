@@ -16,6 +16,8 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
         throw new https_1.HttpsError("internal", "Server configuration error.");
     }
     const defaultSystemPrompt = "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor.";
+    const scopeConstraint = "\n\nCRITICAL SCOPE CONSTRAINT: You are strictly limited to answering questions related to pregnancy, maternal health, prenatal/postpartum care, fetal/baby development, baby naming, or pregnancy tracking/planning. If the user asks about unrelated topics (such as computer programming, writing code, general IT, non-pregnancy math, history, general knowledge, etc.), you MUST reply with exactly: 'I can not help with this, please ask me something related to what I am meant for...' and nothing else. Do not explain, do not apologize, and do not output anything else.";
+    const finalSystemPrompt = (systemPrompt || defaultSystemPrompt) + scopeConstraint;
     try {
         const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
             headers: {
@@ -28,7 +30,7 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
                 messages: [
                     {
                         role: "system",
-                        content: systemPrompt || defaultSystemPrompt
+                        content: finalSystemPrompt
                     },
                     {
                         role: "user",
