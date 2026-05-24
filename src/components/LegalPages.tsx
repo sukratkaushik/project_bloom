@@ -1,10 +1,38 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 
 export const PrivacyPolicy: React.FC = () => {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const handleEmailClick = (email: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    window.location.href = `mailto:${email}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(() => {
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      }).catch((err) => {
+        console.error("Could not copy email: ", err);
+      });
+    } else {
+      try {
+        const tempInput = document.createElement("input");
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      } catch (err) {
+        console.error("Fallback copy failed: ", err);
+      }
+    }
+  };
 
   return (
     <div className="min-h-screen bg-cream py-12 px-6 sm:px-12">
@@ -49,11 +77,16 @@ export const PrivacyPolicy: React.FC = () => {
           <p>In accordance with the <strong>Information Technology Act, 2000</strong> and the <strong>SPDI Rules, 2011</strong>, the name and contact details of the Grievance Officer are provided below. If you have any complaints or concerns regarding your data, please contact:</p>
           <div className="bg-sage-pale p-4 rounded-[12px] mt-4">
             <p className="font-semibold text-charcoal">Grievance Officer: Sukrat Kaushik</p>
-            <p><strong>Email:</strong> <a href="mailto:grievance@ourpregnancy.in" className="hover:text-sage-dark text-sage font-semibold transition-colors">grievance@ourpregnancy.in</a></p>
+            <p><strong>Email:</strong> <a href="mailto:grievance@ourpregnancy.in" onClick={(e) => handleEmailClick("grievance@ourpregnancy.in", e)} className="hover:text-sage-dark text-sage font-semibold transition-colors">grievance@ourpregnancy.in</a></p>
             <p><strong>Time:</strong> Mon-Fri (9:00 AM to 6:00 PM IST)</p>
           </div>
         </div>
       </div>
+      {toastMessage && (
+        <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
+          <span>📋</span> {toastMessage}
+        </div>
+      )}
     </div>
   );
 };

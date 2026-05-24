@@ -108,6 +108,36 @@ export const LandingPage: React.FC = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const handleEmailClick = (email: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    // Attempt standard mailto redirect
+    window.location.href = `mailto:${email}`;
+    
+    // Copy to clipboard fallback
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(email).then(() => {
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      }).catch((err) => {
+        console.error("Could not copy email: ", err);
+      });
+    } else {
+      try {
+        const tempInput = document.createElement("input");
+        tempInput.value = email;
+        document.body.appendChild(tempInput);
+        tempInput.select();
+        document.execCommand("copy");
+        document.body.removeChild(tempInput);
+        setToastMessage("Email copied to clipboard!");
+        setTimeout(() => setToastMessage(null), 3000);
+      } catch (err) {
+        console.error("Fallback copy failed: ", err);
+      }
+    }
+  };
 
   const handleEmailLoginClick = () => {
     if (isSetupComplete) {
@@ -736,18 +766,21 @@ export const LandingPage: React.FC = () => {
             <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
           </div>
 
-          <div className="columns-1 md:columns-3 gap-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             {[
               { review: "I love how personal it feels — everything is tailored to my pregnancy week and my situation.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
               { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" },
               { review: "The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!", author: "Sneha P.", loc: "Goa" },
-              { review: "Finally an app that understands Indian contexts and government schemes.", author: "Divya K.", loc: "Chennai" }
+              { review: "Finally an app that understands Indian contexts and government schemes.", author: "Divya K.", loc: "Chennai" },
+              { review: "The vaccination reminders and daily tips kept me so reassured. A must-have for every expectant mom!", author: "Meera J.", loc: "Pune" }
             ].map((t, i) => (
-              <div key={i} className="bg-cream p-8 rounded-[20px] relative break-inside-avoid shadow-sm hover:shadow-md transition-shadow">
-                <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
-                <p className="text-[15px] text-charcoal leading-relaxed mb-6 italic relative z-10">"{t.review}"</p>
-                <div className="flex items-center gap-3">
+              <div key={i} className="bg-cream p-8 rounded-[20px] relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full">
+                <div>
+                  <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
+                  <p className="text-[15px] text-charcoal leading-relaxed mb-6 italic relative z-10">"{t.review}"</p>
+                </div>
+                <div className="flex items-center gap-3 mt-auto">
                   <div className="w-10 h-10 rounded-full bg-sage-light text-white flex items-center justify-center font-bold text-[14px]">
                     {t.author.charAt(0)}
                   </div>
@@ -776,7 +809,7 @@ export const LandingPage: React.FC = () => {
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
             <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="mailto:hello@ourpregnancy.in" className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
+            <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
           </div>
         </div>
 
@@ -785,6 +818,12 @@ export const LandingPage: React.FC = () => {
           Your data is encrypted and only accessible by you.
         </div>
       </footer>
+
+      {toastMessage && (
+        <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
+          <span>📋</span> {toastMessage}
+        </div>
+      )}
 
     </div>
   );
