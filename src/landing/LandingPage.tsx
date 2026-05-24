@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword } from '../firebase';
-import { 
-  ShieldCheck, 
-  WifiOff, 
-  MapPin, 
-  Stethoscope, 
+import {
+  ShieldCheck,
+  WifiOff,
+  MapPin,
+  Stethoscope,
   IndianRupee,
   Activity,
   Timer,
@@ -25,6 +25,7 @@ import {
   Moon
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
+import { LanguageSelector } from '../components/LanguageSelector';
 
 export const LandingPage: React.FC = () => {
   const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
@@ -64,7 +65,7 @@ export const LandingPage: React.FC = () => {
       const user = await signInWithGoogle();
       if (user) {
         setShowEmailModal(false);
-        
+
         // Check if there is an active journey locally
         if (state.isSetup && state.activeJourneyId) {
           window.location.hash = '#dashboard';
@@ -73,7 +74,7 @@ export const LandingPage: React.FC = () => {
 
         // Try to restore from cloud
         const restored = await restoreJourney(user.uid);
-        
+
         if (restored) {
           window.location.hash = '#dashboard';
         } else {
@@ -84,7 +85,7 @@ export const LandingPage: React.FC = () => {
     } catch (error: any) {
       if (error?.code !== 'auth/popup-closed-by-user') {
         console.error("Login failed", error);
-        
+
         if (error?.code === 'auth/network-request-failed') {
           alert("Network request failed. This often happens if third-party cookies are blocked, or an ad blocker is preventing the login popup. Please disable your ad blocker or allow third-party cookies for this site, then try again.");
         } else {
@@ -207,33 +208,33 @@ export const LandingPage: React.FC = () => {
       {showEmailModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-[24px] p-8 w-full max-w-[400px] shadow-2xl relative animate-in zoom-in-95 duration-200">
-            <button 
+            <button
               onClick={clearModal}
               className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
               aria-label="Close authentication modal"
             >
               <X size={20} />
             </button>
-            
+
             <div className="w-10 h-10 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm">
               <Mail size={20} />
             </div>
-            
+
             {showForgotPassword ? (
               /* Forgot Password View */
               <>
                 <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">Reset password</h2>
                 <p className="text-[13px] text-medium mb-5 leading-relaxed">
-                  {resetSent 
-                    ? `We've sent a password reset link to ${emailInput}. Check your inbox.` 
+                  {resetSent
+                    ? `We've sent a password reset link to ${emailInput}. Check your inbox.`
                     : "Enter your email and we'll send you a link to reset your password."}
                 </p>
                 {!resetSent ? (
                   <form onSubmit={handleForgotPassword} className="flex flex-col gap-3">
                     <div>
                       <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                      <input 
-                        type="email" 
+                      <input
+                        type="email"
                         value={emailInput}
                         onChange={(e) => setEmailInput(e.target.value)}
                         placeholder="you@example.com"
@@ -251,8 +252,8 @@ export const LandingPage: React.FC = () => {
                     <CheckCircle2 size={16} /> Check your inbox for the reset link.
                   </div>
                 )}
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={() => { setShowForgotPassword(false); setResetSent(false); setAuthError(''); }}
                   className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors mt-4 block text-center w-full"
                 >
@@ -268,13 +269,13 @@ export const LandingPage: React.FC = () => {
                 <p className="text-[13px] text-medium mb-5 leading-relaxed">
                   {isRegistering ? 'Sign up with your email to get started.' : 'Log in to access your pregnancy dashboard.'}
                 </p>
-                
+
                 <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
                   {isRegistering && (
                     <div>
                       <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Full Name</label>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         value={nameInput}
                         onChange={(e) => setNameInput(e.target.value)}
                         placeholder="Jane Doe"
@@ -285,8 +286,8 @@ export const LandingPage: React.FC = () => {
                   )}
                   <div>
                     <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                    <input 
-                      type="email" 
+                    <input
+                      type="email"
                       value={emailInput}
                       onChange={(e) => setEmailInput(e.target.value)}
                       placeholder="you@example.com"
@@ -298,9 +299,9 @@ export const LandingPage: React.FC = () => {
                     <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end">
                       <span>Password</span>
                       {!isRegistering && (
-                        <button 
-                          type="button" 
-                          onClick={() => setShowForgotPassword(true)} 
+                        <button
+                          type="button"
+                          onClick={() => setShowForgotPassword(true)}
                           className="text-[10px] text-sage normal-case font-semibold hover:text-sage-dark transition-colors"
                         >
                           Forgot password?
@@ -308,7 +309,7 @@ export const LandingPage: React.FC = () => {
                       )}
                     </label>
                     <div className="relative">
-                      <input 
+                      <input
                         type={showPassword ? 'text' : 'password'}
                         value={passwordInput}
                         onChange={(e) => setPasswordInput(e.target.value)}
@@ -317,9 +318,9 @@ export const LandingPage: React.FC = () => {
                         required
                         minLength={6}
                       />
-                      <button 
-                        type="button" 
-                        onClick={() => setShowPassword(!showPassword)} 
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-medium hover:text-charcoal transition-colors"
                       >
                         {showPassword ? 'Hide' : 'Show'}
@@ -329,7 +330,7 @@ export const LandingPage: React.FC = () => {
                   {isRegistering && (
                     <div>
                       <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Confirm Password</label>
-                      <input 
+                      <input
                         type={showPassword ? 'text' : 'password'}
                         value={confirmPasswordInput}
                         onChange={(e) => setConfirmPasswordInput(e.target.value)}
@@ -341,8 +342,8 @@ export const LandingPage: React.FC = () => {
                     </div>
                   )}
                   {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isSubmitting}
                     className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
@@ -350,8 +351,8 @@ export const LandingPage: React.FC = () => {
                     {isRegistering ? 'Create Account' : 'Log In'}
                   </button>
                   <div className="text-center mt-1.5 mb-1.5">
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       onClick={() => { setIsRegistering(!isRegistering); setAuthError(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
                       className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
                     >
@@ -364,11 +365,11 @@ export const LandingPage: React.FC = () => {
                     <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
                     <div className="flex-grow border-t border-border"></div>
                   </div>
-                  
-                  <button 
+
+                  <button
                     type="button"
-                    onClick={handleStart} 
-                    disabled={isLoggingIn} 
+                    onClick={handleStart}
+                    disabled={isLoggingIn}
                     className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
                   >
                     {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
@@ -387,9 +388,10 @@ export const LandingPage: React.FC = () => {
           <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
         </div>
         <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
-          <button 
+          <LanguageSelector />
+          <button
             onClick={toggleDarkMode}
-            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2"
+            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2 ml-1"
             title="Toggle Dark Mode"
             aria-label="Toggle Dark Mode"
           >
@@ -415,7 +417,7 @@ export const LandingPage: React.FC = () => {
 
       {/* Hero Section */}
       <section className="relative px-6 pt-8 pb-16 md:pt-16 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
-        
+
         {/* Animated Background Blobs */}
         <div className="absolute top-0 -left-12 md:-left-24 w-72 h-72 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob -z-10"></div>
         <div className="absolute top-0 right-32 w-72 h-72 bg-blush-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob animation-delay-2000 -z-10"></div>
@@ -424,22 +426,18 @@ export const LandingPage: React.FC = () => {
         {/* Left Side: Text Content */}
         <div className="flex-1 text-left flex flex-col items-start w-full max-w-[600px] z-20">
           <div className="h-4"></div>
-          
+
           <h1 className="font-serif text-[clamp(40px,6vw,72px)] leading-[1.1] text-charcoal mb-6 mt-2">
             Your pregnancy companion — <span className="italic text-sage">secure & synced.</span>
           </h1>
-          
+
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
             Track symptoms, count kicks, pack your hospital bag, and monitor blood pressure.
-<<<<<<< HEAD
             <strong className="text-charcoal font-semibold"> Core features free. AI tools coming soon.</strong>
-=======
-            <strong className="text-charcoal font-semibold"> All your data, entirely secure.</strong>
->>>>>>> b104294 (New changes)
           </p>
-          
+
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
-            <button 
+            <button
               type="button"
               onClick={handleStart}
               disabled={isLoggingIn}
@@ -468,19 +466,19 @@ export const LandingPage: React.FC = () => {
         <div className="flex-1 relative w-full max-w-[500px] aspect-square flex items-center justify-center -z-10 mt-10 md:mt-0">
           {/* Ambient Glow */}
           <div className="absolute inset-0 bg-sage-pale/80 rounded-full filter blur-[100px] animate-pulse" style={{ animationDuration: '4s' }} />
-          
+
           {/* Outer Protective Rings (The Womb/Growth) */}
           <div className="absolute w-[320px] h-[320px] md:w-[450px] md:h-[450px] border-[2px] border-sage/30 rounded-full animate-[spin_25s_linear_infinite]" style={{ borderRadius: '60% 40% 30% 70% / 60% 30% 70% 40%' }} />
-          
+
           {/* Middle Ring (Mama's embrace) */}
           <div className="absolute w-[300px] h-[300px] md:w-[420px] md:h-[420px] border-[3px] border-blush/40 rounded-full animate-[spin_20s_linear_infinite_reverse]" style={{ borderRadius: '40% 60% 70% 30% / 40% 50% 60% 50%' }} />
-          
+
           {/* Inner Orbit (Baby growing) */}
           <div className="absolute w-[280px] h-[280px] md:w-[380px] md:h-[380px] border-[4px] border-gold/30 rounded-full animate-[spin_15s_linear_infinite]" style={{ borderRadius: '50% 50% 30% 70% / 70% 30% 70% 30%' }}>
             {/* Small glowing orb representing the baby moving within */}
             <div className="absolute top-[-2px] left-1/2 w-4 h-4 md:w-6 md:h-6 bg-gradient-to-r from-blush to-blush-light rounded-full -translate-x-1/2 shadow-[0_0_20px_rgba(242,166,166,0.9)] animate-pulse border-2 border-white/50 z-20" style={{ animationDuration: '2s' }}></div>
           </div>
-          
+
           {/* Inner Core (The Mama/Baby Connection) */}
           <div className="relative w-44 h-44 md:w-64 md:h-64 bg-white/60 backdrop-blur-sm rounded-full shadow-[0_0_50px_rgba(242,166,166,0.2)] flex items-center justify-center animate-[pulse_3s_ease-in-out_infinite] border border-white/60">
             <img src="/logo.png" alt="Our Pregnancy Logo" className="w-36 h-36 md:w-52 md:h-52 object-contain animate-[pulse_2s_ease-in-out_infinite] drop-shadow-md" style={{ animationDuration: '1.5s' }} />
@@ -488,10 +486,10 @@ export const LandingPage: React.FC = () => {
 
           {/* Floating Accents */}
           <div className="absolute top-[20%] right-[10%] text-gold animate-bounce" style={{ animationDuration: '3s' }}>
-             <Bot size={28} className="opacity-70" />
+            <Bot size={28} className="opacity-70" />
           </div>
           <div className="absolute bottom-[20%] left-[10%] text-blush animate-bounce" style={{ animationDuration: '4s' }}>
-             <Activity size={32} className="opacity-70" />
+            <Activity size={32} className="opacity-70" />
           </div>
         </div>
       </section>
@@ -524,7 +522,7 @@ export const LandingPage: React.FC = () => {
           <div className="relative mt-8">
             {/* Connecting Line (Desktop) */}
             <div className="hidden md:block absolute top-[48px] left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-sage-pale via-sage-light to-sage-pale" />
-            
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6 relative z-10">
               {[
                 { step: "1", title: "Quick Setup", desc: "Enter your due date. No account required to start tracking.", icon: <Calendar className="w-6 h-6 text-sage" /> },
@@ -535,7 +533,7 @@ export const LandingPage: React.FC = () => {
                 <div key={i} className="flex flex-col items-center text-center relative group">
                   {/* Connecting Line (Mobile) */}
                   {i !== 3 && <div className="md:hidden absolute top-[100px] bottom-[-48px] left-1/2 w-[2px] -translate-x-1/2 bg-sage-pale z-[-1]" />}
-                  
+
                   <div className="w-24 h-24 rounded-full bg-white border-[4px] border-cream shadow-[0_8px_30px_rgba(107,146,120,0.12)] flex flex-col items-center justify-center mb-6 relative group-hover:-translate-y-2 group-hover:shadow-[0_15px_40px_rgba(107,146,120,0.2)] transition-all duration-400">
                     <span className="text-[10px] font-bold text-sage/70 uppercase tracking-widest absolute top-3">Step {item.step}</span>
                     <div className="mt-4 group-hover:scale-110 transition-transform duration-400">{item.icon}</div>
@@ -552,46 +550,14 @@ export const LandingPage: React.FC = () => {
       {/* Features Bento Grid */}
       <section id="features" className="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
         <div className="text-center mb-16">
-<<<<<<< HEAD
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-pale text-[12px] font-bold text-sage uppercase tracking-wider mb-4 border border-sage/20">
             <Sparkles size={14} /> Comprehensive Toolkit
-=======
-          <h2 className="font-serif text-4xl text-charcoal mb-4">Everything you need, nothing you don't.</h2>
-          <p className="text-medium text-[16px] max-w-2xl mx-auto">Thoughtfully designed tools that put your peace of mind first.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[
-            { icon: <Activity className="w-6 h-6 text-sage" />, title: "Vitals Tracker", desc: "Log blood pressure with preeclampsia threshold alerts." },
-            { icon: <Heart className="w-6 h-6 text-sage" />, title: "Kick Counter", desc: "Count fetal movements daily from 28 weeks. Auto-alerts if count is low." },
-            { icon: <ShieldCheck className="w-6 h-6 text-sage" />, title: "Hospital Bag Checklist", desc: "Prepare essentials for delivery day with our curated list." },
-            { icon: <Timer className="w-6 h-6 text-sage" />, title: "Contraction Timer", desc: "Time contractions and get the 5-1-1 hospital rule calculated automatically." },
-            { icon: <Calendar className="w-6 h-6 text-sage" />, title: "Pregnancy Timeline", desc: "Track weekly changes, milestones, and what to expect." },
-            { icon: <Cloud className="w-6 h-6 text-sage" />, title: "Calm/Dark Mode", desc: "Soothing dark mode for tracking during those 3 AM wake-ups." }
-          ].map((feature, i) => (
-            <div key={i} className="bg-white border-[1.5px] border-border rounded-[16px] p-6 sm:p-8 hover:shadow-md transition-shadow group">
-              <div className="w-12 h-12 rounded-[12px] bg-cream flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                {feature.icon}
-              </div>
-              <h3 className="font-bold text-[18px] text-charcoal mb-2 flex items-center gap-2">
-                {feature.title}
-              </h3>
-              <p className="text-[14px] text-medium leading-relaxed">{feature.desc}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* Coming Soon AI Teaser */}
-        <div className="mt-12 max-w-2xl mx-auto bg-sage-pale/20 border border-sage-light/30 rounded-2xl p-6 text-center">
-          <div className="inline-block bg-white text-sage text-[11px] font-bold tracking-wider uppercase px-3 py-1 rounded-full mb-3 border border-sage-light/30">
-            Coming Soon
->>>>>>> b104294 (New changes)
           </div>
           <h2 className="font-serif text-[clamp(32px,5vw,48px)] text-charcoal mb-4 leading-tight">Everything you need,<br />beautifully organized.</h2>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          
+
           {/* Feature 1: AI Food Scanner (Large) */}
           <div className="md:col-span-2 bg-gradient-to-br from-cream to-white border border-border rounded-[32px] overflow-hidden flex flex-col md:flex-row group hover:shadow-xl transition-all duration-500">
             <div className="p-8 md:p-10 flex-1 flex flex-col justify-center">
@@ -718,7 +684,7 @@ export const LandingPage: React.FC = () => {
               Because a pregnancy in India means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
             {/* Card 1 */}
             <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
@@ -756,13 +722,8 @@ export const LandingPage: React.FC = () => {
 
       {/* Privacy Section */}
       <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
-<<<<<<< HEAD
         <h2 className="font-serif text-4xl text-charcoal mb-4">Core features, always free.</h2>
         <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful. Tracking, vitals, tasks, and more — free, always.</p>
-=======
-        <h2 className="font-serif text-4xl text-charcoal mb-4">Your data is yours. Completely private.</h2>
-        <p className="text-medium text-[16px] mb-10">We believe every mother deserves access to tools that make pregnancy safer and less stressful.</p>
->>>>>>> b104294 (New changes)
         <button type="button" onClick={handleStart} className="py-4 px-10 rounded-full bg-sage text-white font-bold text-[16px] hover:bg-sage-dark transition-colors shadow-lg">
           Start Tracking Now
         </button>
@@ -774,18 +735,14 @@ export const LandingPage: React.FC = () => {
           <div className="text-center mb-16">
             <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
           </div>
-          
+
           <div className="columns-1 md:columns-3 gap-6 space-y-6">
             {[
               { review: "I love how personal it feels — everything is tailored to my pregnancy week and my situation.", author: "Priya M.", loc: "Mumbai" },
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
-<<<<<<< HEAD
               { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" },
               { review: "The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!", author: "Sneha P.", loc: "Goa" },
               { review: "Finally an app that understands Indian contexts and government schemes.", author: "Divya K.", loc: "Chennai" }
-=======
-              { review: "Everything is offline and secure, which is such a blessing when travelling. Highly recommend it.", author: "Anjali S.", loc: "Delhi" }
->>>>>>> b104294 (New changes)
             ].map((t, i) => (
               <div key={i} className="bg-cream p-8 rounded-[20px] relative break-inside-avoid shadow-sm hover:shadow-md transition-shadow">
                 <div className="absolute top-6 right-6 text-sage/20 font-serif text-6xl leading-none">"</div>
@@ -815,14 +772,14 @@ export const LandingPage: React.FC = () => {
             </div>
             <p className="text-[14px] text-light">Made with ❤️ for Indian mothers</p>
           </div>
-          
+
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
             <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:hello@ourpregnancy.in" className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
           </div>
         </div>
-        
+
         <div className="flex justify-center items-center gap-2 text-[13px] text-light/70">
           <Lock className="w-4 h-4" />
           Your data is encrypted and only accessible by you.

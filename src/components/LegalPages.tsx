@@ -16,7 +16,7 @@ export const PrivacyPolicy: React.FC = () => {
         <div className="prose prose-sage max-w-none text-medium space-y-4">
           <p><strong>Last Updated:</strong> April 2026</p>
           <p>Welcome to Our Pregnancy. Your privacy is critically important to us, especially given the sensitive nature of pregnancy and health data. This Privacy Policy explains how we collect, use, and protect your information.</p>
-          
+
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">1. Information We Collect</h2>
           <p>We collect information you provide directly to us when you use the Our Pregnancy app, including:</p>
           <ul className="list-disc pl-5 space-y-2">
@@ -49,7 +49,7 @@ export const PrivacyPolicy: React.FC = () => {
           <p>In accordance with the <strong>Information Technology Act, 2000</strong> and the <strong>SPDI Rules, 2011</strong>, the name and contact details of the Grievance Officer are provided below. If you have any complaints or concerns regarding your data, please contact:</p>
           <div className="bg-sage-pale p-4 rounded-[12px] mt-4">
             <p className="font-semibold text-charcoal">Grievance Officer: Sukrat Kaushik</p>
-            <p><strong>Email:</strong> grievance@ourpregnancy.in</p>
+            <p><strong>Email:</strong> <a href="mailto:grievance@ourpregnancy.in" className="hover:text-sage-dark text-sage font-semibold transition-colors">grievance@ourpregnancy.in</a></p>
             <p><strong>Time:</strong> Mon-Fri (9:00 AM to 6:00 PM IST)</p>
           </div>
         </div>
@@ -73,7 +73,7 @@ export const TermsOfService: React.FC = () => {
         <div className="prose prose-sage max-w-none text-medium space-y-4">
           <p><strong>Last Updated:</strong> April 2026</p>
           <p>Please read these Terms of Service carefully before using the Our Pregnancy app.</p>
-          
+
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">1. Not Medical Advice</h2>
           <p className="font-semibold text-blush">CRITICAL DISCLAIMER: Our Pregnancy is a planning and tracking tool, not a medical device or a substitute for professional medical advice, diagnosis, or treatment.</p>
           <p>Always seek the advice of your physician, obstetrician, or other qualified health provider with any questions you may have regarding a medical condition or your pregnancy. Never disregard professional medical advice or delay in seeking it because of something you have read on the Our Pregnancy app.</p>
