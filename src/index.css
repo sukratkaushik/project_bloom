@@ -39,6 +39,10 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply font-sans bg-cream text-charcoal min-h-screen text-[15px] leading-relaxed;
   }
