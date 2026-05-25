@@ -36,6 +36,7 @@ import { AdminFeedbacks } from './sections/AdminFeedbacks';
 import { Profile } from './sections/Profile';
 import { FloatingChatbot } from './FloatingChatbot';
 import { LanguageSelector } from './LanguageSelector';
+import { MedicalReports } from './sections/MedicalReports';
 
 export const Dashboard: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -213,6 +214,7 @@ export const Dashboard: React.FC = () => {
               {activePage === 'tracker' && <PregnancyTracker />}
               {activePage === 'dev' && <Development filterTasks={filterTasks} />}
               {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
+              {activePage === 'medical-reports' && <MedicalReports />}
               {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
               {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
               {activePage === 'decisions' && <Decisions />}

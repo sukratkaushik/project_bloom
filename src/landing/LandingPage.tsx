@@ -421,12 +421,12 @@ export const LandingPage: React.FC = () => {
         </div>
       )}
       {/* Navigation Header */}
-      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${
         isScrolled 
-          ? 'bg-cream/80 backdrop-blur-md border-b border-border/40 shadow-sm py-2.5' 
-          : 'bg-transparent py-5'
+          ? 'top-2 py-2 px-4 md:px-6 shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20' 
+          : 'top-4 py-3.5 px-4 md:px-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
       }`}>
-        <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between">
+        <nav className="w-full flex items-center justify-between">
           <div className="flex items-center gap-3 shrink-0 mr-4">
             <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
             <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
@@ -469,7 +469,7 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative px-6 pt-8 pb-16 md:pt-16 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
+      <section className="relative px-6 pt-28 pb-16 md:pt-36 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
 
         {/* Animated Background Blobs */}
         <div className="absolute top-0 -left-12 md:-left-24 w-72 h-72 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob -z-10"></div>
