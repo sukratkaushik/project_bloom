@@ -337,24 +337,35 @@ button:active {
   }
 }
 
-/* Hide legacy Google Translate top banner frame and prevent layout shifts */
+/* Hide legacy and modern Google Translate top banner frame and prevent layout shifts */
 iframe.goog-te-banner-frame,
+iframe.skiptranslate,
 .goog-te-banner-frame,
 .goog-te-banner,
-.goog-te-gadget {
+.goog-te-gadget,
+.VIpgJd-ZVi9od-ORHb-OEVmcd,
+.VIpgJd-ZVi9od-l4eHX-hSRGPd-afn30c {
   display: none !important;
   visibility: hidden !important;
 }
 
+html {
+  top: 0px !important;
+  margin-top: 0px !important;
+}
+
 body {
   top: 0px !important;
+  margin-top: 0px !important;
   position: static !important;
 }
 
 #goog-gt-tt,
 .goog-te-balloon-frame,
 .goog-te-tooltip,
-.goog-te-tooltip-sub {
+.goog-te-tooltip-sub,
+.VIpgJd-ZVi9od-aahqb-bU1n1e-oJeWuf,
+.VIpgJd-ZVi9od-aahqb-bU1n1e {
   display: none !important;
   visibility: hidden !important;
 }

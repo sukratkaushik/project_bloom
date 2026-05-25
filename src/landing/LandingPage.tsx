@@ -415,7 +415,7 @@ export const LandingPage: React.FC = () => {
       <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3 shrink-0 mr-4">
           <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
-          <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
+          <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
         </div>
         <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
           <LanguageSelector />
@@ -545,7 +545,7 @@ export const LandingPage: React.FC = () => {
       <section className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
         <div className="max-w-[1000px] mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl text-charcoal mb-4">How Our Pregnancy Works</h2>
+            <h2 className="font-serif text-4xl text-charcoal mb-4">How <span className="notranslate">Our Pregnancy</span> Works</h2>
             <p className="text-medium text-[16px] max-w-2xl mx-auto">A seamless, private journey from your first trimester to delivery day.</p>
           </div>
 
@@ -801,7 +801,7 @@ export const LandingPage: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 mb-4 justify-center md:justify-start">
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 object-contain" />
-              <span className="font-serif text-[24px] font-semibold text-sage tracking-wide">Our Pregnancy</span>
+              <span className="font-serif text-[24px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
             </div>
             <p className="text-[14px] text-light">Made with ❤️ for Indian mothers</p>
           </div>
