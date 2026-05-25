@@ -119,7 +119,7 @@ export const Dashboard: React.FC = () => {
               className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage logo-interact"
             >
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain shrink-0" />
-              <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide whitespace-nowrap">Our Pregnancy</span>
+              <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide whitespace-nowrap notranslate">Our Pregnancy</span>
             </button>
           </div>
 
@@ -246,7 +246,7 @@ export const Dashboard: React.FC = () => {
       <footer className="mt-auto border-t border-border bg-cream py-8 px-6 no-print w-full z-10 relative">
         <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-medium">
           <div className="flex items-center gap-2">
-            <span className="font-serif text-[18px] text-sage font-semibold tracking-wide">Our Pregnancy</span>
+            <span className="font-serif text-[18px] text-sage font-semibold tracking-wide notranslate">Our Pregnancy</span>
             <span className="opacity-60 hidden sm:inline">|</span>
             <span className="opacity-80">Made with ❤️ for Indian mothers</span>
           </div>

@@ -22,7 +22,7 @@ export const SplashScreen: React.FC = () => {
         </div>
         
         {/* Full Name fading in */}
-          <h1 className="font-serif text-[46px] md:text-[64px] font-semibold text-sage tracking-wide mb-3 drop-shadow-sm">
+          <h1 className="font-serif text-[46px] md:text-[64px] font-semibold text-sage tracking-wide mb-3 drop-shadow-sm notranslate">
             Our Pregnancy
           </h1>
         
