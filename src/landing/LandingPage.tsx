@@ -31,6 +31,15 @@ export const LandingPage: React.FC = () => {
   const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  React.useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   React.useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((u) => setUser(u));
@@ -411,39 +420,53 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Navigation */}
-      <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-3 shrink-0 mr-4">
-          <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
-          <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
-        </div>
-        <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
-          <LanguageSelector />
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2 ml-1"
-            title="Toggle Dark Mode"
-            aria-label="Toggle Dark Mode"
-          >
-            <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
-          </button>
-          {!isSetupComplete ? (
-            <>
-              <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
-                Log In
-              </button>
-              <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
-                Sign Up
-              </button>
-            </>
-          ) : (
-            <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
-              {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : null}
-              Open Dashboard
+      {/* Navigation Header */}
+      <header className={`sticky top-0 z-50 w-full transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-cream/80 backdrop-blur-md border-b border-border/40 shadow-sm py-2.5' 
+          : 'bg-transparent py-5'
+      }`}>
+        <nav className="w-full max-w-[1200px] mx-auto px-4 md:px-6 flex items-center justify-between">
+          <div className="flex items-center gap-3 shrink-0 mr-4">
+            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
+            <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
+          </div>
+          
+          {/* Navigation Links - Centered, Desktop Only */}
+          <div className="hidden md:flex items-center gap-8">
+            <a href="#features" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Features</a>
+            <a href="#how-it-works" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">How it Works</a>
+            <a href="#localized-care" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">About</a>
+          </div>
+
+          <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
+            <LanguageSelector />
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2 ml-1"
+              title="Toggle Dark Mode"
+              aria-label="Toggle Dark Mode"
+            >
+              <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
             </button>
-          )}
-        </div>
-      </nav>
+            {!isSetupComplete ? (
+              <>
+                <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
+                  Log In
+                </button>
+                <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
+                  Sign Up
+                </button>
+              </>
+            ) : (
+              <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+                {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : null}
+                Open Dashboard
+              </button>
+            )}
+          </div>
+        </nav>
+      </header>
 
       {/* Hero Section */}
       <section className="relative px-6 pt-8 pb-16 md:pt-16 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
@@ -542,7 +565,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Flowchart Section */}
-      <section className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
+      <section id="how-it-works" className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
         <div className="max-w-[1000px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-serif text-4xl text-charcoal mb-4">How <span className="notranslate">Our Pregnancy</span> Works</h2>
@@ -697,7 +720,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* India Section */}
-      <section className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden">
+      <section id="localized-care" className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-white/10 blur-[120px]"></div>
