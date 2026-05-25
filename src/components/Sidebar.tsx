@@ -123,6 +123,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'finance', icon: '💰', label: 'Financial', progress: getProgress(FIN_TASKS) },
     { id: 'deadlines', icon: '📅', label: 'Deadlines', progress: getProgress(DEADLINE_TASKS) },
     { id: 'medical', icon: '🏥', label: 'Medical', progress: getProgress(medTasks) },
+    { id: 'medical-reports', icon: '📂', label: 'Medical Reports' },
     { id: 'schemes', icon: '🏛', label: 'Government Schemes' },
     { id: 'readiness', icon: '🔮', label: 'Labor Readiness' },
     { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag' },
@@ -189,6 +190,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       {expandedSections['health'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
           <NavItem id="medical" icon="🏥" label="Medical" progress={getProgress(medTasks)} />
+          <NavItem id="medical-reports" icon="📂" label="Medical Reports" />
           <NavItem id="schemes" icon="🏛" label="Government Schemes" />
         </div>
       )}

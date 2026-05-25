@@ -214,6 +214,20 @@ export interface AppStateRecord {
   updatedAt: number;
 }
 
+export interface MedicalReport {
+  id: string;
+  journeyId: string;
+  title: string;
+  date: string; // YYYY-MM-DD
+  timestamp: number;
+  fileName: string;
+  fileType: string;
+  fileSize: number;
+  fileData: string; // Base64 data URL
+  notes?: string;
+  createdAt: number;
+}
+
 export class PregnancyTrackerDB extends Dexie {
   users!: Table<User, string>;
   journeys!: Table<PregnancyJourney, string>;
@@ -229,6 +243,7 @@ export class PregnancyTrackerDB extends Dexie {
   supplementLogs!: Table<SupplementLog, string>;
   foodScanLogs!: Table<FoodScanLog, string>;
   appState!: Table<AppStateRecord, string>;
+  medicalReports!: Table<MedicalReport, string>;
 
   constructor() {
     super('PregnancyTrackerDB');
@@ -253,6 +268,10 @@ export class PregnancyTrackerDB extends Dexie {
 
     this.version(3).stores({
       appState: 'id'
+    });
+
+    this.version(4).stores({
+      medicalReports: 'id, journeyId, timestamp, [journeyId+timestamp]'
     });
   }
 }
