@@ -13,8 +13,17 @@ import {
   Info, 
   AlertCircle,
   X,
-  File
+  File,
+  Brain,
+  Sparkles,
+  Pill,
+  AlertTriangle,
+  RotateCcw,
+  ShieldCheck,
+  Loader2
 } from 'lucide-react';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../../firebase';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -25,6 +34,27 @@ const formatBytes = (bytes: number, decimals = 2) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 };
 
+const AILoadingMessage: React.FC = () => {
+  const messages = [
+    "Reading report file...",
+    "Deciphering doctor handwriting...",
+    "Translating medical abbreviations...",
+    "Extracting prescribed medications...",
+    "Formulating safe guidelines...",
+  ];
+  
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % messages.length);
+    }, 2500);
+    return () => clearInterval(timer);
+  }, []);
+
+  return <span className="text-[12px] text-sage font-medium">{messages[index]}</span>;
+};
+
 export const MedicalReports: React.FC = () => {
   const [reports, setReports] = useState<MedicalReport[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -32,6 +62,8 @@ export const MedicalReports: React.FC = () => {
   const [isUploading, setIsUploading] = useState(false);
   const { state } = usePlanner();
   const [previewReport, setPreviewReport] = useState<MedicalReport | null>(null);
+  const [analyzingMap, setAnalyzingMap] = useState<Record<string, boolean>>({});
+  const [analysisErrorMap, setAnalysisErrorMap] = useState<Record<string, string | null>>({});
 
   const loadReports = async () => {
     if (!state.activeJourneyId) return;
@@ -156,6 +188,64 @@ export const MedicalReports: React.FC = () => {
         await loadReports();
       } catch (e) {
         console.error("Failed to delete report:", e);
+      }
+    }
+  };
+
+  const runAIAnalysis = async (report: MedicalReport) => {
+    setAnalyzingMap(prev => ({ ...prev, [report.id]: true }));
+    setAnalysisErrorMap(prev => ({ ...prev, [report.id]: null }));
+    
+    try {
+      const base64Data = report.fileData.split(',')[1];
+      const fileType = report.fileType;
+      const fileName = report.fileName;
+
+      const analyzeMedicalReport = httpsCallable(functions, 'analyzeMedicalReport');
+      const response = await analyzeMedicalReport({ base64Data, fileType, fileName });
+      
+      const data = response.data as {
+        summary: string;
+        prescriptions: string[];
+        warnings: string[];
+      };
+      
+      const updated = {
+        ...report,
+        aiSummary: data.summary,
+        aiPrescriptions: data.prescriptions,
+        aiWarnings: data.warnings,
+        aiAnalysedAt: Date.now()
+      };
+      
+      await db.medicalReports.put(updated);
+      setReports(prev => prev.map(r => r.id === report.id ? updated : r));
+    } catch (err: any) {
+      console.error("AI Analysis error:", err);
+      setAnalysisErrorMap(prev => ({ 
+        ...prev, 
+        [report.id]: err?.message || "Failed to analyze report. Please try again." 
+      }));
+    } finally {
+      setAnalyzingMap(prev => ({ ...prev, [report.id]: false }));
+    }
+  };
+
+  const resetAIAnalysis = async (report: MedicalReport) => {
+    if (window.confirm("Are you sure you want to clear this AI analysis?")) {
+      try {
+        const updated = {
+          ...report,
+          aiSummary: undefined,
+          aiPrescriptions: undefined,
+          aiWarnings: undefined,
+          aiAnalysedAt: undefined
+        };
+        await db.medicalReports.put(updated);
+        setReports(prev => prev.map(r => r.id === report.id ? updated : r));
+        setAnalysisErrorMap(prev => ({ ...prev, [report.id]: null }));
+      } catch (e) {
+        console.error("Failed to reset AI analysis:", e);
       }
     }
   };
@@ -322,6 +412,125 @@ export const MedicalReports: React.FC = () => {
                       placeholder="Doctor guidelines, vaccine follow-ups, parameters to watch out for..."
                       className="w-full p-2.5 bg-cream/30 border border-border rounded-[10px] text-[13px] text-charcoal resize-y min-h-[50px] font-sans leading-relaxed focus:outline-none focus:border-sage transition-colors placeholder:text-light/80 placeholder:italic"
                     />
+                  </div>
+
+                  {/* AI Assistant Section */}
+                  <div className="mt-2 border-t border-border/40 pt-4">
+                    {!report.aiAnalysedAt && !analyzingMap[report.id] && (
+                      <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div className="flex gap-2.5 items-start">
+                          <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
+                          <div className="text-left">
+                            <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
+                            <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
+                              Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => runAIAnalysis(report)}
+                          className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
+                        >
+                          <Sparkles size={13} /> Analyze Report
+                        </button>
+                      </div>
+                    )}
+
+                    {analyzingMap[report.id] && (
+                      <div className="bg-cream/40 border border-border rounded-[14px] p-4 flex items-center justify-center gap-3 min-h-[80px]">
+                        <Loader2 className="w-5 h-5 text-sage animate-spin" />
+                        <AILoadingMessage />
+                      </div>
+                    )}
+
+                    {analysisErrorMap[report.id] && (
+                      <div className="bg-critical-bg/50 border border-critical/20 rounded-[12px] p-3 flex gap-2 items-start mt-2">
+                        <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
+                        <div className="flex-1 text-left">
+                          <span className="text-[12px] text-critical font-medium">{analysisErrorMap[report.id]}</span>
+                          <button 
+                            onClick={() => runAIAnalysis(report)}
+                            className="text-[11px] text-sage hover:text-sage-dark underline font-bold ml-2 transition-colors cursor-pointer"
+                          >
+                            Retry
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {report.aiAnalysedAt && (
+                      <div className="flex flex-col gap-3 text-left">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1.5">
+                            <Brain size={16} className="text-sage" />
+                            <span className="text-[11px] font-bold tracking-[0.8px] uppercase text-sage">AI Digital Helper Findings</span>
+                          </div>
+                          <button
+                            onClick={() => resetAIAnalysis(report)}
+                            className="text-[11px] text-medium hover:text-critical flex items-center gap-1 transition-colors cursor-pointer"
+                            title="Clear AI Analysis"
+                          >
+                            <RotateCcw size={11} /> Reset Analysis
+                          </button>
+                        </div>
+
+                        {/* Summary */}
+                        {report.aiSummary && (
+                          <div className="bg-sage-pale/20 border border-sage/10 rounded-[12px] p-3.5">
+                            <h6 className="text-[11px] font-bold text-sage-dark mb-1 flex items-center gap-1">
+                              <Sparkles size={12} /> Patient-Friendly Summary
+                            </h6>
+                            <p className="text-[12.5px] text-charcoal leading-relaxed font-sans">{report.aiSummary}</p>
+                          </div>
+                        )}
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {/* Prescriptions */}
+                          <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
+                            <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
+                              <Pill size={12} className="text-rose-400" /> Deciphered Prescriptions
+                            </h6>
+                            {report.aiPrescriptions && report.aiPrescriptions.length > 0 ? (
+                              <ul className="space-y-1.5 flex-1">
+                                {report.aiPrescriptions.map((presc, idx) => (
+                                  <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-rose-400/70 before:rounded-full font-medium">
+                                    {presc}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <span className="text-[12px] text-light italic">No prescriptions detected in this record.</span>
+                            )}
+                          </div>
+
+                          {/* Warnings / Guidance */}
+                          <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
+                            <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
+                              <AlertTriangle size={12} className="text-amber-500" /> Key Warnings & Guidelines
+                            </h6>
+                            {report.aiWarnings && report.aiWarnings.length > 0 ? (
+                              <ul className="space-y-1.5 flex-1">
+                                {report.aiWarnings.map((warn, idx) => (
+                                  <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-amber-400/70 before:rounded-full font-medium">
+                                    {warn}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : (
+                              <span className="text-[12px] text-light italic">No safety warnings detected.</span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Disclaimer */}
+                        <div className="bg-cream/20 border border-border/50 rounded-[10px] p-2.5 flex gap-2 items-start">
+                          <ShieldCheck size={14} className="text-sage shrink-0 mt-0.5" />
+                          <p className="text-[10px] text-medium leading-relaxed font-sans">
+                            <strong>Medical Verification Notice:</strong> This analysis is processed using AI to decipher doctor note formats and is strictly for informational aid. Never alter medications, dosages, or schedules without consulting your practitioner or pharmacist.
+                          </p>
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   {/* Action Buttons */}
