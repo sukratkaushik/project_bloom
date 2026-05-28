@@ -226,6 +226,10 @@ export interface MedicalReport {
   fileData: string; // Base64 data URL
   notes?: string;
   createdAt: number;
+  aiSummary?: string;
+  aiPrescriptions?: string[];
+  aiWarnings?: string[];
+  aiAnalysedAt?: number;
 }
 
 export class PregnancyTrackerDB extends Dexie {

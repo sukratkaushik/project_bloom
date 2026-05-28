@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 // Define the secure secret that we will store in Firebase Secret Manager
@@ -160,4 +160,129 @@ Return ONLY the JSON object.`;
         throw new https_1.HttpsError("internal", "Failed to analyze food image.");
     }
 });
+exports.analyzeMedicalReport = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1", memory: "512MiB", timeoutSeconds: 120 }, async (request) => {
+    const { base64Data, fileType, fileName } = request.data;
+    if (!base64Data || !fileType || !fileName) {
+        throw new https_1.HttpsError("invalid-argument", "base64Data, fileType, and fileName are required.");
+    }
+    const apiKey = hfApiKey.value();
+    if (!apiKey) {
+        throw new https_1.HttpsError("internal", "Server configuration error: Hugging Face API key is missing.");
+    }
+    const systemPrompt = `You are a clinical AI assistant helping a pregnant mother understand her medical reports, ultrasound records, or doctor's prescriptions.
+A major task is deciphering doctor handwriting or complex medical terms, presenting them in a clear, supportive, and easy-to-understand patient-friendly manner.
+
+Extract the information and return ONLY a valid JSON object with the following structure (do NOT wrap it in HTML/markdown, do not add any additional text, just the raw JSON object itself):
+{
+  "summary": "A 2-3 sentence patient-friendly summary of the report contents, findings, or doctor's general advice. Keep the tone warm and supportive.",
+  "prescriptions": [
+    "Medication Name (e.g. Folic Acid 400mcg) - Instructions (e.g. 1 tablet daily after breakfast) - Purpose/Notes (e.g. Essential for baby's neural development)"
+  ],
+  "warnings": [
+    "Important safety instructions, warning symptoms to watch out for, or critical follow-ups (e.g. Avoid taking iron supplements with dairy, Schedule 20-week scan by end of month)"
+  ]
+}
+
+Rules:
+1. Under 'prescriptions', decipher all handwritten or printed medications, dosages, frequency, and instructions. If there are no prescriptions, return an empty array.
+2. Under 'warnings', highlight any warnings, precautions, or key indicators mentioned. If none, return an empty array.
+3. If handwriting is illegible, do your best and append '(please verify with pharmacist)' to the specific item.
+4. Keep all responses supportive, and tailored for a mother's understanding.`;
+    try {
+        let extractedText = "";
+        if (fileType === "application/pdf") {
+            const pdfParse = require("pdf-parse");
+            const buffer = Buffer.from(base64Data, "base64");
+            const parsed = await pdfParse(buffer);
+            extractedText = parsed.text || "";
+            if (extractedText.trim().length < 10) {
+                throw new https_1.HttpsError("invalid-argument", "This PDF file appears to be a scanned image containing no extractable text. Please upload the report as an image (PNG, JPG, WebP) to analyze the visual scan.");
+            }
+            const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+                headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    model: "Qwen/Qwen2.5-72B-Instruct",
+                    messages: [
+                        {
+                            role: "system",
+                            content: systemPrompt,
+                        },
+                        {
+                            role: "user",
+                            content: `Please analyze the following extracted text from a medical report:\n\n${extractedText}`,
+                        },
+                    ],
+                    max_tokens: 800,
+                    temperature: 0.2,
+                }),
+            });
+            const result = await response.json();
+            return parseResponseContent(result);
+        }
+        else if (fileType.startsWith("image/")) {
+            const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
+                headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    model: "Qwen/Qwen2.5-VL-72B-Instruct",
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: `data:${fileType};base64,${base64Data}`,
+                                    },
+                                },
+                                {
+                                    type: "text",
+                                    text: systemPrompt,
+                                },
+                            ],
+                        },
+                    ],
+                    max_tokens: 800,
+                    temperature: 0.1,
+                }),
+            });
+            const result = await response.json();
+            return parseResponseContent(result);
+        }
+        else {
+            throw new https_1.HttpsError("invalid-argument", "Unsupported file type. Only PDFs and images are supported.");
+        }
+    }
+    catch (error) {
+        console.error("analyzeMedicalReport Error:", error);
+        if (error instanceof https_1.HttpsError)
+            throw error;
+        throw new https_1.HttpsError("internal", error.message || "Failed to analyze medical report.");
+    }
+});
+function parseResponseContent(result) {
+    if (result.choices && result.choices.length > 0 && result.choices[0].message) {
+        let content = result.choices[0].message.content.trim();
+        content = content.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
+        try {
+            return JSON.parse(content);
+        }
+        catch (parseErr) {
+            console.error("JSON parse error from model output:", content);
+            throw new https_1.HttpsError("internal", "Failed to parse AI response. The model output was not valid JSON.");
+        }
+    }
+    else if (result.error) {
+        console.error("HF API Error:", result.error);
+        throw new https_1.HttpsError("internal", `AI model error: ${result.error.message || "Unknown error"}`);
+    }
+    throw new https_1.HttpsError("internal", "No response received from AI model.");
+}
 //# sourceMappingURL=index.js.map
