@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../store';
 import { db, MedicalReport } from '../../db';
-import { 
-  UploadCloud, 
-  FileText, 
-  FileImage, 
-  Calendar, 
-  Download, 
-  Trash2, 
-  Eye, 
-  Lock, 
-  Info, 
+import {
+  UploadCloud,
+  FileText,
+  FileImage,
+  Calendar,
+  Download,
+  Trash2,
+  Eye,
+  Lock,
+  Info,
   AlertCircle,
   X,
   File,
@@ -42,7 +42,7 @@ const AILoadingMessage: React.FC = () => {
     "Extracting prescribed medications...",
     "Formulating safe guidelines...",
   ];
-  
+
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
@@ -83,9 +83,9 @@ export const MedicalReports: React.FC = () => {
     loadReports();
   }, [state.activeJourneyId]);
 
-  const processFile = async (file: window.File) => {
+  const processFile = async (file: File) => {
     setUploadError(null);
-    
+
     // File size validation (limit to 10MB)
     const MAX_SIZE = 10 * 1024 * 1024; // 10MB
     if (file.size > MAX_SIZE) {
@@ -106,7 +106,7 @@ export const MedicalReports: React.FC = () => {
       const reader = new FileReader();
       reader.onload = async (event) => {
         const base64 = event.target?.result as string;
-        
+
         const reportId = 'report_' + Date.now();
         const newReport: MedicalReport = {
           id: reportId,
@@ -126,7 +126,7 @@ export const MedicalReports: React.FC = () => {
         await loadReports();
         setIsUploading(false);
       };
-      
+
       reader.onerror = () => {
         setUploadError("Failed to read the file. Please try again.");
         setIsUploading(false);
@@ -159,7 +159,7 @@ export const MedicalReports: React.FC = () => {
   const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       await processFile(e.dataTransfer.files[0]);
     }
@@ -195,7 +195,7 @@ export const MedicalReports: React.FC = () => {
   const runAIAnalysis = async (report: MedicalReport) => {
     setAnalyzingMap(prev => ({ ...prev, [report.id]: true }));
     setAnalysisErrorMap(prev => ({ ...prev, [report.id]: null }));
-    
+
     try {
       const base64Data = report.fileData.split(',')[1];
       const fileType = report.fileType;
@@ -203,13 +203,13 @@ export const MedicalReports: React.FC = () => {
 
       const analyzeMedicalReport = httpsCallable(functions, 'analyzeMedicalReport');
       const response = await analyzeMedicalReport({ base64Data, fileType, fileName });
-      
+
       const data = response.data as {
         summary: string;
         prescriptions: string[];
         warnings: string[];
       };
-      
+
       const updated = {
         ...report,
         aiSummary: data.summary,
@@ -217,14 +217,14 @@ export const MedicalReports: React.FC = () => {
         aiWarnings: data.warnings,
         aiAnalysedAt: Date.now()
       };
-      
+
       await db.medicalReports.put(updated);
       setReports(prev => prev.map(r => r.id === report.id ? updated : r));
     } catch (err: any) {
       console.error("AI Analysis error:", err);
-      setAnalysisErrorMap(prev => ({ 
-        ...prev, 
-        [report.id]: err?.message || "Failed to analyze report. Please try again." 
+      setAnalysisErrorMap(prev => ({
+        ...prev,
+        [report.id]: err?.message || "Failed to analyze report. Please try again."
       }));
     } finally {
       setAnalyzingMap(prev => ({ ...prev, [report.id]: false }));
@@ -283,7 +283,7 @@ export const MedicalReports: React.FC = () => {
         <div>
           <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Privacy First & Offline Storage</h4>
           <p className="text-[12px] text-medium leading-relaxed">
-            All medical reports are stored completely local and offline on your browser's persistent IndexedDB database. 
+            All medical reports are stored completely local and offline on your browser's persistent IndexedDB database.
             They never leave your device, ensuring maximum confidentiality and security for your health records.
           </p>
         </div>
@@ -292,24 +292,24 @@ export const MedicalReports: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-6 items-start">
         {/* Left Column: Upload Area */}
         <div className="flex flex-col gap-4">
-          <div 
+          <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={`border-[2px] border-dashed rounded-[20px] p-8 flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[240px] cursor-pointer relative bg-white
-              ${isDragOver 
-                ? 'border-sage bg-sage-pale/20 scale-[1.02]' 
+              ${isDragOver
+                ? 'border-sage bg-sage-pale/20 scale-[1.02]'
                 : 'border-border hover:border-sage-light hover:shadow-sm'
               }`}
           >
-            <input 
-              type="file" 
+            <input
+              type="file"
               onChange={handleFileChange}
               accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
               disabled={isUploading}
             />
-            
+
             <div className="w-16 h-16 bg-sage-pale/50 text-sage rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
               <UploadCloud className="w-8 h-8" />
             </div>
@@ -363,7 +363,7 @@ export const MedicalReports: React.FC = () => {
           ) : (
             <div className="flex flex-col gap-4">
               {reports.map((report) => (
-                <div 
+                <div
                   key={report.id}
                   className="bg-white border border-border rounded-[18px] p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
                 >
@@ -371,11 +371,11 @@ export const MedicalReports: React.FC = () => {
                     <div className="p-2 bg-cream border border-border rounded-[12px] shrink-0 mt-0.5">
                       {getFileIcon(report.fileType)}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3">
                       <div>
                         {/* Title input */}
-                        <input 
+                        <input
                           type="text"
                           value={report.title}
                           onChange={(e) => updateReportField(report.id, 'title', e.target.value)}
@@ -393,7 +393,7 @@ export const MedicalReports: React.FC = () => {
 
                       <div className="flex items-center gap-2 md:justify-end">
                         <Calendar size={14} className="text-light shrink-0" />
-                        <input 
+                        <input
                           type="date"
                           value={report.date}
                           onChange={(e) => updateReportField(report.id, 'date', e.target.value)}
@@ -406,7 +406,7 @@ export const MedicalReports: React.FC = () => {
                   {/* Doctor Notes Textarea */}
                   <div>
                     <label className="text-[10px] font-bold tracking-[0.8px] uppercase text-light mb-1.5 block">Summary & Doctor Instructions</label>
-                    <textarea 
+                    <textarea
                       value={report.notes || ''}
                       onChange={(e) => updateReportField(report.id, 'notes', e.target.value)}
                       placeholder="Doctor guidelines, vaccine follow-ups, parameters to watch out for..."
@@ -448,7 +448,7 @@ export const MedicalReports: React.FC = () => {
                         <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
                         <div className="flex-1 text-left">
                           <span className="text-[12px] text-critical font-medium">{analysisErrorMap[report.id]}</span>
-                          <button 
+                          <button
                             onClick={() => runAIAnalysis(report)}
                             className="text-[11px] text-sage hover:text-sage-dark underline font-bold ml-2 transition-colors cursor-pointer"
                           >
@@ -536,7 +536,7 @@ export const MedicalReports: React.FC = () => {
                   {/* Action Buttons */}
                   <div className="flex justify-end gap-2 border-t border-border/50 pt-3">
                     {report.fileType.startsWith('image/') && (
-                      <button 
+                      <button
                         onClick={() => setPreviewReport(report)}
                         className="p-2 border border-border text-medium hover:text-sage hover:bg-sage-pale/20 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                         title="Preview Image"
@@ -544,14 +544,14 @@ export const MedicalReports: React.FC = () => {
                         <Eye size={14} /> Preview
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={() => triggerDownload(report)}
                       className="p-2 border border-border text-medium hover:text-sage hover:bg-sage-pale/20 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
                       title="Download File"
                     >
                       <Download size={14} /> Download
                     </button>
-                    <button 
+                    <button
                       onClick={() => deleteReport(report.id)}
                       className="p-2 border border-border text-medium hover:text-critical hover:bg-critical-bg rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors ml-auto cursor-pointer"
                       title="Delete Report"
@@ -575,7 +575,7 @@ export const MedicalReports: React.FC = () => {
                 <span className="font-semibold text-charcoal">{previewReport.title}</span>
                 <span className="text-[11px] bg-sage text-white font-bold px-2 py-0.5 rounded uppercase">{previewReport.fileType.split('/')[1]}</span>
               </div>
-              <button 
+              <button
                 onClick={() => setPreviewReport(null)}
                 className="text-medium hover:text-charcoal p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
               >
@@ -583,9 +583,9 @@ export const MedicalReports: React.FC = () => {
               </button>
             </div>
             <div className="overflow-auto flex items-center justify-center p-4 bg-charcoal/5 flex-1 min-h-0">
-              <img 
-                src={previewReport.fileData} 
-                alt={previewReport.title} 
+              <img
+                src={previewReport.fileData}
+                alt={previewReport.title}
                 className="max-w-full max-h-[70vh] object-contain rounded-md"
               />
             </div>

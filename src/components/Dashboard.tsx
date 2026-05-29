@@ -48,7 +48,7 @@ export const Dashboard: React.FC = () => {
     e.preventDefault();
     // Attempt standard mailto redirect
     window.location.href = `mailto:${email}`;
-    
+
     // Copy to clipboard fallback
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(email).then(() => {
@@ -192,12 +192,39 @@ export const Dashboard: React.FC = () => {
       </header>
 
       {/* Body */}
-      <div className="max-w-[1000px] mx-auto px-4 md:px-6 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full">
-        <div className={`${isMobileMenuOpen ? 'block' : 'hidden'} md:block w-full md:w-auto`}>
+      <div className="max-w-[1000px] mx-auto px-4 md:px-6 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full relative">
+        {/* Desktop Sidebar (Rendered inline) */}
+        <div className="hidden md:block w-full md:w-auto">
           <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
         </div>
 
-        <main className={`pt-6 md:pt-8 print:pt-0 ${isMobileMenuOpen ? 'hidden md:block' : 'block'}`}>
+        {/* Mobile Navigation Drawer Overlay (Slides out from left, blurred backdrop) */}
+        <div className={`fixed inset-0 z-[100] md:hidden transition-all duration-300 ${isMobileMenuOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none'}`}>
+          {/* Backdrop Blur Overlay */}
+          <div
+            onClick={() => setIsMobileMenuOpen(false)}
+            className={`absolute inset-0 bg-charcoal/50 backdrop-blur-xs transition-opacity duration-300 ${isMobileMenuOpen ? 'opacity-100' : 'opacity-0'}`}
+          />
+          {/* Drawer Panel */}
+          <div
+            className={`absolute top-0 bottom-0 left-0 w-[290px] bg-cream dark:bg-[#1B2936] shadow-2xl p-6 overflow-y-auto transition-transform duration-300 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
+          >
+            <div className="flex justify-between items-center mb-4 pb-2 border-b border-border">
+              <span className="font-serif text-[18px] text-sage font-bold">Navigation</span>
+              <button
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-charcoal/20 rounded-md text-charcoal cursor-pointer text-[14px]"
+              >
+                ✕ Close
+              </button>
+            </div>
+            {/* Render Sidebar inside Drawer */}
+            <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} isMobile />
+          </div>
+        </div>
+
+        {/* Main Content Area */}
+        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={activePage}
@@ -221,7 +248,7 @@ export const Dashboard: React.FC = () => {
               {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
               {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
               {activePage === 'symptoms' && <SymptomLogger />}
-              {activePage === 'readiness' && <LaborReadiness />}
+              {activePage === 'readiness' && <LaborReadiness setActivePage={setActivePage} />}
               {activePage === 'foodscanner' && <FoodScanner />}
               {activePage === 'askourpregnancy' && <AskOurPregnancy />}
               {activePage === 'kickcounter' && <KickCounter />}
@@ -242,6 +269,45 @@ export const Dashboard: React.FC = () => {
             </motion.div>
           </AnimatePresence>
         </main>
+      </div>
+
+      {/* Mobile Bottom Navigation Bar (Floating/Glassmorphic) */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#2C3E50]/80 backdrop-blur-md border-t border-border py-2 px-4 flex justify-around items-center md:hidden no-print shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
+        <button
+          onClick={() => setActivePage('tracker')}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'tracker' ? 'text-sage font-semibold' : 'text-medium'}`}
+        >
+          <span className="text-[18px]">📅</span>
+          <span>Tracker</span>
+        </button>
+        <button
+          onClick={() => setActivePage('vitals')}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'vitals' ? 'text-sage font-semibold' : 'text-medium'}`}
+        >
+          <span className="text-[18px]">💙</span>
+          <span>Vitals</span>
+        </button>
+        <button
+          onClick={() => setActivePage('readiness')}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'readiness' ? 'text-sage font-semibold' : 'text-medium'}`}
+        >
+          <span className="text-[18px]">🔮</span>
+          <span>Readiness</span>
+        </button>
+        <button
+          onClick={() => setActivePage('askourpregnancy')}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'askourpregnancy' ? 'text-sage font-semibold' : 'text-medium'}`}
+        >
+          <span className="text-[18px]">✨</span>
+          <span>AI Guide</span>
+        </button>
+        <button
+          onClick={() => setIsMobileMenuOpen(true)}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${isMobileMenuOpen ? 'text-sage font-semibold' : 'text-medium'}`}
+        >
+          <span className="text-[18px]">☰</span>
+          <span>Menu</span>
+        </button>
       </div>
 
       {/* Dashboard Footer */}

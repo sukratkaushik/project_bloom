@@ -87,13 +87,13 @@ export const LanguageSelector: React.FC = () => {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 border-[1.5px] border-border rounded-[12px] bg-white text-charcoal hover:border-sage-light hover:bg-cream transition-all focus:outline-none text-[13px] md:text-[14px] font-semibold shadow-sm notranslate"
+        className="flex items-center gap-1 sm:gap-2 px-2 py-1.5 sm:px-3 sm:py-2 border-[1.5px] border-border rounded-[12px] bg-white text-charcoal hover:border-sage-light hover:bg-cream transition-all focus:outline-none text-[12px] sm:text-[13px] md:text-[14px] font-semibold shadow-sm notranslate"
         aria-haspopup="true"
         aria-expanded={isOpen}
       >
-        <Globe size={15} className="text-sage" />
-        <span className="truncate max-w-[80px] md:max-w-none notranslate">{currentLangObj.native}</span>
-        <ChevronDown size={14} className={`text-medium transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <Globe size={14} className="text-sage sm:w-[15px] sm:h-[15px]" />
+        <span className="truncate max-w-[80px] md:max-w-none notranslate hidden sm:inline">{currentLangObj.native}</span>
+        <ChevronDown size={12} className={`text-medium transition-transform duration-200 ${isOpen ? 'rotate-180' : ''} hidden sm:block`} />
       </button>
 
       {isOpen && (

@@ -124,36 +124,36 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
           // 1. Check for cloud user profile first
           const profile = await getUserProfile(user.uid);
-          
+
           if (profile && profile.isSetup && profile.activeJourneyId) {
             // 2. If already setup in cloud, fetch that journey
             const journeyRef = doc(firestoreDb, 'journeys', profile.activeJourneyId);
             const docSnap = await getDoc(journeyRef);
-            
+
             if (docSnap.exists()) {
               const cloudData = docSnap.data();
-              
+
               // 3. Restore all tracking data (logs, vitals, etc.)
               const trackingRef = collection(firestoreDb, 'journeys', profile.activeJourneyId, 'trackingData');
               const trackingSnap = await getDocs(trackingRef);
               const cloudRecords = trackingSnap.docs.map(d => d.data());
               await cloudSync.restoreJourneyData(profile.activeJourneyId, cloudRecords);
 
-              setState(prev => ({ 
-                ...prev, 
-                ...cloudData, 
-                isSetup: true, 
+              setState(prev => ({
+                ...prev,
+                ...cloudData,
+                isSetup: true,
                 activeJourneyId: profile.activeJourneyId
               }));
-              
+
               // Immediately persist state to Dexie
               if (isDbLoaded) {
                 db.appState.put({
                   id: 'global',
-                  stateJSON: JSON.stringify({ 
-                    ...state, 
-                    ...cloudData, 
-                    isSetup: true, 
+                  stateJSON: JSON.stringify({
+                    ...state,
+                    ...cloudData,
+                    isSetup: true,
                     activeJourneyId: profile.activeJourneyId
                   }),
                   updatedAt: Date.now(),
@@ -169,7 +169,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     return () => unsubscribe();
   }, [isDbLoaded]); // We need to know when Dexie is ready before we start writing to it
 
-  // Sync to Dexie, localStorage and Firestore
+  // Sync to Dexie, localStorage and Firestore (debounced to avoid thrashing on typing)
   useEffect(() => {
     // Save minimal UI preferences to local storage for instant loading on refresh
     try {
@@ -177,52 +177,56 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         isCalmModeActive: state.isCalmModeActive,
         isDarkModeActive: state.isDarkModeActive,
       }));
-    } catch(e) {}
+    } catch (e) { }
 
-    // Only save the full state to Dexie AFTER we have finished loading it from Dexie
-    if (isDbLoaded) {
-      db.appState.put({
-        id: 'global',
-        stateJSON: JSON.stringify(state),
-        updatedAt: Date.now(),
-      }).catch(err => {
-        console.error('Failed to sync state to Dexie:', err);
-      });
-    }
-    
-    if (auth.currentUser && state.activeJourneyId && state.isSetup) {
-      const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
-      setDoc(journeyRef, {
-        ...state,
-        uid: auth.currentUser.uid,
-        status: 'ACTIVE',
-        calculationMethod: 'LMP',
-        referenceDate: state.lmp ? new Date(state.lmp).getTime() : Date.now(),
-        estimatedDueDate: state.dueDate ? new Date(state.dueDate).getTime() : Date.now(),
-        createdAt: state.createdAt || Date.now(),
-        updatedAt: Date.now()
-      }, { merge: true }).catch(err => {
-        handleFirestoreError(err, OperationType.WRITE, `journeys/${state.activeJourneyId}`);
-      });
+    const timer = setTimeout(() => {
+      // Only save the full state to Dexie AFTER we have finished loading it from Dexie
+      if (isDbLoaded) {
+        db.appState.put({
+          id: 'global',
+          stateJSON: JSON.stringify(state),
+          updatedAt: Date.now(),
+        }).catch(err => {
+          console.error('Failed to sync state to Dexie:', err);
+        });
+      }
 
-      // Also ensure user profile is synced with the active journey
-      saveUserProfile(auth.currentUser.uid, {
-        isSetup: true,
-        activeJourneyId: state.activeJourneyId,
-        email: auth.currentUser.email,
-        displayName: auth.currentUser.displayName,
-        createdAt: state.createdAt || Date.now()
-      });
-    }
-  }, [state]);
+      if (auth.currentUser && state.activeJourneyId && state.isSetup) {
+        const journeyRef = doc(firestoreDb, 'journeys', state.activeJourneyId);
+        setDoc(journeyRef, {
+          ...state,
+          uid: auth.currentUser.uid,
+          status: 'ACTIVE',
+          calculationMethod: 'LMP',
+          referenceDate: state.lmp ? new Date(state.lmp).getTime() : Date.now(),
+          estimatedDueDate: state.dueDate ? new Date(state.dueDate).getTime() : Date.now(),
+          createdAt: state.createdAt || Date.now(),
+          updatedAt: Date.now()
+        }, { merge: true }).catch(err => {
+          handleFirestoreError(err, OperationType.WRITE, `journeys/${state.activeJourneyId}`);
+        });
+
+        // Also ensure user profile is synced with the active journey
+        saveUserProfile(auth.currentUser.uid, {
+          isSetup: true,
+          activeJourneyId: state.activeJourneyId,
+          email: auth.currentUser.email,
+          displayName: auth.currentUser.displayName,
+          createdAt: state.createdAt || Date.now()
+        });
+      }
+    }, 1000); // 1-second debounce to prevent lag during typing
+
+    return () => clearTimeout(timer);
+  }, [state, isDbLoaded]);
 
   const claimDailyKnowledge = () => {
     setState((prev) => {
       const today = new Date().toISOString().split('T')[0];
       if (prev.lastKnowledgeDropDate === today) return prev;
-      
+
       let newStreak = (prev.dailyKnowledgeStreak || 0) + 1;
-      
+
       if (prev.lastKnowledgeDropDate) {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
@@ -231,7 +235,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           newStreak = 1;
         }
       }
-      
+
       return {
         ...prev,
         lastKnowledgeDropDate: today,
@@ -384,14 +388,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const generatePlan = async (setupData: Partial<PlannerState>) => {
     if (!setupData.dueDate) return;
-    
+
     const dueDate = new Date(setupData.dueDate);
     const lmp = addDays(dueDate, -280);
     const t1End = addWeeks(lmp, 12);
     const t2End = addWeeks(lmp, 27);
 
     const journeyId = state.activeJourneyId || uuidv4();
-    
+
     // Execute Dexie Schema: Create User and Journey (Local fallback)
     try {
       const userId = auth.currentUser ? auth.currentUser.uid : 'local-user-1';
@@ -458,10 +462,10 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       if (profile && profile.activeJourneyId) {
         const journeyRef = doc(firestoreDb, 'journeys', profile.activeJourneyId);
         const snapshot = await getDoc(journeyRef);
-        
+
         if (snapshot.exists()) {
           const cloudData = snapshot.data() as Partial<PlannerState>;
-          
+
           setState((prev) => {
             const newState = { ...prev, ...cloudData, isSetup: true, activeJourneyId: profile.activeJourneyId };
             if (isDbLoaded) {
@@ -473,7 +477,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
             return newState;
           });
-          
+
           return true;
         }
       }

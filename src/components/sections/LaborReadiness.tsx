@@ -1,25 +1,81 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../store';
-import { Activity, HeartPulse, Thermometer, AlertTriangle, Info, Sparkles } from 'lucide-react';
+import { db } from '../../db';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { Activity, HeartPulse, Thermometer, AlertTriangle, Info, Sparkles, Watch } from 'lucide-react';
 import { calculateLaborReadiness, DailyBiometrics, ReadinessResult } from '../../utils/laborPrediction';
 
-export const LaborReadiness: React.FC = () => {
+interface LaborReadinessProps {
+  setActivePage?: (page: string) => void;
+}
+
+export const LaborReadiness: React.FC<LaborReadinessProps> = ({ setActivePage }) => {
   const { state } = usePlanner();
-  
-  // Mock data for demonstration purposes
-  const [historicalBaseline] = useState<DailyBiometrics[]>([
+
+  // Query synced wearable biometrics
+  const syncedWearableLogs = useLiveQuery(
+    () => {
+      if (!state.activeJourneyId) return [];
+      return db.vitalsLogs
+        .where('journeyId')
+        .equals(state.activeJourneyId)
+        .filter(l => l.type === 'WEARABLE')
+        .reverse()
+        .sortBy('timestamp');
+    },
+    [state.activeJourneyId]
+  ) || [];
+
+  const hasSyncedData = syncedWearableLogs.length >= 3;
+
+  // Mock fallback data for baseline and recent
+  const mockBaseline: DailyBiometrics[] = [
     { date: '2026-02-20', restingHeartRate: 68, hrv: 55, basalBodyTemp: 36.8, braxtonHicksCount: 0 },
     { date: '2026-02-21', restingHeartRate: 67, hrv: 56, basalBodyTemp: 36.7, braxtonHicksCount: 1 },
     { date: '2026-02-22', restingHeartRate: 69, hrv: 54, basalBodyTemp: 36.8, braxtonHicksCount: 0 },
-  ]);
+  ];
 
-  const [recentData, setRecentData] = useState<DailyBiometrics[]>([
+  const mockRecent: DailyBiometrics[] = [
     { date: '2026-03-18', restingHeartRate: 74, hrv: 42, basalBodyTemp: 36.4, braxtonHicksCount: 4 },
     { date: '2026-03-19', restingHeartRate: 75, hrv: 40, basalBodyTemp: 36.3, braxtonHicksCount: 6 },
     { date: '2026-03-20', restingHeartRate: 76, hrv: 38, basalBodyTemp: 36.3, braxtonHicksCount: 5 },
-  ]);
+  ];
 
+  const [historicalBaseline, setHistoricalBaseline] = useState<DailyBiometrics[]>(mockBaseline);
+  const [recentData, setRecentData] = useState<DailyBiometrics[]>(mockRecent);
   const [result, setResult] = useState<ReadinessResult | null>(null);
+
+  useEffect(() => {
+    if (hasSyncedData) {
+      // Split synced wearable logs: ascending by timestamp for algorithms
+      const sortedLogs = [...syncedWearableLogs].sort((a, b) => a.timestamp - b.timestamp);
+      // Last 3 entries are recent, everything older is baseline
+      const recentLogs = sortedLogs.slice(-3);
+      const baselineLogs = sortedLogs.slice(0, -3);
+
+      const mappedRecent = recentLogs.map(log => ({
+        date: new Date(log.timestamp).toISOString().split('T')[0],
+        restingHeartRate: log.restingHeartRate || null,
+        hrv: log.hrv || null,
+        basalBodyTemp: log.basalBodyTemp || null,
+        braxtonHicksCount: 4 // mock Braxton Hicks count
+      }));
+
+      const mappedBaseline = baselineLogs.map(log => ({
+        date: new Date(log.timestamp).toISOString().split('T')[0],
+        restingHeartRate: log.restingHeartRate || null,
+        hrv: log.hrv || null,
+        basalBodyTemp: log.basalBodyTemp || null,
+        braxtonHicksCount: 1
+      }));
+
+      setRecentData(mappedRecent);
+      setHistoricalBaseline(mappedBaseline.length > 0 ? mappedBaseline : mockBaseline);
+    } else {
+      setHistoricalBaseline(mockBaseline);
+      setRecentData(mockRecent);
+    }
+  }, [syncedWearableLogs, hasSyncedData]);
 
   useEffect(() => {
     const res = calculateLaborReadiness(historicalBaseline, recentData);
@@ -36,7 +92,7 @@ export const LaborReadiness: React.FC = () => {
   const baseHRV = getAvg(historicalBaseline, 'hrv');
   const baseBBT = getAvg(historicalBaseline, 'basalBodyTemp');
   const baseBH = getAvg(historicalBaseline, 'braxtonHicksCount');
-  
+
   const recentRHR = getAvg(recentData, 'restingHeartRate');
   const recentHRV = getAvg(recentData, 'hrv');
   const recentBBT = getAvg(recentData, 'basalBodyTemp');
@@ -59,7 +115,7 @@ export const LaborReadiness: React.FC = () => {
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-cream border-[1.5px] border-border rounded-[12px] p-4 mb-8 flex items-start gap-3">
+      <div className="bg-cream border-[1.5px] border-border rounded-[12px] p-4 mb-6 flex items-start gap-3">
         <Info className="text-medium shrink-0 mt-0.5" size={20} />
         <div>
           <h4 className="font-semibold text-[13px] text-charcoal mb-1">Conceptual Demonstration</h4>
@@ -69,6 +125,38 @@ export const LaborReadiness: React.FC = () => {
         </div>
       </div>
 
+      {hasSyncedData ? (
+        <div className="bg-sage-pale border border-sage/30 rounded-[12px] p-4 mb-8 flex items-start gap-3 animate-in fade-in duration-300">
+          <Watch className="text-sage shrink-0 mt-0.5" size={20} />
+          <div>
+            <h4 className="font-semibold text-[13px] text-sage-dark mb-1">Live Wearable Data Synced</h4>
+            <p className="text-[12px] text-medium leading-[1.5]">
+              Your score is now dynamically computed using physiological baseline and recent metrics synced from your wearable device.
+            </p>
+          </div>
+        </div>
+      ) : (
+        <div className="bg-gold-pale border border-gold/30 rounded-[12px] p-4 mb-8 flex items-start justify-between gap-3 animate-in fade-in duration-300">
+          <div className="flex items-start gap-3">
+            <Watch className="text-gold shrink-0 mt-0.5" size={20} />
+            <div>
+              <h4 className="font-semibold text-[13px] text-charcoal mb-1">Simulated Baseline Active</h4>
+              <p className="text-[12px] text-medium leading-[1.5]">
+                To see a personalized Labor Readiness score based on your actual heart rate variability and temperature, connect a wearable device.
+              </p>
+            </div>
+          </div>
+          {setActivePage && (
+            <button
+              onClick={() => setActivePage('vitals')}
+              className="text-[12px] font-bold text-sage hover:text-sage-dark bg-white border border-border px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
+            >
+              Link Wearable
+            </button>
+          )}
+        </div>
+      )}
+
       {result && (
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
           <div className="space-y-6">
@@ -77,8 +165,8 @@ export const LaborReadiness: React.FC = () => {
               <div className="relative w-[140px] h-[140px] shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                   <circle cx="50" cy="50" r="45" fill="none" stroke="#E4E3E0" strokeWidth="8" />
-                  <circle 
-                    cx="50" cy="50" r="45" fill="none" stroke="#6B9278" strokeWidth="8" 
+                  <circle
+                    cx="50" cy="50" r="45" fill="none" stroke="#6B9278" strokeWidth="8"
                     strokeDasharray={`${(result.score / 100) * 283} 283`}
                     className="transition-all duration-1000 ease-out"
                   />
@@ -88,7 +176,7 @@ export const LaborReadiness: React.FC = () => {
                   <span className="text-[10px] font-semibold uppercase tracking-[1px] text-light mt-1">Score</span>
                 </div>
               </div>
-              
+
               <div className="text-center sm:text-left">
                 <h3 className="text-[20px] font-serif font-medium text-charcoal mb-2">
                   {result.score >= 80 ? 'High Readiness' : result.score >= 50 ? 'Elevated Readiness' : 'Baseline'}
@@ -122,7 +210,7 @@ export const LaborReadiness: React.FC = () => {
           {/* Biometric Trends */}
           <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm h-fit">
             <h4 className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium mb-5">7-Day Trends vs Baseline</h4>
-            
+
             <div className="space-y-5">
               <div>
                 <div className="flex justify-between items-center mb-1.5">

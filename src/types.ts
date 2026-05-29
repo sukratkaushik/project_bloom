@@ -69,7 +69,7 @@ export type CustomSupplement = {
 export type SyncPermissions = {
   mode?: 'edit' | 'read';
   excludedTaskIds?: string[];
-  
+
   kickcounter: boolean;
   contractions: boolean;
   vitals: boolean;
@@ -144,4 +144,6 @@ export type PlannerState = {
   lastKnowledgeDropDate?: string;
   customSupplements?: CustomSupplement[];
   isRestoring?: boolean;
+  connectedWearables?: string[];
+  lastWearableSyncTime?: number;
 };

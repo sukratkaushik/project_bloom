@@ -93,8 +93,10 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     }
   };
 
+  if (activePage === 'askourpregnancy') return null;
+
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end print:hidden">
+    <div className="fixed bottom-20 md:bottom-6 right-4 md:right-6 z-50 flex flex-col items-end print:hidden">
       {isOpen && (
         <div className="mb-4 w-[320px] sm:w-[360px] bg-white rounded-[24px] shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-border overflow-hidden flex flex-col animate-in slide-in-from-bottom-5 duration-500 ease-[0.22,1,0.36,1]">
           {/* Header */}
