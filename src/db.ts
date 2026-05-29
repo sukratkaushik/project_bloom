@@ -162,13 +162,20 @@ export interface VitalsLog {
   id: string;
   journeyId: string;
   timestamp: number;
-  type: 'BP' | 'WEIGHT';
+  type: 'BP' | 'WEIGHT' | 'WEARABLE';
   systolic?: number;
   diastolic?: number;
   pulse?: number;
   weight?: number;
   unit?: string;
   notes?: string;
+  hrv?: number;
+  restingHeartRate?: number;
+  basalBodyTemp?: number;
+  sleepHours?: number;
+  steps?: number;
+  spo2?: number;
+  source?: string;
 }
 
 export interface MoodLog {
@@ -258,7 +265,7 @@ export class PregnancyTrackerDB extends Dexie {
       symptomLogs: 'id, journeyId, timestamp, [journeyId+timestamp], [journeyId+symptomType]',
       partnerSyncs: 'id, journeyId, syncPasscodeHash'
     });
-    
+
     this.version(2).stores({
       kickSessions: 'id, journeyId, startTime, [journeyId+startTime]',
       contractionRecords: 'id, sessionId, journeyId, startedAt, [journeyId+startedAt]',

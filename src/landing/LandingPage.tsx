@@ -123,7 +123,7 @@ export const LandingPage: React.FC = () => {
     e.preventDefault();
     // Attempt standard mailto redirect
     window.location.href = `mailto:${email}`;
-    
+
     // Copy to clipboard fallback
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(email).then(() => {
@@ -421,17 +421,16 @@ export const LandingPage: React.FC = () => {
         </div>
       )}
       {/* Navigation Header */}
-      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${
-        isScrolled 
-          ? 'top-2 py-2 px-4 md:px-6 shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20' 
-          : 'top-4 py-3.5 px-4 md:px-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
-      }`}>
+      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${isScrolled
+        ? 'top-2 py-1.5 sm:py-2 px-3 sm:px-4 md:px-6 shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20'
+        : 'top-4 py-2 sm:py-3.5 px-3 sm:px-4 md:px-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+        }`}>
         <nav className="w-full flex items-center justify-between">
-          <div className="flex items-center gap-3 shrink-0 mr-4">
-            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 md:w-12 md:h-12 object-contain" />
-            <span className="font-serif text-[24px] md:text-[28px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 mr-2 sm:mr-4">
+            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain" />
+            <span className="font-serif text-[18px] sm:text-[22px] md:text-[28px] font-semibold text-sage tracking-wide notranslate hidden min-[400px]:inline-block">Our Pregnancy</span>
           </div>
-          
+
           {/* Navigation Links - Centered, Desktop Only */}
           <div className="hidden md:flex items-center gap-8">
             <a href="#features" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Features</a>
@@ -439,29 +438,30 @@ export const LandingPage: React.FC = () => {
             <a href="#localized-care" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">About</a>
           </div>
 
-          <div className="flex flex-wrap md:flex-nowrap justify-end items-center gap-2 md:gap-4">
+          <div className="flex flex-nowrap justify-end items-center gap-1 sm:gap-2 md:gap-4">
             <LanguageSelector />
             <button
               onClick={toggleDarkMode}
-              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1 sm:mr-2 ml-1"
+              className="p-1.5 sm:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center"
               title="Toggle Dark Mode"
               aria-label="Toggle Dark Mode"
             >
-              <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
+              <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
             </button>
             {!isSetupComplete ? (
               <>
-                <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[13px] md:text-[14px] font-semibold px-3 md:px-5 py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
+                <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 py-1.5 sm:px-4 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
                   Log In
                 </button>
-                <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
+                <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
                   Sign Up
                 </button>
               </>
             ) : (
-              <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[13px] md:text-[14px] font-semibold px-4 md:px-5 py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
-                {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin shrink-0" /> : null}
-                Open Dashboard
+              <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+                {isLoggingIn ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : null}
+                <span className="sm:hidden">Dashboard</span>
+                <span className="hidden sm:inline">Open Dashboard</span>
               </button>
             )}
           </div>

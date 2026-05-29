@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS } from '../data';
 import { Task } from '../types';
@@ -10,10 +10,36 @@ type SidebarProps = {
   activePage: string;
   setActivePage: (page: string) => void;
   filterTasks: (tasks: Task[]) => Task[];
+  isMobile?: boolean;
 };
 
-export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks }) => {
+const CATEGORIES: Record<string, { label: string, items: string[] }> = {
+  daily: {
+    label: "Daily Health & Tracking",
+    items: ['kickcounter', 'contractions', 'vitals', 'mood', 'hydration', 'nutrition', 'symptoms']
+  },
+  smart: {
+    label: "Smart Tools",
+    items: ['askourpregnancy', 'foodscanner', 'babynames']
+  },
+  tasks: {
+    label: "Planning & Tasks",
+    items: ['dev', 'prep', 'finance', 'deadlines']
+  },
+  health: {
+    label: "Medical & Govt",
+    items: ['medical', 'medical-reports', 'schemes']
+  },
+  labor: {
+    label: "Labor & Postpartum",
+    items: ['readiness', 'hospitalbag', 'birthplan', 'decisions', 'postpartum']
+  }
+};
+
+export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks, isMobile = false }) => {
   const { state, toggleCalmMode, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
+
+  // Accordion state (for desktop accordion view)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     daily: true,
     smart: true,
@@ -22,24 +48,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     labor: false,
   });
 
-  const toggleSection = (id: string) => {
-    setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }));
-  };
+  // Drill-down state (for mobile category view)
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  const SectionHeader = ({ id, label }: { id: string, label: string }) => {
-    const isExpanded = expandedSections[id];
-    return (
-      <div 
-        className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
-        onClick={() => toggleSection(id)}
-      >
-        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors">{label}</div>
-        <div className="text-light group-hover:text-charcoal flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 transition-colors mr-1">
-          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-        </div>
-      </div>
+  // Auto-set category based on activePage (only on mobile views)
+  useEffect(() => {
+    if (!isMobile) return;
+    const foundCategory = Object.keys(CATEGORIES).find(catId =>
+      CATEGORIES[catId].items.includes(activePage)
     );
-  };
+    if (foundCategory) {
+      setActiveCategory(foundCategory);
+    } else if (activePage === 'tracker') {
+      setActiveCategory(null);
+    }
+  }, [activePage, isMobile]);
 
   const getProgress = (tasks: Task[]) => {
     const filtered = filterTasks(tasks);
@@ -64,7 +87,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     }
   };
 
-  const NavItem = ({ id, icon, label, progress, hideFavorite }: { id: string, icon: string, label: string, progress?: {done: number, total: number}, hideFavorite?: boolean }) => {
+  const NavItem = ({ id, icon, label, progress, hideFavorite }: { id: string, icon: string, label: string, progress?: { done: number, total: number }, hideFavorite?: boolean }) => {
     const isActive = activePage === id;
     const isFav = state.favoritePages?.includes(id);
 
@@ -73,7 +96,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         <button
           onClick={() => setActivePage(id)}
           className={`flex items-center gap-2.5 p-[10px_12px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all border-none w-full text-left
-            ${isActive ? 'bg-sage-pale text-sage font-semibold' : 'bg-transparent text-medium hover:bg-sage-pale hover:text-sage'}
+            ${isActive ? 'bg-sage-pale text-sage font-bold' : 'bg-transparent text-medium hover:bg-sage-pale hover:text-sage'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
           <span className="text-[16px] w-5 text-center">{icon}</span>
@@ -85,9 +108,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
                 {progress.done}/{progress.total}
               </span>
               <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
-                <div 
-                  className={`h-full ${isActive ? 'bg-sage-dark' : 'bg-sage'} transition-all duration-300`} 
-                  style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }} 
+                <div
+                  className={`h-full ${isActive ? 'bg-sage-dark' : 'bg-sage'} transition-all duration-300`}
+                  style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }}
                 />
               </div>
             </div>
@@ -134,11 +157,178 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'notes', icon: '📝', label: 'Notes & Journal' },
   ];
 
+  const CategoryButton = ({ id, label }: { id: string, label: string }) => {
+    return (
+      <button
+        onClick={() => setActiveCategory(id)}
+        className="w-full flex items-center justify-between py-3.5 border-b border-border/50 dark:border-border/10 text-charcoal/90 dark:text-white/80 hover:text-sage dark:hover:text-sage transition-all cursor-pointer text-left group"
+      >
+        <span className="text-[12px] font-bold tracking-[1.5px] uppercase group-hover:translate-x-1 transition-transform duration-300">{label}</span>
+        <ChevronRight className="w-4 h-4 text-light group-hover:text-sage group-hover:translate-x-0.5 transition-all duration-300" />
+      </button>
+    );
+  };
+
+  // Mobile Drill-Down Layout (active sub-group view)
+  if (isMobile && activeCategory) {
+    const categoryInfo = CATEGORIES[activeCategory];
+    return (
+      <div className="sticky top-[80px] pt-4 md:pt-8 no-print">
+        <button
+          onClick={() => setActiveCategory(null)}
+          className="flex items-center gap-1.5 text-[11px] font-bold tracking-[1px] uppercase text-sage hover:text-sage-dark mb-4 cursor-pointer"
+        >
+          ← Back to Categories
+        </button>
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-3 pl-3">
+          {categoryInfo.label}
+        </div>
+        <div className="space-y-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
+          {categoryInfo.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // Mobile Drill-Down Layout (main category list view)
+  if (isMobile) {
+    return (
+      <div className="sticky top-[80px] pt-4 md:pt-8 no-print">
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
+        <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
+
+        {state.favoritePages && state.favoritePages.length > 0 && (
+          <div className="mt-4 mb-2">
+            <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
+              ★ Favourites
+            </div>
+            <div className="space-y-0.5">
+              {state.favoritePages.map(pageId => {
+                const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+                if (!item) return null;
+                return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
+              })}
+            </div>
+          </div>
+        )}
+
+        <div className="mt-4 mb-2">
+          <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-1 pl-3">Features</div>
+          <div className="flex flex-col">
+            {Object.keys(CATEGORIES).map(catId => (
+              <CategoryButton key={catId} id={catId} label={CATEGORIES[catId].label} />
+            ))}
+          </div>
+        </div>
+
+        <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
+        <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
+        <NavItem id="notes" icon="📝" label="Notes & Journal" />
+        <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
+
+        <button
+          onClick={() => setActivePage('feedback')}
+          className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:border-sage hover:bg-sage-pale hover:text-sage flex items-center justify-between
+            ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage' : ''}`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-[16px]">💬</span> Feedback & Support
+          </span>
+        </button>
+
+        {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
+          <button
+            onClick={() => setActivePage('admin-feedbacks')}
+            className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
+              ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600' : ''}`}
+          >
+            <span className="flex items-center gap-2">
+              <span className="text-[16px]">👑</span> Admin: Feedbacks
+            </span>
+          </button>
+        )}
+
+        <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
+
+        <button
+          onClick={toggleCalmMode}
+          className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
+            ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-sage-light'}`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-[16px]">🌿</span> Calm Mode
+          </span>
+          <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
+            <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isCalmModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
+          </div>
+        </button>
+
+        <button
+          onClick={toggleDarkMode}
+          className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
+            ${state.isDarkModeActive ? 'bg-charcoal border-charcoal text-white' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-charcoal'}`}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
+          </span>
+          <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isDarkModeActive ? 'bg-sage' : 'bg-border'}`}>
+            <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isDarkModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
+          </div>
+        </button>
+
+        <button
+          onClick={() => { window.location.hash = '#setup'; }}
+          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:bg-charcoal hover:text-white"
+        >
+          ⚙️ Adjust Setup
+        </button>
+
+        <button
+          onClick={() => {
+            import('../utils/pdfExport').then(module => {
+              module.exportToPDF(state);
+            });
+          }}
+          className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13px] font-medium text-sage cursor-pointer transition-all hover:bg-sage hover:text-white"
+        >
+          📄 Export Care Plan PDF
+        </button>
+
+        <button
+          onClick={handleLogout}
+          className="w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border-[1.5px] border-border dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
+        >
+          🚪 Log Out
+        </button>
+      </div>
+    );
+  }
+
+  // Desktop Accordion Layout
+  const SectionHeader = ({ id, label }: { id: string, label: string }) => {
+    const isExpanded = expandedSections[id];
+    return (
+      <div
+        className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
+        onClick={() => setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }))}
+      >
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors">{label}</div>
+        <div className="text-light group-hover:text-charcoal flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 dark:hover:bg-charcoal/20 transition-colors mr-1">
+          {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="sticky top-[80px] pt-8 no-print">
       <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
       <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
-      
+
       {state.favoritePages && state.favoritePages.length > 0 && (
         <div className="mt-4 mb-2">
           <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
@@ -153,56 +343,59 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           </div>
         </div>
       )}
-      
+
       <SectionHeader id="daily" label="Daily Health & Tracking" />
       {expandedSections['daily'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="kickcounter" icon="👣" label="Kick Counter" />
-          <NavItem id="contractions" icon="⏱" label="Contraction Timer" />
-          <NavItem id="vitals" icon="💙" label="Vitals (BP/Weight)" />
-          <NavItem id="mood" icon="😊" label="Mood Tracker" />
-          <NavItem id="hydration" icon="💧" label="Hydration" />
-          <NavItem id="nutrition" icon="🥗" label="Nutrition & Supplements" />
-          <NavItem id="symptoms" icon="📈" label="Symptom Log" />
+          {CATEGORIES.daily.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
         </div>
       )}
 
       <SectionHeader id="smart" label="Smart Tools" />
       {expandedSections['smart'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="askourpregnancy" icon="✨" label="AskOur Pregnancy AI" />
-          <NavItem id="foodscanner" icon="🤖" label="AI Food Guide" />
-          <NavItem id="babynames" icon="🌟" label="Name Generator" />
+          {CATEGORIES.smart.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
         </div>
       )}
 
       <SectionHeader id="tasks" label="Planning & Tasks" />
       {expandedSections['tasks'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="dev" icon="🌱" label="Development" progress={getProgress(devTasks)} />
-          <NavItem id="prep" icon="📋" label="Preparation" progress={getProgress(prepTasks)} />
-          <NavItem id="finance" icon="💰" label="Financial" progress={getProgress(FIN_TASKS)} />
-          <NavItem id="deadlines" icon="📅" label="Deadlines" progress={getProgress(DEADLINE_TASKS)} />
+          {CATEGORIES.tasks.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
         </div>
       )}
 
       <SectionHeader id="health" label="Medical & Govt" />
       {expandedSections['health'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="medical" icon="🏥" label="Medical" progress={getProgress(medTasks)} />
-          <NavItem id="medical-reports" icon="📂" label="Medical Reports" />
-          <NavItem id="schemes" icon="🏛" label="Government Schemes" />
+          {CATEGORIES.health.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
         </div>
       )}
 
       <SectionHeader id="labor" label="Labor & Postpartum" />
       {expandedSections['labor'] && (
         <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-          <NavItem id="readiness" icon="🔮" label="Labor Readiness" />
-          <NavItem id="hospitalbag" icon="👜" label="Hospital Bag" />
-          <NavItem id="birthplan" icon="📜" label="Birth Plan Builder" />
-          <NavItem id="decisions" icon="✦" label="Decisions" />
-          <NavItem id="postpartum" icon="🍃" label="Early Parenthood" />
+          {CATEGORIES.labor.items.map(itemId => {
+            const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+            if (!item) return null;
+            return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+          })}
         </div>
       )}
 
@@ -211,7 +404,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <NavItem id="notes" icon="📝" label="Notes & Journal" />
       <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
 
-      <button 
+      <button
         onClick={() => setActivePage('feedback')}
         className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-sage hover:bg-sage-pale hover:text-sage flex items-center justify-between
           ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage' : ''}`}
@@ -222,7 +415,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       </button>
 
       {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
-        <button 
+        <button
           onClick={() => setActivePage('admin-feedbacks')}
           className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
             ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600' : ''}`}
@@ -235,7 +428,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
       <div className="h-px bg-border my-4" />
 
-      <button 
+      <button
         onClick={toggleCalmMode}
         className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
           ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white border-border text-charcoal hover:border-sage-light'}`}
@@ -248,7 +441,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </div>
       </button>
 
-      <button 
+      <button
         onClick={toggleDarkMode}
         className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
           ${state.isDarkModeActive ? 'bg-charcoal border-charcoal text-white' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
@@ -261,14 +454,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </div>
       </button>
 
-      <button 
+      <button
         onClick={() => { window.location.hash = '#setup'; }}
         className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-white"
       >
         ⚙️ Adjust Setup
       </button>
 
-      <button 
+      <button
         onClick={() => {
           import('../utils/pdfExport').then(module => {
             module.exportToPDF(state);
@@ -279,7 +472,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         📄 Export Care Plan PDF
       </button>
 
-      <button 
+      <button
         onClick={handleLogout}
         className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
       >
