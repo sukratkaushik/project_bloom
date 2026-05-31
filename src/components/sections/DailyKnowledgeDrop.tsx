@@ -31,39 +31,39 @@ export const DailyKnowledgeDrop: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-sage-pale to-cream border-[1.5px] border-sage-light rounded-[16px] p-6 shadow-sm mb-6 relative overflow-hidden animate-in fade-in duration-300">
-      <div className="flex justify-between items-start mb-4">
-        <div className="flex items-center gap-2 text-sage font-semibold tracking-[1px] uppercase text-[12px]">
-          <Sparkles size={16} />
+    <div className="bg-gradient-to-br from-sage-pale/40 to-cream/60 dark:from-sage-pale/10 dark:to-charcoal/20 backdrop-blur-sm border-[1.5px] border-sage-light/35 rounded-[24px] p-6 shadow-sm mb-6 relative overflow-hidden animate-in fade-in duration-300">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2 text-sage font-semibold tracking-[1.2px] uppercase text-[11px]">
+          <Sparkles size={14} className="animate-pulse" />
           <span>Daily Knowledge Drop</span>
         </div>
         
         {(state.dailyKnowledgeStreak || 0) > 0 && (
-          <div className="flex items-center gap-1.5 bg-white px-3 py-1.5 rounded-full border border-border shadow-sm text-[12px] font-semibold text-orange-500">
-            <Flame size={14} className="fill-orange-500 text-orange-500" />
+          <div className="flex items-center gap-1.5 bg-white/90 dark:bg-charcoal/80 px-3 py-1 rounded-full border border-border/80 dark:border-border/10 shadow-xs text-[11px] font-bold text-orange-500 hover:scale-105 transition-transform duration-300">
+            <Flame size={12} className="fill-orange-500 text-orange-500 animate-bounce" />
             <span>{state.dailyKnowledgeStreak} Day Streak</span>
           </div>
         )}
       </div>
 
-      <div className="bg-white rounded-[12px] p-6 border-[1.5px] border-border relative min-h-[140px] flex flex-col justify-center items-center text-center transition-all duration-500">
+      <div className="bg-white/60 dark:bg-charcoal/40 backdrop-blur-md rounded-[18px] p-6 border-[1.5px] border-border/80 dark:border-border/10 relative min-h-[140px] flex flex-col justify-center items-center text-center transition-all duration-500 shadow-xs hover:border-sage/40 hover:shadow-md">
         {!isRevealed ? (
-          <div className="flex flex-col items-center cursor-pointer group" onClick={handleReveal}>
-            <div className="w-12 h-12 rounded-full bg-sage-pale flex items-center justify-center text-sage mb-3 group-hover:scale-110 transition-transform">
+          <div className="flex flex-col items-center cursor-pointer group w-full" onClick={handleReveal}>
+            <div className="w-12 h-12 rounded-full bg-sage-pale/60 dark:bg-sage/10 flex items-center justify-center text-sage mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">
               <Sparkles size={24} />
             </div>
-            <h3 className="font-serif text-[20px] font-medium text-charcoal mb-1">Unlock Today's Fact</h3>
-            <p className="text-[13px] text-medium">Tap to reveal and build your streak!</p>
+            <h3 className="font-serif text-[19px] font-medium text-charcoal mb-1">Unlock Today's Fact</h3>
+            <p className="text-[12.5px] text-medium">Tap to reveal and build your streak!</p>
           </div>
         ) : (
-          <div className="w-full animate-in zoom-in-95 duration-500">
+          <div className="w-full animate-in zoom-in-95 duration-500 text-left">
             <div className="mb-4">
-              <span className="text-[11px] font-bold tracking-[1.5px] uppercase text-blush bg-blush-pale px-2 py-1 rounded-[4px]">Myth</span>
-              <p className="font-serif text-[18px] text-charcoal mt-2 mb-4 leading-snug">"{knowledge.myth}"</p>
+              <span className="text-[10px] font-bold tracking-[1.5px] uppercase text-red-500 bg-red-50 dark:bg-red-950/20 px-2.5 py-1 rounded-[6px] border border-red-200/30">Myth</span>
+              <p className="font-serif text-[17px] font-semibold text-charcoal mt-2.5 mb-4 leading-snug italic">"{knowledge.myth}"</p>
             </div>
-            <div className="border-t border-border pt-4">
-              <span className="text-[11px] font-bold tracking-[1.5px] uppercase text-sage bg-sage-pale px-2 py-1 rounded-[4px]">Fact</span>
-              <p className="text-[14px] text-medium mt-2 leading-[1.6]">{knowledge.fact}</p>
+            <div className="border-t border-border/70 dark:border-border/10 pt-4">
+              <span className="text-[10px] font-bold tracking-[1.5px] uppercase text-sage bg-sage-pale dark:bg-sage/10 px-2.5 py-1 rounded-[6px] border border-sage-light/30">Fact</span>
+              <p className="text-[13.5px] text-medium dark:text-charcoal/90 mt-2.5 leading-[1.65] font-sans">{knowledge.fact}</p>
             </div>
           </div>
         )}

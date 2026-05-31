@@ -197,30 +197,32 @@ export const PregnancyTracker: React.FC = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="bg-gradient-to-br from-sage-pale to-cream border-[1.5px] border-sage-light rounded-[16px] p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden"
+        className="mesh-glow-container bg-white/40 dark:bg-charcoal/30 backdrop-blur-md border-[1.5px] border-sage-light/30 rounded-[24px] p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden"
       >
-        <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-4">Baby Size</div>
+        <div className="mesh-glow-blob-1" />
+        <div className="mesh-glow-blob-2" />
+        <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-4 relative z-10">Baby Size</div>
         <motion.div 
           key={selectedWeek}
           initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
           animate={{ scale: 1, rotate: 0, opacity: 1 }}
           transition={{ type: "spring", damping: 12 }}
-          className="text-[80px] leading-none mb-4"
+          className="text-[80px] leading-none mb-4 relative z-10"
         >
           {weekData.babyEmoji}
         </motion.div>
-        <h3 className="font-serif text-[32px] font-medium text-charcoal mb-1">
+        <h3 className="font-serif text-[32px] font-medium text-charcoal mb-1 relative z-10">
           {weekData.length}
         </h3>
-        <p className="text-[14px] text-medium mb-4 italic text-sage-dark">{MOTIVATIONAL_QUOTES[selectedWeek - 1]}</p>
-        <div className="flex items-center gap-6 mt-2">
+        <p className="text-[14px] text-medium mb-4 italic text-sage-dark dark:text-sage-light relative z-10">{MOTIVATIONAL_QUOTES[selectedWeek - 1]}</p>
+        <div className="flex items-center gap-6 mt-2 relative z-10">
           <div className="flex flex-col">
             <span className="text-[11px] font-semibold tracking-[1px] uppercase text-medium mb-1">Length</span>
-            <span className="text-[16px] font-medium text-charcoal bg-white px-4 py-1.5 rounded-full border border-border shadow-sm">{weekData.length}</span>
+            <span className="text-[16px] font-medium text-charcoal bg-white/80 dark:bg-charcoal/50 px-4 py-1.5 rounded-full border border-border shadow-sm">{weekData.length}</span>
           </div>
           <div className="flex flex-col">
             <span className="text-[11px] font-semibold tracking-[1px] uppercase text-medium mb-1">Weight</span>
-            <span className="text-[16px] font-medium text-charcoal bg-white px-4 py-1.5 rounded-full border border-border shadow-sm">{weekData.weight}</span>
+            <span className="text-[16px] font-medium text-charcoal bg-white/80 dark:bg-charcoal/50 px-4 py-1.5 rounded-full border border-border shadow-sm">{weekData.weight}</span>
           </div>
         </div>
       </motion.div>
