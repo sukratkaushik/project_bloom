@@ -223,18 +223,16 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Main Content Area */}
         <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0">
           <AnimatePresence mode="wait">
             <motion.div
               key={activePage}
-              initial={{ opacity: 0, y: 15, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10, scale: 0.99 }}
+              initial={{ opacity: 0, scale: 0.995 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.995 }}
               transition={{
-                duration: 0.4,
-                ease: [0.22, 1, 0.36, 1], // Custom "lush" cubic bezier
-                staggerChildren: 0.1
+                duration: 0.25,
+                ease: "easeInOut"
               }}
               className="fill-mode-both"
             >

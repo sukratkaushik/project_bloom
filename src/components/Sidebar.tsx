@@ -95,8 +95,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <div className="group relative flex items-center mb-0.5">
         <button
           onClick={() => setActivePage(id)}
-          className={`flex items-center gap-2.5 p-[10px_12px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all border-none w-full text-left
-            ${isActive ? 'bg-sage-pale text-sage font-bold' : 'bg-transparent text-medium hover:bg-sage-pale hover:text-sage'}
+          className={`flex items-center gap-2.5 p-[9px_11px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all w-full text-left
+            ${isActive 
+              ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage font-bold border border-sage/20 shadow-xs' 
+              : 'bg-transparent border border-transparent text-medium hover:bg-sage-pale/40 hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
           <span className="text-[16px] w-5 text-center">{icon}</span>
