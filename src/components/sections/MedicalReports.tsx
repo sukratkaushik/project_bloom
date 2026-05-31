@@ -281,10 +281,10 @@ export const MedicalReports: React.FC = () => {
       <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
         <Lock className="w-5 h-5 text-sage shrink-0 mt-0.5" />
         <div>
-          <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Privacy First & Offline Storage</h4>
+          <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Secure Cloud Storage & Privacy</h4>
           <p className="text-[12px] text-medium leading-relaxed">
-            All medical reports are stored completely local and offline on your browser's persistent IndexedDB database.
-            They never leave your device, ensuring maximum confidentiality and security for your health records.
+            All medical reports are stored securely in the cloud with strict industry-standard encryption and privacy controls.
+            Your health records are confidential, secure, and accessible across all your linked devices.
           </p>
         </div>
       </div>

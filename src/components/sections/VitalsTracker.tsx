@@ -303,316 +303,78 @@ export const VitalsTracker: React.FC = () => {
               </button>
             </>
           ) : (
-            <div className="space-y-6 animate-in fade-in duration-300">
-              {/* Sync Dashboard Banner */}
-              <div className="bg-gradient-to-r from-sage/10 to-sage-light/5 border border-sage/20 rounded-[16px] p-5 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div className="space-y-1 text-center md:text-left">
-                  <h3 className="font-serif text-[18px] font-medium text-charcoal flex items-center justify-center md:justify-start gap-2">
-                    <Watch className="w-5 h-5 text-sage" /> Wearable Integration Centre
-                  </h3>
-                  <p className="text-[13px] text-medium max-w-[500px]">
-                    Link your favorite fitness app or smartwatch to automatically sync resting heart rate, HRV, body temperature, steps, and sleep tracking into your daily charts and Labor Readiness score.
-                  </p>
-                </div>
-                {state.connectedWearables && state.connectedWearables.length > 0 && (
-                  <button
-                    onClick={async () => {
-                      if (!state.activeJourneyId) return;
-                      setIsSyncing(true);
-                      // Simulate API fetch
-                      await new Promise(r => setTimeout(r, 1500));
-                      for (const devId of state.connectedWearables || []) {
-                        await syncWearableData(state.activeJourneyId, devId);
-                      }
-                      updateState({ lastWearableSyncTime: Date.now() });
-                      setIsSyncing(false);
-                    }}
-                    disabled={isSyncing}
-                    className="px-5 py-3 rounded-[12px] bg-sage text-white font-semibold text-[14px] flex items-center justify-center gap-2 hover:bg-sage-dark transition-all shadow-md disabled:opacity-50 shrink-0"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                    {isSyncing ? 'Syncing...' : 'Sync Wearable Data'}
-                  </button>
-                )}
+            <div className="flex flex-col items-center justify-center text-center p-8 py-16 max-w-xl mx-auto space-y-6 animate-in fade-in duration-500">
+              {/* Animated/Pulse Glow smartwatch icon */}
+              <div className="relative w-20 h-20 bg-sage/10 text-sage rounded-full flex items-center justify-center shadow-inner">
+                <div className="absolute inset-0 bg-sage/20 rounded-full animate-ping opacity-75" />
+                <Watch className="w-10 h-10 text-sage relative z-10 animate-bounce" style={{ animationDuration: '3s' }} />
               </div>
 
-              {/* Connected Wearables Status Grid */}
-              {state.connectedWearables && state.connectedWearables.length > 0 ? (
-                <div className="bg-white border border-border rounded-[16px] p-5 space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[12px] font-bold tracking-wider uppercase text-light">LATEST IMPORTED METRICS</span>
-                    <span className="text-[11px] text-medium">
-                      Last synced:{' '}
-                      {state.lastWearableSyncTime
-                        ? new Date(state.lastWearableSyncTime).toLocaleTimeString(undefined, {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                          second: '2-digit'
-                        })
-                        : 'Never'}
-                    </span>
+              {/* Title & Badge */}
+              <div className="space-y-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 text-[11px] font-bold uppercase tracking-wider border border-amber-200 dark:border-amber-900/30">
+                  ✨ Coming Soon
+                </span>
+                <h3 className="font-serif text-[24px] md:text-[28px] font-bold text-charcoal">
+                  Smart Wearable Integration
+                </h3>
+                <p className="text-[14px] text-medium leading-relaxed">
+                  Link your smartwatch or fitness ring to automatically sync physiological metrics and track your pregnancy wellness effortlessly.
+                </p>
+              </div>
+
+              {/* Feature Highlights Grid */}
+              <div className="w-full grid grid-cols-1 gap-3.5 text-left border-y border-border/60 py-6 my-2">
+                <div className="flex gap-3 items-start">
+                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">⌚</span>
+                  <div>
+                    <h4 className="text-[13px] font-bold text-charcoal">Automatic Biometrics Sync</h4>
+                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
+                      Sync heart rate variability (HRV), resting heart rate, sleep duration, physical steps, and basal body temperature automatically in the background.
+                    </p>
                   </div>
-
-                  {(() => {
-                    const latestLog = logs.find((l) => l.type === 'WEARABLE');
-                    const steps = latestLog?.steps || 6420;
-                    const sleep = latestLog?.sleepHours || 7.2;
-                    const rhr = latestLog?.restingHeartRate || 74;
-                    const hrv = latestLog?.hrv || 42;
-                    const temp = latestLog?.basalBodyTemp || 36.6;
-                    const spo2 = latestLog?.spo2 || 98;
-
-                    return (
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Daily Steps</span>
-                            <Flame className="w-4 h-4 text-orange-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{steps.toLocaleString()}</div>
-                            <div className="text-[10px] text-light mt-0.5">Target: 6,000 steps</div>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Sleep Duration</span>
-                            <Moon className="w-4 h-4 text-indigo-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{sleep} hrs</div>
-                            <div className="text-[10px] text-light mt-0.5">Target: 8.0 hrs</div>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Resting HR (RHR)</span>
-                            <Activity className="w-4 h-4 text-rose-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{rhr} bpm</div>
-                            <div className="text-[10px] text-light mt-0.5">Pregnancy Normal: 70-85</div>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Heart Rate Var (HRV)</span>
-                            <TrendingUp className="w-4 h-4 text-emerald-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{hrv} ms</div>
-                            <div className="text-[10px] text-light mt-0.5">RMSSD baseline</div>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Basal Body Temp</span>
-                            <Thermometer className="w-4 h-4 text-amber-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{temp} °C</div>
-                            <div className="text-[10px] text-light mt-0.5">Pregnancy Normal: 36.5-37.1</div>
-                          </div>
-                        </div>
-
-                        <div className="p-4 bg-cream border border-border rounded-[12px] space-y-2 flex flex-col justify-between">
-                          <div className="flex items-center justify-between text-medium">
-                            <span className="text-[12px] font-semibold">Blood Oxygen (SpO2)</span>
-                            <Heart className="w-4 h-4 text-teal-500 fill-teal-500" />
-                          </div>
-                          <div>
-                            <div className="text-[20px] font-serif font-bold text-charcoal">{spo2}%</div>
-                            <div className="text-[10px] text-light mt-0.5">Pregnancy Normal: &gt;95%</div>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
                 </div>
-              ) : (
-                <div className="text-center p-8 bg-cream border border-dashed border-border rounded-[16px] max-w-xl mx-auto space-y-3">
-                  <Watch className="w-12 h-12 text-medium mx-auto opacity-60" />
-                  <h4 className="font-serif text-[18px] text-charcoal">No Wearables Linked Yet</h4>
-                  <p className="text-[13px] text-medium max-w-sm mx-auto leading-relaxed">
-                    Select a service below to securely link your device. Bloom never shares your medical data and encrypts your biometrics locally.
-                  </p>
+
+                <div className="flex gap-3 items-start">
+                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">🔮</span>
+                  <div>
+                    <h4 className="text-[13px] font-bold text-charcoal">Predictive Labor Readiness</h4>
+                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
+                      Bloom’s algorithms will analyze natural biometric trends (like physiological RHR elevation and HRV changes) to compute your readiness score.
+                    </p>
+                  </div>
                 </div>
-              )}
 
-              {/* Devices Grid */}
-              <div className="space-y-4">
-                <h4 className="text-[12px] font-bold tracking-wider uppercase text-light ml-1">AVAILABLE INTEGRATIONS</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {WEARABLE_DEVICES.map((device) => {
-                    const isConnected = state.connectedWearables?.includes(device.id);
-                    const isConnecting = connectingDevice === device.id;
-
-                    return (
-                      <div
-                        key={device.id}
-                        className="bg-white border-[1.5px] border-border rounded-[16px] p-5 flex flex-col justify-between gap-4 hover:shadow-md transition-shadow relative overflow-hidden group"
-                        style={{ borderLeft: `4px solid ${device.color}` }}
-                      >
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="space-y-1">
-                            <h5 className="font-bold text-[15px] text-charcoal flex items-center gap-1.5">
-                              <span className="text-[18px]">{device.icon}</span> {device.name}
-                            </h5>
-                            <p className="text-[12px] text-light leading-relaxed">{device.description}</p>
-                          </div>
-                          {isConnected && (
-                            <span className="bg-sage/10 text-sage border border-sage/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider whitespace-nowrap">
-                              Connected
-                            </span>
-                          )}
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] text-light">
-                            {isConnected ? '✓ Biometrics syncing active' : 'Disconnected'}
-                          </span>
-
-                          {isConnected ? (
-                            <button
-                              onClick={() => {
-                                const list = state.connectedWearables || [];
-                                updateState({
-                                  connectedWearables: list.filter((id) => id !== device.id)
-                                });
-                              }}
-                              className="px-3.5 py-1.5 border-[1.5px] border-critical text-critical text-[12px] font-semibold rounded-lg hover:bg-critical-bg transition-colors cursor-pointer"
-                            >
-                              Disconnect
-                            </button>
-                          ) : (
-                            <button
-                              onClick={() => {
-                                setShowOAuthModal(device.id);
-                              }}
-                              disabled={isConnecting}
-                              className="px-3.5 py-1.5 bg-sage text-white text-[12px] font-semibold rounded-lg hover:bg-sage-dark transition-colors disabled:opacity-50 flex items-center gap-1 shadow-sm cursor-pointer"
-                            >
-                              {isConnecting ? (
-                                <>
-                                  <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Connecting...
-                                </>
-                              ) : (
-                                'Link Device'
-                              )}
-                            </button>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="flex gap-3 items-start">
+                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">📄</span>
+                  <div>
+                    <h4 className="text-[13px] font-bold text-charcoal">Dynamic Doctor PDF Reports</h4>
+                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
+                      Your synced wearable logs will be automatically plotted and summarized in the downloadable clinical care plan report to share with your OB/GYN.
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Simulated OAuth Modal Overlay */}
-              {showOAuthModal && (() => {
-                const device = WEARABLE_DEVICES.find((d) => d.id === showOAuthModal);
-                if (!device) return null;
-
-                return (
-                  <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 animate-in fade-in duration-300">
-                    <div className="bg-white border-[1.5px] border-border rounded-[20px] max-w-md w-full p-6 shadow-xl relative animate-in zoom-in duration-200">
-                      <button
-                        onClick={() => setShowOAuthModal(null)}
-                        className="absolute right-4 top-4 text-light hover:text-charcoal p-1.5 rounded-full hover:bg-gray-100 transition-colors cursor-pointer"
-                      >
-                        ✕
-                      </button>
-
-                      <div className="text-center space-y-2 mb-6">
-                        <span className="text-[40px] block">{device.icon}</span>
-                        <h4 className="font-serif text-[22px] font-medium text-charcoal">Link {device.name}</h4>
-                        <p className="text-[13px] text-medium leading-relaxed">
-                          Bloom will download physiological and fitness logs securely from your {device.name} account to calculate reports.
-                        </p>
-                      </div>
-
-                      <div className="bg-cream border border-border rounded-[12px] p-4 space-y-3 mb-6">
-                        <span className="text-[11px] font-bold tracking-wider uppercase text-light block mb-1">
-                          SELECT PERMISSIONS TO ALLOW
-                        </span>
-
-                        <label className="flex items-center gap-3 text-[13px] text-charcoal font-medium cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={oauthPermissions.activity}
-                            onChange={(e) => setOauthPermissions({ ...oauthPermissions, activity: e.target.checked })}
-                            className="w-4 h-4 rounded text-sage focus:ring-sage border-border cursor-pointer"
-                          />
-                          <span>Read Active Fitness & Steps</span>
-                        </label>
-
-                        <label className="flex items-center gap-3 text-[13px] text-charcoal font-medium cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={oauthPermissions.vitals}
-                            onChange={(e) => setOauthPermissions({ ...oauthPermissions, vitals: e.target.checked })}
-                            className="w-4 h-4 rounded text-sage focus:ring-sage border-border cursor-pointer"
-                          />
-                          <span>Read Heart Rate Biometrics (RHR, HRV)</span>
-                        </label>
-
-                        <label className="flex items-center gap-3 text-[13px] text-charcoal font-medium cursor-pointer">
-                          <input
-                            type="checkbox"
-                            checked={oauthPermissions.sleep}
-                            onChange={(e) => setOauthPermissions({ ...oauthPermissions, sleep: e.target.checked })}
-                            className="w-4 h-4 rounded text-sage focus:ring-sage border-border cursor-pointer"
-                          />
-                          <span>Read Sleep & Basal Body Temperature</span>
-                        </label>
-                      </div>
-
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => setShowOAuthModal(null)}
-                          className="flex-1 py-3 border border-border text-medium text-[14px] font-semibold rounded-[10px] hover:bg-gray-50 transition-all cursor-pointer"
-                        >
-                          Cancel
-                        </button>
-                        <button
-                          onClick={async () => {
-                            const devId = showOAuthModal;
-                            setShowOAuthModal(null);
-                            setConnectingDevice(devId);
-                            // Simulate link loading
-                            await new Promise((r) => setTimeout(r, 1200));
-
-                            const current = state.connectedWearables || [];
-                            if (!current.includes(devId)) {
-                              const updatedList = [...current, devId];
-                              updateState({ connectedWearables: updatedList });
-                              // Auto sync fresh data immediately
-                              if (state.activeJourneyId) {
-                                await syncWearableData(state.activeJourneyId, devId);
-                                updateState({ lastWearableSyncTime: Date.now() });
-                              }
-                            }
-                            setConnectingDevice(null);
-                          }}
-                          className="flex-1 py-3 bg-sage text-white text-[14px] font-semibold rounded-[10px] hover:bg-sage-dark transition-all shadow-md cursor-pointer"
-                        >
-                          Agree & Sync
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+              {/* Supported brands footer */}
+              <div className="space-y-3">
+                <div className="text-[10px] font-semibold tracking-[1px] uppercase text-light">SUPPORTED ECOSYSTEMS</div>
+                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+                  <span className="text-[12px] font-bold flex items-center gap-1">⌚ Apple Health</span>
+                  <span className="text-[12px] font-bold flex items-center gap-1">💍 Oura Ring</span>
+                  <span className="text-[12px] font-bold flex items-center gap-1">🏃 Google Fit</span>
+                  <span className="text-[12px] font-bold flex items-center gap-1">🧭 Garmin</span>
+                  <span className="text-[12px] font-bold flex items-center gap-1">💚 Fitbit</span>
+                </div>
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {activeTab !== 'WEARABLES' && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <TrendingUp className="w-5 h-5 text-sage" />
@@ -812,6 +574,8 @@ export const VitalsTracker: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+        </>
       )}
     </div>
   );
