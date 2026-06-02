@@ -94,6 +94,23 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out: ease-in-out;
   --ease-active: cubic-bezier(0, 0, 0.2, 1);
+  --ease-premium: cubic-bezier(0.25, 0.8, 0.25, 1); /* 400ms theme transitions */
+
+  /* ----- Mesh Glow (new May 2026) ----- */
+  --mesh-glow-blob-1-color: rgba(138, 182, 163, 0.22); /* Sage at 22% */
+  --mesh-glow-blob-2-color: rgba(249, 199, 210, 0.26); /* Lotus Pink at 26% */
+  --mesh-glow-blur: 50px;
+  --mesh-glow-duration-1: 12s;
+  --mesh-glow-duration-2: 15s;
+
+  /* ----- Sticky header (new May 2026) ----- */
+  --header-radius: 20px;
+  --header-blur: 12px;
+  --header-bg: rgba(255, 255, 255, 0.90);
+  --header-top-resting: 16px;
+  --header-top-scrolled: 8px;
+  --header-shadow-resting: 0 4px 20px rgba(0, 0, 0, 0.04);
+  --header-shadow-scrolled: 0 12px 32px rgba(0, 0, 0, 0.08);
 
   /* ----- Breakpoints (info only — for use in media queries) ----- */
   --bp-sm: 640px;
@@ -165,10 +182,90 @@ body.calm-mode, [data-mode="calm"] {
   line-height: var(--lh-body);
 }
 
+/* ----- Glassmorphic panel (used in sticky header + dashboard cards) ----- */
+.glass-panel {
+  background: var(--header-bg);
+  backdrop-filter: blur(var(--header-blur));
+  -webkit-backdrop-filter: blur(var(--header-blur));
+  border: 1px solid rgba(255, 255, 255, 0.40);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+}
+
+/* ----- Mesh Glow Container (new May 2026) -----
+ * Wrap a card with .mesh-glow-container then add the two blob children
+ * inside it. The blobs are positioned absolutely and drift in offset rhythms.
+ */
+.mesh-glow-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.mesh-glow-blob-1 {
+  position: absolute;
+  top: -20%;
+  left: -20%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, var(--mesh-glow-blob-1-color) 0%, transparent 70%);
+  filter: blur(var(--mesh-glow-blur));
+  z-index: 0;
+  pointer-events: none;
+  animation: float-blob-1 var(--mesh-glow-duration-1) infinite ease-in-out;
+}
+
+.mesh-glow-blob-2 {
+  position: absolute;
+  bottom: -20%;
+  right: -20%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(circle, var(--mesh-glow-blob-2-color) 0%, transparent 70%);
+  filter: blur(var(--mesh-glow-blur));
+  z-index: 0;
+  pointer-events: none;
+  animation: float-blob-2 var(--mesh-glow-duration-2) infinite ease-in-out;
+}
+
+@keyframes float-blob-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(30px, 20px) scale(1.15); }
+}
+
+@keyframes float-blob-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50%      { transform: translate(-20px, -30px) scale(1.1); }
+}
+
+/* ----- Premium theme transitions (new May 2026) -----
+ * Apply once to enable smooth fading on theme toggles (Dark/Calm).
+ */
+html, body, header, main, footer,
+.premium-card, .glass-panel,
+button, input, textarea, select {
+  transition:
+    background-color 400ms var(--ease-premium),
+    border-color     400ms var(--ease-premium),
+    color            400ms var(--ease-premium),
+    box-shadow       400ms var(--ease-premium);
+}
+
+/* ----- Notranslate (used on brand name "Our Pregnancy") -----
+ * Google Translate inspects this class and leaves the element alone.
+ */
+.notranslate {
+  /* No styling — class is functional. Google Translate honors it. */
+}
+
+/* ----- Smooth scroll (new May 2026) -----
+ * Anchor links in the sticky header navigate to sections with smooth scroll.
+ */
+html { scroll-behavior: smooth; }
+
 /* ----- Reduced motion ----- */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+  html { scroll-behavior: auto; }
 }

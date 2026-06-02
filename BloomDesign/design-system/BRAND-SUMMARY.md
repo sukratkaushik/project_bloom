@@ -69,12 +69,15 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 - Real-Time Partner Sync (WebRTC + encrypted cloud)
 - Indian Foods Database · Govt Scheme Guide (JSY/PMMVY/JSSK)
 - Emergency Ready (108/112/iCall) · FHIR R4 EHR Export
+- Medical Reports (upload + secure storage) · Wearable Integrations (Apple Health, Oura, Google Fit, Garmin, Fitbit)
+- Language Selector (11 Indian languages) · Daily Knowledge Drop · Vaccination Reminders
 - Calm Mode · Dark Mode · Cloud Sync
 
 **Premium (AI tools coming soon):**
 - Ask Bloom 24/7 (AI chatbot, fine-tuned)
 - AI Food Safety Scanner (Gemini + Qwen2.5-VL, tailored to Indian cuisine)
 - AI Name Generator
+- AI Medical Report Summarizer + Prescription Decipherer
 - Labor Readiness Score (HRV / RHR / Braxton Hicks biometrics)
 
 ## The non-negotiables

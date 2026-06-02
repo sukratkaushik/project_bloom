@@ -112,6 +112,22 @@ The product now ships AI. Talk about each feature like a careful safety tool, no
 | AI predicts when you'll go into labor! | The Labor Readiness Score combines your HRV, RHR, and Braxton Hicks frequency into a single readiness signal. |
 | Magic biometric birth predictor | Predictive biometrics. Not a diagnosis — call your OB if anything feels off. |
 
+### Medical Reports (new May 2026)
+
+| ❌ | ✅ |
+|---|---|
+| AI reads your medical reports! | Upload a report or prescription. The AI Medical Report Summarizer pulls out the highlights and decodes the doctor's handwriting. |
+| Trust the AI summary fully | We summarise. We don't diagnose. Always read the full report yourself and discuss anything unclear with your OB. |
+| Smart medical record analysis | Drop a PDF or photo of your ultrasound report or prescription — get a plain-English summary in seconds. |
+
+### Wearable Sync (new May 2026)
+
+| ❌ | ✅ |
+|---|---|
+| Sync ALL your fitness trackers! | Sync vitals from Apple Health, Oura Ring, Google Fit, Garmin Connect, or Fitbit. |
+| Universal wearable integration | Compatible with Apple Watch (heart rate, activity, sleep), Oura Ring (sleep stages, RHR, HRV, BBT), and more. |
+| Track your steps and sleep | Resting heart rate, HRV, sleep stages, and basal body temperature — automatically logged from your Oura, Fitbit, or Apple Watch. |
+
 ## Social — Instagram caption
 
 | ❌ | ✅ |

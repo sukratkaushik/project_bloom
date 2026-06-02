@@ -2,21 +2,59 @@
 
 Three full sets of hero copy. Mix and match across A/B tests. All on-brand.
 
-Last refreshed against live site on **2026-05-17** (commits up to `24a6d48`).
+Last refreshed against live site on **2026-05-31** (commits up to `5cb33a9`).
+
+## Sticky glassmorphic header (new May 2026)
+
+Floats above the page, centered, max-width 1200px, with rounded `20px` corners. Backdrop blur + white/90 fill. Border + shadow intensify when the user scrolls more than 20px.
+
+```
+RESTING (top of page)        SCROLLED (>20px)
+top: 16px                    top: 8px
+padding: 14px 24px           padding: 8px 24px
+shadow: 0 4px 20px           shadow: 0 12px 32px (heavier)
+border: border/80            border: sage-light/20 (tinted)
+```
+
+**Left:** Lotus logo (`/logo.png`, 40–48px tall) + "Our Pregnancy" Sage Playfair semibold (hidden below 400px). The wordmark carries `.notranslate` so Google Translate leaves the brand name alone.
+
+**Center (desktop only, ≥768px):** Three nav links — `Features` · `How it Works` · `About`. Charcoal/80 text, hover underline grows left-to-right in Sage.
+
+**Right:** Language Selector pill, dark-mode toggle (☀️/🌙), `Log In` (transparent), `Sign Up` (Charcoal-filled, white text) — or `Open Dashboard` if the user is already set up. **Note:** these header CTAs use a 10px corner radius and Charcoal/white — NOT the Sage pill used on the hero CTA. The header is a tighter, more functional treatment.
+
+## Language Selector (new May 2026)
+
+A pill button labelled with the current language (or "English" by default), opens a dropdown of 11 supported Indian languages:
+
+```
+en  English      hi  हिन्दी          pa  ਪੰਜਾਬੀ
+gu  ગુજરાતી       mr  मराठी         bn  বাংলা
+ta  தமிழ்         kn  ಕನ್ನಡ         te  తెలుగు
+ml  മലയാളം       ur  اردو
+```
+
+Backed by Google Translate widget. The brand name "Our Pregnancy" is marked `.notranslate` and will NOT be translated. When a non-English language is selected, the body content is auto-translated client-side.
 
 ## Variant A — the shipped one (verbatim)
 
 ```
-EYEBROW    New: Cloud Sync Available
 H1         Your pregnancy companion — secure & synced.
             (note: "secure & synced" is italic Sage #8AB6A3)
 SUBTITLE   Track symptoms, count kicks, pack your hospital bag, and monitor
            blood pressure. Core features free. AI tools coming soon.
             (note: "Core features free. AI tools coming soon." is bold Charcoal)
-CTA 1      Start Tracking
-CTA 2      Sign Up with Email
+CTA 1      Start Tracking         (Sage pill, 32px radius, ArrowRight icon)
+CTA 2      Sign Up with Email     (Outline Sage pill)
 LINK       See how it works ↓
 ```
+
+**Right side (hero visual — new May 2026):** A "womb / growth" animated tableau:
+- Ambient Sage-pale glow at 80% opacity, blur 100px, pulsing at 4s.
+- 3 nested organic blob shapes (using custom `border-radius` like `60% 40% 30% 70% / 60% 30% 70% 40%`) — Sage at 30%, Blush at 40%, Gold at 30%.
+- Each rotates at a different speed: 25s linear infinite (outer), 20s reverse (middle), 15s (inner).
+- A single Lotus Pink → blush-light glowing orb sits on the inner ring representing the baby, with a soft `box-shadow` glow and a 2s pulse.
+
+This is the brand's most ambient marketing visual. Do NOT replicate the womb tableau on social or deck assets — it's tuned for the live web experience only.
 
 ## Variant B — privacy + security emphasis
 
@@ -177,9 +215,9 @@ BODY        Know exactly what's safe. Comprehensive coverage for dal, ragi,
 CARD 2
 🏥 (Blush-pale tile, rotated -3°)
 TITLE       Govt Scheme Guide
-BODY        Don't miss out on free benefits. Clear, actionable guides for
-            JSY, PMMVY (₹5,000 cash assistance), and JSSK (free hospital
-            delivery).
+BODY        Don't miss out on important benefits. Clear, actionable
+            guides for JSY, PMMVY (₹5,000 cash assistance), and JSSK
+            (hospital delivery).
 
 CARD 3
 📞 (Gold-pale tile, rotated 3°)
@@ -205,9 +243,9 @@ CTA    Start Tracking Now
 
 ---
 
-## Testimonials — 5 cards (verbatim, ordered)
+## Testimonials — 6 cards (verbatim, ordered)
 
-Live homepage rotates 3 at a time. The full set:
+Live homepage shows all 6 in a symmetric 3-col grid (2 rows). The full set:
 
 ```
 1. "I love how personal it feels — everything is tailored to my
@@ -229,9 +267,13 @@ Live homepage rotates 3 at a time. The full set:
 5. "Finally an app that understands Indian contexts and government
    schemes."
    — Divya K., Chennai
+
+6. "The vaccination reminders and daily tips kept me so reassured.
+   A must-have for every expectant mom!"
+   — Meera J., Pune
 ```
 
-Card style: cream background, sage open-quote in upper-right at 20% opacity, Charcoal italic quote, Sage-light circle avatar with single letter, name + city below in small Charcoal/Medium.
+Card style: cream background, sage open-quote in upper-right at 20% opacity, Charcoal italic quote, Sage-light circle avatar with single letter, name + city below in small Charcoal/Medium. Cards use `flex flex-col justify-between h-full` so all cards in a row line up symmetrically regardless of quote length.
 
 ---
 

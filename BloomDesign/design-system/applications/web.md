@@ -23,12 +23,12 @@ Use a 12-column grid only where genuinely needed (asymmetric marketing layouts).
 
 ## Components used per surface
 
-### Landing page (live structure as of May 2026)
+### Landing page (live structure as of May 2026, refreshed 2026-05-31)
 
 The landing page is now a 9-section scroll story. In order, top to bottom:
 
-1. **Top nav bar** — Logo, "Log In", "Sign Up", dark-mode toggle (right).
-2. **Hero** — Cloud Sync chip + Playfair H1 ("Your pregnancy companion — *secure & synced*") + subhead with bold "Core features free. AI tools coming soon." + Sage primary CTA "Start Tracking" + secondary outline "Sign Up with Email" + tertiary "See how it works ↓" link. Right half: ambient Sage-pale blur with lotus mark animated.
+1. **Sticky glassmorphic header** *(new)* — Logo + "Our Pregnancy" wordmark left; nav links (Features · How it Works · About) centered; Language Selector + dark-mode + Log In / Sign Up (Charcoal-on-white) right. Floats `top:16px` resting → `top:8px` when scrolled (>20px). Backdrop-blur, white/90, rounded 20px.
+2. **Hero** — Playfair H1 ("Your pregnancy companion — *secure & synced*") + subhead with bold "Core features free. AI tools coming soon." + Sage primary CTA "Start Tracking" (pill, ArrowRight icon) + secondary outline "Sign Up with Email" + tertiary "See how it works ↓" link. Right half: animated **womb tableau** — 3 nested organic blob rings rotating at different speeds (25s / 20s reverse / 15s) in Sage/Blush/Gold with a glowing Lotus-Pink baby orb on the inner ring.
 3. **Trust bar** — White strip with 4 Sage-icon chips: *Made for Indian mothers 🇮🇳 · Your data is private & secure · Core features are free · Works offline via PWA*.
 4. **Flowchart "How Our Pregnancy Works"** — Sage-pale tinted bg, 4 numbered step nodes connected by a Sage gradient line. Each node: circular white card with icon, "Step N" overline, title, body.
 5. **Features Bento Grid "Comprehensive Toolkit"** — 12 cards: 1 hero (AI Food Safety Scanner, 2-col, with thali image on right), 1 tall (Real-Time Partner Sync, with Sync Mode + Cloud Storage pills), 10 small. Each small card: colored circle icon (Sage / Blush / Gold / Charcoal tile), Playfair title, Nunito body. See "Bento Grid Layout" below for the exact tile colour rotation.
@@ -55,11 +55,26 @@ All cards: `border-[32px]` radius (more rounded than the rest of the system — 
 
 The "Made for Indian mothers 🇮🇳" section uses **Sage `#8AB6A3` as a full-bleed background with white type**. This is a deliberate brand moment — the only marketing surface where the visual hierarchy inverts. Use it sparingly elsewhere; reserve full-Sage backgrounds for India / cultural-context content.
 
+### Glassmorphic Mesh Glow (new May 2026)
+
+The dashboard's tracker hero card now uses a custom glow pattern documented in `tokens/tokens.css` as the `mesh-glow-*` utility classes. Mark a container with `.mesh-glow-container` (sets `position: relative; overflow: hidden`), then drop in two absolutely-positioned blobs:
+
+- **`.mesh-glow-blob-1`** — 70% × 70% Sage radial gradient (`rgba(138, 182, 163, 0.22)`), blurred 50px, animated `float-blob-1` (12s ease-in-out infinite).
+- **`.mesh-glow-blob-2`** — 70% × 70% Lotus Pink radial gradient (`rgba(249, 199, 210, 0.26)`), blurred 50px, animated `float-blob-2` (15s reverse infinite).
+
+The two blobs drift across the container in offset rhythms, giving a subtle warm ambient glow. Use this for premium cards (e.g., pregnancy tracker, knowledge drop) — not for every card.
+
+### Premium theme transitions (new May 2026)
+
+A new global rule applies a 400ms `cubic-bezier(0.25, 0.8, 0.25, 1)` transition to `background-color`, `border-color`, `color`, and `box-shadow` on every theme-affected element (`html, body, header, main, footer, .premium-card, .glass-panel, button, input, textarea, select`). When the user toggles Dark Mode or Calm Mode, everything fades smoothly instead of snapping.
+
 ### Dashboard
 - Top bar with logo + LMP / T1 / T2 / Due date + 0% done bar + mode toggles (Critical only, Calm Mode, Dark Mode)
 - Left sidebar (`nav.tsx`) — Overview / Daily Health & Tracking / Smart Tools / Planning & Tasks / Medical & Govt / Labor & Postpartum sections
-- Smart Tools section includes: AskOur Pregnancy AI (Ask Bloom full page), AI Food Guide (Food Safety Scanner), Name Generator
-- Main content — alternating `Card`, `feature-card`, and form components
+- Smart Tools section includes: AskOur Pregnancy AI (Ask Bloom full page), AI Food Guide (Food Safety Scanner), Name Generator, **Medical Reports** (new)
+- Medical & Govt section: vaccination reminders, government schemes
+- Labor & Postpartum: Labor Readiness Score, hospital bag, birth plan
+- Main content — alternating `Card`, `feature-card`, `premium-card`, `mesh-glow-container`, and form components
 - Right floating: Feedback button (sage pill, bottom-right)
 - Floating chatbot pill (lower-right on the landing) opens **Ask Bloom** in an inline panel powered by the Hugging Face Router API + Cloud Functions backend.
 
@@ -69,19 +84,40 @@ The "Made for Indian mothers 🇮🇳" section uses **Sage `#8AB6A3` as a full-b
 - Pull quote — Playfair italic, sage-light left border
 - Disclaimer card at footer — `tone="sage"` with the standard disclaimer text
 
-## SEO / metadata (verbatim from live `index.html`)
+## SEO / metadata (verbatim from live `index.html` — refreshed 2026-05-31)
 
 | Field | Value |
 |---|---|
-| `<title>` | Our Pregnancy — Your Free Pregnancy Companion |
-| `<meta description>` | A beautifully designed pregnancy companion — track milestones, health vitals, tasks, and decisions, securely synced across your devices. |
+| `<title>` | Our Pregnancy — Secure & Private Indian Pregnancy Companion |
+| `<meta description>` | A privacy-first, free pregnancy companion tailored for Indian mothers. Track milestones, blood pressure, kick counts, contraction timing, and scan food safety offline. |
 | Keywords | pregnancy tracker, pregnancy app, baby tracker, kick counter, contraction timer, pregnancy companion, pregnancy journal, safe food for pregnancy, Indian pregnancy app, our pregnancy, ourpregnancy.in, maternity tracker, baby growth tracker, trimester guide |
-| `<meta theme-color>` | `#F2F4EB` (currently shipping; recommended change to `#FDFBF7` to match the page background) |
+| `<meta theme-color>` | `#F2F4EB` (still shipping; recommended change to `#FDFBF7` to match the page background) |
+| OG title | Our Pregnancy — Your Secure & Private Pregnancy Companion |
+| OG description | A privacy-first, beautifully designed pregnancy companion. Track vitals, symptoms, hydration, and prepare for birth with confidence. |
 | Favicon | Replace with `design-system/logo/favicon.png` once approved |
 | OG image | 1200×630 — Sandalwood bg, lotus + italic Playfair "Our Pregnancy" + tagline + Sage URL pill |
 | Twitter card | summary_large_image, same OG image |
+| JSON-LD | SoftwareApplication schema in `<head>` — `@type: SoftwareApplication`, `applicationCategory: HealthApplication`, `operatingSystem: Web` |
+| Google Translate | Widget initialized for 11 Indian languages: `en, hi, pa, gu, mr, bn, ta, kn, te, ml, ur` |
 
-> Note: The `<title>` tag still leads with "Your Free Pregnancy Companion" even though the H1 dropped "Free" in May 2026. This is intentional — search-query matches still benefit from the keyword. The visible H1 is more conservative ("Your pregnancy companion — secure & synced.").
+> **Important — SEO metadata went BACK to leading with "Private" + "Free":**
+> Earlier in May 2026, the H1 and trust chips dropped "Free" and "Privacy-first" for honesty. As of `5cb33a9`, the **`<title>` and `<meta description>` were rewritten** for SEO (this is a YMYL-category page that competes on search), and both "privacy-first" and "free" came back into the metadata. The **visible H1 still does NOT include "free"** — that's "Your pregnancy companion — secure & synced." This is intentional:
+>
+> - **Metadata (SEO surface):** "privacy-first, free, secure" — match search queries.
+> - **Hero (user-facing surface):** "secure & synced" — honest, no absolute promises.
+>
+> Both surfaces are correct for their context. Don't sync them to identical copy.
+
+## Multilingual support (new May 2026)
+
+The site ships with Google Translate auto-translation for **11 Indian languages**: English, Hindi, Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu. The `LanguageSelector` component reads the active language from the `googtrans` cookie or `<html lang>` attribute.
+
+**Copy rules for multilingual surfaces:**
+
+- The brand name "Our Pregnancy" carries the `.notranslate` class — Google Translate skips it. The wordmark always reads in English.
+- Other proper nouns we want untranslated: AI feature names (Ask Bloom, AI Food Safety Scanner), government scheme abbreviations (JSY, PMMVY, JSSK), helpline numbers (108, 112, 1098).
+- The Google Translate banner frame is suppressed via custom CSS to prevent layout shift.
+- All marketing copy in this design system is written in English. Translations are done at runtime by Google Translate — we do not author Hindi or Bengali versions of marketing copy.
 
 ## Accessibility (must-pass)
 

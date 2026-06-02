@@ -46,8 +46,8 @@ The shipped product runs on a tier:
 
 | Tier | What's in it | Status |
 |---|---|---|
-| **Core (always free)** | Vitals, kicks, contractions, mood, hydration, nutrition, symptom log, hospital bag, birth plan, government schemes, Partner Sync, FHIR R4 EHR export, Pregnancy Timeline, Calm/Dark Mode | Live |
-| **Premium (coming)** | Ask Bloom 24/7 AI chatbot, AI Food Safety Scanner (Qwen2.5-VL-72B), AI Name Generator, predictive Labor Readiness Score | AI tools coming soon — actively in development |
+| **Core (always free)** | Vitals, kicks, contractions, mood, hydration, nutrition, symptom log, hospital bag, birth plan, government schemes, Partner Sync, FHIR R4 EHR export, Pregnancy Timeline, **Medical Reports**, **Wearable Sync** (Apple Health / Oura / Google Fit / Garmin / Fitbit), **Language Selector** (11 languages), Vaccination Reminders, Daily Knowledge Drop, Calm/Dark Mode | Live |
+| **Premium (coming)** | Ask Bloom 24/7 AI chatbot, AI Food Safety Scanner (Qwen2.5-VL-72B), AI Name Generator, AI Medical Report Summarizer + Prescription Decipherer, predictive Labor Readiness Score | AI tools coming soon — actively in development |
 
 Pricing language to use:
 - ✅ "Core features free."

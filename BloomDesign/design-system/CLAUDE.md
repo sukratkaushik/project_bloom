@@ -110,6 +110,28 @@ These phrases were live on the homepage and have since been walked back. If you 
 
 Every component must work in all three. See `tokens/tokens.css` for the full mode-specific overrides.
 
+The product also has **premium theme transitions** — toggling Dark/Calm fades all theme-affected CSS over 400ms with a `cubic-bezier(0.25, 0.8, 0.25, 1)` curve. Components don't need to opt in; it's a global rule on `html, body, header, main, footer, .premium-card, .glass-panel, button, input, textarea, select`.
+
+---
+
+## Multilingual (11 Indian languages)
+
+The site auto-translates to: **English · Hindi · Punjabi · Gujarati · Marathi · Bengali · Tamil · Kannada · Telugu · Malayalam · Urdu** via Google Translate.
+
+Rules:
+- Author all design-system copy in **English**. Translations happen at runtime.
+- The brand name "**Our Pregnancy**" carries `.notranslate` and is never translated.
+- Other strings to mark `.notranslate` when used inline: AI feature names (Ask Bloom, AI Food Safety Scanner), scheme abbreviations (JSY, PMMVY, JSSK), helpline numbers (108, 112, 1098).
+
+---
+
+## Premium visual patterns (new May 2026)
+
+Two new utility patterns ship in `tokens/tokens.css`:
+
+- **`.glass-panel`** — translucent white bg with backdrop-blur. Used by the sticky header and premium dashboard cards.
+- **`.mesh-glow-container`** + `.mesh-glow-blob-1` + `.mesh-glow-blob-2` — premium ambient glow with two drifting radial gradients (Sage + Lotus Pink). Use sparingly — reserved for hero / premium tracker cards.
+
 ---
 
 ## When in doubt

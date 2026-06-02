@@ -82,6 +82,23 @@ The shipped product surfaces these features by these names. Use them verbatim.
 | Biometric labor prediction | **Labor Readiness Score** |
 | Calm Mode | Calm Mode |
 | Dark Mode | Dark Mode (sometimes shown as "Calm/Dark Mode") |
+| Medical record upload + AI summary | **Medical Reports** *(new May 2026 — AI Medical Report Summarizer + Prescription Decipherer)* |
+| Wearable sync | **Wearable Integrations** *(new May 2026 — Apple Health, Oura Ring, Google Fit, Garmin Connect, Fitbit)* |
+| Multilingual support | **Language Selector** *(new May 2026 — 11 Indian languages via Google Translate)* |
+| Daily knowledge | Daily Knowledge Drop |
+| Vaccination reminders | Vaccination Reminders *(referenced in testimonials)* |
+
+## Wearable device names — use these exact strings
+
+The product integrates with these wearables. Use the exact device name:
+
+- **Apple Health** (Apple Watch — heart rate, activity, sleep)
+- **Oura Ring** (sleep stages, RHR, HRV, BBT)
+- **Google Fit** (Android activity, heart rate, steps)
+- **Garmin Connect** (all-day HR, body battery, sleep, steps)
+- **Fitbit** (steps, sleep quality, active zone minutes)
+
+When referring to the feature as a category: **Wearable Sync** or **Wearable Integrations**. Avoid "smartwatch integration" or "fitness tracker integration" — too generic.
 
 ## Numbers — always include them
 

@@ -1,5 +1,68 @@
 # Design system changelog
 
+## v1.3 — 2026-05-31 — Sticky header, mesh glow, multilingual, AI Medical Reports
+
+A wave of UI polish + 4 new product surfaces landed on `main` (commits `5cb33a9`, `75422ba`, `587078a`, `d87cd3a`, `c99e24e`, `f9f6e9b`, `bfd5856`, `ec87a03`, and others).
+
+### New visual patterns
+
+- **Sticky glassmorphic header** documented in `applications/web.md` + new tokens in `tokens.css` + `tokens.json`. Floats `top:16px` resting → `top:8px` when scrolled (>20px). Backdrop-blur 12px, white/90 bg, rounded 20px, max-width 1200px. Border + shadow intensify on scroll.
+- **Mesh Glow pattern** for premium cards — `.mesh-glow-container` + `.mesh-glow-blob-1` (Sage 22%) + `.mesh-glow-blob-2` (Lotus Pink 26%). Two blobs drift in offset rhythms (12s + 15s).
+- **Premium theme transitions** — global 400ms `cubic-bezier(0.25, 0.8, 0.25, 1)` on `background-color`, `border-color`, `color`, `box-shadow` for all theme-affected elements. Makes Dark/Calm Mode toggles fade smoothly.
+- **Animated hero womb tableau** — 3 nested organic blob rings (Sage 30%, Blush 40%, Gold 30%) rotating at 25s / 20s reverse / 15s with a Lotus-Pink glowing baby orb on the inner ring.
+- **`.notranslate` class** on the brand name "Our Pregnancy" — Google Translate leaves it alone.
+- **scroll-behavior: smooth** added to `<html>` for nav-link smooth scrolling.
+
+### New product features (now in vocabulary)
+
+- **Medical Reports** — secure upload + AI Medical Report Summarizer + Prescription Decipherer (Cloud Function backend).
+- **Wearable Integrations** — Apple Health, Oura Ring, Google Fit, Garmin Connect, Fitbit.
+- **Language Selector** — 11 Indian languages: English, Hindi, Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu.
+- **Daily Knowledge Drop** (was already in product, now elevated in vocab).
+- **Vaccination Reminders** (now referenced in 6th testimonial).
+
+### SEO / metadata went BACK to leading with "Free" + "Private"
+
+| Surface | Now reads |
+|---|---|
+| `<title>` | Our Pregnancy — Secure & Private Indian Pregnancy Companion |
+| `<meta description>` | A privacy-first, free pregnancy companion tailored for Indian mothers. Track milestones, blood pressure, kick counts, contraction timing, and scan food safety offline. |
+| OG title | Our Pregnancy — Your Secure & Private Pregnancy Companion |
+
+This is a SEO decision — search-query matches still benefit from "free" + "privacy-first" + "secure" keywords. The **visible H1 stays conservative** ("Your pregnancy companion — secure & synced.") so the brand voice remains honest. Two-track copy: metadata for SEO, on-page copy for trust.
+
+### Testimonial pool: 6 cards
+
+Added: *Meera J., Pune* — "The vaccination reminders and daily tips kept me so reassured. A must-have for every expectant mom!"
+
+Live site now shows all 6 in a symmetric 3-col × 2-row grid (was 3-up rotation).
+
+### Govt scheme copy softened
+
+- "Don't miss out on **important** benefits" (was "**free** benefits")
+- "JSSK (hospital delivery)" (was "**free** hospital delivery")
+
+These edits preserve the JSY/PMMVY/JSSK names but reduce the absolute "free benefits" framing.
+
+### Files updated
+
+- `BRAND-SUMMARY.md` — feature list expanded with Medical Reports, Wearables, Language Selector
+- `README.md` — version bumped to v1.3, provenance date refreshed
+- `applications/web.md` — full sticky header spec, hero womb tableau, mesh glow + premium-transitions docs, SEO metadata refresh, Multilingual section
+- `voice/homepage-copy.md` — sticky header spec, Language Selector copy, refreshed hero (no Cloud Sync chip), 6-card testimonial pool, softened scheme copy
+- `foundations/vocabulary.md` — Medical Reports, Wearables, Language Selector, Daily Knowledge Drop, Vaccination Reminders, exact wearable device names
+- `tokens/tokens.css` — header tokens, mesh-glow tokens, `.glass-panel`, `.mesh-glow-*` utility classes, premium transition rule, `.notranslate`, smooth-scroll
+- `tokens/tokens.json` — header.*, mesh-glow.*, easing.premium, duration.premium / mesh-glow-1 / mesh-glow-2, shadow.header-resting / header-scrolled
+
+### Unchanged
+
+- Color palette, type stack, base spacing — all confirmed unchanged in `src/index.css` diff.
+- Logo (`logo.png`) — MD5 unchanged.
+- The three modes (Light / Dark / Calm) — same overrides.
+- Six non-negotiables in `CLAUDE.md` still apply.
+
+---
+
 ## v1.2 — 2026-05-17 — Landing page refresh + AI features
 
 The live site shipped a major landing page redesign (commit `32476d3` and follow-ups) plus a wave of AI backend work. The design system caught up.

@@ -9,7 +9,7 @@ Last refreshed against live site on **2026-05-17**.
 ## 1. Company name and blurb (≤80 words)
 
 ```
-Our Pregnancy is a pregnancy companion app for Indian mothers, live at ourpregnancy.in. We help women in India track kicks, contractions, BP, mood, and nutrition; navigate JSY, PMMVY, and JSSK government schemes; check Indian foods for safety with an AI scanner; and prepare the hospital bag. Core tracking features are free; AI tools (Ask Bloom chatbot, food scanner, name generator) are coming soon. We ship: a marketing website, mobile-PWA UI, pitch decks, Instagram and LinkedIn posts, email newsletters, infographics, and paid ads.
+Our Pregnancy is a pregnancy companion app for Indian mothers, live at ourpregnancy.in. We help women in India track kicks, contractions, BP, mood, and nutrition; sync wearables (Apple Health, Oura, Google Fit, Garmin, Fitbit); upload medical reports with AI summarisation; navigate JSY, PMMVY, JSSK schemes; check Indian foods with an AI scanner; and prepare the hospital bag. Available in 11 Indian languages. Core features always free; AI tools coming soon. We ship: marketing website, mobile-PWA UI, pitch decks, Instagram/LinkedIn posts, email, infographics, ads.
 ```
 
 ---
@@ -31,7 +31,11 @@ Imagery: real Indian women in soft cotton kurtas, warm morning light, real homes
 
 Logo: ONE canonical PNG only — logo/logo.png. Never recreate as SVG, never redraw, never approximate. Composed lockups in logo/ embed the source PNG.
 
-Three modes ship: Light (default), Dark, Calm. Every output must work in all three.
+Three modes ship: Light (default), Dark, Calm. Every output must work in all three. Mode toggles fade with a global 400ms premium transition.
+
+Premium visual patterns (use sparingly): glassmorphic panels (white/90 + 12px backdrop-blur, used in sticky header), mesh-glow containers (Sage 22% + Lotus Pink 26% radial-gradient blobs that drift in 12s + 15s rhythms — only for hero/premium tracker cards). The animated hero "womb tableau" (3 organic-shape rings rotating at 25s/20s/15s) is bespoke to the live web hero — do NOT replicate on social or deck assets.
+
+Multilingual: site auto-translates to English, Hindi, Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu. The brand name "Our Pregnancy" carries `.notranslate` and is never translated. Author all copy in English.
 
 Tagline (verbatim): Your pregnancy companion — secure & synced.
 Pricing line (verbatim): Core features, always free. AI tools coming soon.
