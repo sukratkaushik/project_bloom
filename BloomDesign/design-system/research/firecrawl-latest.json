@@ -1,0 +1,161 @@
+{
+  "source": {
+    "url": "https://ourpregnancy.in/",
+    "scrapedAt": "2026-05-31",
+    "tool": "Firecrawl CLI",
+    "scrapeId": "019e851a-2a47-75db-b79f-dc2ab52cab15"
+  },
+  "metadata": {
+    "title": "Our Pregnancy — Secure & Private Indian Pregnancy Companion",
+    "description": "A privacy-first, free pregnancy companion tailored for Indian mothers. Track milestones, blood pressure, kick counts, contraction timing, and scan food safety offline.",
+    "keywords": "pregnancy tracker, pregnancy app, baby tracker, kick counter, contraction timer, pregnancy companion, pregnancy journal, safe food for pregnancy, Indian pregnancy app, our pregnancy, ourpregnancy.in, maternity tracker, baby growth tracker, trimester guide",
+    "themeColor": "#F2F4EB",
+    "ogTitle": "Our Pregnancy — Your Secure & Private Pregnancy Companion",
+    "ogDescription": "A privacy-first, beautifully designed pregnancy companion. Track vitals, symptoms, hydration, and prepare for birth with confidence.",
+    "ogImage": "https://ourpregnancy.in/logo.png",
+    "language": "en"
+  },
+  "branding": {
+    "colorScheme": "light",
+    "fonts": [
+      {
+        "family": "Nunito",
+        "role": "body"
+      },
+      {
+        "family": "Inter",
+        "role": "body"
+      },
+      {
+        "family": "Playfair Display",
+        "role": "heading"
+      },
+      {
+        "family": "Google Sans",
+        "role": "unknown"
+      }
+    ],
+    "colors": {
+      "primary": "#6B7A87",
+      "secondary": "#8AB6A3",
+      "accent": "#8AB6A3",
+      "background": "#FDFBF7",
+      "textPrimary": "#2C3E50",
+      "link": "#2C3E50"
+    },
+    "typography": {
+      "fontFamilies": {
+        "primary": "Nunito",
+        "heading": "Playfair Display"
+      },
+      "fontStacks": {
+        "heading": [
+          "Playfair Display",
+          "serif"
+        ],
+        "body": [
+          "Nunito",
+          "Inter",
+          "sans-serif"
+        ],
+        "paragraph": [
+          "Nunito",
+          "Inter",
+          "sans-serif"
+        ]
+      },
+      "fontSizes": {
+        "h1": "72px",
+        "h2": "36px",
+        "body": "20px"
+      }
+    },
+    "spacing": {
+      "baseUnit": 8,
+      "borderRadius": "0px"
+    },
+    "components": {
+      "buttonPrimary": {
+        "background": "#8AB6A3",
+        "textColor": "#FFFFFF",
+        "borderRadius": "33554400px",
+        "borderRadiusCorners": {
+          "topLeft": "33554400px",
+          "topRight": "33554400px",
+          "bottomRight": "33554400px",
+          "bottomLeft": "33554400px"
+        },
+        "shadow": "rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0) 0px 0px 0px 0px, rgba(0, 0, 0, 0.1) 0px 10px 15px -3px, rgba(0, 0, 0, 0.1) 0px 4px 6px -4px"
+      },
+      "buttonSecondary": {
+        "background": "#FFFFFF",
+        "textColor": "#8AB6A3",
+        "borderColor": "#8AB6A3",
+        "borderRadius": "33554400px",
+        "borderRadiusCorners": {
+          "topLeft": "33554400px",
+          "topRight": "33554400px",
+          "bottomRight": "33554400px",
+          "bottomLeft": "33554400px"
+        },
+        "shadow": "none"
+      }
+    },
+    "images": {
+      "logo": "https://ourpregnancy.in/logo.png",
+      "favicon": "https://ourpregnancy.in/favicon.svg",
+      "ogImage": "https://ourpregnancy.in/logo.png",
+      "logoAlt": "Our Pregnancy Logo"
+    },
+    "__llm_logo_reasoning": {
+      "selectedIndex": 0,
+      "reasoning": "Selected #0 because it is visible, matches the brand name 'Our Pregnancy', and is the most prominent logo on the page.",
+      "confidence": 0.9,
+      "source": "llm"
+    },
+    "__llm_button_reasoning": {
+      "primary": {
+        "index": 0,
+        "text": "Start Tracking Now",
+        "reasoning": "Button #0 ('Start Tracking Now') is the primary CTA due to its prominent placement, vibrant green color (#8AB6A3), and action-oriented text, making it the most likely to attract user interaction."
+      },
+      "secondary": {
+        "index": 2,
+        "text": "Sign Up with Email",
+        "reasoning": "Button #2 ('Sign Up with Email') is secondary because it has a different color group (#FFFFFF) and serves as an alternative action, complementing the primary CTA."
+      },
+      "confidence": 0.95
+    },
+    "personality": {
+      "tone": "professional",
+      "energy": "medium",
+      "targetAudience": "Expectant mothers in India"
+    },
+    "designSystem": {
+      "framework": "tailwind",
+      "componentLibrary": ""
+    },
+    "confidence": {
+      "buttons": 0.95,
+      "colors": 0.9,
+      "overall": 0.925
+    },
+    "__llm_metadata": {
+      "logoSelection": {
+        "llmCalled": true,
+        "llmSucceeded": true,
+        "finalSource": "llm",
+        "rawLogoSelection": {
+          "selectedLogoIndex": 0,
+          "selectedLogoReasoning": "Selected #0 because it is visible, matches the brand name 'Our Pregnancy', and is the most prominent logo on the page.",
+          "confidence": 0.9
+        }
+      },
+      "buttonClassification": {
+        "llmCalled": true,
+        "llmSucceeded": true
+      }
+    }
+  },
+  "markdown": "![Our Pregnancy Logo](https://ourpregnancy.in/logo.png)Our Pregnancy\n\n[Features](https://ourpregnancy.in/#features) [How it Works](https://ourpregnancy.in/#how-it-works) [About](https://ourpregnancy.in/#localized-care)\n\nEnglish\n\n☀️Log InSign Up\n\n# Your pregnancy companion — secure & synced.\n\nTrack symptoms, count kicks, pack your hospital bag, and monitor blood pressure. **Core features free. AI tools coming soon.**\n\nStart TrackingSign Up with Email [See how it works ↓](https://ourpregnancy.in/#how-it-works)\n\n![Our Pregnancy Logo](https://ourpregnancy.in/logo.png)\n\nMade for Indian mothers 🇮🇳\n\nYour data is private & secure\n\nCore features are free\n\nWorks offline via PWA\n\n## How Our Pregnancy Works\n\nA seamless, private journey from your first trimester to delivery day.\n\nStep 1\n\n### Quick Setup\n\nEnter your due date. No account required to start tracking.\n\nStep 2\n\n### Track Daily\n\nLog vitals, kick counts, and contractions right on your phone.\n\nStep 3\n\n### Prepare\n\nBuild your hospital bag checklist and track symptoms.\n\nStep 4\n\n### Sync & Share\n\nSecurely sync to the cloud or share progress with your partner.\n\nComprehensive Toolkit\n\n## Everything you need,  beautifully organized.\n\n### AI Food Safety Scanner\n\nNot sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our Gemini-powered AI verify it against Indian food safety guidelines instantly.\n\n- Detects harmful ingredients\n- Tailored for Indian cuisine\n\n![Food Scanner UI](https://ourpregnancy.in/food_scanner_updated_1779026987896.png)\n\n### Real-Time Partner Sync\n\nEnjoy secure storage in the cloud. Securely link devices via WebRTC to share the journey with your partner while maintaining granular privacy controls.\n\nSync ModeEncrypted\n\nCloud StorageSecure\n\n#### Labor Readiness Score\n\nPredictive biometrics analyzing your HRV, RHR, and Braxton Hicks frequency.\n\n#### FHIR R4 EHR Export\n\nInstantly export your entire care plan and vitals to major hospital systems like Epic.\n\n#### Ask Bloom 24/7\n\nGet immediate answers to your pregnancy questions with our fine-tuned AI companion.\n\n#### Vitals Tracker\n\nLog blood pressure with preeclampsia threshold alerts.\n\n#### Kick Counter\n\nCount fetal movements daily from 28 weeks with auto-alerts if count is low.\n\n#### Multiple Checklists\n\nPrepare essentials for delivery day with our curated hospital bag lists.\n\n#### Contraction Timer\n\nTime contractions and get the 5-1-1 hospital rule calculated automatically.\n\n#### Pregnancy Timeline\n\nTrack weekly changes, milestones, and what to expect along your journey.\n\n#### Calm/Dark Mode\n\nSoothing dark mode for tracking during those 3 AM wake-ups.\n\nLocalized Care\n\n## Made for Indian mothers 🇮🇳\n\nBecause a pregnancy in India means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.\n\n🥗\n\n### Indian Foods Database\n\nKnow exactly what's safe. Comprehensive coverage for dal, ragi, paneer, amla, and accurate risk flags for items like raw papaya or street food.\n\n🏥\n\n### Govt Scheme Guide\n\nDon't miss out on important benefits. Clear, actionable guides for JSY, PMMVY (₹5,000 cash assistance), and JSSK (hospital delivery).\n\n📞\n\n### Emergency Ready\n\nCritical helplines at your fingertips. 108 Ambulance, 112 National Emergency, and iCall psychosocial support — always one tap away.\n\n## Core features, always free.\n\nWe believe every mother deserves access to tools that make pregnancy safer and less stressful. Tracking, vitals, tasks, and more — free, always.\n\nStart Tracking Now\n\n## Trusted by Indian mothers\n\n\"\n\n\"I love how personal it feels — everything is tailored to my pregnancy week and my situation.\"\n\nP\n\nPriya M.\n\nMumbai\n\n\"\n\n\"The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.\"\n\nK\n\nKavitha R.\n\nBangalore\n\n\"\n\n\"The core features are free and work even when I'm travelling. Such a blessing!\"\n\nA\n\nAnjali S.\n\nDelhi\n\n\"\n\n\"The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!\"\n\nS\n\nSneha P.\n\nGoa\n\n\"\n\n\"Finally an app that understands Indian contexts and government schemes.\"\n\nD\n\nDivya K.\n\nChennai\n\n\"\n\n\"The vaccination reminders and daily tips kept me so reassured. A must-have for every expectant mom!\"\n\nM\n\nMeera J.\n\nPune\n\n![Our Pregnancy Logo](https://ourpregnancy.in/logo.png)Our Pregnancy\n\nMade with ❤️ for Indian mothers\n\n[Privacy Policy](https://ourpregnancy.in/#privacy) [Terms of Service](https://ourpregnancy.in/#terms) [hello@ourpregnancy.in](mailto:hello@ourpregnancy.in)\n\nYour data is encrypted and only accessible by you.\n\n![](https://fonts.gstatic.com/s/i/productlogos/translate/v14/24px.svg)\n\nOriginal text\n\nRate this translation\n\nYour feedback will be used to help improve Google Translate"
+}

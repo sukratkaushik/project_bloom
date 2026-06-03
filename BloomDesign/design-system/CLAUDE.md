@@ -12,6 +12,8 @@
 4. `foundations/color.md` + `foundations/typography.md` + `tokens/tokens.css` — for visuals.
 5. `applications/<surface>.md` — for the specific channel you're working on.
 6. `assets/templates/<surface>/` — copy the real shipped templates whenever they exist; only generate fresh designs from scratch when no template is present.
+7. `research/reconciliation.md` — only when you need to understand *why* the system says what it says (provenance / history of brand-kit vs shipped product).
+8. `research/claude-design-form.md` — paste-ready blurb + notes for the Claude Design setup form.
 
 ---
 

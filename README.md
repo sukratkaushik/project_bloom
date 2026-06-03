@@ -12,16 +12,17 @@ BloomDesign/
     ├── README.md
     ├── CLAUDE.md                       — load-order + non-negotiables for LLMs
     ├── BRAND-SUMMARY.md                — 60-second snapshot
-    ├── CLAUDE-DESIGN-HANDOFF.md        — paste-ready text for Claude Design
+    ├── CHANGELOG.md                    — version-by-version refresh history
     ├── foundations/                    — brand, voice, color, typography, etc.
     ├── tokens/                         — tokens.json + tokens.css + tailwind.preset.js
-    ├── logo/                           — SVG + PNG + JPG + usage rules
+    ├── logo/                           — canonical logo PNG + composed lockups + usage rules
     ├── components/                     — React + Tailwind starters
     ├── voice/                          — copy examples + drop-in homepage variants
     ├── applications/                   — per-surface guidance (web, IG, LinkedIn, email, decks, ads, infographics)
-    └── assets/
-        ├── patterns/                   — Mehndi watermark, Rangoli corner, grid, brand wash
-        └── templates/                  — real shipped assets + synthetic drafts per surface
+    ├── assets/
+    │   ├── patterns/                   — Mehndi watermark, Rangoli corner, grid, brand wash
+    │   └── templates/                  — real shipped assets + synthetic drafts per surface
+    └── research/                       — receipts: reconciliation log + Claude Design form + extraction snapshots
 ```
 
 ## How to use
@@ -29,7 +30,7 @@ BloomDesign/
 | What you want to do | What to read |
 |---|---|
 | Start here | [`BloomDesign/design-system/README.md`](BloomDesign/design-system/README.md) |
-| Upload to Claude Design | [`BloomDesign/design-system/CLAUDE-DESIGN-HANDOFF.md`](BloomDesign/design-system/CLAUDE-DESIGN-HANDOFF.md) |
+| Upload to Claude Design | [`BloomDesign/design-system/research/claude-design-form.md`](BloomDesign/design-system/research/claude-design-form.md) |
 | Hand to any LLM that produces brand assets | [`BloomDesign/design-system/CLAUDE.md`](BloomDesign/design-system/CLAUDE.md) |
 | 60-second brand snapshot | [`BloomDesign/design-system/BRAND-SUMMARY.md`](BloomDesign/design-system/BRAND-SUMMARY.md) |
 

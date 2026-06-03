@@ -1,5 +1,30 @@
 # Design system changelog
 
+## v1.4 — 2026-06-03 — Add research/ folder
+
+Restructure-only release. No content changes to foundations / tokens / voice / applications. Brings the folder shape in line with the skill's reference layout (as shown in the YouTube walkthrough at https://youtube.com/watch?v=cl5Oudk3Hjo).
+
+### What's new
+
+- **`research/` folder added.** Holds the provenance docs that were previously top-level or undocumented:
+  - `research/reconciliation.md` — new comprehensive doc covering brand-kit-vs-shipped reconciliation for v1.0 → v1.3, with open questions and maintenance workflow.
+  - `research/claude-design-form.md` — renamed from `CLAUDE-DESIGN-HANDOFF.md` (git tracks the move).
+  - `research/firecrawl-latest.json` — slimmed Firecrawl scrape (markdown + branding + meta). Snapshot of the live site as of 2026-05-31. ~10 KB.
+  - `research/extracted-tokens.json` — `extract-design-system` normalized output. Independent CSS-computed tokens for cross-checking Firecrawl values.
+  - `research/README.md` — explains the folder + the refresh workflow.
+
+### Files updated
+
+- `README.md` — added `research/` to the structure table + new "how to use" steps + linked the reconciliation doc from Provenance.
+- `CLAUDE.md` — load order extended with `research/reconciliation.md` (steps 7–8) for LLMs that need provenance context.
+
+### Files unchanged
+
+- All `foundations/`, `tokens/`, `voice/`, `applications/`, `components/`, `logo/`, `assets/`.
+- Logo, tokens, design rules — all identical to v1.3.
+
+---
+
 ## v1.3 — 2026-05-31 — Sticky header, mesh glow, multilingual, AI Medical Reports
 
 A wave of UI polish + 4 new product surfaces landed on `main` (commits `5cb33a9`, `75422ba`, `587078a`, `d87cd3a`, `c99e24e`, `f9f6e9b`, `bfd5856`, `ec87a03`, and others).

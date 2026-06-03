@@ -1,0 +1,37 @@
+{
+  "source": {
+    "url": "https://ourpregnancy.in/",
+    "extractedAt": "2026-05-17T13:59:21.743Z",
+    "extractor": "dembrandt"
+  },
+  "colors": {
+    "palette": [],
+    "cssVariables": {}
+  },
+  "typography": {
+    "headingFont": "Playfair Display",
+    "bodyFont": "Playfair Display"
+  },
+  "spacing": {
+    "scale": [
+      "4px",
+      "6px",
+      "8px",
+      "12px",
+      "16px",
+      "24px",
+      "32px",
+      "40px",
+      "48px",
+      "64px",
+      "80px",
+      "96px"
+    ]
+  },
+  "radius": {
+    "scale": []
+  },
+  "shadows": {
+    "scale": []
+  }
+}
