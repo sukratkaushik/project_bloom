@@ -102,8 +102,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               : 'bg-transparent border border-transparent text-medium hover:bg-sage-pale/40 hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
-          <span className="text-[16px] w-5 text-center shrink-0">{icon}</span>
-          <span className="flex-1 leading-tight break-words py-0.5">{label}</span>
+          <span className="text-[16px] w-5 text-center shrink-0" translate="no" aria-hidden="true">{icon}</span>
+          <span className="flex-1 leading-normal whitespace-normal break-words py-0.5">{label}</span>
           {progress && !state.isCalmModeActive && progress.total > 0 && (
             <div className="ml-auto w-12 flex flex-col gap-1 items-end">
               <span className={`text-[10px] font-semibold leading-none
@@ -166,7 +166,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         onClick={() => setActiveCategory(id)}
         className="w-full flex items-center justify-between py-3.5 border-b border-border/50 dark:border-border/10 text-charcoal/90 dark:text-white/80 hover:text-sage dark:hover:text-sage transition-all cursor-pointer text-left group"
       >
-        <span className="text-[12px] font-bold tracking-[1.5px] uppercase group-hover:translate-x-1 transition-transform duration-300">{label}</span>
+        <span className="text-[12px] font-bold tracking-[1.5px] uppercase group-hover:translate-x-1 transition-transform duration-300 leading-normal whitespace-normal text-left flex-1">{label}</span>
         <ChevronRight className="w-4 h-4 text-light group-hover:text-sage group-hover:translate-x-0.5 transition-all duration-300" />
       </button>
     );
@@ -201,7 +201,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   if (isMobile) {
     return (
       <div className="sticky top-[80px] pt-4 md:pt-8 no-print">
-        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
         <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
 
         {state.favoritePages && state.favoritePages.length > 0 && (
@@ -220,7 +220,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         )}
 
         <div className="mt-4 mb-2">
-          <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-1 pl-3">Features</div>
+          <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-1 pl-3 leading-normal whitespace-normal">Features</div>
           <div className="flex flex-col">
             {Object.keys(CATEGORIES).map(catId => (
               <CategoryButton key={catId} id={catId} label={CATEGORIES[catId].label} />
@@ -339,7 +339,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
         onClick={() => setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }))}
       >
-        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors">{label}</div>
+        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors leading-normal whitespace-normal text-left flex-1">{label}</div>
         <div className="text-light group-hover:text-charcoal flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 dark:hover:bg-charcoal/20 transition-colors mr-1">
           {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
@@ -349,7 +349,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
   return (
     <div className="sticky top-[80px] pt-8 no-print">
-      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3">Overview</div>
+      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
       <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
 
       {state.favoritePages && state.favoritePages.length > 0 && (
