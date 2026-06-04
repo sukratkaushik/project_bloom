@@ -38,6 +38,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks, isMobile = false }) => {
   const { state, toggleCalmMode, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
+  const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
 
   // Accordion state (for desktop accordion view)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -289,6 +290,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           ⚙️ Adjust Setup
         </button>
 
+        {planTier === 'free' ? (
+          <button
+            onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+            className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+          >
+            <span className="flex items-center gap-1.5">
+              <span>✨</span> Upgrade to Premium
+            </span>
+            <span>➜</span>
+          </button>
+        ) : planTier === 'standard' ? (
+          <div className="w-full mt-2 p-2.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2">
+            <span>🩺</span> Standard Plan Active
+          </div>
+        ) : (
+          <div className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2">
+            <span>👑</span> AI Premium Active
+          </div>
+        )}
+
         <button
           onClick={() => {
             import('../utils/pdfExport').then(module => {
@@ -462,6 +483,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       >
         ⚙️ Adjust Setup
       </button>
+
+      {planTier === 'free' ? (
+        <button
+          onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+          className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+        >
+          <span className="flex items-center gap-1.5">
+            <span>✨</span> Upgrade to Premium
+          </span>
+          <span>➜</span>
+        </button>
+      ) : planTier === 'standard' ? (
+        <div className="w-full mt-2 p-2.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2">
+          <span>🩺</span> Standard Plan Active
+        </div>
+      ) : (
+        <div className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2">
+          <span>👑</span> AI Premium Active
+        </div>
+      )}
 
       <button
         onClick={() => {

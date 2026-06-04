@@ -35,77 +35,8 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const discount = Math.floor(months / 3) * 50;
   const totalPrice = basePrice * months - discount;
 
-  const handlePayment = async () => {
-    setIsProcessing(true);
-
-    try {
-      const createPaymentOrder = httpsCallable(functions, 'createPaymentOrder');
-      const verifyPaymentSignature = httpsCallable(functions, 'verifyPaymentSignature');
-
-      // 1. Create order on backend
-      const orderRes: any = await createPaymentOrder({
-        planTier: isPremiumFeature ? 'premium' : 'standard',
-        months
-      });
-
-      const { orderId, amount } = orderRes.data;
-
-      // 2. Load Razorpay options
-      const options = {
-        key: "rzp_test_YOUR_KEY_HERE", // Replace with your public key ID in production
-        amount: amount,
-        currency: "INR",
-        name: "Our Pregnancy",
-        description: `Upgrade to ${isPremiumFeature ? 'Premium' : 'Standard'} (${months} Months)`,
-        order_id: orderId,
-        handler: async function (response: any) {
-          try {
-            setIsProcessing(true);
-            const verifyRes: any = await verifyPaymentSignature({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              planTier: isPremiumFeature ? 'premium' : 'standard',
-              months
-            });
-
-            if (verifyRes.data.success) {
-              alert(`Payment successful! Welcome to the ${isPremiumFeature ? 'Premium' : 'Standard'} Plan.`);
-              // Update local state directly
-              updateState({
-                planTier: isPremiumFeature ? 'premium' : 'standard',
-                isPremium: isPremiumFeature,
-                premiumExpiry: verifyRes.data.expiry,
-                razorpayPaymentId: response.razorpay_payment_id
-              });
-            }
-          } catch (err: any) {
-            console.error("Verification failed", err);
-            alert("Cryptographic verification failed. If your account was debited, contact hello@ourpregnancy.in");
-          } finally {
-            setIsProcessing(false);
-          }
-        },
-        prefill: {
-          email: state.userName ? `${state.userName.toLowerCase().replace(/\s+/g, '')}@example.com` : "hello@ourpregnancy.in",
-        },
-        theme: {
-          color: isPremiumFeature ? "#F4A261" : "#8ab6a3", // Gold for premium, Sage for standard
-        },
-        modal: {
-          ondismiss: function () {
-            setIsProcessing(false);
-          }
-        }
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
-    } catch (error: any) {
-      console.error("Failed to start payment checkout", error);
-      alert(`Could not connect to payment gateway: ${error.message || error}`);
-      setIsProcessing(false);
-    }
+  const handlePayment = () => {
+    window.location.hash = `#checkout?plan=${isPremiumFeature ? 'premium' : 'standard'}&months=${months}`;
   };
 
   return (
