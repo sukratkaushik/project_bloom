@@ -102,8 +102,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               : 'bg-transparent border border-transparent text-medium hover:bg-sage-pale/40 hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
-          <span className="text-[16px] w-5 text-center">{icon}</span>
-          {label}
+          <span className="text-[16px] w-5 text-center shrink-0">{icon}</span>
+          <span className="flex-1 leading-tight break-words py-0.5">{label}</span>
           {progress && !state.isCalmModeActive && progress.total > 0 && (
             <div className="ml-auto w-12 flex flex-col gap-1 items-end">
               <span className={`text-[10px] font-semibold leading-none
