@@ -136,7 +136,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const ALL_NAV_ITEMS = [
     { id: 'kickcounter', icon: '👣', label: 'Kick Counter' },
     { id: 'contractions', icon: '⏱', label: 'Contraction Timer' },
-    { id: 'vitals', icon: '💙', label: 'Vitals (BP/Weight)' },
+    { id: 'vitals', icon: '💙', label: 'Health Metrics' },
     { id: 'mood', icon: '😊', label: 'Mood Tracker' },
     { id: 'hydration', icon: '💧', label: 'Hydration' },
     { id: 'nutrition', icon: '🥗', label: 'Nutrition & Supplements' },

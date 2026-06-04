@@ -201,7 +201,7 @@ export const VitalsTracker: React.FC = () => {
     return (
       <div className="p-6 bg-white border border-border rounded-2xl shadow-sm text-center">
         <Heart className="w-12 h-12 text-medium mx-auto mb-4" />
-        <h2 className="font-serif text-2xl text-charcoal mb-2">Vitals Tracker</h2>
+        <h2 className="font-serif text-2xl text-charcoal mb-2">Health Metrics Tracker</h2>
         <p className="text-medium text-[15px]">Please complete setup first.</p>
       </div>
     );
@@ -211,7 +211,7 @@ export const VitalsTracker: React.FC = () => {
     <div className="space-y-6 animate-in fade-in duration-300">
       <div className="flex items-center gap-3">
         <Heart className="w-8 h-8 text-sage" />
-        <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Vitals</h1>
+        <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Health Metrics</h1>
       </div>
 
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
