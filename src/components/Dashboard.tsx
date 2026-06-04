@@ -181,7 +181,7 @@ export const Dashboard: React.FC = () => {
               <button
                 onClick={() => updateState({ isDarkModeActive: !state.isDarkModeActive })}
                 className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
-                  ${state.isDarkModeActive ? 'border-charcoal text-white bg-charcoal' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
+                  ${state.isDarkModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
                 title="Toggle Dark Mode"
               >
                 {state.isDarkModeActive ? '🌙 Dark Mode' : '☀️ Dark Mode'}

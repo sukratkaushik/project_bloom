@@ -556,7 +556,7 @@ export const CheckoutPage: React.FC = () => {
                 onClick={() => {
                   window.location.hash = '#dashboard';
                 }}
-                className="w-full py-4 bg-charcoal dark:bg-white dark:text-charcoal hover:bg-gray-800 dark:hover:bg-white/90 text-white font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-4 bg-charcoal text-[#ffffff] dark:bg-[#ffffff] dark:text-[#0F172A] hover:bg-gray-800 dark:hover:bg-white/90 font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
               >
                 Go to Dashboard
               </button>

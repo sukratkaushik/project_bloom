@@ -273,7 +273,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         <button
           onClick={toggleDarkMode}
           className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-            ${state.isDarkModeActive ? 'bg-charcoal border-charcoal text-white' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-charcoal'}`}
+            ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-charcoal'}`}
         >
           <span className="flex items-center gap-2">
             <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
@@ -467,7 +467,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <button
         onClick={toggleDarkMode}
         className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isDarkModeActive ? 'bg-charcoal border-charcoal text-white' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
+          ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
       >
         <span className="flex items-center gap-2">
           <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode

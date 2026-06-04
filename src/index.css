@@ -14,6 +14,7 @@
   /* Darker mint for accessible white text */
   --color-sage-light: #b5d5c7;
   --color-sage-pale: #E9F5E9;
+  --color-sage-dark: #3F5E4D;
   /* Official Tulsi Mint */
 
   /* Blush is now referencing Lotus Pink family */
@@ -26,6 +27,7 @@
   --color-gold: #F4A261;
   /* Official Soft Saffron */
   --color-gold-pale: #fcf1e8;
+  --color-gold-dark: #B26A29;
 
   --color-cream: #FDFBF7;
   /* Official Sandalwood Neutral */
@@ -86,6 +88,7 @@ button,
   --color-sage: #96C1AE;
   --color-sage-light: #6E9484;
   --color-sage-pale: #1E2E25;
+  --color-sage-dark: #A7CFC0;
 
   --color-blush: #E8A8B7;
   --color-blush-light: #D48496;
@@ -93,6 +96,7 @@ button,
 
   --color-gold: #EDB785;
   --color-gold-pale: #3D2D1E;
+  --color-gold-dark: #F7C194;
 
   --color-cream: #0F172A;
   /* Rich Slate-900 instead of #1B2936 */
@@ -477,4 +481,24 @@ select {
   50% {
     transform: translate(-20px, -30px) scale(1.1);
   }
+}
+
+/* Force text-white and border-white to remain pure white, resolving dark-mode override bugs */
+.text-white,
+.dark\:text-white,
+.dark .text-white,
+.dark .dark\:text-white {
+  color: #ffffff !important;
+}
+.text-white\/80,
+.dark\:text-white\/80,
+.dark .text-white\/80,
+.dark .dark\:text-white\/80 {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+.border-white,
+.dark\:border-white,
+.dark .border-white,
+.dark .dark\:border-white {
+  border-color: #ffffff !important;
 }
