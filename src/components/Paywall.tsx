@@ -1,120 +1,204 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
-import { Bot, Sparkles, ShieldCheck, Camera, Loader2 } from 'lucide-react';
+import { getFunctions, httpsCallable } from 'firebase/functions';
+import { functions } from '../firebase';
+import { Bot, Sparkles, ShieldCheck, Loader2, Lock, Gift } from 'lucide-react';
 
 interface PaywallProps {
   children: React.ReactNode;
-  featureName: 'AskOurPregnancy' | 'FoodScanner';
+  featureName: 'AskOurPregnancy' | 'FoodScanner' | 'MaternalCare' | 'GovernmentSchemes' | 'Postpartum' | 'PartnerSync' | 'EhrExports';
 }
+
+const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature: string) => {
+  const premiumFeatures = ['AskOurPregnancy', 'FoodScanner', 'EhrExports'];
+  const standardFeatures = ['MaternalCare', 'GovernmentSchemes', 'Postpartum', 'PartnerSync'];
+
+  if (tier === 'premium') return true;
+  if (tier === 'standard' && standardFeatures.includes(feature)) return true;
+  return false;
+};
 
 export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const { state, updateState } = usePlanner();
   const [isProcessing, setIsProcessing] = useState(false);
+  const [months, setMonths] = useState(3); // default to 3 months for best value
 
-  // If premium is active, render the wrapped component normally
-  if (state.isPremium) {
+  const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
+  const hasAccess = checkAccess(planTier, featureName);
+
+  if (hasAccess) {
     return <>{children}</>;
   }
 
-  // Mock payment integration for Razorpay
-  const handleSimulatePayment = (plan: 'monthly' | 'annual') => {
+  const isPremiumFeature = ['AskOurPregnancy', 'FoodScanner', 'EhrExports'].includes(featureName);
+  const basePrice = isPremiumFeature ? 499 : 199;
+  const discount = Math.floor(months / 3) * 50;
+  const totalPrice = basePrice * months - discount;
+
+  const handlePayment = async () => {
     setIsProcessing(true);
-    
-    // Simulate network delay and Razorpay checkout popup
-    setTimeout(() => {
-      alert(`Simulation: Razorpay checkout successful for ${plan} plan.`);
-      
-      updateState({
-        isPremium: true,
-        premiumPlan: plan,
-        razorpayPaymentId: `pay_mock_${Date.now()}`,
-        premiumExpiry: new Date(Date.now() + (plan === 'monthly' ? 30 : 365) * 24 * 60 * 60 * 1000).toISOString()
+
+    try {
+      const createPaymentOrder = httpsCallable(functions, 'createPaymentOrder');
+      const verifyPaymentSignature = httpsCallable(functions, 'verifyPaymentSignature');
+
+      // 1. Create order on backend
+      const orderRes: any = await createPaymentOrder({
+        planTier: isPremiumFeature ? 'premium' : 'standard',
+        months
       });
-      
+
+      const { orderId, amount } = orderRes.data;
+
+      // 2. Load Razorpay options
+      const options = {
+        key: "rzp_test_YOUR_KEY_HERE", // Replace with your public key ID in production
+        amount: amount,
+        currency: "INR",
+        name: "Our Pregnancy",
+        description: `Upgrade to ${isPremiumFeature ? 'Premium' : 'Standard'} (${months} Months)`,
+        order_id: orderId,
+        handler: async function (response: any) {
+          try {
+            setIsProcessing(true);
+            const verifyRes: any = await verifyPaymentSignature({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              planTier: isPremiumFeature ? 'premium' : 'standard',
+              months
+            });
+
+            if (verifyRes.data.success) {
+              alert(`Payment successful! Welcome to the ${isPremiumFeature ? 'Premium' : 'Standard'} Plan.`);
+              // Update local state directly
+              updateState({
+                planTier: isPremiumFeature ? 'premium' : 'standard',
+                isPremium: isPremiumFeature,
+                premiumExpiry: verifyRes.data.expiry,
+                razorpayPaymentId: response.razorpay_payment_id
+              });
+            }
+          } catch (err: any) {
+            console.error("Verification failed", err);
+            alert("Cryptographic verification failed. If your account was debited, contact hello@ourpregnancy.in");
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        prefill: {
+          email: state.userName ? `${state.userName.toLowerCase().replace(/\s+/g, '')}@example.com` : "hello@ourpregnancy.in",
+        },
+        theme: {
+          color: isPremiumFeature ? "#F4A261" : "#8ab6a3", // Gold for premium, Sage for standard
+        },
+        modal: {
+          ondismiss: function () {
+            setIsProcessing(false);
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error("Failed to start payment checkout", error);
+      alert(`Could not connect to payment gateway: ${error.message || error}`);
       setIsProcessing(false);
-    }, 1500);
+    }
   };
 
   return (
     <div className="animate-in fade-in duration-300">
       <div className="mb-8">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-          <Sparkles className="text-gold" size={32} /> {featureName === 'AskOurPregnancy' ? 'AskOur Pregnancy AI' : 'AI Food Guide'}
+          <Lock className={isPremiumFeature ? "text-gold" : "text-sage"} size={32} />
+          {isPremiumFeature ? 'AI Ultimate Pack' : 'Maternal Care Pack'}
         </h2>
         <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-          Unlock our advanced AI tools specifically designed for Indian pregnancies.
+          {isPremiumFeature
+            ? 'Unlock advanced AI-powered pregnancy scanners, chatbots, and EHR reports.'
+            : 'Unlock essential clinical checklists, Indian government maternity schemes, and postpartum care.'}
         </p>
       </div>
 
-      <div className="bg-white border-[2px] border-gold rounded-[24px] overflow-hidden shadow-xl max-w-[800px] mx-auto">
-        <div className="bg-gold text-charcoal px-8 py-5 flex items-center justify-between">
+      <div className={`bg-white dark:bg-[#1E293B] border-[2px] ${isPremiumFeature ? 'border-gold' : 'border-sage'} rounded-[24px] overflow-hidden shadow-xl max-w-[700px] mx-auto`}>
+        <div className={`px-8 py-5 flex items-center justify-between ${isPremiumFeature ? 'bg-gold text-charcoal' : 'bg-sage text-white'}`}>
           <div className="font-bold text-[18px] flex items-center gap-2">
-            Our Pregnancy Premium <Bot className="w-5 h-5 flex-shrink-0" />
+            {isPremiumFeature ? 'Our Pregnancy Premium' : 'Our Pregnancy Standard'} <Sparkles className="w-5 h-5 flex-shrink-0" />
           </div>
-          <div className="text-[12px] font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm shadow-sm">
-            Unlock Access
+          <div className="text-[11px] font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm shadow-sm">
+            Locked Feature
           </div>
         </div>
 
         <div className="p-8 sm:p-10">
-          <h3 className="font-serif text-[28px] text-charcoal mb-4">
-            {featureName === 'AskOurPregnancy' 
-              ? 'Your 24/7 Pregnancy Companion ✨' 
-              : 'Instant Pregnancy Safety & Indian Food Guide ✨'}
+          <h3 className="font-serif text-[26px] text-charcoal dark:text-white mb-4">
+            {isPremiumFeature
+              ? 'Unlock Intelligent Features ✨'
+              : 'Unlock Healthcare & Support Guides 🩺'}
           </h3>
-          
-          <p className="text-[16px] text-charcoal/80 mb-8 leading-relaxed">
-            {featureName === 'AskOurPregnancy' 
-              ? 'Ask anything about your pregnancy — symptoms, food safety, what to expect, when to worry — and get instant, personalised answers grounded in ACOG and WHO medical guidelines.'
-              : 'Upload a picture of any meal, Indian snack, or ingredient label. Our AI vision instantly breaks down the nutrition profile and checks for hidden pregnancy hazards like raw papaya, unpasteurized dairy, or excess caffeine.'}
+
+          <p className="text-[15px] text-charcoal/80 dark:text-white/80 mb-8 leading-relaxed">
+            {isPremiumFeature
+              ? 'Get 24/7 personal access to Bloom AI (chat support), AI Food Safety Scanners (identifies hidden pregnancy hazards in Indian snacks/dishes), and formatted FHIR R4 clinical exports.'
+              : 'Get full access to Indian Government Schemes (JSY, PMMVY maternity benefits), Postpartum/Early Parenthood recovery logs, and encrypted Partner Sync functionality.'}
           </p>
 
-          {featureName === 'AskOurPregnancy' && (
-            <div className="space-y-4 mb-10">
-              <div className="bg-gray-50 border border-border p-3 rounded-[12px] rounded-bl-none text-[14px] text-charcoal inline-block shadow-sm">
-                "Is spotting normal at 6 weeks?"
-              </div>
-              <div className="bg-gray-50 border border-border p-3 rounded-[12px] rounded-br-none text-[14px] text-charcoal ml-auto block shadow-sm text-right w-fit">
-                "Can I eat paneer pizza during pregnancy?"
-              </div>
-              <div className="bg-gray-50 border border-border p-3 rounded-[12px] rounded-bl-none text-[14px] text-charcoal inline-block shadow-sm">
-                "I haven't felt the baby move in 3 hours — what should I do?"
-              </div>
+          <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-5 mb-8">
+            <div className="flex justify-between items-center mb-2">
+              <label className="text-[12px] font-bold text-charcoal dark:text-white uppercase tracking-wider">Select Duration</label>
+              <span className={`text-[13px] font-semibold px-2.5 py-0.5 rounded-full ${isPremiumFeature ? 'bg-gold-pale text-gold border border-gold/20' : 'bg-sage-pale text-sage border border-sage/20'}`}>
+                {months} {months === 1 ? 'Month' : 'Months'}
+              </span>
             </div>
-          )}
-          
-          {featureName === 'FoodScanner' && (
-            <div className="flex gap-4 mb-10 justify-center">
-              <div className="w-24 h-24 bg-sage-pale/40 rounded-[12px] flex items-center justify-center border border-border mt-4 shrink-0 transition-transform hover:scale-105">
-                <span className="text-[40px]">🥭</span>
-              </div>
-              <div className="w-24 h-24 bg-sage-pale/40 rounded-[12px] flex items-center justify-center border border-border shrink-0 transition-transform hover:scale-105">
-                <span className="text-[40px]">🍕</span>
-              </div>
-              <div className="w-24 h-24 bg-sage-pale/40 rounded-[12px] flex items-center justify-center border border-border mt-8 shrink-0 transition-transform hover:scale-105">
-                <span className="text-[40px]">🥗</span>
-              </div>
+            <input
+              type="range"
+              min={1}
+              max={12}
+              value={months}
+              onChange={(e) => setMonths(Number(e.target.value))}
+              aria-label="Select upgrade duration"
+              className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white dark:bg-[#1E293B] border border-border dark:border-white/10"
+              style={{
+                accentColor: isPremiumFeature ? "var(--color-gold)" : "var(--color-sage)"
+              }}
+            />
+            <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
+              <span>1m</span>
+              <span>3m</span>
+              <span>6m</span>
+              <span>9m</span>
+              <span>12m</span>
             </div>
-          )}
+          </div>
 
-          <div className="flex flex-col items-center gap-4 border-t border-border pt-8 mt-4">
+          <div className="flex flex-col items-center gap-4 border-t border-border dark:border-white/10 pt-8">
+            <div className="flex items-baseline gap-1.5 mb-2">
+              <span className="text-[36px] font-serif font-bold text-charcoal dark:text-white">₹{totalPrice}</span>
+              <span className="text-[14px] text-medium">/ {months} {months === 1 ? 'month' : 'months'}</span>
+            </div>
+
+            {months >= 3 && (
+              <div className="text-[12px] font-bold text-green-600 dark:text-green-400 flex items-center gap-1.5 bg-green-50 dark:bg-green-950/20 px-3 py-1 rounded-md mb-2">
+                <Gift size={14} /> Includes ₹{Math.floor(months / 3) * 50} discount!
+              </div>
+            )}
+
             <button
-              onClick={() => handleSimulatePayment('monthly')}
+              onClick={handlePayment}
               disabled={isProcessing}
-              className="w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-full bg-gold text-charcoal font-bold text-[16px] hover:bg-yellow-400 transition-colors shadow-lg shadow-gold/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+              className={`w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-full font-bold text-[16px] transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed
+                ${isPremiumFeature
+                  ? 'bg-gold text-charcoal hover:bg-yellow-400 shadow-gold/20'
+                  : 'bg-sage text-white hover:bg-sage-dark shadow-sage/20'}`}
             >
               {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
-              Unlock Premium — ₹299/month
+              Upgrade Plan
             </button>
-            <button
-              onClick={() => handleSimulatePayment('annual')}
-              disabled={isProcessing}
-              className="text-[14px] text-medium hover:text-charcoal transition-colors underline font-medium"
-            >
-              or ₹1,999/year (save 44%)
-            </button>
+
             <p className="text-[11px] text-light mt-2 italic text-center">
-              This is a demonstration. No real payment will be processed.
+              Demonstration Mode: Integrate your active Razorpay Key ID in the options.
             </p>
           </div>
         </div>

@@ -71,81 +71,85 @@ const LINKS = [
   { label: 'Find Anganwadi', url: 'https://wcd.nic.in', domain: 'wcd.nic.in' },
 ];
 
+import { Paywall } from '../Paywall';
+
 export const GovernmentSchemes: React.FC = () => {
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex items-center gap-3">
-        <Building className="w-8 h-8 text-sage" />
-        <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Government Schemes</h1>
-      </div>
+    <Paywall featureName="GovernmentSchemes">
+      <div className="space-y-6 animate-in fade-in duration-300">
+        <div className="flex items-center gap-3">
+          <Building className="w-8 h-8 text-sage" />
+          <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Government Schemes</h1>
+        </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-        {SCHEMES.map(scheme => (
-          <div key={scheme.id} className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage transition-colors">
-            <div className="p-5 border-b border-border bg-gray-50/50 flex items-start justify-between gap-4">
-              <div className="flex gap-3">
-                <div className="text-[24px]">{scheme.icon}</div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          {SCHEMES.map(scheme => (
+            <div key={scheme.id} className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage transition-colors">
+              <div className="p-5 border-b border-border bg-gray-50/50 flex items-start justify-between gap-4">
+                <div className="flex gap-3">
+                  <div className="text-[24px]">{scheme.icon}</div>
+                  <div>
+                    <h3 className="font-bold text-charcoal text-[15px] leading-tight mb-1">{scheme.name}</h3>
+                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-block ${scheme.badgeColor}`}>
+                      {scheme.badge}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-5 space-y-4 flex-1">
                 <div>
-                  <h3 className="font-bold text-charcoal text-[15px] leading-tight mb-1">{scheme.name}</h3>
-                  <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-block ${scheme.badgeColor}`}>
-                    {scheme.badge}
-                  </span>
+                  <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">Benefit</dt>
+                  <dd className="text-[14px] text-charcoal">{scheme.benefit}</dd>
+                </div>
+
+                <div className="bg-sage-pale/20 p-3 rounded-lg border border-sage-pale">
+                  <dt className="text-[11px] font-bold text-sage uppercase tracking-wider mb-0.5">Who Qualifies?</dt>
+                  <dd className="text-[13px] text-charcoal/90">{scheme.who}</dd>
+                </div>
+
+                <div>
+                  <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">How to Apply</dt>
+                  <dd className="text-[13px] text-medium">{scheme.how}</dd>
                 </div>
               </div>
             </div>
-            
-            <div className="p-5 space-y-4 flex-1">
-              <div>
-                <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">Benefit</dt>
-                <dd className="text-[14px] text-charcoal">{scheme.benefit}</dd>
-              </div>
-              
-              <div className="bg-sage-pale/20 p-3 rounded-lg border border-sage-pale">
-                <dt className="text-[11px] font-bold text-sage uppercase tracking-wider mb-0.5">Who Qualifies?</dt>
-                <dd className="text-[13px] text-charcoal/90">{scheme.who}</dd>
-              </div>
-              
-              <div>
-                <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">How to Apply</dt>
-                <dd className="text-[13px] text-medium">{scheme.how}</dd>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <div className="bg-sage border border-sage-dark rounded-[16px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4 text-white text-center sm:text-left mt-8">
-        <div className="bg-white/20 p-3 rounded-full shrink-0">
-          <HeartHandshake className="w-8 h-8 text-white" />
-        </div>
-        <div>
-          <h3 className="font-serif text-[22px] mb-2">Your ASHA Worker is your best resource</h3>
-          <p className="text-[15px] opacity-90 leading-relaxed max-w-3xl">
-            Every village and urban ward has an ASHA (Accredited Social Health Activist) who can help you access all these schemes, accompany you to hospital for delivery, and answer your questions. Ask at your nearest PHC to find your ASHA worker.
-          </p>
-        </div>
-      </div>
-
-      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6 mt-6">
-        <h3 className="font-semibold text-charcoal text-[15px] mb-4">Important Links</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {LINKS.map(link => (
-            <a 
-              key={link.url}
-              href={link.url} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="flex flex-col p-3 border border-border rounded-lg hover:bg-gray-50 hover:border-sage transition-all group"
-            >
-              <div className="flex items-center justify-between mb-1">
-                <span className="font-medium text-[14px] text-charcoal">{link.label}</span>
-                <ExternalLink className="w-4 h-4 text-medium group-hover:text-sage" />
-              </div>
-              <span className="text-[12px] text-medium">{link.domain}</span>
-            </a>
           ))}
         </div>
+
+        <div className="bg-sage border border-sage-dark rounded-[16px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4 text-white text-center sm:text-left mt-8">
+          <div className="bg-white/20 p-3 rounded-full shrink-0">
+            <HeartHandshake className="w-8 h-8 text-white" />
+          </div>
+          <div>
+            <h3 className="font-serif text-[22px] mb-2">Your ASHA Worker is your best resource</h3>
+            <p className="text-[15px] opacity-90 leading-relaxed max-w-3xl">
+              Every village and urban ward has an ASHA (Accredited Social Health Activist) who can help you access all these schemes, accompany you to hospital for delivery, and answer your questions. Ask at your nearest PHC to find your ASHA worker.
+            </p>
+          </div>
+        </div>
+
+        <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6 mt-6">
+          <h3 className="font-semibold text-charcoal text-[15px] mb-4">Important Links</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {LINKS.map(link => (
+              <a
+                key={link.url}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex flex-col p-3 border border-border rounded-lg hover:bg-gray-50 hover:border-sage transition-all group"
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-medium text-[14px] text-charcoal">{link.label}</span>
+                  <ExternalLink className="w-4 h-4 text-medium group-hover:text-sage" />
+                </div>
+                <span className="text-[12px] text-medium">{link.domain}</span>
+              </a>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </Paywall>
   );
 };
