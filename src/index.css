@@ -1,6 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Nunito:wght@400;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Lexend:wght@300;400;500&display=swap');
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --color-white: #ffffff;
   --color-border: #e8e6e1;
@@ -72,10 +74,14 @@ button,
 
 /* Dark Mode Overrides */
 .dark {
-  --color-white: #2C3E50;
-  --color-border: #3A4F63;
-  --color-medium: #8096A8;
-  --color-light: #52687A;
+  --color-white: #1E293B;
+  /* Rich Slate-800 instead of flat charcoal #2C3E50 */
+  --color-border: #334155;
+  /* Slate-700 instead of #3A4F63 */
+  --color-medium: #94A3B8;
+  /* Slate-400 instead of #8096A8 */
+  --color-light: #64748B;
+  /* Slate-500 instead of #52687A */
 
   --color-sage: #96C1AE;
   --color-sage-light: #6E9484;
@@ -88,8 +94,10 @@ button,
   --color-gold: #EDB785;
   --color-gold-pale: #3D2D1E;
 
-  --color-cream: #1B2936;
-  --color-charcoal: #EAE6DB;
+  --color-cream: #0F172A;
+  /* Rich Slate-900 instead of #1B2936 */
+  --color-charcoal: #F8FAFC;
+  /* Slate-50 instead of #EAE6DB */
 
   --color-critical: #E88E8E;
   --color-critical-bg: #4A2929;
@@ -193,9 +201,27 @@ button:active {
   border-color: var(--color-sage-light);
 }
 
+.dark .premium-card {
+  background-color: var(--color-white);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 20px -4px rgba(0, 0, 0, 0.3), inset 0 1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.dark .premium-card:hover {
+  border-color: var(--color-sage-light);
+  box-shadow: 0 12px 30px -10px rgba(150, 193, 174, 0.15), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
+}
+
 /* Glassmorphism Polish */
 .glass-panel {
   @apply bg-white/70 backdrop-blur-md border border-white/40 shadow-sm;
+}
+
+.dark .glass-panel {
+  background-color: rgba(255, 255, 255, 0.035) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.05) !important;
 }
 
 /* Logo Interactive Glow */
@@ -380,11 +406,21 @@ body {
 }
 
 /* Premium smooth theme variable transitions */
-html, body, header, main, footer, .premium-card, .glass-panel, button, input, textarea, select {
-  transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-              border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-              color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), 
-              box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+html,
+body,
+header,
+main,
+footer,
+.premium-card,
+.glass-panel,
+button,
+input,
+textarea,
+select {
+  transition: background-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    border-color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    color 0.4s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
 /* Premium Glassmorphic Mesh Glow container & animations */
@@ -420,18 +456,24 @@ html, body, header, main, footer, .premium-card, .glass-panel, button, input, te
 }
 
 @keyframes float-blob-1 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
   }
+
   50% {
     transform: translate(30px, 20px) scale(1.15);
   }
 }
 
 @keyframes float-blob-2 {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0px, 0px) scale(1);
   }
+
   50% {
     transform: translate(-20px, -30px) scale(1.1);
   }

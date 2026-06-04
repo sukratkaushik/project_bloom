@@ -1,8 +1,15 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
+import * as admin from "firebase-admin";
+import crypto from "crypto";
+
+// Initialize Firebase Admin SDK
+admin.initializeApp();
 
 // Define the secure secret that we will store in Firebase Secret Manager
 const hfApiKey = defineSecret("HUGGINGFACE_API_KEY");
+const razorpayKeyId = defineSecret("RAZORPAY_KEY_ID");
+const razorpayKeySecret = defineSecret("RAZORPAY_KEY_SECRET");
 
 export const chatWithAI = onCall(
   { secrets: [hfApiKey], region: "asia-south1" },
@@ -333,4 +340,92 @@ function parseResponseContent(result: any) {
   }
   throw new HttpsError("internal", "No response received from AI model.");
 }
+
+/**
+ * Creates a secure payment order via Razorpay API
+ */
+export const createPaymentOrder = onCall(
+  { secrets: [razorpayKeyId, razorpayKeySecret], region: "asia-south1" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const { planTier, months } = request.data;
+    if (!['standard', 'premium'].includes(planTier) || !months) {
+      throw new HttpsError("invalid-argument", "Valid planTier and months are required.");
+    }
+
+    const basePrice = planTier === 'standard' ? 199 : 499;
+    const discount = Math.floor(months / 3) * 50;
+    const finalTotal = Math.max(0, (basePrice * months) - discount);
+
+    const Razorpay = require("razorpay");
+    const rzp = new Razorpay({
+      key_id: razorpayKeyId.value(),
+      key_secret: razorpayKeySecret.value(),
+    });
+
+    try {
+      const order = await rzp.orders.create({
+        amount: finalTotal * 100, // Razorpay requires amounts in paise
+        currency: "INR",
+        receipt: `receipt_${request.auth.uid}_${Date.now()}`,
+        notes: {
+          uid: request.auth.uid,
+          planTier,
+          months: months.toString()
+        }
+      });
+
+      return { orderId: order.id, amount: order.amount };
+    } catch (err: any) {
+      console.error("Razorpay order creation error:", err);
+      throw new HttpsError("internal", `Payment gateway error: ${err.message || "Unknown error"}`);
+    }
+  }
+);
+
+/**
+ * Securely verifies payment signature and updates user's plan state in Firestore
+ */
+export const verifyPaymentSignature = onCall(
+  { secrets: [razorpayKeySecret], region: "asia-south1" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planTier, months } = request.data;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !planTier || !months) {
+      throw new HttpsError("invalid-argument", "Missing required verification parameters.");
+    }
+
+    const secret = razorpayKeySecret.value();
+    const hmac = crypto.createHmac("sha256", secret);
+    hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const generatedSignature = hmac.digest("hex");
+
+    if (generatedSignature !== razorpay_signature) {
+      throw new HttpsError("permission-denied", "Payment verification failed: invalid signature.");
+    }
+
+    // Determine plan expiry
+    const db = admin.firestore();
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + Number(months));
+
+    // Update the user profile in database
+    await db.collection("users").doc(request.auth.uid).set({
+      planTier,
+      planExpiry: expiry.toISOString(),
+      razorpayPaymentId: razorpay_payment_id,
+      razorpayOrderId: razorpay_order_id,
+      isPremium: planTier === 'premium', // backward compatibility mapping
+      updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+
+    return { success: true, planTier, expiry: expiry.toISOString() };
+  }
+);
 

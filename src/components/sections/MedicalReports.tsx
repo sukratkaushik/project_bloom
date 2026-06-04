@@ -24,6 +24,7 @@ import {
 } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
+import { Paywall } from '../Paywall';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -269,337 +270,339 @@ export const MedicalReports: React.FC = () => {
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <div className="mb-7">
-        <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Medical Reports</h2>
-        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-          Upload and organize your ultrasound scans, blood test reports, and clinic prescriptions.
-        </p>
-      </div>
-
-      {/* Privacy Notice Banner */}
-      <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
-        <Lock className="w-5 h-5 text-sage shrink-0 mt-0.5" />
-        <div>
-          <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Secure Cloud Storage & Privacy</h4>
-          <p className="text-[12px] text-medium leading-relaxed">
-            All medical reports are stored securely in the cloud with strict industry-standard encryption and privacy controls.
-            Your health records are confidential, secure, and accessible across all your linked devices.
+    <Paywall featureName="EhrExports">
+      <div className="animate-in fade-in duration-300">
+        <div className="mb-7">
+          <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Medical Reports</h2>
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
+            Upload and organize your ultrasound scans, blood test reports, and clinic prescriptions.
           </p>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-6 items-start">
-        {/* Left Column: Upload Area */}
-        <div className="flex flex-col gap-4">
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`border-[2px] border-dashed rounded-[20px] p-8 flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[240px] cursor-pointer relative bg-white
-              ${isDragOver
-                ? 'border-sage bg-sage-pale/20 scale-[1.02]'
-                : 'border-border hover:border-sage-light hover:shadow-sm'
-              }`}
-          >
-            <input
-              type="file"
-              onChange={handleFileChange}
-              accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-              disabled={isUploading}
-            />
-
-            <div className="w-16 h-16 bg-sage-pale/50 text-sage rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-              <UploadCloud className="w-8 h-8" />
-            </div>
-
-            <h3 className="text-[15px] font-bold text-charcoal mb-1">
-              {isUploading ? "Uploading & encrypting..." : "Upload Medical Report"}
-            </h3>
-            <p className="text-[12px] text-medium max-w-[200px] leading-relaxed mb-3">
-              Drag & drop your files here, or click to browse.
-            </p>
-            <span className="text-[10px] text-light uppercase tracking-wider font-bold">
-              PDF, PNG, JPG (Max 10MB)
-            </span>
-          </div>
-
-          {uploadError && (
-            <div className="bg-critical-bg border border-critical/30 rounded-[12px] p-3 flex gap-2 items-start animate-in zoom-in-95 duration-200">
-              <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
-              <span className="text-[12px] text-critical font-medium">{uploadError}</span>
-            </div>
-          )}
-
-          <div className="bg-white border border-border rounded-[18px] p-5 shadow-sm">
-            <h4 className="text-[13px] font-bold text-charcoal mb-2 flex items-center gap-1.5">
-              <Info className="w-4 h-4 text-sage" /> Quick Tip
-            </h4>
+        {/* Privacy Notice Banner */}
+        <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
+          <Lock className="w-5 h-5 text-sage shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Secure Cloud Storage & Privacy</h4>
             <p className="text-[12px] text-medium leading-relaxed">
-              When storing reports, rename them with clear labels (e.g. <em>"12 Week Ultrasound Scan"</em> or <em>"CBC Blood Test - May 2026"</em>) and add important summaries in the doctor notes block.
+              All medical reports are stored securely in the cloud with strict industry-standard encryption and privacy controls.
+              Your health records are confidential, secure, and accessible across all your linked devices.
             </p>
           </div>
         </div>
 
-        {/* Right Column: Reports List */}
-        <div className="flex flex-col gap-4">
-          <div className="flex items-center justify-between pl-1">
-            <h3 className="text-[14px] font-bold text-charcoal uppercase tracking-[1px]">
-              My Stored Records ({reports.length})
-            </h3>
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-6 items-start">
+          {/* Left Column: Upload Area */}
+          <div className="flex flex-col gap-4">
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              className={`border-[2px] border-dashed rounded-[20px] p-8 flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[240px] cursor-pointer relative bg-white
+              ${isDragOver
+                  ? 'border-sage bg-sage-pale/20 scale-[1.02]'
+                  : 'border-border hover:border-sage-light hover:shadow-sm'
+                }`}
+            >
+              <input
+                type="file"
+                onChange={handleFileChange}
+                accept=".pdf,image/png,image/jpeg,image/jpg,image/webp"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                disabled={isUploading}
+              />
 
-          {reports.length === 0 ? (
-            <div className="bg-white border border-border rounded-[20px] p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
-              <div className="w-12 h-12 bg-cream text-light rounded-full flex items-center justify-center mb-3">
-                <FileText className="w-6 h-6" />
+              <div className="w-16 h-16 bg-sage-pale/50 text-sage rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
+                <UploadCloud className="w-8 h-8" />
               </div>
-              <h4 className="text-[14px] font-bold text-charcoal mb-1">No reports uploaded yet</h4>
-              <p className="text-[12px] text-medium max-w-[260px] leading-relaxed">
-                Keep all your screenings, vitals records, and vaccine receipts safe in one place. Drag & drop files on the left to add one!
+
+              <h3 className="text-[15px] font-bold text-charcoal mb-1">
+                {isUploading ? "Uploading & encrypting..." : "Upload Medical Report"}
+              </h3>
+              <p className="text-[12px] text-medium max-w-[200px] leading-relaxed mb-3">
+                Drag & drop your files here, or click to browse.
+              </p>
+              <span className="text-[10px] text-light uppercase tracking-wider font-bold">
+                PDF, PNG, JPG (Max 10MB)
+              </span>
+            </div>
+
+            {uploadError && (
+              <div className="bg-critical-bg border border-critical/30 rounded-[12px] p-3 flex gap-2 items-start animate-in zoom-in-95 duration-200">
+                <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
+                <span className="text-[12px] text-critical font-medium">{uploadError}</span>
+              </div>
+            )}
+
+            <div className="bg-white border border-border rounded-[18px] p-5 shadow-sm">
+              <h4 className="text-[13px] font-bold text-charcoal mb-2 flex items-center gap-1.5">
+                <Info className="w-4 h-4 text-sage" /> Quick Tip
+              </h4>
+              <p className="text-[12px] text-medium leading-relaxed">
+                When storing reports, rename them with clear labels (e.g. <em>"12 Week Ultrasound Scan"</em> or <em>"CBC Blood Test - May 2026"</em>) and add important summaries in the doctor notes block.
               </p>
             </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {reports.map((report) => (
-                <div
-                  key={report.id}
-                  className="bg-white border border-border rounded-[18px] p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
-                >
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-cream border border-border rounded-[12px] shrink-0 mt-0.5">
-                      {getFileIcon(report.fileType)}
-                    </div>
+          </div>
 
-                    <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3">
-                      <div>
-                        {/* Title input */}
-                        <input
-                          type="text"
-                          value={report.title}
-                          onChange={(e) => updateReportField(report.id, 'title', e.target.value)}
-                          className="w-full font-serif text-[17px] font-semibold text-charcoal border-b border-transparent hover:border-border focus:border-sage focus:outline-none bg-transparent py-0.5 truncate transition-colors"
-                          placeholder="Report Title"
-                        />
-                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1 text-[11px] text-light">
-                          <span className="truncate max-w-[150px]" title={report.fileName}>
-                            {report.fileName}
-                          </span>
-                          <span>•</span>
-                          <span>{formatBytes(report.fileSize)}</span>
+          {/* Right Column: Reports List */}
+          <div className="flex flex-col gap-4">
+            <div className="flex items-center justify-between pl-1">
+              <h3 className="text-[14px] font-bold text-charcoal uppercase tracking-[1px]">
+                My Stored Records ({reports.length})
+              </h3>
+            </div>
+
+            {reports.length === 0 ? (
+              <div className="bg-white border border-border rounded-[20px] p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
+                <div className="w-12 h-12 bg-cream text-light rounded-full flex items-center justify-center mb-3">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <h4 className="text-[14px] font-bold text-charcoal mb-1">No reports uploaded yet</h4>
+                <p className="text-[12px] text-medium max-w-[260px] leading-relaxed">
+                  Keep all your screenings, vitals records, and vaccine receipts safe in one place. Drag & drop files on the left to add one!
+                </p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                {reports.map((report) => (
+                  <div
+                    key={report.id}
+                    className="bg-white border border-border rounded-[18px] p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
+                  >
+                    <div className="flex items-start gap-4">
+                      <div className="p-2 bg-cream border border-border rounded-[12px] shrink-0 mt-0.5">
+                        {getFileIcon(report.fileType)}
+                      </div>
+
+                      <div className="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-[1.5fr_1fr] gap-3">
+                        <div>
+                          {/* Title input */}
+                          <input
+                            type="text"
+                            value={report.title}
+                            onChange={(e) => updateReportField(report.id, 'title', e.target.value)}
+                            className="w-full font-serif text-[17px] font-semibold text-charcoal border-b border-transparent hover:border-border focus:border-sage focus:outline-none bg-transparent py-0.5 truncate transition-colors"
+                            placeholder="Report Title"
+                          />
+                          <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1 mt-1 text-[11px] text-light">
+                            <span className="truncate max-w-[150px]" title={report.fileName}>
+                              {report.fileName}
+                            </span>
+                            <span>•</span>
+                            <span>{formatBytes(report.fileSize)}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 md:justify-end">
+                          <Calendar size={14} className="text-light shrink-0" />
+                          <input
+                            type="date"
+                            value={report.date}
+                            onChange={(e) => updateReportField(report.id, 'date', e.target.value)}
+                            className="font-sans text-[12px] text-medium font-medium bg-cream border border-border rounded-[8px] p-1.5 focus:outline-none focus:border-sage transition-all max-w-[130px]"
+                          />
                         </div>
                       </div>
-
-                      <div className="flex items-center gap-2 md:justify-end">
-                        <Calendar size={14} className="text-light shrink-0" />
-                        <input
-                          type="date"
-                          value={report.date}
-                          onChange={(e) => updateReportField(report.id, 'date', e.target.value)}
-                          className="font-sans text-[12px] text-medium font-medium bg-cream border border-border rounded-[8px] p-1.5 focus:outline-none focus:border-sage transition-all max-w-[130px]"
-                        />
-                      </div>
                     </div>
-                  </div>
 
-                  {/* Doctor Notes Textarea */}
-                  <div>
-                    <label className="text-[10px] font-bold tracking-[0.8px] uppercase text-light mb-1.5 block">Summary & Doctor Instructions</label>
-                    <textarea
-                      value={report.notes || ''}
-                      onChange={(e) => updateReportField(report.id, 'notes', e.target.value)}
-                      placeholder="Doctor guidelines, vaccine follow-ups, parameters to watch out for..."
-                      className="w-full p-2.5 bg-cream/30 border border-border rounded-[10px] text-[13px] text-charcoal resize-y min-h-[50px] font-sans leading-relaxed focus:outline-none focus:border-sage transition-colors placeholder:text-light/80 placeholder:italic"
-                    />
-                  </div>
+                    {/* Doctor Notes Textarea */}
+                    <div>
+                      <label className="text-[10px] font-bold tracking-[0.8px] uppercase text-light mb-1.5 block">Summary & Doctor Instructions</label>
+                      <textarea
+                        value={report.notes || ''}
+                        onChange={(e) => updateReportField(report.id, 'notes', e.target.value)}
+                        placeholder="Doctor guidelines, vaccine follow-ups, parameters to watch out for..."
+                        className="w-full p-2.5 bg-cream/30 border border-border rounded-[10px] text-[13px] text-charcoal resize-y min-h-[50px] font-sans leading-relaxed focus:outline-none focus:border-sage transition-colors placeholder:text-light/80 placeholder:italic"
+                      />
+                    </div>
 
-                  {/* AI Assistant Section */}
-                  <div className="mt-2 border-t border-border/40 pt-4">
-                    {!report.aiAnalysedAt && !analyzingMap[report.id] && (
-                      <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                        <div className="flex gap-2.5 items-start">
-                          <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
-                          <div className="text-left">
-                            <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
-                            <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
-                              Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
+                    {/* AI Assistant Section */}
+                    <div className="mt-2 border-t border-border/40 pt-4">
+                      {!report.aiAnalysedAt && !analyzingMap[report.id] && (
+                        <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                          <div className="flex gap-2.5 items-start">
+                            <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
+                            <div className="text-left">
+                              <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
+                              <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
+                                Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => runAIAnalysis(report)}
+                            className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
+                          >
+                            <Sparkles size={13} /> Analyze Report
+                          </button>
+                        </div>
+                      )}
+
+                      {analyzingMap[report.id] && (
+                        <div className="bg-cream/40 border border-border rounded-[14px] p-4 flex items-center justify-center gap-3 min-h-[80px]">
+                          <Loader2 className="w-5 h-5 text-sage animate-spin" />
+                          <AILoadingMessage />
+                        </div>
+                      )}
+
+                      {analysisErrorMap[report.id] && (
+                        <div className="bg-critical-bg/50 border border-critical/20 rounded-[12px] p-3 flex gap-2 items-start mt-2">
+                          <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
+                          <div className="flex-1 text-left">
+                            <span className="text-[12px] text-critical font-medium">{analysisErrorMap[report.id]}</span>
+                            <button
+                              onClick={() => runAIAnalysis(report)}
+                              className="text-[11px] text-sage hover:text-sage-dark underline font-bold ml-2 transition-colors cursor-pointer"
+                            >
+                              Retry
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {report.aiAnalysedAt && (
+                        <div className="flex flex-col gap-3 text-left">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <Brain size={16} className="text-sage" />
+                              <span className="text-[11px] font-bold tracking-[0.8px] uppercase text-sage">AI Digital Helper Findings</span>
+                            </div>
+                            <button
+                              onClick={() => resetAIAnalysis(report)}
+                              className="text-[11px] text-medium hover:text-critical flex items-center gap-1 transition-colors cursor-pointer"
+                              title="Clear AI Analysis"
+                            >
+                              <RotateCcw size={11} /> Reset Analysis
+                            </button>
+                          </div>
+
+                          {/* Summary */}
+                          {report.aiSummary && (
+                            <div className="bg-sage-pale/20 border border-sage/10 rounded-[12px] p-3.5">
+                              <h6 className="text-[11px] font-bold text-sage-dark mb-1 flex items-center gap-1">
+                                <Sparkles size={12} /> Patient-Friendly Summary
+                              </h6>
+                              <p className="text-[12.5px] text-charcoal leading-relaxed font-sans">{report.aiSummary}</p>
+                            </div>
+                          )}
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {/* Prescriptions */}
+                            <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
+                              <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
+                                <Pill size={12} className="text-rose-400" /> Deciphered Prescriptions
+                              </h6>
+                              {report.aiPrescriptions && report.aiPrescriptions.length > 0 ? (
+                                <ul className="space-y-1.5 flex-1">
+                                  {report.aiPrescriptions.map((presc, idx) => (
+                                    <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-rose-400/70 before:rounded-full font-medium">
+                                      {presc}
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <span className="text-[12px] text-light italic">No prescriptions detected in this record.</span>
+                              )}
+                            </div>
+
+                            {/* Warnings / Guidance */}
+                            <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
+                              <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
+                                <AlertTriangle size={12} className="text-amber-500" /> Key Warnings & Guidelines
+                              </h6>
+                              {report.aiWarnings && report.aiWarnings.length > 0 ? (
+                                <ul className="space-y-1.5 flex-1">
+                                  {report.aiWarnings.map((warn, idx) => (
+                                    <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-amber-400/70 before:rounded-full font-medium">
+                                      {warn}
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : (
+                                <span className="text-[12px] text-light italic">No safety warnings detected.</span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Disclaimer */}
+                          <div className="bg-cream/20 border border-border/50 rounded-[10px] p-2.5 flex gap-2 items-start">
+                            <ShieldCheck size={14} className="text-sage shrink-0 mt-0.5" />
+                            <p className="text-[10px] text-medium leading-relaxed font-sans">
+                              <strong>Medical Verification Notice:</strong> This analysis is processed using AI to decipher doctor note formats and is strictly for informational aid. Never alter medications, dosages, or schedules without consulting your practitioner or pharmacist.
                             </p>
                           </div>
                         </div>
+                      )}
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-end gap-2 border-t border-border/50 pt-3">
+                      {report.fileType.startsWith('image/') && (
                         <button
-                          onClick={() => runAIAnalysis(report)}
-                          className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
+                          onClick={() => setPreviewReport(report)}
+                          className="p-2 border border-border text-medium hover:text-sage hover:bg-sage-pale/20 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                          title="Preview Image"
                         >
-                          <Sparkles size={13} /> Analyze Report
+                          <Eye size={14} /> Preview
                         </button>
-                      </div>
-                    )}
-
-                    {analyzingMap[report.id] && (
-                      <div className="bg-cream/40 border border-border rounded-[14px] p-4 flex items-center justify-center gap-3 min-h-[80px]">
-                        <Loader2 className="w-5 h-5 text-sage animate-spin" />
-                        <AILoadingMessage />
-                      </div>
-                    )}
-
-                    {analysisErrorMap[report.id] && (
-                      <div className="bg-critical-bg/50 border border-critical/20 rounded-[12px] p-3 flex gap-2 items-start mt-2">
-                        <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
-                        <div className="flex-1 text-left">
-                          <span className="text-[12px] text-critical font-medium">{analysisErrorMap[report.id]}</span>
-                          <button
-                            onClick={() => runAIAnalysis(report)}
-                            className="text-[11px] text-sage hover:text-sage-dark underline font-bold ml-2 transition-colors cursor-pointer"
-                          >
-                            Retry
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    {report.aiAnalysedAt && (
-                      <div className="flex flex-col gap-3 text-left">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1.5">
-                            <Brain size={16} className="text-sage" />
-                            <span className="text-[11px] font-bold tracking-[0.8px] uppercase text-sage">AI Digital Helper Findings</span>
-                          </div>
-                          <button
-                            onClick={() => resetAIAnalysis(report)}
-                            className="text-[11px] text-medium hover:text-critical flex items-center gap-1 transition-colors cursor-pointer"
-                            title="Clear AI Analysis"
-                          >
-                            <RotateCcw size={11} /> Reset Analysis
-                          </button>
-                        </div>
-
-                        {/* Summary */}
-                        {report.aiSummary && (
-                          <div className="bg-sage-pale/20 border border-sage/10 rounded-[12px] p-3.5">
-                            <h6 className="text-[11px] font-bold text-sage-dark mb-1 flex items-center gap-1">
-                              <Sparkles size={12} /> Patient-Friendly Summary
-                            </h6>
-                            <p className="text-[12.5px] text-charcoal leading-relaxed font-sans">{report.aiSummary}</p>
-                          </div>
-                        )}
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                          {/* Prescriptions */}
-                          <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
-                            <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
-                              <Pill size={12} className="text-rose-400" /> Deciphered Prescriptions
-                            </h6>
-                            {report.aiPrescriptions && report.aiPrescriptions.length > 0 ? (
-                              <ul className="space-y-1.5 flex-1">
-                                {report.aiPrescriptions.map((presc, idx) => (
-                                  <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-rose-400/70 before:rounded-full font-medium">
-                                    {presc}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <span className="text-[12px] text-light italic">No prescriptions detected in this record.</span>
-                            )}
-                          </div>
-
-                          {/* Warnings / Guidance */}
-                          <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
-                            <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
-                              <AlertTriangle size={12} className="text-amber-500" /> Key Warnings & Guidelines
-                            </h6>
-                            {report.aiWarnings && report.aiWarnings.length > 0 ? (
-                              <ul className="space-y-1.5 flex-1">
-                                {report.aiWarnings.map((warn, idx) => (
-                                  <li key={idx} className="text-[12px] text-charcoal leading-relaxed pl-3 relative before:content-[''] before:absolute before:left-0 before:top-2 before:w-1.5 before:h-1.5 before:bg-amber-400/70 before:rounded-full font-medium">
-                                    {warn}
-                                  </li>
-                                ))}
-                              </ul>
-                            ) : (
-                              <span className="text-[12px] text-light italic">No safety warnings detected.</span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Disclaimer */}
-                        <div className="bg-cream/20 border border-border/50 rounded-[10px] p-2.5 flex gap-2 items-start">
-                          <ShieldCheck size={14} className="text-sage shrink-0 mt-0.5" />
-                          <p className="text-[10px] text-medium leading-relaxed font-sans">
-                            <strong>Medical Verification Notice:</strong> This analysis is processed using AI to decipher doctor note formats and is strictly for informational aid. Never alter medications, dosages, or schedules without consulting your practitioner or pharmacist.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex justify-end gap-2 border-t border-border/50 pt-3">
-                    {report.fileType.startsWith('image/') && (
+                      )}
                       <button
-                        onClick={() => setPreviewReport(report)}
+                        onClick={() => triggerDownload(report)}
                         className="p-2 border border-border text-medium hover:text-sage hover:bg-sage-pale/20 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                        title="Preview Image"
+                        title="Download File"
                       >
-                        <Eye size={14} /> Preview
+                        <Download size={14} /> Download
                       </button>
-                    )}
-                    <button
-                      onClick={() => triggerDownload(report)}
-                      className="p-2 border border-border text-medium hover:text-sage hover:bg-sage-pale/20 rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
-                      title="Download File"
-                    >
-                      <Download size={14} /> Download
-                    </button>
-                    <button
-                      onClick={() => deleteReport(report.id)}
-                      className="p-2 border border-border text-medium hover:text-critical hover:bg-critical-bg rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors ml-auto cursor-pointer"
-                      title="Delete Report"
-                    >
-                      <Trash2 size={14} /> Delete
-                    </button>
+                      <button
+                        onClick={() => deleteReport(report.id)}
+                        className="p-2 border border-border text-medium hover:text-critical hover:bg-critical-bg rounded-[10px] text-xs font-semibold flex items-center gap-1.5 transition-colors ml-auto cursor-pointer"
+                        title="Delete Report"
+                      >
+                        <Trash2 size={14} /> Delete
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Lightbox / Preview Modal for Images */}
-      {previewReport && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-[24px] overflow-hidden max-w-[90%] max-h-[90%] w-full md:w-auto relative shadow-2xl flex flex-col">
-            <div className="p-4 border-b border-border flex justify-between items-center bg-cream">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-charcoal">{previewReport.title}</span>
-                <span className="text-[11px] bg-sage text-white font-bold px-2 py-0.5 rounded uppercase">{previewReport.fileType.split('/')[1]}</span>
+                ))}
               </div>
-              <button
-                onClick={() => setPreviewReport(null)}
-                className="text-medium hover:text-charcoal p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
-              >
-                <X size={20} />
-              </button>
-            </div>
-            <div className="overflow-auto flex items-center justify-center p-4 bg-charcoal/5 flex-1 min-h-0">
-              <img
-                src={previewReport.fileData}
-                alt={previewReport.title}
-                className="max-w-full max-h-[70vh] object-contain rounded-md"
-              />
-            </div>
-            <div className="p-4 border-t border-border flex justify-end gap-3 bg-cream">
-              <button
-                onClick={() => triggerDownload(previewReport)}
-                className="px-4 py-2 bg-sage text-white font-semibold text-sm rounded-[10px] flex items-center gap-2 hover:bg-sage-dark transition-colors cursor-pointer"
-              >
-                <Download size={16} /> Download File
-              </button>
-            </div>
+            )}
           </div>
         </div>
-      )}
-    </div>
+
+        {/* Lightbox / Preview Modal for Images */}
+        {previewReport && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-white rounded-[24px] overflow-hidden max-w-[90%] max-h-[90%] w-full md:w-auto relative shadow-2xl flex flex-col">
+              <div className="p-4 border-b border-border flex justify-between items-center bg-cream">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold text-charcoal">{previewReport.title}</span>
+                  <span className="text-[11px] bg-sage text-white font-bold px-2 py-0.5 rounded uppercase">{previewReport.fileType.split('/')[1]}</span>
+                </div>
+                <button
+                  onClick={() => setPreviewReport(null)}
+                  className="text-medium hover:text-charcoal p-1.5 rounded-full hover:bg-black/5 cursor-pointer"
+                >
+                  <X size={20} />
+                </button>
+              </div>
+              <div className="overflow-auto flex items-center justify-center p-4 bg-charcoal/5 flex-1 min-h-0">
+                <img
+                  src={previewReport.fileData}
+                  alt={previewReport.title}
+                  className="max-w-full max-h-[70vh] object-contain rounded-md"
+                />
+              </div>
+              <div className="p-4 border-t border-border flex justify-end gap-3 bg-cream">
+                <button
+                  onClick={() => triggerDownload(previewReport)}
+                  className="px-4 py-2 bg-sage text-white font-semibold text-sm rounded-[10px] flex items-center gap-2 hover:bg-sage-dark transition-colors cursor-pointer"
+                >
+                  <Download size={16} /> Download File
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </Paywall>
   );
 };

@@ -13,7 +13,7 @@ export const AskOurPregnancy: React.FC = () => {
   const [input, setInput] = useState('');
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
-    { role: 'model', text: "Hello! I'm AskOurPregnancy, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?" }
+    { role: 'model', text: "Hello! I'm Bloom AI, your AI prenatal assistant. I have your current pregnancy details and recent symptom logs. How can I support you today?" }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Consulting guidelines...");
@@ -60,9 +60,9 @@ export const AskOurPregnancy: React.FC = () => {
         .join(', ') || 'None reported';
 
       const systemInstruction = `
-# SYSTEM INSTRUCTIONS: AskOur Pregnancy AI Prenatal Assistant
+# SYSTEM INSTRUCTIONS: Bloom AI Prenatal Assistant
 
-You are "AskOurPregnancy," the built-in AI prenatal assistant for the "Project Bloom" / "Our Pregnancy" application. Your primary function is to provide supportive, accurate, and safe prenatal health information to expectant parents. 
+You are "Bloom AI," the built-in AI prenatal assistant for the "Our Pregnancy" application. Your primary function is to provide supportive, accurate, and safe prenatal health information to expectant parents. 
 
 CRITICAL RULE: You are the native AI for this pregnancy app. NEVER recommend that the user "download a pregnancy app" or "use an app to track growth" — they are already using your app! You have direct access to their gestational age in the context below, so use it to directly answer questions about baby size, development, and milestones.
 
@@ -97,7 +97,7 @@ Before providing any clinical or symptom-related information, you must possess t
 You MUST append the following hard clinical disclaimer to the very end of EVERY single response you generate. It must appear exactly as formatted below, using markdown blockquotes and bold text to ensure it is visually distinct. Do not alter the wording of this disclaimer.
 
 > **⚠️ IMPORTANT CLINICAL NOTICE**
-> AskOurPregnancy is an AI informational assistant and does not provide medical advice, diagnosis, or treatment. Always consult your OB-GYN or midwife regarding your specific health needs. 
+> Bloom AI is an AI informational assistant and does not provide medical advice, diagnosis, or treatment. Always consult your OB-GYN or midwife regarding your specific health needs. 
 >
 > **Seek IMMEDIATE emergency medical care (call 911 or go to the nearest emergency department) if you experience any of the following red-flag symptoms:**
 > *   Vaginal bleeding or spotting
@@ -213,7 +213,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
   if (!state.activeJourneyId) {
     return (
       <div className="text-center p-10 text-light italic">
-        Please generate a new plan to use AskOurPregnancy.
+        Please generate a new plan to use Bloom AI.
       </div>
     );
   }
@@ -223,7 +223,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
       <div className="animate-in fade-in duration-300 flex flex-col h-[calc(100vh-140px)]">
         <div className="mb-5 shrink-0">
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-            <Sparkles className="text-sage" size={32} /> AskOur Pregnancy AI
+            <Sparkles className="text-sage" size={32} /> Bloom AI
           </h2>
           {!state.isCalmModeActive && (
             <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
@@ -237,8 +237,8 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] rounded-[16px] p-4 ${msg.role === 'user'
-                    ? 'bg-sage text-white rounded-tr-[4px]'
-                    : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
+                  ? 'bg-sage text-white rounded-tr-[4px]'
+                  : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
                   }`}>
                   {msg.role === 'model' ? (
                     <div className="markdown-body text-[14px] leading-[1.6]">
@@ -315,7 +315,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
               </button>
             </div>
             <div className="text-center mt-2 text-[10px] text-light">
-              AskOurPregnancy uses AI and may make mistakes. Always verify medical information with your healthcare provider.
+              Bloom AI uses AI and may make mistakes. Always verify medical information with your healthcare provider.
             </div>
           </div>
         </div>

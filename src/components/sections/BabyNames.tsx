@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
-import { 
-  Sparkles, 
-  Baby, 
-  Heart, 
-  Globe, 
-  RefreshCw, 
+import {
+  Sparkles,
+  Baby,
+  Heart,
+  Globe,
+  RefreshCw,
   AlertCircle
 } from 'lucide-react';
 import { CustomSelect } from '../CustomSelect';
@@ -18,15 +18,15 @@ export const BabyNames: React.FC = () => {
   const [origin, setOrigin] = useState('Modern Indian');
   const [startingLetter, setStartingLetter] = useState('');
   const [keywords, setKeywords] = useState('');
-  
+
   const [isGenerating, setIsGenerating] = useState(false);
-  const [suggestions, setSuggestions] = useState<{name: string, meaning: string, origin: string}[]>([]);
+  const [suggestions, setSuggestions] = useState<{ name: string, meaning: string, origin: string }[]>([]);
   const [error, setError] = useState('');
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     setError('');
-    
+
     try {
       const prompt = `Generate 6 beautiful, meaningful baby names based on these preferences:
       - Gender: ${gender}
@@ -45,16 +45,16 @@ export const BabyNames: React.FC = () => {
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
       const response = await chatWithAI({ message: prompt, systemPrompt });
       const result = response.data as { reply: string };
-      
+
       const cleanText = result.reply.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleanText);
-      
+
       if (Array.isArray(parsed)) {
         setSuggestions(parsed);
       } else {
         throw new Error("Invalid response format");
       }
-      
+
     } catch (err) {
       console.error(err);
       setError('Something went wrong. Please try again.');
@@ -76,14 +76,14 @@ export const BabyNames: React.FC = () => {
         {/* Form Section */}
         <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
           <h3 className="font-semibold text-charcoal text-[17px] mb-5">AI Name Generator</h3>
-          
+
           <div className="space-y-4">
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Gender focus</label>
               <div className="flex gap-2">
                 {['Boy', 'Girl', 'Neutral'].map(g => (
-                  <button 
-                    key={g} 
+                  <button
+                    key={g}
                     onClick={() => setGender(g)}
                     className={`flex-1 py-2.5 rounded-[10px] text-[14px] font-medium border-[1.5px] transition-all
                       ${gender === g ? 'bg-sage-pale/40 border-sage text-sage' : 'border-border text-medium hover:border-medium/30'}`}
@@ -96,8 +96,8 @@ export const BabyNames: React.FC = () => {
 
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Origin / Style</label>
-              <CustomSelect 
-                value={origin} 
+              <CustomSelect
+                value={origin}
                 onChange={(val) => setOrigin(val)}
                 className="w-full relative z-10"
                 options={[
@@ -113,24 +113,24 @@ export const BabyNames: React.FC = () => {
 
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Starting Letter (Optional)</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 maxLength={1}
-                placeholder="e.g., A" 
-                value={startingLetter} 
-                onChange={e => setStartingLetter(e.target.value)} 
-                className="p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none" 
+                placeholder="e.g., A"
+                value={startingLetter}
+                onChange={e => setStartingLetter(e.target.value)}
+                className="p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none"
               />
             </div>
 
             <div className="flex flex-col">
               <label className="text-[12px] font-semibold uppercase tracking-wider text-light mb-1.5 ml-1">Specific meaning? (Optional)</label>
-              <input 
-                type="text" 
-                placeholder="e.g., light, warrior, ocean" 
-                value={keywords} 
-                onChange={e => setKeywords(e.target.value)} 
-                className="p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none" 
+              <input
+                type="text"
+                placeholder="e.g., light, warrior, ocean"
+                value={keywords}
+                onChange={e => setKeywords(e.target.value)}
+                className="p-3 border-[1.5px] border-border rounded-[10px] focus:border-sage focus:ring-[3px] focus:ring-sage/10 text-charcoal text-[15px] outline-none"
               />
             </div>
 
@@ -162,7 +162,7 @@ export const BabyNames: React.FC = () => {
               {!suggestions.length && !isGenerating ? (
                 <div className="h-full flex flex-col items-center justify-center text-center text-medium space-y-3">
                   <Baby className="w-12 h-12 text-sage/40" />
-                  <p className="text-[15px] max-w-[200px]">Tell AskOurPregnancy what you're looking for to unveil beautiful names.</p>
+                  <p className="text-[15px] max-w-[200px]">Tell Bloom AI what you're looking for to unveil beautiful names.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -179,7 +179,7 @@ export const BabyNames: React.FC = () => {
                               <span className="text-[11px] font-semibold text-sage uppercase tracking-wide">{suggestion.origin}</span>
                             </div>
                           </div>
-                          <button 
+                          <button
                             onClick={() => toggleFavoriteName(suggestion.name)}
                             className="p-2 -mr-2 -mt-2 rounded-full hover:bg-gray-50 transition-colors"
                           >
@@ -200,15 +200,15 @@ export const BabyNames: React.FC = () => {
       {favoriteNames.length > 0 && (
         <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
           <h3 className="font-semibold text-charcoal text-[17px] mb-4 flex items-center gap-2">
-            <Heart className="w-5 h-5 text-sage" fill="currentColor" /> 
+            <Heart className="w-5 h-5 text-sage" fill="currentColor" />
             Saved Favorites
           </h3>
           <div className="flex flex-wrap gap-2">
             {favoriteNames.map((name) => (
               <div key={name} className="flex items-center gap-1.5 bg-sage-pale text-sage pl-3 pr-1 py-1 rounded-full text-[14px] font-medium border border-sage/20">
                 {name}
-                <button 
-                  onClick={() => toggleFavoriteName(name)} 
+                <button
+                  onClick={() => toggleFavoriteName(name)}
                   className="w-6 h-6 rounded-full flex items-center justify-center hover:bg-sage/20"
                 >
                   ×

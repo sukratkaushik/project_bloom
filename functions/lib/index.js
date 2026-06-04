@@ -1,10 +1,52 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function (o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+        desc = { enumerable: true, get: function () { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function (o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function (o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function (o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function (o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
+const admin = __importStar(require("firebase-admin"));
+const crypto_1 = __importDefault(require("crypto"));
+// Initialize Firebase Admin SDK
+admin.initializeApp();
 // Define the secure secret that we will store in Firebase Secret Manager
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
+const razorpayKeyId = (0, params_1.defineSecret)("RAZORPAY_KEY_ID");
+const razorpayKeySecret = (0, params_1.defineSecret)("RAZORPAY_KEY_SECRET");
 exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1" }, async (request) => {
     const { message, systemPrompt, maxTokens } = request.data;
     if (!message) {
@@ -285,4 +327,74 @@ function parseResponseContent(result) {
     }
     throw new https_1.HttpsError("internal", "No response received from AI model.");
 }
+/**
+ * Creates a secure payment order via Razorpay API
+ */
+exports.createPaymentOrder = (0, https_1.onCall)({ secrets: [razorpayKeyId, razorpayKeySecret], region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const { planTier, months } = request.data;
+    if (!['standard', 'premium'].includes(planTier) || !months) {
+        throw new https_1.HttpsError("invalid-argument", "Valid planTier and months are required.");
+    }
+    const basePrice = planTier === 'standard' ? 199 : 499;
+    const discount = Math.floor(months / 3) * 50;
+    const finalTotal = Math.max(0, (basePrice * months) - discount);
+    const Razorpay = require("razorpay");
+    const rzp = new Razorpay({
+        key_id: razorpayKeyId.value(),
+        key_secret: razorpayKeySecret.value(),
+    });
+    try {
+        const order = await rzp.orders.create({
+            amount: finalTotal * 100, // Razorpay requires amounts in paise
+            currency: "INR",
+            receipt: `receipt_${request.auth.uid}_${Date.now()}`,
+            notes: {
+                uid: request.auth.uid,
+                planTier,
+                months: months.toString()
+            }
+        });
+        return { orderId: order.id, amount: order.amount };
+    }
+    catch (err) {
+        console.error("Razorpay order creation error:", err);
+        throw new https_1.HttpsError("internal", `Payment gateway error: ${err.message || "Unknown error"}`);
+    }
+});
+/**
+ * Securely verifies payment signature and updates user's plan state in Firestore
+ */
+exports.verifyPaymentSignature = (0, https_1.onCall)({ secrets: [razorpayKeySecret], region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, planTier, months } = request.data;
+    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature || !planTier || !months) {
+        throw new https_1.HttpsError("invalid-argument", "Missing required verification parameters.");
+    }
+    const secret = razorpayKeySecret.value();
+    const hmac = crypto_1.default.createHmac("sha256", secret);
+    hmac.update(`${razorpay_order_id}|${razorpay_payment_id}`);
+    const generatedSignature = hmac.digest("hex");
+    if (generatedSignature !== razorpay_signature) {
+        throw new https_1.HttpsError("permission-denied", "Payment verification failed: invalid signature.");
+    }
+    // Determine plan expiry
+    const db = admin.firestore();
+    const expiry = new Date();
+    expiry.setMonth(expiry.getMonth() + Number(months));
+    // Update the user profile in database
+    await db.collection("users").doc(request.auth.uid).set({
+        planTier,
+        planExpiry: expiry.toISOString(),
+        razorpayPaymentId: razorpay_payment_id,
+        razorpayOrderId: razorpay_order_id,
+        isPremium: planTier === 'premium', // backward compatibility mapping
+        updatedAt: admin.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    return { success: true, planTier, expiry: expiry.toISOString() };
+});
 //# sourceMappingURL=index.js.map

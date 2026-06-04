@@ -34,7 +34,7 @@ const CONTEXT_GUIDES: Record<string, { greeting: string, suggestions: string[] }
 };
 
 const DEFAULT_CONTEXT = {
-  greeting: "Hi! I'm Our Pregnancy AI ✨ How can I help you with your journey today?",
+  greeting: "Hi! I'm Bloom AI ✨ How can I help you with your journey today?",
   suggestions: ["Food safety", "Kick counting", "BP Tracking"]
 };
 
@@ -110,7 +110,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
               </div>
               <div>
                 <h3 className="font-bold text-[15px] flex items-center gap-1.5">
-                  Our Pregnancy AI
+                  Bloom AI
                   <Sparkles size={12} className="animate-pulse" />
                 </h3>
                 <div className="flex items-center gap-1.5 opacity-80 text-[10px] font-medium uppercase tracking-wider">

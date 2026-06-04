@@ -96,8 +96,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         <button
           onClick={() => setActivePage(id)}
           className={`flex items-center gap-2.5 p-[9px_11px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all w-full text-left
-            ${isActive 
-              ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage font-bold border border-sage/20 shadow-xs' 
+            ${isActive
+              ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage font-bold border border-sage/20 shadow-xs'
               : 'bg-transparent border border-transparent text-medium hover:bg-sage-pale/40 hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
@@ -140,7 +140,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'hydration', icon: '💧', label: 'Hydration' },
     { id: 'nutrition', icon: '🥗', label: 'Nutrition & Supplements' },
     { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
-    { id: 'askourpregnancy', icon: '✨', label: 'AskOur Pregnancy AI' },
+    { id: 'askourpregnancy', icon: '✨', label: 'Bloom AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
     { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },

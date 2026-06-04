@@ -8,6 +8,7 @@ import { PlannerProvider, usePlanner } from './store';
 import { SetupScreen } from './components/SetupScreen';
 import { Dashboard } from './components/Dashboard';
 import { LandingPage } from './landing/LandingPage';
+import { TeamPage } from './landing/TeamPage';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
 import { auth } from './firebase';
@@ -47,7 +48,9 @@ const AppContent: React.FC = () => {
 
   let content = <LandingPage />;
 
-  if (currentHash === '#privacy') {
+  if (currentHash === '#team') {
+    content = <TeamPage />;
+  } else if (currentHash === '#privacy') {
     content = <PrivacyPolicy />;
   } else if (currentHash === '#terms') {
     content = <TermsOfService />;

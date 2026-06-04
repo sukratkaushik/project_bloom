@@ -31,22 +31,22 @@ export const DailyKnowledgeDrop: React.FC = () => {
   };
 
   return (
-    <div className="bg-gradient-to-br from-sage-pale/40 to-cream/60 dark:from-sage-pale/10 dark:to-charcoal/20 backdrop-blur-sm border-[1.5px] border-sage-light/35 rounded-[24px] p-6 shadow-sm mb-6 relative overflow-hidden animate-in fade-in duration-300">
+    <div className="glass-panel rounded-[24px] p-6 shadow-sm mb-6 relative overflow-hidden animate-in fade-in duration-300">
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2 text-sage font-semibold tracking-[1.2px] uppercase text-[11px]">
           <Sparkles size={14} className="animate-pulse" />
           <span>Daily Knowledge Drop</span>
         </div>
-        
+
         {(state.dailyKnowledgeStreak || 0) > 0 && (
-          <div className="flex items-center gap-1.5 bg-white/90 dark:bg-charcoal/80 px-3 py-1 rounded-full border border-border/80 dark:border-border/10 shadow-xs text-[11px] font-bold text-orange-500 hover:scale-105 transition-transform duration-300">
+          <div className="flex items-center gap-1.5 bg-white/90 dark:bg-white/15 px-3 py-1 rounded-full border border-border/85 dark:border-white/15 shadow-xs text-[11px] font-bold text-orange-500 hover:scale-105 transition-transform duration-300">
             <Flame size={12} className="fill-orange-500 text-orange-500 animate-bounce" />
             <span>{state.dailyKnowledgeStreak} Day Streak</span>
           </div>
         )}
       </div>
 
-      <div className="bg-white/60 dark:bg-charcoal/40 backdrop-blur-md rounded-[18px] p-6 border-[1.5px] border-border/80 dark:border-border/10 relative min-h-[140px] flex flex-col justify-center items-center text-center transition-all duration-500 shadow-xs hover:border-sage/40 hover:shadow-md">
+      <div className="bg-white/50 dark:bg-white/5 backdrop-blur-md rounded-[18px] p-6 border-[1.5px] border-white/20 dark:border-white/10 relative min-h-[140px] flex flex-col justify-center items-center text-center transition-all duration-500 shadow-xs hover:border-sage/40 hover:shadow-md">
         {!isRevealed ? (
           <div className="flex flex-col items-center cursor-pointer group w-full" onClick={handleReveal}>
             <div className="w-12 h-12 rounded-full bg-sage-pale/60 dark:bg-sage/10 flex items-center justify-center text-sage mb-3 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300">

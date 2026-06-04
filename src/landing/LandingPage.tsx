@@ -22,7 +22,8 @@ import {
   Sparkles,
   Mail,
   X,
-  Moon
+  Moon,
+  Linkedin
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -32,6 +33,9 @@ export const LandingPage: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [freeMonths, setFreeMonths] = useState(1);
+  const [standardMonths, setStandardMonths] = useState(1);
+  const [premiumMonths, setPremiumMonths] = useState(1);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -436,6 +440,8 @@ export const LandingPage: React.FC = () => {
             <a href="#features" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Features</a>
             <a href="#how-it-works" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">How it Works</a>
             <a href="#localized-care" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">About</a>
+            <a href="#pricing" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Pricing</a>
+            <a href="#team" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Team</a>
           </div>
 
           <div className="flex flex-nowrap justify-end items-center gap-1 sm:gap-2 md:gap-4">
@@ -773,6 +779,248 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Pricing / Packages Section */}
+      <section id="pricing" className="bg-cream border-t border-border px-6 py-16 md:py-24">
+        <div className="max-w-[1200px] mx-auto">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-pale text-[12px] font-bold text-sage uppercase tracking-wider mb-4 border border-sage/20">
+              <Sparkles size={14} /> Packages
+            </div>
+            <h2 className="font-serif text-[clamp(32px,5vw,48px)] text-charcoal mb-4 leading-tight">Simple, Transparent Pricing</h2>
+            <p className="text-medium text-[16px] max-w-2xl mx-auto">
+              Choose the package that fits your pregnancy journey. No hidden fees or contracts.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+            {/* Starter Plan */}
+            <div className="bg-white border border-border rounded-[28px] p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300 relative group">
+              <div>
+                <span className="text-[12px] font-bold tracking-[1px] uppercase text-medium">Starter</span>
+                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Free Plan</h3>
+
+                {/* Free Plan Price Display */}
+                <div className="flex flex-col mt-4 mb-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-serif font-bold text-charcoal">₹0</span>
+                    <span className="text-[14px] text-medium">/ {freeMonths} {freeMonths === 1 ? 'month' : 'months'}</span>
+                  </div>
+                  <div className="text-[12px] text-medium italic mt-1">Always free for moms</div>
+                </div>
+
+                {/* Free Plan Slider */}
+                <div className="my-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[12px] font-bold text-charcoal uppercase tracking-wider">Duration</label>
+                    <span className="text-[13px] font-semibold bg-gray-100 dark:bg-white/10 text-medium px-2.5 py-0.5 rounded-full">
+                      {freeMonths} {freeMonths === 1 ? 'Month' : 'Months'}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={12}
+                    value={freeMonths}
+                    onChange={(e) => setFreeMonths(Number(e.target.value))}
+                    aria-label="Select free plan duration"
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-medium [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-medium [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
+                    style={{ background: `linear-gradient(to right, rgb(107,122,135) 0%, rgb(107,122,135) ${((freeMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((freeMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
+                  />
+                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
+                    <span>1m</span>
+                    <span>3m</span>
+                    <span>6m</span>
+                    <span>9m</span>
+                    <span>12m</span>
+                  </div>
+                </div>
+
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Essential tracking tools for everyday updates, completely free.</p>
+                <div className="h-px bg-border mb-6" />
+                <ul className="space-y-3.5">
+                  {[
+                    "Basic pregnancy weekly tracker",
+                    "Daily symptom logs & timeline",
+                    "Kick counter & contraction timer",
+                    "Hospital bag checklist",
+                    "Offline-first sync capabilities"
+                  ].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
+                      <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={handleStart}
+                className="w-full mt-8 py-3.5 rounded-xl border-[1.5px] border-sage text-sage font-bold text-[14px] hover:bg-sage-pale transition-all active:scale-98"
+              >
+                Start Tracking Free
+              </button>
+            </div>
+
+            {/* Standard Plan (Highlight) */}
+            <div className="bg-white border-2 border-sage rounded-[28px] p-8 flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 relative group scale-102">
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm">
+                Most Popular
+              </div>
+              <div>
+                <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">Maternal Care Pack</span>
+                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Standard Plan</h3>
+
+                {/* Standard Plan Price Display */}
+                <div className="flex flex-col mt-4 mb-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{199 * standardMonths - Math.floor(standardMonths / 3) * 50}</span>
+                    <span className="text-[14px] text-medium">/ {standardMonths} {standardMonths === 1 ? 'month' : 'months'}</span>
+                  </div>
+                  {standardMonths >= 3 && (
+                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1 animate-pulse">
+                      <span>🏷️ Save ₹{Math.floor(standardMonths / 3) * 50}</span>
+                    </div>
+                  )}
+                  {standardMonths > 1 && (
+                    <div className="text-[12.5px] text-medium mt-0.5">
+                      Equivalent to ₹{Math.round((199 * standardMonths - Math.floor(standardMonths / 3) * 50) / standardMonths)}/mo
+                    </div>
+                  )}
+                </div>
+
+                {/* Standard Plan Slider */}
+                <div className="my-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
+                    <span className="text-[13px] font-semibold bg-sage-pale text-sage px-2.5 py-0.5 rounded-full border border-sage/20">
+                      {standardMonths} {standardMonths === 1 ? 'Month' : 'Months'}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={12}
+                    value={standardMonths}
+                    onChange={(e) => setStandardMonths(Number(e.target.value))}
+                    aria-label="Select standard plan duration"
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-sage [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sage [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
+                    style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((standardMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((standardMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
+                  />
+                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
+                    <span>1m</span>
+                    <span>3m</span>
+                    <span>6m</span>
+                    <span>9m</span>
+                    <span>12m</span>
+                  </div>
+                </div>
+
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Comprehensive tracking with complete medical guides & postpartum care.</p>
+                <div className="h-px bg-border mb-6" />
+                <ul className="space-y-3.5">
+                  {[
+                    "Everything in Free starter plan",
+                    "Complete Medical tasks & vaccines tracker",
+                    "Detailed Indian Government Schemes guide",
+                    "Postpartum & Early Parenthood support",
+                    "Encrypted real-time Partner Sync"
+                  ].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
+                      <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={handleStart}
+                className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
+              >
+                Upgrade to Standard
+              </button>
+            </div>
+
+            {/* Premium Plan */}
+            <div className="bg-white border border-border rounded-[28px] p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300 relative group">
+              <div>
+                <span className="text-[12px] font-bold tracking-[1px] uppercase text-gold">AI Ultimate</span>
+                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Premium Plan</h3>
+
+                {/* Premium Plan Price Display */}
+                <div className="flex flex-col mt-4 mb-4">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths - Math.floor(premiumMonths / 3) * 50}</span>
+                    <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
+                  </div>
+                  {premiumMonths >= 3 && (
+                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1 animate-pulse">
+                      <span>🏷️ Save ₹{Math.floor(premiumMonths / 3) * 50}</span>
+                    </div>
+                  )}
+                  {premiumMonths > 1 && (
+                    <div className="text-[12.5px] text-medium mt-0.5">
+                      Equivalent to ₹{Math.round((499 * premiumMonths - Math.floor(premiumMonths / 3) * 50) / premiumMonths)}/mo
+                    </div>
+                  )}
+                </div>
+
+                {/* Premium Plan Slider */}
+                <div className="my-6">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[12px] font-bold text-gold uppercase tracking-wider">Duration</label>
+                    <span className="text-[13px] font-semibold bg-gold-pale text-gold px-2.5 py-0.5 rounded-full border border-gold/20">
+                      {premiumMonths} {premiumMonths === 1 ? 'Month' : 'Months'}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={1}
+                    max={12}
+                    value={premiumMonths}
+                    onChange={(e) => setPremiumMonths(Number(e.target.value))}
+                    aria-label="Select premium plan duration"
+                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-gold [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gold [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
+                    style={{ background: `linear-gradient(to right, rgb(244,162,97) 0%, rgb(244,162,97) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
+                  />
+                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
+                    <span>1m</span>
+                    <span>3m</span>
+                    <span>6m</span>
+                    <span>9m</span>
+                    <span>12m</span>
+                  </div>
+                </div>
+
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to advanced AI support tools & clinical report exports.</p>
+                <div className="h-px bg-border mb-6" />
+                <ul className="space-y-3.5">
+                  {[
+                    "Everything in Standard plan",
+                    "Bloom AI prenatal chatbot support 24/7",
+                    "Gemini-powered AI Food Safety Scanner",
+                    "FHIR R4 EHR Doctor Report Exports",
+                    "Priority feature request channel"
+                  ].map((feat, i) => (
+                    <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
+                      <CheckCircle2 size={16} className="text-gold mt-0.5 shrink-0" />
+                      <span>{feat}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <button
+                type="button"
+                onClick={handleStart}
+                className="w-full mt-8 py-3.5 rounded-xl bg-charcoal text-white font-bold text-[14px] hover:bg-gray-800 transition-all shadow-md active:scale-98"
+              >
+                Go Premium
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Privacy Section */}
       <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
         <h2 className="font-serif text-4xl text-charcoal mb-4">Core features, always free.</h2>
@@ -830,6 +1078,7 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
+            <a href="#team" className="hover:text-white transition-colors">Meet the Team</a>
             <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
