@@ -132,6 +132,7 @@ export type PlannerState = {
   premiumPlan?: 'monthly' | 'annual';
   premiumExpiry?: string;
   razorpayPaymentId?: string;
+  planTier?: 'free' | 'standard' | 'premium';
   favoriteNames?: string[];
   favoritePages?: string[];
   userName?: string;

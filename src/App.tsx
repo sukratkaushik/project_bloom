@@ -11,6 +11,7 @@ import { LandingPage } from './landing/LandingPage';
 import { TeamPage } from './landing/TeamPage';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
+import { CheckoutPage } from './components/CheckoutPage';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 
@@ -54,6 +55,8 @@ const AppContent: React.FC = () => {
     content = <PrivacyPolicy />;
   } else if (currentHash === '#terms') {
     content = <TermsOfService />;
+  } else if (currentHash.startsWith('#checkout') || currentHash.startsWith('#payment')) {
+    content = <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
   } else if (currentHash === '#dashboard' && state.isSetup) {
