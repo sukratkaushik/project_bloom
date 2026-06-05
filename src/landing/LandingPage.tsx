@@ -286,7 +286,7 @@ export const LandingPage: React.FC = () => {
                       />
                     </div>
                     {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
-                    <button type="submit" className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px]">
+                    <button type="submit" className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px]">
                       Send Reset Link
                     </button>
                   </form>
@@ -388,7 +388,7 @@ export const LandingPage: React.FC = () => {
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-charcoal text-white rounded-[10px] font-bold py-2.5 hover:bg-gray-800 transition-colors mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
                   >
                     {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                     {isRegistering ? 'Create Account' : 'Log In'}
@@ -459,12 +459,12 @@ export const LandingPage: React.FC = () => {
                 <button type="button" onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }} className="bg-transparent text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 py-1.5 sm:px-4 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
                   Log In
                 </button>
-                <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-white rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap shrink-0">
+                <button type="button" onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }} className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0">
                   Sign Up
                 </button>
               </>
             ) : (
-              <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-white rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:bg-gray-800 transition-colors shadow-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+              <button type="button" onClick={handleStart} disabled={isLoggingIn} className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
                 {isLoggingIn ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : null}
                 <span className="sm:hidden">Dashboard</span>
                 <span className="hidden sm:inline">Open Dashboard</span>
@@ -654,7 +654,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <div className="bg-cream rounded-xl p-4 border border-border flex items-center justify-between">
                 <span className="text-[13px] font-bold text-charcoal">Cloud Storage</span>
-                <span className="text-[12px] bg-charcoal text-white px-2 py-1 rounded font-bold">Secure</span>
+                <span className="text-[12px] bg-charcoal text-cream px-2 py-1 rounded font-bold">Secure</span>
               </div>
             </div>
           </div>
@@ -1012,7 +1012,7 @@ export const LandingPage: React.FC = () => {
               <button
                 type="button"
                 onClick={handleStart}
-                className="w-full mt-8 py-3.5 rounded-xl bg-charcoal text-white font-bold text-[14px] hover:bg-gray-800 transition-all shadow-md active:scale-98"
+                className="w-full mt-8 py-3.5 rounded-xl bg-charcoal text-cream font-bold text-[14px] hover:opacity-90 transition-all shadow-md active:scale-98"
               >
                 Go Premium
               </button>

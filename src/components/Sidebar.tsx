@@ -285,7 +285,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         <button
           onClick={() => { window.location.hash = '#setup'; }}
-          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:bg-charcoal hover:text-white"
+          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
         >
           ⚙️ Adjust Setup
         </button>
@@ -479,7 +479,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
       <button
         onClick={() => { window.location.hash = '#setup'; }}
-        className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-white"
+        className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
       >
         ⚙️ Adjust Setup
       </button>

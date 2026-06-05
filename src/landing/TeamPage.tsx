@@ -62,7 +62,7 @@ export const TeamPage: React.FC = () => {
             >
               <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
             </button>
-            <a href="#" className="inline-flex items-center gap-1.5 bg-charcoal text-white rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:bg-gray-800 transition-colors shadow-sm whitespace-nowrap">
+            <a href="#" className="inline-flex items-center gap-1.5 bg-charcoal text-cream rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap">
               <ArrowLeft size={14} /> Back Home
             </a>
           </div>
