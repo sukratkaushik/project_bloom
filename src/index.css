@@ -630,7 +630,8 @@ select {
 .dark .bg-charcoal\/5 {
   background-color: rgba(255, 255, 255, 0.02) !important;
 }
-.dark div.bg-charcoal {
+.dark div.bg-charcoal,
+.dark footer.bg-charcoal {
   background-color: var(--color-white) !important; /* Slate-800 */
   color: #ffffff !important;
 }

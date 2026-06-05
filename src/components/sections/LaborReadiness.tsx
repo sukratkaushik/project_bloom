@@ -146,14 +146,9 @@ export const LaborReadiness: React.FC<LaborReadinessProps> = ({ setActivePage })
               </p>
             </div>
           </div>
-          {setActivePage && (
-            <button
-              onClick={() => setActivePage('vitals')}
-              className="text-[12px] font-bold text-sage hover:text-sage-dark bg-white border border-border px-3 py-1.5 rounded-lg transition-colors cursor-pointer shrink-0"
-            >
-              Link Wearable
-            </button>
-          )}
+          <span className="text-[11px] font-bold text-gold-dark dark:text-gold bg-gold/10 border border-gold/20 px-3 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0 self-center">
+            Coming Soon
+          </span>
         </div>
       )}
 

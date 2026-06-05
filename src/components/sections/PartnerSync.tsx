@@ -333,7 +333,7 @@ export const PartnerSync: React.FC = () => {
                       placeholder="Enter partner code..."
                       className="w-full p-3 border border-border rounded-xl font-mono text-[13px] text-charcoal focus:border-sage focus:outline-none focus:ring-2 focus:ring-sage/20 transition-all mb-3"
                     />
-                    <button onClick={handleConnect} disabled={!partnerIdInput.trim() || status.includes('Connecting')} className="w-full py-3 bg-charcoal text-white font-medium text-[14px] rounded-xl hover:bg-black disabled:opacity-50 transition-colors">
+                    <button onClick={handleConnect} disabled={!partnerIdInput.trim() || status.includes('Connecting')} className="w-full py-3 bg-charcoal text-cream font-medium text-[14px] rounded-xl hover:opacity-90 disabled:opacity-50 transition-all">
                       Connect
                     </button>
                   </div>

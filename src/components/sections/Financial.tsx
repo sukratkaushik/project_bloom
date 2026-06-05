@@ -94,11 +94,11 @@ export const Financial: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mt-5">
         <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5 text-center">
-          <div className="font-serif text-[34px] font-normal text-charcoal">€{totalEst.toLocaleString()}</div>
+          <div className="font-serif text-[34px] font-normal text-charcoal">₹{totalEst.toLocaleString()}</div>
           <div className="text-[12px] text-light mt-[3px]">Total estimated</div>
         </div>
         <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5 text-center">
-          <div className="font-serif text-[34px] font-normal text-charcoal">€{totalAct.toLocaleString()}</div>
+          <div className="font-serif text-[34px] font-normal text-charcoal">₹{totalAct.toLocaleString()}</div>
           <div className="text-[12px] text-light mt-[3px]">Total actual spent</div>
         </div>
       </div>

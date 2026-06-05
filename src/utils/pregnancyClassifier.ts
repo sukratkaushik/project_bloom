@@ -48,35 +48,39 @@ export const isPregnancyRelated = (text: string): boolean => {
     // Pregnancy core
     'pregnan', 'gestat', 'trimester', 'due date', 'concep', 'fertility', 'ovulation', 'miscarriage', 'ectopic', 'stillbirth',
     'fetus', 'fetal', 'embryo', 'womb', 'uterus', 'placenta', 'umbilical', 'cervix', 'amniotic', 'gestational',
-    'week 1', 'week 2', 'week 3', 'week 4', 'week 5', 'week 6', 'week 7', 'week 8', 'week 9', 'week 10',
-    'week 11', 'week 12', 'week 13', 'week 14', 'week 15', 'week 16', 'week 17', 'week 18', 'week 19', 'week 20',
-    'week 21', 'week 22', 'week 23', 'week 24', 'week 25', 'week 26', 'week 27', 'week 28', 'week 29', 'week 30',
-    'week 31', 'week 32', 'week 33', 'week 34', 'week 35', 'week 36', 'week 37', 'week 38', 'week 39', 'week 40',
-    '1st trimester', '2nd trimester', '3rd trimester', 'first trimester', 'second trimester', 'third trimester',
-    // Symptoms / Health
+    'week', 'trimester',
+    // Baby & Child
+    'baby', 'babies', 'newborn', 'infant', 'toddler', 'child', 'kid', 'son', 'daughter', 'boy', 'girl',
+    'parent', 'mother', 'mom', 'mama', 'father', 'dad', 'papa', 'partner', 'husband', 'wife', 'family',
+    // Symptoms / Health & Vitals
     'symptom', 'nausea', 'vomit', 'morning sickness', 'heartburn', 'acid reflux', 'indigestion', 'constipation',
     'diarrhea', 'gas', 'bloat', 'hemorrhoid', 'piles', 'swelling', 'edema', 'back pain', 'pelvic', 'sciatica',
     'fatigue', 'tired', 'sleep', 'insomnia', 'stretch mark', 'melasma', 'linea nigra', 'cramp', 'bleed', 'spotting',
     'headache', 'vision change', 'shortness of breath', 'fluid leaking', 'discharge', 'fever', 'chills', 'dizzy',
     'high blood pressure', 'bp', 'hypertension', 'preeclampsia', 'eclampsia', 'gestational diabetes', 'gdm',
-    'blood sugar', 'glucose', 'weight', 'heart rate', 'pulse',
-    // Nutrition / Diet
+    'blood sugar', 'glucose', 'weight', 'heart rate', 'pulse', 'vital', 'vitals', 'health', 'medical', 'pain',
+    'body', 'fever', 'cold', 'flu', 'vaccin', 'immuniz', 'medicine', 'pill', 'supplement', 'vitamin', 'iron', 'calcium',
+    'folic acid', 'folate',
+    // Nutrition / Diet / Food
     'food', 'eat', 'drink', 'diet', 'nutrition', 'recipe', 'meal', 'fruit', 'vegetable', 'meat', 'fish', 'egg', 'dairy',
     'milk', 'cheese', 'papaya', 'pineapple', 'saffron', 'coconut', 'caffeine', 'coffee', 'tea', 'alcohol', 'wine', 'beer',
-    'smoking', 'tobacco', 'drug', 'folic acid', 'folate', 'iron', 'calcium', 'vitamin', 'supplement', 'street food',
-    'ragi', 'dates', 'nut', 'seed',
-    // Medical / Care
+    'smoking', 'tobacco', 'drug', 'street food', 'ragi', 'dates', 'nut', 'seed', 'saf', 'hazard', 'risk', 'danger',
+    // Care & Labor & Tracking
     'ob-gyn', 'obgyn', 'midwife', 'gynecologist', 'obstetrician', 'pediatrician', 'prenatal', 'postpartum', 'post-partum',
     'antenatal', 'c-section', 'cesarean', 'vaginal delivery', 'labor', 'contraction', 'water broke', 'delivery', 'birth',
-    'breastfeed', 'breast milk', 'lactation', 'colostrum', 'formula feeding', 'diaper', 'lullaby', 'vaccin', 'immuniz',
-    'kick', 'fetal movement', 'ultrasound', 'scan', 'sonography', 'hcg', 'progesterone', 'estrogen', 'hormone',
-    'hospital bag', 'nursery', 'cot', 'crib', 'stroller', 'car seat', 'swaddle', 'pacifier', 'teething', 'weaning',
-    'colic', 'tummy time', 'milestone', 'growth chart', 'doula', 'epidural', 'pain relief', 'nesting', 'braxton hicks',
-    'kegel', 'pelvic floor', 'prenatal yoga', 'exercise', 'stretch', 'anxiety', 'mood swing', 'baby blues',
-    'postpartum depression', 'ppd', 'mental health',
+    'breastfeed', 'breast milk', 'lactation', 'colostrum', 'formula feeding', 'diaper', 'lullaby', 
+    'kick', 'kicks', 'count', 'counting', 'counter', 'movement', 'movements', 'ultrasound', 'scan', 'sonography',
+    'hcg', 'progesterone', 'estrogen', 'hormone', 'bag', 'checklist', 'nursery', 'cot', 'crib', 'stroller', 'car seat',
+    'swaddle', 'pacifier', 'teething', 'weaning', 'colic', 'tummy time', 'milestone', 'growth chart', 'doula', 'epidural',
+    'pain relief', 'nesting', 'braxton hicks', 'kegel', 'pelvic floor', 'prenatal yoga', 'exercise', 'stretch',
+    'anxiety', 'mood swing', 'baby blues', 'postpartum depression', 'ppd', 'mental health',
     // App features / Administration
-    'tracker', 'vitals', 'kick counter', 'budget', 'finance', 'pmmvy', 'jsy', 'scheme', 'maternity leave', 'delivery cost',
-    'hospital cost', 'baby name', 'suggest names'
+    'tracker', 'budget', 'finance', 'pmmvy', 'jsy', 'scheme', 'maternity leave', 'delivery cost', 'hospital cost',
+    'baby name', 'suggest names', 'name', 'names', 'naming', 'meaning',
+    // General helpful descriptors/actions
+    'doctor', 'physician', 'call', 'consult', 'rule', 'rules', 'guideline', 'guidelines', 'normal', 'abnormal',
+    'high', 'low', 'average', 'level', 'levels', 'test', 'tests', 'result', 'results', 'advice', 'advise',
+    'prevent', 'cause', 'effect', 'safety', 'warning', 'danger', 'alert', 'time', 'when', 'schedule', 'planning'
   ];
 
   // If the query contains any of the positive keywords, allow it
