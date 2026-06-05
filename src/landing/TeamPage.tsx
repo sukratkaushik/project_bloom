@@ -125,6 +125,13 @@ export const TeamPage: React.FC = () => {
           ))}
         </section>
 
+        {/* Section Divider */}
+        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+          <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Team</span>
+          <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+        </div>
+
         {/* Section 3: Meet the Team (Visual Grid with Pictures) */}
         <section id="team" className="mb-24 md:mb-32">
           <div className="text-center mb-16">
@@ -206,6 +213,13 @@ export const TeamPage: React.FC = () => {
             ))}
           </div>
         </section>
+
+        {/* Section Divider */}
+        <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+          <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+          <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Philosophy</span>
+          <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+        </div>
 
         {/* Section 4: Design Philosophy & Creative Text */}
         <section className="bg-white border border-border rounded-[32px] p-8 md:p-12 shadow-sm relative overflow-hidden mb-16">

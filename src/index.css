@@ -641,3 +641,25 @@ select {
 .dark .bg-gold .text-charcoal {
   color: #0f172a !important; /* High contrast dark text on gold */
 }
+
+/* 6. Sophisticated Viewport App Frame */
+@media (min-width: 768px) {
+  html::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    border: 14px solid var(--color-cream);
+    z-index: 9998;
+    pointer-events: none;
+  }
+  html::before {
+    content: "";
+    position: fixed;
+    inset: 14px;
+    border: 1px solid var(--color-border);
+    border-radius: 16px;
+    z-index: 9999;
+    pointer-events: none;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  }
+}

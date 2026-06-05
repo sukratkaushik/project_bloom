@@ -606,6 +606,13 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Toolkit</span>
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
+
       {/* Features Bento Grid */}
       <section id="features" className="max-w-[1200px] mx-auto px-6 py-16 md:py-24">
         <div className="text-center mb-16">
@@ -726,7 +733,7 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* India Section */}
-      <section id="localized-care" className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden">
+      <section id="localized-care" className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden border-y border-white/20">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[50%] rounded-full bg-white/10 blur-[120px]"></div>
@@ -1021,6 +1028,13 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Privacy</span>
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
+
       {/* Privacy Section */}
       <section className="max-w-[800px] mx-auto px-6 py-16 md:py-24 text-center">
         <h2 className="font-serif text-4xl text-charcoal mb-4">Core features, always free.</h2>
@@ -1030,8 +1044,15 @@ export const LandingPage: React.FC = () => {
         </button>
       </section>
 
+      {/* Section Divider */}
+      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Reviews</span>
+        <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
+      </div>
+
       {/* Testimonials */}
-      <section className="border-t border-border bg-white px-6 py-16 md:py-24">
+      <section className="bg-white px-6 py-16 md:py-24">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
             <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
