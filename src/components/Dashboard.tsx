@@ -39,7 +39,7 @@ import { LanguageSelector } from './LanguageSelector';
 import { MedicalReports } from './sections/MedicalReports';
 
 export const Dashboard: React.FC = () => {
-  const { state, updateState } = usePlanner();
+  const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
   const [activePage, setActivePage] = useState('tracker');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -106,7 +106,7 @@ export const Dashboard: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-cream">
       {/* Header */}
-      <header className="bg-white border-b border-border px-4 md:px-6 sticky top-0 z-50 shadow-sm no-print">
+      <header className="bg-white border-b border-border px-4 md:px-10 lg:px-12 sticky top-0 md:top-[14px] z-50 shadow-sm no-print">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px]">
           <div className="flex items-center shrink-0">
             <button
@@ -170,8 +170,8 @@ export const Dashboard: React.FC = () => {
               >
                 {state.critFilter ? '✓ Critical only' : 'Critical only'}
               </button>
-              <button
-                onClick={() => updateState({ isCalmModeActive: !state.isCalmModeActive })}
+               <button
+                onClick={toggleCalmMode}
                 className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
                   ${state.isCalmModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
                 title="Toggle Calm Mode (reduces visual clutter and hides timers)"
@@ -179,7 +179,7 @@ export const Dashboard: React.FC = () => {
                 {state.isCalmModeActive ? '🌿 Calm Mode' : '🌿 Calm Mode'}
               </button>
               <button
-                onClick={() => updateState({ isDarkModeActive: !state.isDarkModeActive })}
+                onClick={toggleDarkMode}
                 className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
                   ${state.isDarkModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
                 title="Toggle Dark Mode"
@@ -192,7 +192,7 @@ export const Dashboard: React.FC = () => {
       </header>
 
       {/* Body */}
-      <div className="max-w-[1000px] mx-auto px-4 md:px-6 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full relative">
+      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full relative">
         {/* Desktop Sidebar (Rendered inline) */}
         <div className="hidden md:block w-full md:w-auto">
           <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />

@@ -424,10 +424,9 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
-      {/* Navigation Header */}
-      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${isScrolled
-        ? 'top-2 py-1.5 sm:py-2 px-3 sm:px-4 md:px-6 shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20'
-        : 'top-4 py-2 sm:py-3.5 px-3 sm:px-4 md:px-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
+      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4.5rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${isScrolled
+        ? 'top-2 md:top-[22px] py-1.5 sm:py-2 px-3 sm:px-4 md:px-8 shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20'
+        : 'top-4 md:top-[30px] py-2 sm:py-3.5 px-3 sm:px-4 md:px-8 shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
         }`}>
         <nav className="w-full flex items-center justify-between">
           <div className="flex items-center gap-1.5 sm:gap-3 shrink-0 mr-2 sm:mr-4">

@@ -131,7 +131,7 @@ export const CheckoutPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative py-12 px-4 sm:px-6 md:px-12 lg:px-16">
       {/* Background decoration */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/10 rounded-full mix-blend-multiply filter blur-3xl -z-10" />
       <div className="absolute top-1/3 right-10 w-96 h-96 bg-gold-pale/20 rounded-full mix-blend-multiply filter blur-3xl -z-10" />

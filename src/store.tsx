@@ -489,11 +489,25 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const toggleCalmMode = () => {
-    setState((prev) => ({ ...prev, isCalmModeActive: !prev.isCalmModeActive }));
+    setState((prev) => {
+      const nextCalm = !prev.isCalmModeActive;
+      return {
+        ...prev,
+        isCalmModeActive: nextCalm,
+        isDarkModeActive: nextCalm ? false : prev.isDarkModeActive,
+      };
+    });
   };
 
   const toggleDarkMode = () => {
-    setState((prev) => ({ ...prev, isDarkModeActive: !prev.isDarkModeActive }));
+    setState((prev) => {
+      const nextDark = !prev.isDarkModeActive;
+      return {
+        ...prev,
+        isDarkModeActive: nextDark,
+        isCalmModeActive: nextDark ? false : prev.isCalmModeActive,
+      };
+    });
   };
 
   const toggleFavoriteName = (name: string) => {
