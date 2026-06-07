@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
+import { httpsCallable } from 'firebase/functions';
+import { functions } from '../firebase';
 import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
 
 export const CheckoutPage: React.FC = () => {
@@ -78,7 +80,7 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handlePaymentSubmit = (e: React.FormEvent) => {
+  const handlePaymentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Simple mock validations
@@ -108,26 +110,80 @@ export const CheckoutPage: React.FC = () => {
     // Start payment processing
     setCheckoutStep('processing');
 
-    setTimeout(() => {
-      // Complete transaction details
-      const randomTxn = 'TXN' + Math.floor(100000000 + Math.random() * 900000000);
-      const computedExpiry = new Date();
-      computedExpiry.setMonth(computedExpiry.getMonth() + months);
+    try {
+      const createOrderParams = { planTier: selectedPlan, months };
+      const createOrder = httpsCallable(functions, 'createPaymentOrder');
+      const orderRes = await createOrder(createOrderParams) as { data: { orderId: string, amount: number } };
       
-      setTxnId(randomTxn);
-      setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
+      const { orderId, amount } = orderRes.data;
 
-      // Update state in app context
-      updateState({
-        planTier: selectedPlan,
-        isPremium: selectedPlan === 'premium',
-        premiumPlan: months >= 12 ? 'annual' : 'monthly',
-        premiumExpiry: computedExpiry.toISOString(),
-        razorpayPaymentId: randomTxn,
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY_HERE', 
+        amount: amount, 
+        currency: "INR",
+        name: "Our Pregnancy",
+        description: selectedPlan === 'premium' ? "Premium AI Pack" : "Standard Plan",
+        image: "https://ourpregnancy.in/logo.png",
+        order_id: orderId, 
+        handler: async function (response: any) {
+          try {
+            setCheckoutStep('processing');
+            const verifySig = httpsCallable(functions, 'verifyPaymentSignature');
+            const verifyRes = await verifySig({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              planTier: selectedPlan,
+              months
+            }) as { data: { success: boolean, expiry: string } };
+
+            if (verifyRes.data.success) {
+              setTxnId(response.razorpay_payment_id);
+              const computedExpiry = new Date(verifyRes.data.expiry);
+              setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
+              
+              updateState({
+                planTier: selectedPlan,
+                isPremium: selectedPlan === 'premium',
+                premiumPlan: months >= 12 ? 'annual' : 'monthly',
+                premiumExpiry: verifyRes.data.expiry,
+                razorpayPaymentId: response.razorpay_payment_id,
+              });
+
+              setCheckoutStep('success');
+            }
+          } catch (err: any) {
+            console.error("Verification failed:", err);
+            alert("Payment verification failed. If money was deducted, it will be refunded automatically.");
+            setCheckoutStep('checkout');
+          }
+        },
+        prefill: {
+          name: state.userName || "",
+          email: userEmail,
+        },
+        theme: {
+          color: "#8ab6a3"
+        },
+        modal: {
+          ondismiss: function() {
+            setCheckoutStep('checkout');
+          }
+        }
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.on('payment.failed', function (response: any){
+        alert("Payment Failed: " + response.error.description);
+        setCheckoutStep('checkout');
       });
-
-      setCheckoutStep('success');
-    }, 2500);
+      rzp.open();
+      
+    } catch (err: any) {
+      console.error("Payment initiation failed:", err);
+      alert("Could not connect to payment gateway. Please try again.");
+      setCheckoutStep('checkout');
+    }
   };
 
   return (
