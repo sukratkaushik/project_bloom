@@ -264,7 +264,7 @@ export const PartnerSync: React.FC = () => {
               <p className="text-[13px] text-medium mt-1">{status}</p>
             </div>
             <div className={`px-3 py-1.5 rounded-full text-[12px] font-semibold tracking-wide uppercase ${status.includes('Connected') ? 'bg-sage text-white' :
-                status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'bg-amber-400 text-amber-900' : 'bg-gray-100 text-medium'
+              status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'bg-amber-400 text-amber-900' : 'bg-gray-100 text-medium'
               }`}>
               {status.includes('Connected') ? 'Active' : status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'Pending' : 'Disconnected'}
             </div>
