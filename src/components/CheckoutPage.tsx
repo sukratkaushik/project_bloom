@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../firebase';
+import { functions, auth } from '../firebase';
 import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
+import { Header } from './Header';
 
 export const CheckoutPage: React.FC = () => {
   const { state, updateState, toggleDarkMode } = usePlanner();
@@ -21,19 +22,10 @@ export const CheckoutPage: React.FC = () => {
   const initialParams = getParams();
   const [selectedPlan, setSelectedPlan] = useState<'standard' | 'premium'>(initialParams.plan);
   const [months, setMonths] = useState<number>(initialParams.months);
-  const [paymentMethod, setPaymentMethod] = useState<'card' | 'upi' | 'netbanking'>('upi');
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
-
-  // Form states
-  const [cardNumber, setCardNumber] = useState('');
-  const [cardExpiry, setCardExpiry] = useState('');
-  const [cardCvv, setCardCvv] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [upiId, setUpiId] = useState('');
-  const [selectedBank, setSelectedBank] = useState('');
 
   // Flow states
   const [checkoutStep, setCheckoutStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
@@ -80,35 +72,16 @@ export const CheckoutPage: React.FC = () => {
     }
   };
 
-  const handlePaymentSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Simple mock validations
-    if (paymentMethod === 'upi' && !upiId.includes('@')) {
-      alert('Please enter a valid UPI ID (e.g. user@okhdfcbank)');
-      return;
-    }
-    if (paymentMethod === 'card') {
-      if (cardNumber.replace(/\s/g, '').length < 16) {
-        alert('Please enter a valid 16-digit Card Number');
-        return;
-      }
-      if (cardExpiry.length < 5) {
-        alert('Please enter expiration date (MM/YY)');
-        return;
-      }
-      if (cardCvv.length < 3) {
-        alert('Please enter a valid CVV');
-        return;
-      }
-    }
-    if (paymentMethod === 'netbanking' && !selectedBank) {
-      alert('Please select a bank');
-      return;
-    }
+  const handlePaymentSubmit = async () => {
 
     // Start payment processing
     setCheckoutStep('processing');
+
+    if (!auth.currentUser) {
+      alert('You must be signed in to complete this purchase. Please go back to the home screen and sign in.');
+      setCheckoutStep('checkout');
+      return;
+    }
 
     try {
       const createOrderParams = { planTier: selectedPlan, months };
@@ -181,20 +154,22 @@ export const CheckoutPage: React.FC = () => {
       
     } catch (err: any) {
       console.error("Payment initiation failed:", err);
-      alert("Could not connect to payment gateway. Please try again.");
+      alert(`Payment Error: ${err.message || 'Could not connect to payment gateway. Please try again.'}`);
       setCheckoutStep('checkout');
     }
   };
 
   return (
-    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative py-12 px-4 sm:px-6 md:px-12 lg:px-16">
-      {/* Background decoration */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/10 rounded-full mix-blend-multiply filter blur-3xl -z-10" />
-      <div className="absolute top-1/3 right-10 w-96 h-96 bg-gold-pale/20 rounded-full mix-blend-multiply filter blur-3xl -z-10" />
+    <div className="flex flex-col min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
+      <Header hideMenuIcon />
 
-      <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-8 pb-4 border-b border-border/80">
+      {/* Background decoration */}
+      <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/10 rounded-full mix-blend-multiply filter blur-3xl -z-10 pointer-events-none" />
+      <div className="absolute top-1/3 right-10 w-96 h-96 bg-gold-pale/20 rounded-full mix-blend-multiply filter blur-3xl -z-10 pointer-events-none" />
+
+      <div className="max-w-5xl mx-auto w-full py-8 md:py-12 px-4 sm:px-6 md:px-12 lg:px-16 flex-1">
+        
+        <div className="mb-6">
           <button
             onClick={() => {
               // Redirect back to dashboard if set up, else landing
@@ -204,11 +179,6 @@ export const CheckoutPage: React.FC = () => {
           >
             <ArrowLeft size={16} /> Back
           </button>
-          
-          <div className="flex items-center gap-2">
-            <img src="/logo.png" alt="Bloom Logo" className="w-8 h-8 object-contain" />
-            <span className="font-serif text-[18px] font-semibold text-sage">Our Pregnancy Secure Checkout</span>
-          </div>
         </div>
 
         {checkoutStep === 'checkout' && (
@@ -351,195 +321,24 @@ export const CheckoutPage: React.FC = () => {
               </div>
             </div>
 
-            {/* Right Column: Checkout Payment Form */}
-            <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 shadow-sm">
-              <h2 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white mb-2">Secure Payment</h2>
-              <p className="text-[13px] text-medium mb-6">Select a payment option below to finalize your upgrade instantly.</p>
+            {/* Right Column: Checkout Action */}
+            <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 shadow-sm flex flex-col justify-center items-center text-center">
+              <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white mb-4">Complete Your Upgrade</h2>
+              <p className="text-[14px] text-medium mb-8 max-w-[300px]">
+                You will be redirected to our secure payment gateway to complete your purchase using UPI, Card, Netbanking, or Wallet.
+              </p>
 
-              {/* Payment Methods tabs */}
-              <div className="grid grid-cols-3 gap-2 bg-cream dark:bg-[#0F172A] p-1 border border-border dark:border-white/5 rounded-xl mb-6">
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('upi')}
-                  className={`py-3 rounded-lg text-[13px] font-bold transition-all flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === 'upi'
-                      ? 'bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 text-sage font-extrabold shadow-sm'
-                      : 'text-medium hover:text-sage'
-                  }`}
-                >
-                  ⚡ <span className="text-[11px] sm:text-[12px]">UPI ID</span>
-                </button>
+              <button
+                onClick={handlePaymentSubmit}
+                className={`w-full max-w-[320px] py-4 rounded-xl font-bold text-[15px] text-white transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0
+                  ${selectedPlan === 'premium' ? 'bg-gold hover:bg-yellow-500 text-charcoal shadow-gold/20' : 'bg-sage hover:bg-sage-dark shadow-sage/20'}`}
+              >
+                <ShieldCheck size={18} /> Proceed to Secure Checkout
+              </button>
 
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('card')}
-                  className={`py-3 rounded-lg text-[13px] font-bold transition-all flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === 'card'
-                      ? 'bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 text-sage font-extrabold shadow-sm'
-                      : 'text-medium hover:text-sage'
-                  }`}
-                >
-                  <CreditCard size={16} /> <span className="text-[11px] sm:text-[12px]">Credit/Debit</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPaymentMethod('netbanking')}
-                  className={`py-3 rounded-lg text-[13px] font-bold transition-all flex flex-col items-center justify-center gap-1 ${
-                    paymentMethod === 'netbanking'
-                      ? 'bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 text-sage font-extrabold shadow-sm'
-                      : 'text-medium hover:text-sage'
-                  }`}
-                >
-                  <Landmark size={16} /> <span className="text-[11px] sm:text-[12px]">Net Banking</span>
-                </button>
+              <div className="flex items-center justify-center gap-1 text-[11px] text-light mt-6">
+                <span>🔒 Secured by Razorpay | SSL encryption | PCI-DSS compliant</span>
               </div>
-
-              {/* Form Content */}
-              <form onSubmit={handlePaymentSubmit} className="space-y-5">
-                {paymentMethod === 'upi' && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
-                    <div>
-                      <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Enter UPI ID</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. mobileNumber@upi, name@okhdfcbank"
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage"
-                      />
-                      <p className="text-[11px] text-light mt-1.5 leading-relaxed">
-                        Verify your address. A payment notification request will be pushed to your Google Pay, PhonePe, or Paytm app.
-                      </p>
-                    </div>
-
-                    {/* Common UPI shortcuts */}
-                    <div className="pt-2">
-                      <span className="text-[10px] font-bold text-light uppercase tracking-wider block mb-2">Popular UPI Options</span>
-                      <div className="flex flex-wrap gap-2">
-                        {['@okaxis', '@okhdfcbank', '@okicici', '@okbizaxis', '@paytm', '@ybl'].map((sfx) => (
-                          <button
-                            key={sfx}
-                            type="button"
-                            onClick={() => {
-                              const base = upiId.includes('@') ? upiId.split('@')[0] : (state.userName ? state.userName.toLowerCase().replace(/\s+/g, '') : 'mom');
-                              setUpiId(base + sfx);
-                            }}
-                            className="px-3 py-1.5 border border-border dark:border-white/5 rounded-lg text-[11px] font-bold text-medium hover:border-sage hover:text-sage bg-cream dark:bg-[#0F172A]"
-                          >
-                            {sfx}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {paymentMethod === 'card' && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
-                    <div>
-                      <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Cardholder Name</label>
-                      <input
-                        type="text"
-                        placeholder="Name printed on card"
-                        value={cardName}
-                        onChange={(e) => setCardName(e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Card Number</label>
-                      <input
-                        type="text"
-                        maxLength={19}
-                        placeholder="4111 2222 3333 4444"
-                        value={cardNumber}
-                        onChange={(e) => {
-                          const v = e.target.value.replace(/\D/g, '').replace(/(.{4})/g, '$1 ').trim();
-                          setCardNumber(v);
-                        }}
-                        required
-                        className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage"
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Expiry Date</label>
-                        <input
-                          type="text"
-                          maxLength={5}
-                          placeholder="MM/YY"
-                          value={cardExpiry}
-                          onChange={(e) => {
-                            let v = e.target.value.replace(/\D/g, '');
-                            if (v.length > 2) {
-                              v = v.substring(0, 2) + '/' + v.substring(2);
-                            }
-                            setCardExpiry(v);
-                          }}
-                          required
-                          className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage text-center"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">CVV</label>
-                        <input
-                          type="password"
-                          maxLength={3}
-                          placeholder="•••"
-                          value={cardCvv}
-                          onChange={(e) => setCardCvv(e.target.value.replace(/\D/g, ''))}
-                          required
-                          className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage text-center"
-                        />
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {paymentMethod === 'netbanking' && (
-                  <div className="space-y-4 animate-in fade-in duration-200">
-                    <div>
-                      <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Select Your Bank</label>
-                      <select
-                        value={selectedBank}
-                        onChange={(e) => setSelectedBank(e.target.value)}
-                        required
-                        className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage"
-                      >
-                        <option value="">-- Choose Bank --</option>
-                        <option value="sbi">State Bank</option>
-                        <option value="hdfc">HDFC Bank</option>
-                        <option value="icici">ICICI Bank</option>
-                        <option value="axis">Axis Bank</option>
-                        <option value="kotak">Kotak Mahindra Bank</option>
-                        <option value="pnb">Punjab National Bank</option>
-                      </select>
-                      <p className="text-[11px] text-light mt-1.5">
-                        You will be redirected securely to your bank portal to sign in and complete the payment.
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                <div className="pt-4 border-t border-border dark:border-white/10 mt-6">
-                  <button
-                    type="submit"
-                    className={`w-full py-4 rounded-xl font-bold text-[15px] text-white transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0
-                      ${selectedPlan === 'premium' ? 'bg-gold hover:bg-yellow-500 text-charcoal shadow-gold/20' : 'bg-sage hover:bg-sage-dark shadow-sage/20'}`}
-                  >
-                    <ShieldCheck size={18} /> Pay ₹{finalPrice} Securely
-                  </button>
-
-                  <div className="flex items-center justify-center gap-1 text-[11px] text-light mt-4 text-center">
-                    <span>🔒 Secured by SSL encryption | PCI-DSS compliant checkout</span>
-                  </div>
-                </div>
-              </form>
             </div>
           </div>
         )}
