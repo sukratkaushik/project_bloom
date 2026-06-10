@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { usePlanner } from '../../store';
 import { WEEKLY_DATA } from '../../weeklyData';
-import { ChevronLeft, ChevronRight, Calendar } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Calendar, Sparkles } from 'lucide-react';
 import { DailyKnowledgeDrop } from './DailyKnowledgeDrop';
 
 const MOTIVATIONAL_QUOTES = [
@@ -192,7 +192,7 @@ export const PregnancyTracker: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Baby Size Visuals */}
+      {/* Baby Size Visuals - Coming Soon */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
@@ -201,30 +201,31 @@ export const PregnancyTracker: React.FC = () => {
       >
         <div className="mesh-glow-blob-1" />
         <div className="mesh-glow-blob-2" />
-        <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-4 relative z-10">Baby Size</div>
-        <motion.div
-          key={selectedWeek}
-          initial={{ scale: 0.5, rotate: -10, opacity: 0 }}
-          animate={{ scale: 1, rotate: 0, opacity: 1 }}
-          transition={{ type: "spring", damping: 12 }}
-          className="text-[80px] leading-none mb-4 relative z-10"
-        >
-          {weekData.babyEmoji}
-        </motion.div>
-        <h3 className="font-serif text-[32px] font-medium text-charcoal mb-1 relative z-10">
-          {weekData.length}
-        </h3>
-        <p className="text-[14px] text-medium mb-4 italic text-sage-dark dark:text-sage-light relative z-10">{MOTIVATIONAL_QUOTES[selectedWeek - 1]}</p>
-        <div className="flex items-center gap-6 mt-2 relative z-10">
-          <div className="flex flex-col">
-            <span className="text-[11px] font-semibold tracking-[1px] uppercase text-medium mb-1">Length</span>
-            <span className="text-[16px] font-medium text-charcoal bg-white/80 dark:bg-white/10 px-4 py-1.5 rounded-full border border-white/20 shadow-sm">{weekData.length}</span>
-          </div>
-          <div className="flex flex-col">
-            <span className="text-[11px] font-semibold tracking-[1px] uppercase text-medium mb-1">Weight</span>
-            <span className="text-[16px] font-medium text-charcoal bg-white/80 dark:bg-white/10 px-4 py-1.5 rounded-full border border-white/20 shadow-sm">{weekData.weight}</span>
-          </div>
+        
+        <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-2 relative z-10">Baby Size</div>
+        
+        <div className="relative w-20 h-20 bg-sage/10 rounded-full flex items-center justify-center shadow-inner mb-4 mt-2 relative z-10">
+          <div className="absolute inset-0 bg-sage/20 rounded-full animate-ping opacity-75" />
+          <motion.div
+            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            className="text-[44px] relative z-10"
+          >
+            👶
+          </motion.div>
         </div>
+
+        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-pale/40 text-sage-dark text-[11px] font-bold uppercase tracking-wider border border-sage/20 mb-3 relative z-10">
+          <Sparkles size={12} className="text-sage" /> Coming Soon
+        </span>
+
+        <h3 className="font-serif text-[24px] font-medium text-charcoal mb-2 max-w-[320px] relative z-10">
+          Interactive Size Comparisons
+        </h3>
+
+        <p className="text-[14px] text-medium leading-relaxed max-w-[420px] mb-2 relative z-10">
+          We're preparing interactive, high-fidelity visualizations and fruit-size comparisons to help you track your baby's weekly growth in beautiful 3D.
+        </p>
       </motion.div>
 
       {/* Development & Body Changes */}
