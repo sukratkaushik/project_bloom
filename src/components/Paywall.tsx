@@ -49,7 +49,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
         <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
           {isPremiumFeature
             ? 'Unlock advanced AI-powered pregnancy scanners, chatbots, and EHR reports.'
-            : 'Unlock essential clinical checklists, Indian government maternity schemes, and postpartum care.'}
+            : 'Unlock essential clinical checklists, government maternity schemes, and postpartum care.'}
         </p>
       </div>
 
@@ -72,8 +72,8 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
 
           <p className="text-[15px] text-charcoal/80 dark:text-white/80 mb-8 leading-relaxed">
             {isPremiumFeature
-              ? 'Get 24/7 personal access to Bloom AI (chat support), AI Food Safety Scanners (identifies hidden pregnancy hazards in Indian snacks/dishes), and formatted FHIR R4 clinical exports.'
-              : 'Get full access to Indian Government Schemes (JSY, PMMVY maternity benefits), Postpartum/Early Parenthood recovery logs, and encrypted Partner Sync functionality.'}
+              ? 'Get 24/7 personal access to Bloom AI (chat support), AI Food Safety Scanners (identifies hidden pregnancy hazards in local snacks/dishes), and formatted FHIR R4 clinical exports.'
+              : 'Get full access to Government Schemes (JSY, PMMVY maternity benefits), Postpartum/Early Parenthood recovery logs, and encrypted Partner Sync functionality.'}
           </p>
 
           <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-5 mb-8">

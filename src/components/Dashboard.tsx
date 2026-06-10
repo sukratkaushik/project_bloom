@@ -314,7 +314,7 @@ export const Dashboard: React.FC = () => {
           <div className="flex items-center gap-2">
             <span className="font-serif text-[18px] text-sage font-semibold tracking-wide notranslate">Our Pregnancy</span>
             <span className="opacity-60 hidden sm:inline">|</span>
-            <span className="opacity-80">Made with ❤️ for Indian mothers</span>
+            <span className="opacity-80">Made with ❤️ for expectant mothers</span>
           </div>
 
           <div className="flex items-center gap-6">

@@ -278,7 +278,7 @@ export const NutritionTracker: React.FC = () => {
       {/* Foods DB */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-border bg-gray-50/50">
-          <h3 className="font-semibold text-charcoal text-[17px]">Indian Food Guide</h3>
+          <h3 className="font-semibold text-charcoal text-[17px]">Pregnancy Food Guide</h3>
         </div>
         <div className="p-4 sm:p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

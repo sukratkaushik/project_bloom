@@ -85,7 +85,7 @@ export const TeamPage: React.FC = () => {
 
           <div className="prose prose-sage max-w-3xl mx-auto text-left text-medium text-[16px] md:text-[18px] leading-relaxed space-y-6">
             <p>
-              Pregnancy is an extraordinary journey, yet finding reliable, context-specific, and private digital tools remains a challenge for many. Our Pregnancy was born out of a desire to create a digital sanctuary for expectant parents, designed explicitly to serve Indian mothers with tools optimized for their lives.
+              Pregnancy is an extraordinary journey, yet finding reliable, context-specific, and private digital tools remains a challenge for many. Our Pregnancy was born out of a desire to create a digital sanctuary for expectant parents, designed explicitly to serve expectant mothers with tools optimized for their lives.
             </p>
             <p>
               We envision a future where high-quality prenatal guidance is accessible to everyone. Our core philosophy bridges cutting-edge engineering with maternal empathy. We prioritize your privacy above all, building local-first solutions that perform perfectly offline because maternal health shouldn’t depend on stable internet.
@@ -106,8 +106,8 @@ export const TeamPage: React.FC = () => {
             },
             {
               icon: <Heart className="w-6 h-6 text-blush" />,
-              title: "Local Indian Context",
-              desc: "From ragi and aamla risk factors in our local food database to actionable guides for national maternity schemes (like PMMVY), our features fit your life."
+              title: "Localized Context",
+              desc: "From local food risk factors in our food database to actionable guides for national maternity schemes (like PMMVY), our features fit your life."
             },
             {
               icon: <Wifi className="w-6 h-6 text-gold" />,
@@ -169,7 +169,7 @@ export const TeamPage: React.FC = () => {
                 roleBg: "bg-gold-pale text-gold border-gold/10",
                 initials: "VK",
                 gradient: "from-gold-pale to-gold",
-                bio: "Growth and marketing specialist dedicated to building supportive maternal communities across India.",
+                bio: "Growth and marketing specialist dedicated to building supportive maternal communities.",
                 linkedin: null,
                 image: "/vaishali.png"
               }
@@ -233,7 +233,7 @@ export const TeamPage: React.FC = () => {
                 At the intersection of health, pregnancy, and technology lies a crucial need for clarity. We believe complex biometrics don’t have to feel overwhelming. That’s why we design clean interface spaces, subtle animations, and highly structured checklists to keep anxiety at bay.
               </p>
               <p className="text-medium text-[16px] leading-relaxed mb-8">
-                Every detail in Our Pregnancy is thoroughly planned—from our preeclampsia alert algorithms down to the visual size updates of our baby womb widget. By keeping the core features open and entirely free, we hope to build a more equitable maternal health system across India.
+                Every detail in Our Pregnancy is thoroughly planned—from our preeclampsia alert algorithms down to the visual size updates of our baby womb widget. By keeping the core features open and entirely free, we hope to build a more equitable maternal health system.
               </p>
 
               <div className="flex flex-wrap gap-x-8 gap-y-4">
@@ -244,7 +244,7 @@ export const TeamPage: React.FC = () => {
                 <div className="border-r border-border hidden sm:block" />
                 <div>
                   <div className="text-[32px] font-serif font-bold text-blush">Local</div>
-                  <div className="text-[13px] text-medium font-bold uppercase tracking-wider">Indian Context</div>
+                  <div className="text-[13px] text-medium font-bold uppercase tracking-wider">Context</div>
                 </div>
                 <div className="border-r border-border hidden sm:block" />
                 <div>
@@ -303,7 +303,7 @@ export const TeamPage: React.FC = () => {
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 object-contain" />
               <span className="font-serif text-[24px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
             </div>
-            <p className="text-[14px] text-light">Made with ❤️ for Indian mothers</p>
+            <p className="text-[14px] text-light">Made with ❤️ for expectant mothers</p>
           </div>
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">

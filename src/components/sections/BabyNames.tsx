@@ -15,7 +15,7 @@ import { functions } from '../../firebase';
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
   const [gender, setGender] = useState('Neutral');
-  const [origin, setOrigin] = useState('Modern Indian');
+  const [origin, setOrigin] = useState('Modern');
   const [startingLetter, setStartingLetter] = useState('');
   const [keywords, setKeywords] = useState('');
 
@@ -40,7 +40,7 @@ export const BabyNames: React.FC = () => {
         {"name": "...", "meaning": "...", "origin": "..."}
       ]`;
 
-      const systemPrompt = `You are a helpful assistant for expecting parents in India. You suggest beautiful, culturally appropriate baby names. Always respond with ONLY valid JSON — no markdown, no explanation, no extra text.`;
+      const systemPrompt = `You are a helpful assistant for expecting parents. You suggest beautiful baby names. Always respond with ONLY valid JSON — no markdown, no explanation, no extra text.`;
 
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
       const response = await chatWithAI({ message: prompt, systemPrompt });
@@ -101,7 +101,7 @@ export const BabyNames: React.FC = () => {
                 onChange={(val) => setOrigin(val)}
                 className="w-full relative z-10"
                 options={[
-                  { label: 'Modern Indian (Short, easy to pronounce globally)', value: 'Modern Indian' },
+                  { label: 'Modern (Short, easy to pronounce globally)', value: 'Modern' },
                   { label: 'Traditional Sanskrit', value: 'Traditional Sanskrit' },
                   { label: 'Islamic / Arabic', value: 'Islamic / Arabic' },
                   { label: 'Sikh / Punjabi', value: 'Sikh / Punjabi' },

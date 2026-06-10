@@ -128,6 +128,15 @@ export const SetupScreen: React.FC = () => {
   const [hasConsented, setHasConsented] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
+  const selectedDate = dueDate ? new Date(dueDate) : null;
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  if (selectedDate) {
+    selectedDate.setHours(0, 0, 0, 0);
+  }
+  const diffWeeks = selectedDate ? (selectedDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24 * 7) : 0;
+  const isYetToBegin = diffWeeks > 40;
+
   const toggleFlag = (id: string) => {
     setFlags((prev) => ({ ...prev, [id]: !prev[id] }));
   };
@@ -192,6 +201,11 @@ export const SetupScreen: React.FC = () => {
             <span className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium text-center mb-2">Expected Due Date *</span>
             <DateWheelPicker value={dueDate} onChange={setDueDate} />
             <span className="text-[11px] text-light mt-[3px] text-center">Swipe to set the exact date. Your OB or midwife will confirm this.</span>
+            {isYetToBegin && (
+              <div className="mt-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-300 rounded-[12px] text-[13px] text-center font-medium animate-in fade-in slide-in-from-top-1">
+                ⚠️ You are yet to begin your journey.
+              </div>
+            )}
           </div>
           
           <div className="flex flex-col gap-1.5">
@@ -284,8 +298,8 @@ export const SetupScreen: React.FC = () => {
 
         <button 
           onClick={handleGenerate}
-          disabled={!hasConsented}
-          className={`w-full mt-6 p-[17px] border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+          disabled={!hasConsented || isYetToBegin}
+          className={`w-full mt-6 p-[17px] border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented && !isYetToBegin ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
           ✦ Generate My Personalised Plan
         </button>
