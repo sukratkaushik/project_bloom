@@ -1,0 +1,109 @@
+import React from 'react';
+import { usePlanner } from '../store';
+import { fmtShort } from '../utils';
+import { LanguageSelector } from './LanguageSelector';
+
+interface HeaderProps {
+  isMobileMenuOpen?: boolean;
+  setIsMobileMenuOpen?: (open: boolean) => void;
+  progressPct?: number;
+  hideMenuIcon?: boolean;
+}
+
+export const Header: React.FC<HeaderProps> = ({ 
+  isMobileMenuOpen = false, 
+  setIsMobileMenuOpen, 
+  progressPct,
+  hideMenuIcon = false 
+}) => {
+  const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
+
+  return (
+    <header className="bg-white border-b border-border px-4 md:px-10 lg:px-12 sticky top-0 md:top-[14px] z-50 shadow-sm no-print">
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px]">
+        <div className="flex items-center shrink-0">
+          {!hideMenuIcon && setIsMobileMenuOpen && (
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="md:hidden mr-3 p-1.5 text-sage hover:bg-sage-pale rounded-md transition-colors"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+            </button>
+          )}
+          <button
+            onClick={() => updateState({ isSetup: false })}
+            className="flex items-center gap-3 md:pr-6 md:border-r border-border md:mr-5 cursor-pointer bg-transparent border-none hover:opacity-80 transition-opacity text-sage logo-interact"
+          >
+            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 md:w-10 md:h-10 object-contain shrink-0" />
+            <span className="font-serif text-[22px] md:text-[26px] font-semibold tracking-wide whitespace-nowrap notranslate">Our Pregnancy</span>
+          </button>
+        </div>
+
+        {state.isCalmModeActive ? (
+          <div className="hidden md:flex flex-1 items-center justify-center text-[14px] text-medium italic">
+            Taking it one day at a time.
+          </div>
+        ) : (
+          <div className="hidden md:flex items-center justify-center gap-6 flex-1 px-4 min-w-max">
+            <div className="text-center">
+              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
+              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T1 ends</div>
+              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t1End)}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T2 ends</div>
+              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t2End)}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">Due date</div>
+              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.dueDate)}</div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex items-center gap-3 shrink-0">
+          <LanguageSelector />
+          <div className="hidden md:flex items-center gap-4 pl-4 border-l border-border">
+            {!state.isCalmModeActive && progressPct !== undefined && (
+              <div className="flex items-center gap-2.5">
+                <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-sage to-sage-light rounded-[3px] transition-all duration-400"
+                    style={{ width: `${progressPct}%` }}
+                  />
+                </div>
+                <div className="text-[12px] font-semibold text-sage whitespace-nowrap">{progressPct}% done</div>
+              </div>
+            )}
+            <button
+              onClick={() => updateState({ critFilter: !state.critFilter })}
+              className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
+                ${state.critFilter ? 'border-critical text-critical bg-critical-bg' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
+            >
+              {state.critFilter ? '✓ Critical only' : 'Critical only'}
+            </button>
+             <button
+              onClick={toggleCalmMode}
+              className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
+                ${state.isCalmModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
+              title="Toggle Calm Mode (reduces visual clutter and hides timers)"
+            >
+              {state.isCalmModeActive ? '🌿 Calm Mode' : '🌿 Calm Mode'}
+            </button>
+            <button
+              onClick={toggleDarkMode}
+              className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
+                ${state.isDarkModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
+              title="Toggle Dark Mode"
+            >
+              {state.isDarkModeActive ? '🌙 Dark Mode' : '☀️ Dark Mode'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+  );
+};
