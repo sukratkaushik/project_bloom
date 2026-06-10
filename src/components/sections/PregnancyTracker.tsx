@@ -54,6 +54,14 @@ export const PregnancyTracker: React.FC = () => {
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [tempDate, setTempDate] = useState(state.dueDate || '');
 
+  const tempSelectedDate = tempDate ? new Date(tempDate) : null;
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+  if (tempSelectedDate) {
+    tempSelectedDate.setHours(0, 0, 0, 0);
+  }
+  const isYetToBegin = tempSelectedDate ? (tempSelectedDate.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24 * 7) > 40 : false;
+
   // Calculate current week based on due date
   useEffect(() => {
     if (state.dueDate) {
@@ -111,19 +119,27 @@ export const PregnancyTracker: React.FC = () => {
             <Calendar size={16} />
           </div>
           {isEditingDate ? (
-            <div className="flex items-center gap-2">
-              <input
-                type="date"
-                value={tempDate}
-                onChange={(e) => setTempDate(e.target.value)}
-                className="text-[13px] font-sans border-[1.5px] border-border rounded-[6px] px-2 py-1 focus:outline-none focus:border-sage"
-              />
-              <button
-                onClick={handleSaveDate}
-                className="text-[11px] font-semibold tracking-[0.5px] uppercase bg-sage text-white px-3 py-1.5 rounded-[6px] hover:opacity-90 transition-opacity"
-              >
-                Save
-              </button>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="date"
+                  value={tempDate}
+                  onChange={(e) => setTempDate(e.target.value)}
+                  className="text-[13px] font-sans border-[1.5px] border-border rounded-[6px] px-2 py-1 focus:outline-none focus:border-sage"
+                />
+                <button
+                  onClick={handleSaveDate}
+                  disabled={isYetToBegin}
+                  className={`text-[11px] font-semibold tracking-[0.5px] uppercase text-white px-3 py-1.5 rounded-[6px] transition-opacity ${isYetToBegin ? 'bg-gray-300 cursor-not-allowed opacity-60' : 'bg-sage hover:opacity-90'}`}
+                >
+                  Save
+                </button>
+              </div>
+              {isYetToBegin && (
+                <div className="text-[11px] font-medium text-amber-700 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 px-2.5 py-1.5 rounded-[6px] animate-in fade-in slide-in-from-top-1">
+                  ⚠️ You are yet to begin your journey.
+                </div>
+              )}
             </div>
           ) : (
             <div className="flex flex-col">

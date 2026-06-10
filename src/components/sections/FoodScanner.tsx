@@ -76,7 +76,7 @@ export const FoodScanner: React.FC = () => {
           </h2>
           {!state.isCalmModeActive && (
             <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-              Upload a photo of your meal, Indian snack, or food label to get an AI nutritional breakdown and pregnancy safety check.
+              Upload a photo of your meal, local snack, or food label to get an AI nutritional breakdown and pregnancy safety check.
             </p>
           )}
         </div>

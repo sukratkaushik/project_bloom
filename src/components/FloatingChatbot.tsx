@@ -20,7 +20,7 @@ const CONTEXT_GUIDES: Record<string, { greeting: string, suggestions: string[] }
     suggestions: ["What is Normal BP?", "High BP symptoms", "Weight gain guide"]
   },
   foodscanner: {
-    greeting: "Curious about what's safe to eat? I know all about Indian foods and pregnancy safety. 🥗",
+    greeting: "Curious about what's safe to eat? I know all about foods and pregnancy safety. 🥗",
     suggestions: ["Can I eat Papaya?", "Safe street foods", "Ragi benefits"]
   },
   kickcounter: {
@@ -28,7 +28,7 @@ const CONTEXT_GUIDES: Record<string, { greeting: string, suggestions: string[] }
     suggestions: ["Count to 10 rule", "Best time to count", "When to call doctor"]
   },
   finance: {
-    greeting: "Planning your finances? I can explain government schemes like PMMVY or help you budget for the hospital. 🇮🇳",
+    greeting: "Planning your finances? I can explain government schemes like PMMVY or help you budget for the hospital.",
     suggestions: ["PMMVY Scheme info", "JSY benefits", "Delivery costs"]
   }
 };

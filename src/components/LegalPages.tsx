@@ -65,20 +65,20 @@ export const PrivacyPolicy: React.FC = () => {
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">3. How We Use Your Information</h2>
           <p>We use your information to provide, maintain, and improve the Our Pregnancy app. Your data is strictly used to provide the personalized tracking experience. We do not sell your personal data to third parties, and your health data is never used to train public AI models.</p>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. Your Rights under Indian Law</h2>
-          <p>In compliance with the <strong>Digital Personal Data Protection Act, 2023 (DPDP Act)</strong>, you as a Data Principal have the following rights regarding your personal data:</p>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. Your Data Rights</h2>
+          <p>You have the following rights regarding your personal data:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Right to access and update:</strong> You may review and correct your data directly within the app.</li>
             <li><strong>Right to withdraw consent & erasure:</strong> You can choose to delete specific health logs or delete your entire account, which permanently erases your data from our systems.</li>
-            <li><strong>Right to nominee:</strong> In the event of death or incapacity, you have the right to nominate someone to exercise these rights.</li>
+            <li><strong>Right to nominee:</strong> You have the right to nominate someone to exercise these rights on your behalf.</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Grievance Officer</h2>
-          <p>In accordance with the <strong>Information Technology Act, 2000</strong> and the <strong>SPDI Rules, 2011</strong>, the name and contact details of the Grievance Officer are provided below. If you have any complaints or concerns regarding your data, please contact:</p>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Grievance Representative</h2>
+          <p>If you have any complaints or concerns regarding your data, please contact our support and grievance representative:</p>
           <div className="bg-sage-pale p-4 rounded-[12px] mt-4">
-            <p className="font-semibold text-charcoal">Grievance Officer: Sukrat Kaushik</p>
+            <p className="font-semibold text-charcoal">Representative: Sukrat Kaushik</p>
             <p><strong>Email:</strong> <a href="mailto:grievance@ourpregnancy.in" onClick={(e) => handleEmailClick("grievance@ourpregnancy.in", e)} className="hover:text-sage-dark text-sage font-semibold transition-colors">grievance@ourpregnancy.in</a></p>
-            <p><strong>Time:</strong> Mon-Fri (9:00 AM to 6:00 PM IST)</p>
+            <p><strong>Time:</strong> Mon-Fri (9:00 AM to 6:00 PM)</p>
           </div>
         </div>
       </div>
@@ -112,7 +112,7 @@ export const TermsOfService: React.FC = () => {
           <p>Always seek the advice of your physician, obstetrician, or other qualified health provider with any questions you may have regarding a medical condition or your pregnancy. Never disregard professional medical advice or delay in seeking it because of something you have read on the Our Pregnancy app.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">2. Acceptance of Terms & Eligibility</h2>
-          <p>By accessing or using Our Pregnancy, you agree to be bound by these Terms. Under the <strong>Indian Contract Act, 1872</strong>, you must be at least 18 years of age to form a binding contract. If you are under 18, you may not use this service independently.</p>
+          <p>By accessing or using Our Pregnancy, you agree to be bound by these Terms. You must be at least 18 years of age to form a binding contract and use this service independently.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">3. User Accounts</h2>
           <p>When you create an account with us, you must provide information that is accurate, complete, and current at all times. You are responsible for safeguarding the password or credentials that you use to access the service.</p>
@@ -121,7 +121,7 @@ export const TermsOfService: React.FC = () => {
           <p>You agree not to use the app in any way that causes, or may cause, damage to the app or impairment of the availability or accessibility of the app.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Governing Law & Jurisdiction</h2>
-          <p>These Terms shall be governed by and construed in accordance with the <strong>laws of India</strong>. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the courts located in New Delhi, India.</p>
+          <p>These Terms shall be governed by and construed in accordance with the applicable laws. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the competent courts.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Changes to Terms</h2>
           <p>We reserve the right to modify or replace these Terms at any time. We will provide notice of any significant changes.</p>

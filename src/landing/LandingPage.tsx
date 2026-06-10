@@ -6,7 +6,7 @@ import {
   WifiOff,
   MapPin,
   Stethoscope,
-  IndianRupee,
+  Coins,
   Activity,
   Timer,
   Heart,
@@ -556,9 +556,9 @@ export const LandingPage: React.FC = () => {
       <section className="border-y border-border bg-white px-6 py-6">
         <div className="max-w-[1200px] mx-auto flex flex-wrap justify-center gap-x-8 gap-y-4">
           {[
-            { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for Indian mothers 🇮🇳" },
+            { icon: <MapPin className="w-5 h-5 text-sage" />, text: "Made for expectant mothers" },
             { icon: <ShieldCheck className="w-5 h-5 text-sage" />, text: "Your data is private & secure" },
-            { icon: <IndianRupee className="w-5 h-5 text-sage" />, text: "Core features are free" },
+            { icon: <Coins className="w-5 h-5 text-sage" />, text: "Core features are free" },
             { icon: <WifiOff className="w-5 h-5 text-sage" />, text: "Works offline via PWA" }
           ].map((item, i) => (
             <div key={i} className="flex items-center gap-2 text-[14px] font-semibold text-charcoal">
@@ -631,11 +631,11 @@ export const LandingPage: React.FC = () => {
               </div>
               <h3 className="font-serif text-[28px] font-bold text-charcoal mb-3">AI Food Safety Scanner</h3>
               <p className="text-[16px] text-medium leading-relaxed mb-6">
-                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our Gemini-powered AI verify it against Indian food safety guidelines instantly.
+                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our Gemini-powered AI verify it against food safety guidelines instantly.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Detects harmful ingredients</li>
-                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Tailored for Indian cuisine</li>
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Tailored for local cuisines</li>
               </ul>
             </div>
             <div className="flex-1 min-h-[300px] relative overflow-hidden bg-sage-pale/30">
@@ -731,7 +731,7 @@ export const LandingPage: React.FC = () => {
         </div>
       </section>
 
-      {/* India Section */}
+      {/* Localized Section */}
       <section id="localized-care" className="relative bg-sage text-white px-6 py-16 md:py-24 overflow-hidden border-y border-white/20">
         {/* Decorative Background Elements */}
         <div className="absolute top-0 left-0 w-full h-full overflow-hidden z-0 pointer-events-none">
@@ -744,9 +744,9 @@ export const LandingPage: React.FC = () => {
             <span className="bg-white/20 text-white border border-white/30 px-4 py-1.5 rounded-full text-[13px] font-bold tracking-[2px] uppercase mb-6 inline-block shadow-sm backdrop-blur-md">
               Localized Care
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6">Made for Indian mothers 🇮🇳</h2>
+            <h2 className="font-serif text-4xl md:text-5xl mb-6">Made for expectant mothers</h2>
             <p className="text-white/90 text-[16px] md:text-[18px] max-w-2xl mx-auto font-medium">
-              Because a pregnancy in India means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.
+              Because pregnancy means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.
             </p>
           </div>
 
@@ -756,7 +756,7 @@ export const LandingPage: React.FC = () => {
               <div className="w-16 h-16 bg-sage-pale text-sage rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
                 🥗
               </div>
-              <h3 className="font-bold text-[20px] mb-3">Indian Foods Database</h3>
+              <h3 className="font-bold text-[20px] mb-3">Foods Database</h3>
               <p className="text-medium text-[15px] leading-relaxed">
                 Know exactly what's safe. Comprehensive coverage for dal, ragi, paneer, amla, and accurate risk flags for items like raw papaya or street food.
               </p>
@@ -927,7 +927,7 @@ export const LandingPage: React.FC = () => {
                   {[
                     "Everything in Free starter plan",
                     "Complete Medical tasks & vaccines tracker",
-                    "Detailed Indian Government Schemes guide",
+                    "Detailed Government Schemes guide",
                     "Postpartum & Early Parenthood support",
                     "Encrypted real-time Partner Sync"
                   ].map((feat, i) => (
@@ -1054,7 +1054,7 @@ export const LandingPage: React.FC = () => {
       <section className="bg-white px-6 py-16 md:py-24">
         <div className="max-w-[1200px] mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by Indian mothers</h2>
+            <h2 className="font-serif text-3xl text-charcoal mb-2">Trusted by expectant mothers</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
@@ -1063,7 +1063,7 @@ export const LandingPage: React.FC = () => {
               { review: "The kick counter works perfectly. Simple, fast, exactly what I needed when my doctor asked me to track.", author: "Kavitha R.", loc: "Bangalore" },
               { review: "The core features are free and work even when I'm travelling. Such a blessing!", author: "Anjali S.", loc: "Delhi" },
               { review: "The AI food scanner saved me so much anxiety during my babymoon in Goa. Highly recommend!", author: "Sneha P.", loc: "Goa" },
-              { review: "Finally an app that understands Indian contexts and government schemes.", author: "Divya K.", loc: "Chennai" },
+              { review: "Finally an app that understands local contexts and government schemes.", author: "Divya K.", loc: "Chennai" },
               { review: "The vaccination reminders and daily tips kept me so reassured. A must-have for every expectant mom!", author: "Meera J.", loc: "Pune" }
             ].map((t, i) => (
               <div key={i} className="bg-cream p-8 rounded-[20px] relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full">
@@ -1094,7 +1094,7 @@ export const LandingPage: React.FC = () => {
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 object-contain" />
               <span className="font-serif text-[24px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
             </div>
-            <p className="text-[14px] text-light">Made with ❤️ for Indian mothers</p>
+            <p className="text-[14px] text-light">Made with ❤️ for expectant mothers</p>
           </div>
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">

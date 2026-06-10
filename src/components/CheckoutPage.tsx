@@ -512,7 +512,7 @@ export const CheckoutPage: React.FC = () => {
                         className="w-full px-4 py-3 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13.5px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage"
                       >
                         <option value="">-- Choose Bank --</option>
-                        <option value="sbi">State Bank of India (SBI)</option>
+                        <option value="sbi">State Bank</option>
                         <option value="hdfc">HDFC Bank</option>
                         <option value="icici">ICICI Bank</option>
                         <option value="axis">Axis Bank</option>
