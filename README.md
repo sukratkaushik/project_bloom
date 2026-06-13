@@ -1,4 +1,4 @@
-# 🌸 Bloom — Pregnancy Companion App
+# Our Pregnancy — YOUR Pregnancy Companion 
 
 > A comprehensive pregnancy companion that helps expectant parents track milestones, health vitals, tasks, and decisions — securely synced across devices via Firebase, with offline support via IndexedDB.
 
