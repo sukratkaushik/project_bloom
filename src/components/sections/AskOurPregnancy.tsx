@@ -197,7 +197,7 @@ You MUST append the following hard clinical disclaimer to the very end of EVERY 
 
       setLoadingText("Consulting guidelines...");
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext });
+      const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext, dueDate: state.dueDate });
       const result = response.data as { reply: string };
 
       setMessages(prev => [...prev, { role: 'model', text: result.reply }]);

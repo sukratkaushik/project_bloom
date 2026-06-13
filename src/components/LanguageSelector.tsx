@@ -12,7 +12,8 @@ const LANGUAGES = [
   { code: 'kn', label: 'Kannada', native: 'ಕನ್ನಡ' },
   { code: 'te', label: 'Telugu', native: 'తెలుగు' },
   { code: 'ml', label: 'Malayalam', native: 'മലയാളം' },
-  { code: 'ur', label: 'Urdu', native: 'اردو' }
+  { code: 'ur', label: 'Urdu', native: 'اردو' },
+  { code: 'de', label: 'German', native: 'Deutsch' }
 ];
 
 export const LanguageSelector: React.FC = () => {
