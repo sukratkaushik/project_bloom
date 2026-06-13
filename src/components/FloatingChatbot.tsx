@@ -73,7 +73,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     try {
       // 2. Call the secure Firebase Cloud Function instead of HF directly
       const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: textToSend });
+      const response = await chatWithAI({ message: textToSend, dueDate: state.dueDate });
       const result = response.data as { reply: string };
 
       // Replace the "Thinking..." message with the actual response

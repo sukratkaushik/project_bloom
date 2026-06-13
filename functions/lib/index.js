@@ -47,8 +47,81 @@ admin.initializeApp();
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
 const razorpayKeyId = (0, params_1.defineSecret)("RAZORPAY_KEY_ID");
 const razorpayKeySecret = (0, params_1.defineSecret)("RAZORPAY_KEY_SECRET");
+function isQueryDueDateInvalid(message) {
+    const clean = message.toLowerCase();
+    // 1. Check if the message contains a year 2028 or later
+    const year2028PlusMatch = clean.match(/\b(202[8-9]|20[3-9][0-9])\b/);
+    if (year2028PlusMatch) {
+        return true;
+    }
+    // 2. Check if the message contains 2027
+    if (clean.includes("2027")) {
+        // Check for invalid months in 2027 (April to December)
+        const outOfRangeMonths = [
+            // English
+            'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec',
+            'april', 'june', 'july', 'august', 'september', 'october', 'november', 'december',
+            // German
+            'mai', 'okt', 'dez', 'juni', 'juli', 'oktober', 'dezember',
+            // Hindi / Hinglish transliterated
+            'aprail', 'mai', 'jun', 'julai', 'agast', 'sitambar', 'aktubar', 'navambar', 'disambar',
+            'dec', 'disember', 'december',
+            // Devanagari Hindi
+            'अप्रैल', 'मई', 'जून', 'जुलाई', 'अगस्त', 'सितंबर', 'अक्टूबर', 'नवंबर', 'दिसंबर',
+            // Punjabi
+            'ਅਪ੍ਰੈਲ', 'ਮਈ', 'ਜੂਨ', 'ਜੁਲਾਈ', 'ਅਗਸਤ', 'ਸਤੰਬਰ', 'ਅਕਤੂਬਰ', 'ਨਵੰਬਰ', 'ਦਸੰਬਰ',
+            // Gujarati
+            'એપ્રિલ', 'મે', 'જૂન', 'જુલાઈ', 'ઓગસ્ટ', 'સપ્ટેમ્બર', 'ઓક્ટોબર', 'નવેમ્બર', 'ડિસેમ્બર',
+            // Marathi
+            'एप्रिल', 'मे', 'जून', 'जुलै', 'ऑगस्ट', 'सप्टेंबर', 'ऑक्टोबर', 'नोव्हेंबर', 'डिसेंबर',
+            // Bengali
+            'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টেম্বর', 'অক্টোবর', 'নভেম্বর', 'ডিসেম্বর',
+            // Tamil
+            'ஏப்ரல்', 'மே', 'ஜூன்', 'ஜூலை', 'ஆகஸ்ட்', 'செப்டம்பர்', 'அக்டோபர்', 'நவம்பர்', 'டிசம்பர்',
+            // Kannada
+            'ಏಪ್ರಿಲ್', 'ಮೇ', 'ಜೂನ್', 'ಜುಲೈ', 'ಆಗಸ್ಟ್', 'ಸೆಪ್ಟೆಂಬರ್', 'ಅಕ್ಟೋಬರ್', 'ನವೆಂಬರ್', 'ಡಿಸೆಂಬರ್',
+            // Telugu
+            'ఏప్రిల్', 'మే', 'జూన్', 'జూలై', 'ఆగస్టు', 'సెప్టेंबर', 'అక్టోబర్', 'నవంబర్', 'డిసెంబర్',
+            // Malayalam
+            'ഏപ്രിൽ', 'മേയ്', 'ജൂൺ', 'ജൂലൈ', 'ആഗസ്റ്റ്', 'സെപ്റ്റംബർ', 'ഒക്ടോബർ', 'നവംബർ', 'ഡിസംബർ',
+            // Urdu
+            'اپریل', 'مئی', 'جون', 'جولائی', 'اگست', 'ستمبر', 'اکتوبر', 'نومبر', 'دسمبر'
+        ];
+        for (const m of outOfRangeMonths) {
+            if (clean.includes(m)) {
+                return true;
+            }
+        }
+        // Check numeric dates like DD/MM/2027 or MM/DD/2027
+        const numericDateMatches = clean.match(/\b(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.]2027\b/);
+        if (numericDateMatches) {
+            const val1 = parseInt(numericDateMatches[1], 10);
+            const val2 = parseInt(numericDateMatches[2], 10);
+            const minVal = Math.min(val1, val2);
+            const maxVal = Math.max(val1, val2);
+            if (minVal > 3) {
+                return true;
+            }
+            if (maxVal > 12 && minVal > 3) {
+                return true;
+            }
+        }
+    }
+    // 3. Check for relative time phrases
+    const outOfRangePhrases = [
+        'in 10 month', 'in 11 month', 'in 12 month', 'in 13 month', 'in 14 month', 'in 15 month',
+        'in 16 month', 'in 17 month', 'in 18 month', 'in 19 month', 'in 20 month', 'in 24 month',
+        'in 1 year', 'in 2 year', 'in 3 year', 'in 1.5 year', 'next year', 'after 9 months',
+        '10 mahine', '11 mahine', '12 mahine', '1 saal', '2 saal', 'agle saal',
+        '10 महीने', '11 महीने', '12 महीने', '1 साल', '2 साल'
+    ];
+    if (outOfRangePhrases.some(phrase => clean.includes(phrase))) {
+        return true;
+    }
+    return false;
+}
 exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1" }, async (request) => {
-    const { message, systemPrompt, maxTokens } = request.data;
+    const { message, systemPrompt, maxTokens, dueDate } = request.data;
     if (!message) {
         throw new https_1.HttpsError("invalid-argument", "Message is required.");
     }
@@ -57,9 +130,51 @@ exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-so
         console.error("Missing Hugging Face API Key");
         throw new https_1.HttpsError("internal", "Server configuration error.");
     }
-    const defaultSystemPrompt = "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor.";
-    const scopeConstraint = "\n\nCRITICAL SCOPE CONSTRAINT: You are strictly limited to answering questions related to pregnancy, maternal health, prenatal/postpartum care, fetal/baby development, baby naming, or pregnancy tracking/planning. If the user asks about unrelated topics (such as computer programming, writing code, general IT, non-pregnancy math, history, general knowledge, etc.), you MUST reply with exactly: 'I can not help with this, please ask me something related to what I am meant for...' and nothing else. Do not explain, do not apologize, and do not output anything else.";
-    const finalSystemPrompt = (systemPrompt || defaultSystemPrompt) + scopeConstraint;
+    let isDueDateOutside9Months = false;
+    if (dueDate) {
+        try {
+            const due = new Date(dueDate);
+            const today = new Date();
+            const limitDate = new Date(today);
+            limitDate.setMonth(today.getMonth() + 9);
+            if (due < today || due > limitDate) {
+                isDueDateOutside9Months = true;
+            }
+        }
+        catch (e) {
+            console.error("Error parsing due date in functions:", e);
+        }
+    }
+    // Also check the user's message programmatically
+    if (isQueryDueDateInvalid(message)) {
+        isDueDateOutside9Months = true;
+    }
+    let finalSystemPrompt = "";
+    if (isDueDateOutside9Months) {
+        finalSystemPrompt = `You are a professional translator and conversational AI.
+Detect the language and style of the user's message.
+Reply ONLY with the following statement translated into the detected language and style of the user's message:
+"I currently can help you when you are expecting your due date within 9 months from tday."
+
+CRITICAL TRANSLATION RULES:
+1. If the user's message is written in Romanized Hindi (Hinglish) (e.g. using English/Latin alphabet to write Hindi words like "agar", "m", "apna", "expect krr rhi hu", "kya", "kar sakte ho", etc.), you MUST reply in Romanized Hindi (Hinglish), for example: "Main abhi tabhi help kar sakta hoon jab aap apni due date aaj se 9 mahine ke andar expect kar rahe hon."
+2. If the user's message is in German, translate it to German: "Ich kann Ihnen derzeit helfen, wenn Sie Ihren Geburtstermin innerhalb von 9 Monaten ab heute erwarten."
+3. If the user's message is in English, reply in English: "I currently can help you when you are expecting your due date within 9 months from tday."
+4. If the user's message is in Devanagari Hindi, translate it to Hindi: "मैं वर्तमान में आपकी मदद कर सकता हूँ जब आप आज से 9 महीने के भीतर अपनी नियत तारीख की उम्मीद कर रहे हों।"
+5. Otherwise, translate the statement into the matching native language and script of the user's message (e.g. Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu, etc.).
+
+Do not output anything else. Do not explain, do not apologize, do not add any other text. Output ONLY the translated statement. This overrides all other instructions.`;
+    }
+    else {
+        const defaultSystemPrompt = "You are a helpful AI assistant for a pregnancy app called 'Project Bloom'. Keep answers short (1-3 sentences), encouraging, and rooted in safe medical guidelines. Do not provide dangerous medical advice. If you are unsure, advise them to consult a doctor.";
+        const scopeConstraint = `\n\nCRITICAL SCOPE CONSTRAINT: You are strictly limited to answering questions related to pregnancy, maternal health, prenatal/postpartum care, fetal/baby development, baby naming, or pregnancy tracking/planning. If the user asks about unrelated topics (such as computer programming, writing code, general IT, non-pregnancy math, history, general knowledge, etc.), you MUST reply with exactly: 'I can not help with this, please ask me something related to what I am meant for...' and nothing else. Do not explain, do not apologize, and do not output anything else.
+
+CRITICAL LANGUAGE & DUE DATE RULES:
+1. You MUST detect the language of the user's query/message and answer/respond in that EXACT same language (e.g., if the user asks/writes in Hindi, respond in Hindi; if in German, respond in German; if in English, respond in English; if in Punjabi, respond in Punjabi, etc.).
+2. Today's date is June 13, 2026.
+3. If the user's query references/asks about expecting a due date that is not within 9 months from today (i.e. before June 13, 2026 or after March 13, 2027, such as expecting in December 2027), you MUST reply ONLY with: "I currently can help you when you are expecting your due date within 9 months from tday." (translated into the language of the user's message) and absolutely nothing else. Do not output any clinical disclaimer, warnings, explanations, or additional text.`;
+        finalSystemPrompt = (systemPrompt || defaultSystemPrompt) + scopeConstraint;
+    }
     try {
         const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
             headers: {
