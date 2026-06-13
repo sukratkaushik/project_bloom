@@ -547,11 +547,10 @@ firebase deploy
 
 ### Custom Domain Setup
 
-- **Domain:** `ourpregnancy.in` (registered on GoDaddy)
-- **DNS:** A record → `199.36.158.100` (Firebase Hosting IP)
+- **Domain:** `ourpregnancy.in`
 - **SSL:** Automatically provisioned by Firebase
-- **Auth Domain:** `ourpregnancy.in` (Google sign-in shows branded domain)
-
+- **Auth Domain:** `ourpregnancy.in`
+  
 ### Firebase Services Used
 
 | Service | Purpose |
