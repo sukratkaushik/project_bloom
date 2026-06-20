@@ -425,7 +425,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   };
 
   return (
-    <div className="sticky top-[80px] pt-8 no-print">
+    <div className="pt-8 no-print">
       {renderSearchInput()}
 
       {isSearching ? (

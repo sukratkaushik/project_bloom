@@ -116,7 +116,7 @@ export const Dashboard: React.FC = () => {
       {/* Body */}
       <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full relative">
         {/* Desktop Sidebar (Rendered inline) */}
-        <div className="hidden md:block w-full md:w-auto">
+        <div className="hidden md:block w-full md:w-auto sticky top-[95px] self-start">
           <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
         </div>
 
@@ -145,7 +145,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0">
+        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 sticky top-[95px] self-start">
           <AnimatePresence mode="wait">
             <motion.div
               key={activePage}
