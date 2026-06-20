@@ -485,19 +485,16 @@ select {
 
 /* Force text-white and border-white to remain pure white, resolving dark-mode override bugs */
 .text-white,
-.dark\:text-white,
 .dark .text-white,
 .dark .dark\:text-white {
   color: #ffffff !important;
 }
 .text-white\/80,
-.dark\:text-white\/80,
 .dark .text-white\/80,
 .dark .dark\:text-white\/80 {
   color: rgba(255, 255, 255, 0.8) !important;
 }
 .border-white,
-.dark\:border-white,
 .dark .border-white,
 .dark .dark\:border-white {
   border-color: #ffffff !important;

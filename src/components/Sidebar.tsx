@@ -20,7 +20,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   },
   smart: {
     label: "Smart Tools",
-    items: ['askourpregnancy', 'foodscanner', 'babynames']
+    items: ['askourpregnancy', 'foodscanner', 'babynames', 'travel']
   },
   tasks: {
     label: "Planning & Tasks",
@@ -101,23 +101,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             setActivePage(id);
             setSearchQuery('');
           }}
-          className={`flex items-center gap-2.5 p-[9px_11px] rounded-[10px] text-[13px] font-medium cursor-pointer transition-all w-full text-left
+          className={`flex items-center gap-2.5 p-[9px_11px] rounded-[10px] text-[14px] font-semibold md:font-medium cursor-pointer transition-all w-full text-left
             ${isActive
-              ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage font-bold border border-sage/20 shadow-xs'
-              : 'bg-transparent border border-transparent text-medium hover:bg-sage-pale/40 hover:text-sage dark:hover:bg-sage-pale/5'}
+              ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage-dark dark:text-sage font-bold border border-sage/20 shadow-xs'
+              : 'bg-transparent border border-transparent text-charcoal/80 hover:bg-sage-pale/40 hover:text-sage-dark dark:hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
           <span className="text-[16px] w-5 text-center shrink-0" translate="no" aria-hidden="true">{icon}</span>
           <span className="flex-1 leading-normal whitespace-normal break-words py-0.5">{label}</span>
           {progress && !state.isCalmModeActive && progress.total > 0 && (
             <div className="ml-auto w-12 flex flex-col gap-1 items-end">
-              <span className={`text-[10px] font-semibold leading-none
-                ${isActive ? 'text-sage-dark' : 'text-medium'}`}>
+              <span className={`text-[11px] font-bold leading-none
+                ${isActive ? 'text-sage-dark dark:text-sage' : 'text-charcoal/65'}`}>
                 {progress.done}/{progress.total}
               </span>
-              <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden">
+              <div className="w-full h-1.5 bg-charcoal/10 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className={`h-full ${isActive ? 'bg-sage-dark' : 'bg-sage'} transition-all duration-300`}
+                  className={`h-full ${isActive ? 'bg-sage-dark dark:bg-sage' : 'bg-sage-dark/60 dark:bg-sage/60'} transition-all duration-300`}
                   style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }}
                 />
               </div>
@@ -128,7 +128,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           <button
             onClick={(e) => { e.stopPropagation(); toggleFavoritePage(id); }}
             className={`absolute right-2 p-1.5 rounded-md transition-opacity
-              ${isFav ? 'opacity-100 text-gold' : 'opacity-0 group-hover:opacity-100 text-medium hover:text-gold hover:bg-gold/10'}`}
+              ${isFav ? 'opacity-100 text-gold' : 'opacity-0 group-hover:opacity-100 text-charcoal/60 hover:text-gold hover:bg-gold/10'}`}
             title={isFav ? "Remove from Favorites" : "Add to Favorites"}
           >
             <Star className={`w-3.5 h-3.5 ${isFav ? 'fill-gold' : ''}`} />
@@ -150,6 +150,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'askourpregnancy', icon: '✨', label: 'Bloom AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
+    { id: 'travel', icon: '✈️', label: 'Safe Travel Guide' },
     { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },
     { id: 'prep', icon: '📋', label: 'Preparation', progress: getProgress(prepTasks) },
     { id: 'finance', icon: '💰', label: 'Financial', progress: getProgress(FIN_TASKS) },
@@ -179,18 +180,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const renderSearchInput = () => (
     <div className="relative mb-5 px-3">
       <div className="relative flex items-center group">
-        <Search className="absolute left-3 w-4 h-4 text-light pointer-events-none transition-colors group-focus-within:text-sage dark:group-focus-within:text-sage" />
+        <Search className="absolute left-3 w-4 h-4 text-charcoal/55 pointer-events-none transition-colors group-focus-within:text-sage-dark dark:group-focus-within:text-sage" />
         <input
           type="text"
           placeholder="Search features..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-8 py-2 text-[13px] font-sans font-medium rounded-[10px] border border-border/60 dark:border-border/10 bg-white dark:bg-charcoal/15 text-charcoal dark:text-white placeholder:text-light/70 focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/15 transition-all shadow-xs"
+          className="w-full pl-9 pr-8 py-2.5 text-[14px] font-sans font-medium rounded-[10px] border border-border/80 dark:border-border/20 bg-white dark:bg-charcoal/15 text-charcoal placeholder:text-charcoal/45 focus:outline-none focus:border-sage-dark dark:focus:border-sage focus:ring-2 focus:ring-sage/15 transition-all shadow-xs"
         />
         {searchQuery && (
           <button
             onClick={() => setSearchQuery('')}
-            className="absolute right-2.5 p-1 rounded-md text-light hover:text-charcoal dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+            className="absolute right-2.5 p-1 rounded-md text-charcoal/55 hover:text-charcoal dark:hover:text-charcoal transition-all"
             title="Clear Search"
           >
             <X className="w-3.5 h-3.5" />
@@ -202,9 +203,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
   const renderSearchResults = () => (
     <div className="space-y-0.5 animate-in fade-in slide-in-from-top-1 duration-200">
-      <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-sage mb-2 pl-3 flex items-center justify-between">
+      <div className="text-[13px] font-bold tracking-[1px] uppercase text-sage-dark dark:text-sage mb-2 pl-3 flex items-center justify-between">
         <span>Search Results ({filteredNavItems.length})</span>
-        <button onClick={() => setSearchQuery('')} className="text-light hover:text-sage normal-case font-normal text-[11px] cursor-pointer">
+        <button onClick={() => setSearchQuery('')} className="text-charcoal/55 hover:text-sage-dark dark:hover:text-sage normal-case font-normal text-[11px] cursor-pointer">
           Clear
         </button>
       </div>
@@ -220,7 +221,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           />
         ))
       ) : (
-        <div className="text-[13px] text-light/80 py-4 px-3 text-center italic">
+        <div className="text-[13px] text-charcoal/60 py-4 px-3 text-center italic">
           No features found matching "{searchQuery}"
         </div>
       )}
@@ -231,10 +232,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     return (
       <button
         onClick={() => setActiveCategory(id)}
-        className="w-full flex items-center justify-between py-3.5 border-b border-border/50 dark:border-border/10 text-charcoal/90 dark:text-white/80 hover:text-sage dark:hover:text-sage transition-all cursor-pointer text-left group"
+        className="w-full flex items-center justify-between py-3.5 border-b border-border/50 dark:border-border/10 text-charcoal/85 hover:text-sage-dark dark:hover:text-sage transition-all cursor-pointer text-left group"
       >
-        <span className="text-[12px] font-bold tracking-[1.5px] uppercase group-hover:translate-x-1 transition-transform duration-300 leading-normal whitespace-normal text-left flex-1">{label}</span>
-        <ChevronRight className="w-4 h-4 text-light group-hover:text-sage group-hover:translate-x-0.5 transition-all duration-300" />
+        <span className="text-[13.5px] font-bold tracking-[1px] uppercase group-hover:translate-x-1 transition-transform duration-300 leading-normal whitespace-normal text-left flex-1">{label}</span>
+        <ChevronRight className="w-4 h-4 text-charcoal/55 group-hover:text-sage-dark dark:group-hover:text-sage group-hover:translate-x-0.5 transition-all duration-300" />
       </button>
     );
   };
@@ -247,11 +248,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         {renderSearchInput()}
         <button
           onClick={() => setActiveCategory(null)}
-          className="flex items-center gap-1.5 text-[11px] font-bold tracking-[1px] uppercase text-sage hover:text-sage-dark mb-4 cursor-pointer px-3"
+          className="flex items-center gap-1.5 text-[12.5px] font-bold tracking-[1px] uppercase text-sage-dark dark:text-sage hover:text-sage dark:hover:text-sage-light mb-4 cursor-pointer px-3"
         >
           ← Back to Categories
         </button>
-        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-3 pl-3">
+        <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-3 pl-3">
           {categoryInfo.label}
         </div>
         <div className="space-y-0.5 animate-in fade-in slide-in-from-left-2 duration-300">
@@ -275,12 +276,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           renderSearchResults()
         ) : (
           <>
-            <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
+            <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
             <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
 
             {state.favoritePages && state.favoritePages.length > 0 && (
               <div className="mt-4 mb-2">
-                <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
+                <div className="text-[13px] font-bold tracking-[1px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
                   ★ Favourites
                 </div>
                 <div className="space-y-0.5">
@@ -294,7 +295,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             )}
 
             <div className="mt-4 mb-2">
-              <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-1 pl-3 leading-normal whitespace-normal">Features</div>
+              <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-1.5 pl-3 leading-normal whitespace-normal">Features</div>
               <div className="flex flex-col">
                 {Object.keys(CATEGORIES).map(catId => (
                   <CategoryButton key={catId} id={catId} label={CATEGORIES[catId].label} />
@@ -309,8 +310,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
             <button
               onClick={() => setActivePage('feedback')}
-              className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:border-sage hover:bg-sage-pale hover:text-sage flex items-center justify-between
-                ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage' : ''}`}
+              className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:border-sage hover:bg-sage-pale/40 hover:text-sage-dark dark:hover:text-sage flex items-center justify-between
+                ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : ''}`}
             >
               <span className="flex items-center gap-2">
                 <span className="text-[16px]">💬</span> Feedback & Support
@@ -320,8 +321,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
               <button
                 onClick={() => setActivePage('admin-feedbacks')}
-                className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                  ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600' : ''}`}
+                className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
+                  ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
               >
                 <span className="flex items-center gap-2">
                   <span className="text-[16px]">👑</span> Admin: Feedbacks
@@ -335,8 +336,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         <button
           onClick={toggleCalmMode}
-          className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-            ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-sage-light'}`}
+          className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
+            ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal/85 hover:border-sage-light'}`}
         >
           <span className="flex items-center gap-2">
             <span className="text-[16px]">🌿</span> Calm Mode
@@ -348,8 +349,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         <button
           onClick={toggleDarkMode}
-          className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-            ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal dark:text-white hover:border-charcoal'}`}
+          className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
+            ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal/85 hover:border-charcoal'}`}
         >
           <span className="flex items-center gap-2">
             <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
@@ -361,7 +362,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         <button
           onClick={() => { window.location.hash = '#setup'; }}
-          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal dark:text-white cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
+          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
         >
           ⚙️ Adjust Setup
         </button>
@@ -369,7 +370,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         {planTier === 'free' ? (
           <button
             onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
-            className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+            className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13.5px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
           >
             <span className="flex items-center gap-1.5">
               <span>✨</span> Upgrade to Premium
@@ -392,14 +393,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               module.exportToPDF(state);
             });
           }}
-          className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13px] font-medium text-sage cursor-pointer transition-all hover:bg-sage hover:text-white"
+          className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13.5px] font-medium text-sage-dark dark:text-sage cursor-pointer transition-all hover:bg-sage-dark hover:text-white dark:hover:bg-sage dark:hover:text-charcoal"
         >
           📄 Export Care Plan PDF
         </button>
 
         <button
           onClick={handleLogout}
-          className="w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border-[1.5px] border-border dark:border-border/10 rounded-[10px] font-sans text-[13px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
+          className="w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border-[1.5px] border-border dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
         >
           🚪 Log Out
         </button>
@@ -415,8 +416,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
         onClick={() => setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }))}
       >
-        <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light group-hover:text-charcoal transition-colors leading-normal whitespace-normal text-left flex-1">{label}</div>
-        <div className="text-light group-hover:text-charcoal flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 dark:hover:bg-charcoal/20 transition-colors mr-1">
+        <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 group-hover:text-sage-dark dark:group-hover:text-sage transition-colors leading-normal whitespace-normal text-left flex-1">{label}</div>
+        <div className="text-charcoal/55 group-hover:text-sage-dark dark:group-hover:text-sage flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 dark:hover:bg-charcoal/20 transition-colors mr-1">
           {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
       </div>
@@ -431,12 +432,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         renderSearchResults()
       ) : (
         <>
-          <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-light mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
+          <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
           <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
 
           {state.favoritePages && state.favoritePages.length > 0 && (
             <div className="mt-4 mb-2">
-              <div className="text-[10px] font-semibold tracking-[1.5px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
+              <div className="text-[13px] font-bold tracking-[1px] uppercase text-gold mb-2 pl-3 flex items-center gap-1.5">
                 <Star className="w-3 h-3 fill-gold" /> Favourites
               </div>
               <div className="space-y-0.5">
@@ -511,8 +512,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
           <button
             onClick={() => setActivePage('feedback')}
-            className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-sage hover:bg-sage-pale hover:text-sage flex items-center justify-between
-              ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage' : ''}`}
+            className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:border-sage hover:bg-sage-pale/40 hover:text-sage-dark flex items-center justify-between
+              ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage-dark font-bold' : ''}`}
           >
             <span className="flex items-center gap-2">
               <span className="text-[16px]">💬</span> Feedback & Support
@@ -522,8 +523,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
             <button
               onClick={() => setActivePage('admin-feedbacks')}
-              className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600' : ''}`}
+              className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
+                ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
             >
               <span className="flex items-center gap-2">
                 <span className="text-[16px]">👑</span> Admin: Feedbacks
@@ -537,8 +538,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
       <button
         onClick={toggleCalmMode}
-        className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white border-border text-charcoal hover:border-sage-light'}`}
+        className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
+          ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage-dark font-bold' : 'bg-white border-border text-charcoal hover:border-sage-light'}`}
       >
         <span className="flex items-center gap-2">
           <span className="text-[16px]">🌿</span> Calm Mode
@@ -550,8 +551,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
       <button
         onClick={toggleDarkMode}
-        className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
+        className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
+          ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage-dark font-bold' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
       >
         <span className="flex items-center gap-2">
           <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
@@ -563,7 +564,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
       <button
         onClick={() => { window.location.hash = '#setup'; }}
-        className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
+        className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
       >
         ⚙️ Adjust Setup
       </button>
@@ -571,7 +572,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       {planTier === 'free' ? (
         <button
           onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
-          className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+          className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13.5px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
         >
           <span className="flex items-center gap-1.5">
             <span>✨</span> Upgrade to Premium
@@ -594,14 +595,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             module.exportToPDF(state);
           });
         }}
-        className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13px] font-medium text-sage cursor-pointer transition-all hover:bg-sage hover:text-white"
+        className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13.5px] font-medium text-sage-dark cursor-pointer transition-all hover:bg-sage-dark hover:text-white"
       >
         📄 Export Care Plan PDF
       </button>
 
       <button
         onClick={handleLogout}
-        className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
+        className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13.5px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
       >
         🚪 Log Out
       </button>
