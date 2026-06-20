@@ -66,6 +66,17 @@ export const Header: React.FC<HeaderProps> = ({
 
         <div className="flex items-center gap-3 shrink-0">
           <LanguageSelector />
+          
+          {/* Mobile Dark Mode Toggle */}
+          <button
+            onClick={toggleDarkMode}
+            className={`md:hidden p-2 rounded-full border-[1.5px] transition-all text-[15px] cursor-pointer flex items-center justify-center w-9 h-9
+              ${state.isDarkModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10' : 'border-border text-charcoal/70 dark:text-white/70 bg-transparent hover:border-charcoal'}`}
+            title="Toggle Dark Mode"
+          >
+            {state.isDarkModeActive ? '🌙' : '☀️'}
+          </button>
+
           <div className="hidden md:flex items-center gap-4 pl-4 border-l border-border">
             {!state.isCalmModeActive && progressPct !== undefined && (
               <div className="flex items-center gap-2.5">
@@ -88,7 +99,7 @@ export const Header: React.FC<HeaderProps> = ({
              <button
               onClick={toggleCalmMode}
               className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
-                ${state.isCalmModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
+                ${state.isCalmModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10 font-semibold' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
               title="Toggle Calm Mode (reduces visual clutter and hides timers)"
             >
               {state.isCalmModeActive ? '🌿 Calm Mode' : '🌿 Calm Mode'}
@@ -96,7 +107,7 @@ export const Header: React.FC<HeaderProps> = ({
             <button
               onClick={toggleDarkMode}
               className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
-                ${state.isDarkModeActive ? 'border-sage text-sage bg-sage-pale' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
+                ${state.isDarkModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10 font-semibold' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
               title="Toggle Dark Mode"
             >
               {state.isDarkModeActive ? '🌙 Dark Mode' : '☀️ Dark Mode'}

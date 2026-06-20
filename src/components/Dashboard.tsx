@@ -25,6 +25,7 @@ import { HospitalBag } from './sections/HospitalBag';
 import { BirthPlanBuilder } from './sections/BirthPlanBuilder';
 import { GovernmentSchemes } from './sections/GovernmentSchemes';
 import { BabyNames } from './sections/BabyNames';
+import { SafeTravel } from './sections/SafeTravel';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS, POSTPARTUM_TASKS } from '../data';
 import { Task } from '../types';
 
@@ -106,10 +107,10 @@ export const Dashboard: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-cream">
-      <Header 
-        isMobileMenuOpen={isMobileMenuOpen} 
-        setIsMobileMenuOpen={setIsMobileMenuOpen} 
-        progressPct={progressPct} 
+      <Header
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        progressPct={progressPct}
       />
 
       {/* Body */}
@@ -131,7 +132,7 @@ export const Dashboard: React.FC = () => {
             className={`absolute top-0 bottom-0 left-0 w-[290px] bg-cream dark:bg-[#1B2936] shadow-2xl p-6 overflow-y-auto transition-transform duration-300 ease-out transform ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}
           >
             <div className="flex justify-between items-center mb-4 pb-2 border-b border-border">
-              <span className="font-serif text-[18px] text-sage font-bold">Navigation</span>
+              <span className="font-serif text-[18px] text-sage-dark dark:text-sage font-bold">Navigation</span>
               <button
                 onClick={() => setIsMobileMenuOpen(false)}
                 className="p-1.5 hover:bg-gray-100 dark:hover:bg-charcoal/20 rounded-md text-charcoal cursor-pointer text-[14px]"
@@ -180,6 +181,7 @@ export const Dashboard: React.FC = () => {
               {activePage === 'birthplan' && <BirthPlanBuilder />}
               {activePage === 'schemes' && <GovernmentSchemes />}
               {activePage === 'babynames' && <BabyNames />}
+              {activePage === 'travel' && <SafeTravel />}
               {activePage === 'partnersync' && <PartnerSync />}
               {activePage === 'feedback' && <Feedback />}
               {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
@@ -194,35 +196,35 @@ export const Dashboard: React.FC = () => {
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#2C3E50]/80 backdrop-blur-md border-t border-border py-2 px-4 flex justify-around items-center md:hidden no-print shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
         <button
           onClick={() => setActivePage('tracker')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'tracker' ? 'text-sage font-semibold' : 'text-medium'}`}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'tracker' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
         >
           <span className="text-[18px]">📅</span>
           <span>Tracker</span>
         </button>
         <button
           onClick={() => setActivePage('vitals')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'vitals' ? 'text-sage font-semibold' : 'text-medium'}`}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'vitals' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
         >
           <span className="text-[18px]">💙</span>
           <span>Vitals</span>
         </button>
         <button
           onClick={() => setActivePage('readiness')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'readiness' ? 'text-sage font-semibold' : 'text-medium'}`}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'readiness' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
         >
           <span className="text-[18px]">🔮</span>
           <span>Readiness</span>
         </button>
         <button
           onClick={() => setActivePage('askourpregnancy')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${activePage === 'askourpregnancy' ? 'text-sage font-semibold' : 'text-medium'}`}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'askourpregnancy' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
         >
           <span className="text-[18px]">✨</span>
           <span>AI Guide</span>
         </button>
         <button
           onClick={() => setIsMobileMenuOpen(true)}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11px] font-medium transition-colors cursor-pointer ${isMobileMenuOpen ? 'text-sage font-semibold' : 'text-medium'}`}
+          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${isMobileMenuOpen ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
         >
           <span className="text-[18px]">☰</span>
           <span>Menu</span>

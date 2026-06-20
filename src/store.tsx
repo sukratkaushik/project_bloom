@@ -100,12 +100,22 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const record = await db.appState.get('global');
         if (record) {
-          setState({ ...defaultState, ...JSON.parse(record.stateJSON) });
+          setState(prev => ({
+            ...prev,
+            ...JSON.parse(record.stateJSON),
+            isCalmModeActive: prev.isCalmModeActive,
+            isDarkModeActive: prev.isDarkModeActive
+          }));
         } else {
           // Fallback to localStorage just in case of migration
           const saved = localStorage.getItem('bloom_planner');
           if (saved) {
-            setState({ ...defaultState, ...JSON.parse(saved) });
+            setState(prev => ({
+              ...prev,
+              ...JSON.parse(saved),
+              isCalmModeActive: prev.isCalmModeActive,
+              isDarkModeActive: prev.isDarkModeActive
+            }));
           }
         }
       } catch (e) {
@@ -142,6 +152,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               setState(prev => ({
                 ...prev,
                 ...cloudData,
+                isCalmModeActive: prev.isCalmModeActive,
+                isDarkModeActive: prev.isDarkModeActive,
                 isSetup: true,
                 activeJourneyId: profile.activeJourneyId
               }));
@@ -153,6 +165,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   stateJSON: JSON.stringify({
                     ...state,
                     ...cloudData,
+                    isCalmModeActive: state.isCalmModeActive,
+                    isDarkModeActive: state.isDarkModeActive,
                     isSetup: true,
                     activeJourneyId: profile.activeJourneyId
                   }),
@@ -453,7 +467,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const resetPlan = () => {
-    setState(defaultState);
+    setState((prev) => ({
+      ...defaultState,
+      isCalmModeActive: prev.isCalmModeActive,
+      isDarkModeActive: prev.isDarkModeActive
+    }));
   };
 
   const restoreJourney = async (uid: string): Promise<boolean> => {
@@ -467,7 +485,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           const cloudData = snapshot.data() as Partial<PlannerState>;
 
           setState((prev) => {
-            const newState = { ...prev, ...cloudData, isSetup: true, activeJourneyId: profile.activeJourneyId };
+            const newState = {
+              ...prev,
+              ...cloudData,
+              isCalmModeActive: prev.isCalmModeActive,
+              isDarkModeActive: prev.isDarkModeActive,
+              isSetup: true,
+              activeJourneyId: profile.activeJourneyId
+            };
             if (isDbLoaded) {
               db.appState.put({
                 id: 'global',
