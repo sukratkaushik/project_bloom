@@ -10,7 +10,7 @@ permissions:
 
 jobs:
     call-devsecops:
-        uses: l3montree-dev/devguard-ci-components/.github/workflows/full.yml@main
+        uses: l3montree-dev/devguard-action/.github/workflows/full.yml@main
         with:
             asset-name: "bloom/projects/bloom/assets/project_bloom"
             api-url: "https://api.devguard.org"
