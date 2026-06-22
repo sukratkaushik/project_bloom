@@ -26,7 +26,7 @@ jobs:
             sarif-file: "./results.sarif"
             web-ui: "https://app.devguard.org"
         secrets:
-            devguard-token: "${{ 324651f6c122b89b6da4fded0426f32411b3d74fc9a917c3b1d29db2202a8829 }}"
+            devguard-token: "${{ secrets.DEVGUARD_TOKEN }}"
 
     dependency-risk-identification:
         uses: l3montree-dev/devguard-ci-components/.github/workflows/dependency-risk-identification.yml@main
@@ -36,4 +36,4 @@ jobs:
             sbom-file: "./results.sbom"
             web-ui: "https://app.devguard.org"
         secrets:
-            devguard-token: "${{ 324651f6c122b89b6da4fded0426f32411b3d74fc9a917c3b1d29db2202a8829 }}" 
+            devguard-token: "${{ secrets.DEVGUARD_TOKEN }}" 
