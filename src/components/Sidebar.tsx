@@ -173,8 +173,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const isSearching = searchQuery.trim().length > 0;
   const filteredNavItems = isSearching
     ? ALL_NAV_ITEMS.filter(item =>
-        item.label.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+      item.label.toLowerCase().includes(searchQuery.toLowerCase())
+    )
     : [];
 
   const renderSearchInput = () => (
