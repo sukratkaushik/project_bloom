@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Bot, MessageCircle, Send, X, Sparkles, ChevronRight } from 'lucide-react';
+import { Send, X, Sparkles, ChevronRight } from 'lucide-react';
 import { AnimatePresence, motion } from 'motion/react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
@@ -102,11 +102,11 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
           {/* Header */}
           <div className="bg-sage text-white p-4 flex justify-between items-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-1 opacity-20 transform translate-x-2 -translate-y-2">
-              <Bot size={80} />
+              <img src="/logo.png" alt="Bloom Background" className="w-20 h-20 object-contain" />
             </div>
             <div className="flex items-center gap-3 relative z-10">
               <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                <Bot size={20} />
+                <img src="/logo.png" alt="Bloom Logo" className="w-6 h-6 object-contain" />
               </div>
               <div>
                 <h3 className="font-bold text-[15px] flex items-center gap-1.5">
@@ -195,13 +195,13 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
           ) : (
             <motion.div
               key="open"
-              className="relative"
+              className="relative flex items-center justify-center"
               initial={{ opacity: 0, scale: 0.5, rotate: 90 }}
               animate={{ opacity: 1, scale: 1, rotate: 0 }}
               exit={{ opacity: 0, scale: 0.5, rotate: -90 }}
               transition={{ duration: 0.2 }}
             >
-              <MessageCircle size={28} />
+              <img src="/logo.png" alt="Bloom" className="w-8 h-8 object-contain" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center border-2 border-sage">
                 <span className="w-1 h-1 bg-sage rounded-full animate-pulse" />
               </span>
