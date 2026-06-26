@@ -15,6 +15,7 @@ jobs:
             asset-name: "bloom/projects/bloom/assets/project_bloom"
             api-url: "https://api.devguard.org"
             web-ui: "https://app.devguard.org"
+            should-deploy: false
         secrets:
             devguard-token: "${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings
 
