@@ -480,7 +480,7 @@ Project_Bloom/
 
 ```bash
 # Clone the repository
-git clone https://github.com/sukratkaushik/Project_Bloom.git
+git clone https://github.com/sukratkaushik/project_bloom.git
 cd Project_Bloom
 
 # Install dependencies

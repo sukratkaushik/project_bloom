@@ -36,6 +36,9 @@
 - SEO metadata (title tags, meta descriptions, Open Graph tags, structured data) was deployed on May 7 to help crawlers categorize the site as `Health-and-Medicine`.
 - No new dispute submissions have been made yet. Continue monitoring via the links below.
 
+### 2026-06-28
+- Domain `ourpregnancy.in` is now well past the 32-day `Newly-Registered-Domain` window. The Palo Alto URL Filtering flag should be automatically lifted, meaning corporate firewall blocks are significantly less likely.
+
 ## Key Links for Dispute
 - **Cisco Talos:** [talosintelligence.com/reputation_center](https://www.talosintelligence.com/reputation_center)
 - **Palo Alto:** [urlfiltering.paloaltonetworks.com](https://urlfiltering.paloaltonetworks.com/)
