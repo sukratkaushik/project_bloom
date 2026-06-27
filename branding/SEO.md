@@ -13,7 +13,7 @@ Pregnancy tracking resides in a highly competitive and strictly regulated **YMYL
 ### The SEO Challenges:
 1. **Hash-Based Routing (`#dashboard`, `#setup`, `#privacy`, `#terms`)**: Search engine crawlers (except Googlebot to a limited extent) do not index URL fragments after the hash `#`. Currently, search engines view our entire website as a single, static page (`/`).
 2. **Private Client-Side Data (IndexedDB)**: Core tracking utilities are client-side and require authentication or onboarding. They cannot (and should not) be indexed, meaning our search footprint relies entirely on static marketing, informational, and educational pages.
-3. **YMYL & E-E-A-T Standards**: Google heavily demotes health-related websites that do not have medically reviewed content, clear author/expert citations, and robust privacy disclosures.
+3. **YMYL & E-E-A-T Standards**: Google heavily demotes health-related websites that do not have medically reviewed content, clear author/expert citations, and robust privacy disclosures. It is extremely important to have a clear disclosure and medical review board in place to build trust. We have a Medical Review Board with experienced obstetricians and gynecologists who review our content.
 
 ---
 
