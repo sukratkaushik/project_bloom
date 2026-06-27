@@ -208,39 +208,51 @@ export const PregnancyTracker: React.FC = () => {
         </div>
       </motion.div>
 
-      {/* Baby Size Visuals - Coming Soon */}
+      {/* Baby Size Visuals - Live */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="mesh-glow-container glass-panel rounded-[24px] p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden"
+        className="mesh-glow-container glass-panel rounded-[24px] p-6 md:p-8 shadow-sm flex flex-col items-center text-center relative overflow-hidden"
       >
         <div className="mesh-glow-blob-1" />
         <div className="mesh-glow-blob-2" />
         
-        <div className="text-[12px] font-semibold tracking-[1.5px] uppercase text-sage mb-2 relative z-10">Baby Size</div>
+        <div className="text-[11px] font-semibold tracking-[1.5px] uppercase text-sage mb-2 relative z-10">Baby Size Comparison</div>
         
-        <div className="relative w-20 h-20 bg-sage/10 rounded-full flex items-center justify-center shadow-inner mb-4 mt-2 relative z-10">
-          <div className="absolute inset-0 bg-sage/20 rounded-full animate-ping opacity-75" />
+        <div className="relative w-24 h-24 bg-sage/10 rounded-full flex items-center justify-center shadow-inner mb-4 mt-2 relative z-10">
+          <div className="absolute inset-0 bg-sage/20 rounded-full animate-pulse opacity-40" />
           <motion.div
-            animate={{ scale: [1, 1.05, 1], rotate: [0, 5, -5, 0] }}
-            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-            className="text-[44px] relative z-10"
+            key={selectedWeek}
+            initial={{ scale: 0.6, rotate: -15, opacity: 0 }}
+            animate={{ scale: 1.0, rotate: 0, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            className="text-[52px] relative z-10 select-none cursor-default filter drop-shadow-md"
           >
-            👶
+            {weekData.babyEmoji}
           </motion.div>
         </div>
 
-        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-pale/40 text-sage-dark text-[11px] font-bold uppercase tracking-wider border border-sage/20 mb-3 relative z-10">
-          <Sparkles size={12} className="text-sage" /> Coming Soon
-        </span>
-
-        <h3 className="font-serif text-[24px] font-medium text-charcoal mb-2 max-w-[320px] relative z-10">
-          Interactive Size Comparisons
+        <h3 className="font-serif text-[26px] font-medium text-charcoal mb-1 relative z-10 flex items-center gap-2 justify-center">
+          Size of a <span className="text-sage font-semibold">{weekData.babySizeAnalogy}</span>
         </h3>
 
-        <p className="text-[14px] text-medium leading-relaxed max-w-[420px] mb-2 relative z-10">
-          We're preparing interactive, high-fidelity visualizations and fruit-size comparisons to help you track your baby's weekly growth in beautiful 3D.
+        <div className="flex items-center gap-3 mt-3 mb-6 relative z-10">
+          <div className="px-4 py-1.5 rounded-full bg-sage-pale/40 text-sage-dark text-[13px] font-bold border border-sage/20 shadow-xs flex items-center gap-1.5">
+            <span>📏 Length:</span> <span className="font-sans font-medium text-charcoal">{weekData.length}</span>
+          </div>
+          <div className="px-4 py-1.5 rounded-full bg-sage-pale/40 text-sage-dark text-[13px] font-bold border border-sage/20 shadow-xs flex items-center gap-1.5">
+            <span>⚖️ Weight:</span> <span className="font-sans font-medium text-charcoal">{weekData.weight}</span>
+          </div>
+        </div>
+
+        <p className="text-[14px] text-medium leading-relaxed max-w-[480px] mb-6 relative z-10">
+          {weekData.babyDev}
+        </p>
+
+        {/* Disclaimer */}
+        <p className="text-[11px] text-medium/60 leading-normal max-w-[500px] border-t border-charcoal/5 pt-4 mt-2 font-sans font-normal relative z-10">
+          *Disclaimer: These size comparisons are approximate references and indications based on clinical studies. For exact measurements and personalized growth assessments, it is best to consult with your obstetrician/gynecologist.*
         </p>
       </motion.div>
 
