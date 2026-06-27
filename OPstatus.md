@@ -4,6 +4,22 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 
 ---
 
+## 📅 2026-06-28
+
+### **Task 1: Repository Migration & Pregnancy Tracking Enhancements**
+*   **Details:**
+    *   **Repository Renaming:** The GitHub repository was successfully renamed to `https://github.com/sukratkaushik/project_bloom`.
+    *   **Pregnancy Tracker Updates (`PregnancyTracker.tsx`, `weeklyData.ts`):** Fetched and deployed the latest comprehensive updates to the week-by-week pregnancy tracking data and UI components.
+    *   **Dockerization (`Dockerfile`):** Added a new Dockerfile to the repository to support containerized environments.
+
+### **Task 2: Payment Gateway & Checkout Flow Fixes (Razorpay)**
+*   **Details:**
+    *   **Razorpay Pop-up Fix (`functions/src/index.ts`):** Resolved an issue where the Razorpay checkout pop-up was failing to load by removing broken legacy validations from the backend.
+    *   **Receipt Naming Optimization:** Optimized the receipt string generation logic in `createPaymentOrder` to adhere to Razorpay's 40-character limit constraint.
+    *   **Checkout UI Unified (`CheckoutPage.tsx`, `Header.tsx`):** Created a new reusable `<Header />` component and applied it to the checkout page to fix the mismatched header issue and unify the layout.
+
+---
+
 ## 📅 2026-05-20
 
 ### **Task: Partner Sync UI Polish**

@@ -465,7 +465,7 @@ exports.createPaymentOrder = (0, https_1.onCall)({ secrets: [razorpayKeyId, razo
         const order = await rzp.orders.create({
             amount: finalTotal * 100, // Razorpay requires amounts in paise
             currency: "INR",
-            receipt: `receipt_${request.auth.uid}_${Date.now()}`,
+            receipt: `rcpt_${request.auth.uid.substring(0, 10)}_${Date.now()}`,
             notes: {
                 uid: request.auth.uid,
                 planTier,
