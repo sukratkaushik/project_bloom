@@ -16,6 +16,7 @@ export const CheckoutPage: React.FC = () => {
     return {
       plan: (params.get('plan') || 'premium') as 'standard' | 'premium',
       months: parseInt(params.get('months') || '3', 10),
+      coupon: params.get('coupon') || '',
     };
   };
 
@@ -46,6 +47,35 @@ export const CheckoutPage: React.FC = () => {
     return () => window.removeEventListener('hashchange', handleHashChange);
   }, []);
 
+  // Trigger auto-apply coupon if present in URL
+  useEffect(() => {
+    const params = getParams();
+    if (params.coupon) {
+      const promo = params.coupon.trim().toUpperCase();
+      setCouponCode(promo);
+      
+      const initialBase = params.plan === 'premium' ? 499 : 99;
+      const initialDurationDiscount = Math.floor(params.months / 3) * 50;
+      const initialRawSubtotal = initialBase * params.months - initialDurationDiscount;
+      
+      if (promo === 'BLOOM30') {
+        if (params.plan === 'premium') {
+          const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
+          setAppliedDiscount(discount);
+          setCouponSuccess('Promo code BLOOM30 applied! 3 months of Premium for free.');
+        } else {
+          setCouponError('Promo code BLOOM30 is only valid for Premium plans.');
+        }
+      } else if (promo === 'BLOOM50') {
+        setAppliedDiscount(Math.round(initialRawSubtotal * 0.5));
+        setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
+      } else if (promo === 'WELCOME10') {
+        setAppliedDiscount(Math.round(initialRawSubtotal * 0.1));
+        setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
+      }
+    }
+  }, [selectedPlan, months]);
+
   // Compute pricing
   const basePrice = selectedPlan === 'premium' ? 499 : 99;
   const durationDiscount = Math.floor(months / 3) * 50;
@@ -65,10 +95,18 @@ export const CheckoutPage: React.FC = () => {
       const discount = Math.round(rawSubtotal * 0.1);
       setAppliedDiscount(discount);
       setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
+    } else if (cleanedCode === 'BLOOM30') {
+      if (selectedPlan !== 'premium') {
+        setCouponError('Promo code BLOOM30 is only valid for Premium plans.');
+      } else {
+        const discount = months <= 3 ? rawSubtotal : (basePrice * 3 - 50);
+        setAppliedDiscount(discount);
+        setCouponSuccess('Promo code BLOOM30 applied! 3 months of Premium for free.');
+      }
     } else if (cleanedCode === '') {
       setCouponError('Please enter a coupon code.');
     } else {
-      setCouponError('Invalid coupon code. Try BLOOM50.');
+      setCouponError('Invalid coupon code. Try BLOOM50 or BLOOM30.');
     }
   };
 
@@ -316,7 +354,7 @@ export const CheckoutPage: React.FC = () => {
                 {couponError && <p className="text-[11.5px] text-red-500 font-semibold mt-2">{couponError}</p>}
                 {couponSuccess && <p className="text-[11.5px] text-green-600 dark:text-green-400 font-semibold mt-2">{couponSuccess}</p>}
                 <div className="text-[10px] text-light mt-2 italic">
-                  💡 Hint: Enter <span className="font-bold text-sage">BLOOM50</span> to claim a 50% discount on standard or premium tiers!
+                  💡 Hint: Enter <span className="font-bold text-sage">BLOOM30</span> to claim 3 free months of Premium, or <span className="font-bold text-sage">BLOOM50</span> to claim a 50% discount!
                 </div>
               </div>
             </div>
