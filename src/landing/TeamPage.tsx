@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ArrowLeft, Linkedin, Sparkles, Shield, Heart, Wifi, Lock } from 'lucide-react';
 import { usePlanner } from '../store';
 import { LanguageSelector } from '../components/LanguageSelector';
+import { PromoBanner } from '../components/PromoBanner';
 
 export const TeamPage: React.FC = () => {
   const { state, toggleDarkMode } = usePlanner();
@@ -45,28 +46,31 @@ export const TeamPage: React.FC = () => {
       <div className="absolute bottom-20 left-1/4 w-96 h-96 bg-gold-pale/35 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000 -z-10" />
 
       {/* Header */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md py-2 px-4 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
-        <nav className="w-full flex items-center justify-between">
-          <a href="#" className="flex items-center gap-2 shrink-0">
-            <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
-            <span className="font-serif text-[18px] sm:text-[22px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
-          </a>
-
-          <div className="flex items-center gap-2">
-            <LanguageSelector />
-            <button
-              onClick={toggleDarkMode}
-              className="p-1.5 sm:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1"
-              title="Toggle Dark Mode"
-              aria-label="Toggle Dark Mode"
-            >
-              <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
-            </button>
-            <a href="#" className="inline-flex items-center gap-1.5 bg-charcoal text-cream rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap">
-              <ArrowLeft size={14} /> Back Home
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+        <PromoBanner />
+        <div className="py-2 px-4">
+          <nav className="w-full flex items-center justify-between">
+            <a href="#" className="flex items-center gap-2 shrink-0">
+              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
+              <span className="font-serif text-[18px] sm:text-[22px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
             </a>
-          </div>
-        </nav>
+
+            <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <button
+                onClick={toggleDarkMode}
+                className="p-1.5 sm:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center mr-1"
+                title="Toggle Dark Mode"
+                aria-label="Toggle Dark Mode"
+              >
+                <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
+              </button>
+              <a href="#" className="inline-flex items-center gap-1.5 bg-charcoal text-cream rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap">
+                <ArrowLeft size={14} /> Back Home
+              </a>
+            </div>
+          </nav>
+        </div>
       </header>
 
       {/* Main Container */}

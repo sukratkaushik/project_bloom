@@ -660,3 +660,22 @@ select {
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
 }
+
+/* Promo Banner Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  animation: marquee 30s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}

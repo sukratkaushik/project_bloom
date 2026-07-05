@@ -2,6 +2,7 @@ import React from 'react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { LanguageSelector } from './LanguageSelector';
+import { PromoBanner } from './PromoBanner';
 
 interface HeaderProps {
   isMobileMenuOpen?: boolean;
@@ -19,8 +20,10 @@ export const Header: React.FC<HeaderProps> = ({
   const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
 
   return (
-    <header className="bg-white border-b border-border px-4 md:px-10 lg:px-12 sticky top-0 md:top-[14px] z-50 shadow-sm no-print">
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px]">
+    <header className="bg-white border-b border-border sticky top-0 md:top-[14px] z-50 shadow-sm no-print overflow-hidden md:rounded-[14px]">
+      <PromoBanner />
+      <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px] px-4 md:px-10 lg:px-12">
+
         <div className="flex items-center shrink-0">
           {!hideMenuIcon && setIsMobileMenuOpen && (
             <button
