@@ -4,6 +4,15 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 
 ---
 
+## 📅 2026-07-05
+
+### **Task: Premium Features & Vision Documentation**
+*   **Details:**
+    *   **Promo Banner & Checkout (`PromoBanner.tsx`, `CheckoutPage.tsx`):** Added a sliding announcement banner for the `BLOOM30` promotion and enabled promo code support in the checkout flow.
+    *   **Product Vision (`PRODUCT_VISION.md`):** Added a comprehensive product vision document detailing the executive summary, feature scope, and business potential of the app.
+
+---
+
 ## 📅 2026-06-28
 
 ### **Task 1: Repository Migration & Pregnancy Tracking Enhancements**

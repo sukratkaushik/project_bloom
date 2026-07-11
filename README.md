@@ -60,6 +60,7 @@ The app is live at **[ourpregnancy.in](https://ourpregnancy.in)** and supports:
 | **Partner Sync** | Real-time P2P data sync via WebRTC with granular permission controls (read-only / edit, per-section exclusions) |
 | **Export** | Full PDF export of pregnancy plan, decisions, checklists, vitals, and hospital bag |
 | **EHR Integration** | FHIR R4 compliant data mapping for Blood Pressure, Weight, and Fetal Kick Count with OAuth 2.0 EHR client |
+| **Premium Services** | Promo code checkout system with sliding announcement banners for campaigns (e.g., BLOOM30) |
 | **UI/UX** | Calm Mode (reduces visual clutter), Dark Mode, critical-only filter, responsive design, installable PWA |
 
 ---
