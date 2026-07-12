@@ -4,10 +4,11 @@ The receipts for every decision in this design system.
 
 | File | What it is |
 |---|---|
-| [`reconciliation.md`](reconciliation.md) | Where the brand kit and the shipped product disagreed, and which one we picked. Version-by-version log of brand-kit → live-site reconciliation across v1.0–v1.3. |
+| [`reconciliation.md`](reconciliation.md) | Where the brand kit and the shipped product disagreed, and which one we picked. Version-by-version log of brand-kit → live-site reconciliation across v1.0–v1.5. |
 | [`claude-design-form.md`](claude-design-form.md) | Paste-ready text for Claude Design's "Set up your design system" setup form (company blurb + non-negotiables notes). |
-| [`firecrawl-latest.json`](firecrawl-latest.json) | Latest Firecrawl scrape of ourpregnancy.in. Contains markdown, branding extraction (colors, fonts, components), and meta tags. Slimmed from the full 10KB scrape. |
+| [`firecrawl-latest.json`](firecrawl-latest.json) | Latest Firecrawl scrape of ourpregnancy.in. Contains markdown, branding extraction (colors, fonts, components), and meta tags. |
 | [`extracted-tokens.json`](extracted-tokens.json) | Latest `extract-design-system` normalized output — independent CSS-computed token extraction that cross-checks the Firecrawl values. |
+| [`shipped-screens/`](shipped-screens/) | **57 canonical screenshots** of the live app (June 2026 capture). The visual source of truth. When docs and screenshots disagree, the screenshots win. See folder README for the full index by surface. |
 
 ## How this folder is used
 

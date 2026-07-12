@@ -33,7 +33,7 @@ The single source of truth for everything **Our Pregnancy** ships: the live web 
 
 ## Provenance
 
-This system was first extracted on **2026-05-12** and most recently refreshed on **2026-05-31** from:
+This system was first extracted on **2026-05-12** and most recently refreshed on **2026-06-28** from:
 - The live site at https://ourpregnancy.in/ (Firecrawl scrape + extract-design-system).
 - The shipped React/Tailwind codebase at `src/index.css`.
 - The existing internal brand kit at `branding/Master-Brand-Kit.md`.
@@ -46,4 +46,4 @@ Refresh history → [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Version
 
-Currently at **v1.4** (June 2026 — adds `research/` folder; no content changes).
+Currently at **v1.5** (June 2026 — 3-tier pricing shipped, audience broadened to "expectant mothers", Bloom AI rebrand, 12 languages, 57 shipped screenshots added to `research/`).

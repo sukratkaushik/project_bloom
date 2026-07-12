@@ -1,5 +1,104 @@
 # Design system changelog
 
+## v1.5 — 2026-06-28 — Pricing tier live · audience broadened · AI shipped
+
+Full visual refresh based on 57 shipped screenshots (in `research/shipped-screens/`). This is a major positioning + product shift, not just a cosmetic tune-up.
+
+### Positioning shifts (biggest)
+
+- **Audience broadened from "Indian mothers" to "expectant mothers"** across every marketing surface:
+  - Trust bar chip: "Made for Indian mothers 🇮🇳" → "Made for expectant mothers"
+  - India section H2: "Made for Indian mothers 🇮🇳" → "Made for expectant mothers"
+  - India section lead: "Because a pregnancy in India…" → "Because pregnancy means navigating…"
+  - Card 1 title: "Indian Foods Database" → "Foods Database" (body copy retains dal/ragi/paneer)
+  - Footer caption: "Made with ❤️ for Indian mothers" → "Made with 🤍 for expectant mothers"
+  - Indian nouns still appear in feature bodies (schemes, foods, helplines) — the depth stays, the audience headline broadens.
+- **German (Deutsch) added to Language Selector** — 11 → 12 languages. Signals openness beyond India.
+
+### Pricing tier shipped (was "coming soon")
+
+**3-tier subscription now live on the landing.** "AI tools coming soon" phrasing is officially retired.
+
+| Tier | Price | Overline | CTA |
+|---|---|---|---|
+| Free Plan | ₹0 / month | STARTER | Start Tracking Free |
+| Standard Plan | ₹199 / month | MATERNAL CARE PACK · **MOST POPULAR** | Upgrade to Standard |
+| Premium Plan | ₹499 / month | AI ULTIMATE | Go Premium |
+
+New pricing section overline: **PACKAGES** · Simple, Transparent Pricing · "Choose the package that fits your pregnancy journey. No hidden fees or contracts."
+
+The "Core features, always free." H2 still ships as a reinforcement below the pricing grid, but the primary story is now 3 cards.
+
+### AI chatbot rebranded (again)
+
+- **"Ask Bloom 24/7" → "Bloom AI"** across every surface (in-app H2, landing feature card, Premium tier feature list).
+- Marketing description: "Bloom AI prenatal chatbot support 24/7" (on the Premium card).
+- In-app framing: "Your personal, secure AI prenatal assistant. Ask questions based on ACOG and WHO guidelines."
+- Standing disclaimer: "Bloom AI uses AI and may make mistakes. Always verify medical information with your healthcare provider."
+
+### Navigation expanded
+
+- Header nav grew from **3 links → 5 links**: `Features · How it Works · About` → `Features · How it Works · About · Pricing · Team`.
+
+### New product features documented
+
+- **Safe Travel Guide** (Smart Tools sidebar item, risk calculator)
+- **Sidebar search** ("Search features…" input at the top of the sidebar)
+- **Streak gamification** — "N Day Streak" 🔥 pill on Daily Knowledge Drop
+- **Adjust Setup** sidebar button (opens personalization form)
+- **AI Premium Active** sidebar pill (Sage/Saffron — shown when Premium is active)
+- **Financial Planning** section (Budget Tracker Items + Checklist)
+- **Key Decisions** section (birth setting, pain relief, feeding, cord clamping, skin-to-skin, childcare)
+- **Early Parenthood / Fourth Trimester** in Labor & Postpartum
+- **Government Schemes expanded** — 3 schemes → **6 schemes** (added PMSMA, PMJAY/Ayushman Bharat, ICDS)
+- **Medical Reports** now has its own section (was combined with Vitals in v1.4)
+
+### Feature renames (in-app vs marketing split)
+
+| Marketing name | In-app name |
+|---|---|
+| AI Food Safety Scanner | **Our Pregnancy AI Food Guide** |
+| Ask Bloom 24/7 | **Bloom AI** |
+| Vitals Tracker | **Health Metrics** |
+| Labor Readiness Score | **Labor Readiness** |
+| Pregnancy Timeline | **Pregnancy Tracker** |
+| Multiple Checklists | **Hospital Bag** |
+
+Marketing keeps the sales-friendly names; in-app uses the concise labels. Both are correct for their context.
+
+### Labor Readiness — honesty framing tightened
+
+Documented for the first time: the feature ships with **explicit "Conceptual Demonstration"** framing:
+- "PREMIUM FEATURE" pill (Saffron)
+- Info card: "This is a simulated feature demonstrating how wearable data (Apple Health, Oura) could be integrated. There is currently no ACOG/WHO guideline validating the use of consumer wearables to predict labor onset. Do not use this for medical decisions."
+- "Simulated Baseline Active" + "COMING SOON" pill on the personalized-score band
+
+This is now the canonical example of how to talk about AI/biometric features honestly. Added to `foundations/voice.md` as a pattern.
+
+### Hero visual replaced
+
+The v1.3 "3 nested organic blob rings + Lotus-Pink baby orb" is **gone**. New visual: a **soft Sandalwood-pale disc** (~360px) with **the pink lotus logo centered inside**, wrapped in **two orbiting Saffron dot rings** (~15s clockwise / ~20s counter-clockwise) and small Blush heart-glyph accents at ring corners. Much cleaner and more focused.
+
+### Files updated
+
+- `BRAND-SUMMARY.md` — new 3-tier feature list, audience updated, non-negotiables 5 / 7 / 8 / 9 refreshed
+- `CLAUDE.md` — identity paragraph, tagline, pricing line, audience, tiers table
+- `foundations/vocabulary.md` — new feature name column (marketing vs in-app split), 12 languages table, June 2026 retired-claims table, wearable/scheme rename notes
+- `voice/homepage-copy.md` — header (5 nav links), Language Selector (12 langs), Trust bar, India section, new PACKAGES pricing section (3 full cards with checkmark features), footer caption, bento grid Bloom AI rename
+- `CHANGELOG.md` — this entry
+- `research/shipped-screens/` — 57 canonical screenshots from `Project_Bloom_Docs/OPIN ScreenShots/` copied in for provenance
+
+### Unchanged
+
+- Logo (`logo.png`) — MD5 unchanged.
+- Color palette — verified against `src/index.css` (no diff).
+- Type stack — Playfair + Nunito + Inter + Lexend unchanged.
+- Three modes (Light / Dark / Calm).
+- Sticky glassmorphic header token values (though nav link count grew).
+- All patterns in `assets/patterns/`.
+
+---
+
 ## v1.4 — 2026-06-03 — Add research/ folder
 
 Restructure-only release. No content changes to foundations / tokens / voice / applications. Brings the folder shape in line with the skill's reference layout (as shown in the YouTube walkthrough at https://youtube.com/watch?v=cl5Oudk3Hjo).

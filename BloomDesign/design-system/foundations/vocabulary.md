@@ -62,31 +62,40 @@ The shipped product surfaces these features by these names. Use them verbatim.
 
 | Feature | Exact name |
 |---|---|
-| Pregnancy tracker (week-by-week) | Pregnancy Timeline *(rebranded — was "Pregnancy Tracker")* |
+| Pregnancy tracker (week-by-week) | Pregnancy Tracker *(app-level H2)* — or **Pregnancy Timeline** on marketing |
 | Kick counter | Kick Counter |
 | Contraction timer | Contraction Timer |
-| BP + weight | Vitals Tracker |
+| BP + weight | **Health Metrics** *(rebranded June 2026 — was "Vitals Tracker")* |
 | Mood logger | Mood Tracker |
 | Hydration | Hydration |
 | Nutrition + supplements | Nutrition & Supplements |
 | Symptom logger | Symptom Log |
-| AI chatbot | **Ask Bloom 24/7** *(rebranded — was "AskOur Pregnancy AI")* |
-| AI food scanner | **AI Food Safety Scanner** *(now Gemini + Qwen2.5-VL backed)* |
-| Name generator | AI Name Generator |
-| Hospital bag | Multiple Checklists *(rebranded — was "Hospital Bag Checklist")* |
+| AI chatbot | **Bloom AI** *(rebranded June 2026 — was "Ask Bloom 24/7"; marketing description: "Bloom AI prenatal chatbot support 24/7")* |
+| AI food scanner | **Our Pregnancy AI Food Guide** *(in-app)* — or **AI Food Safety Scanner** *(landing feature card)*. Gemini + Qwen2.5-VL backed. |
+| Name generator | AI Name Generator *(also seen as "Name Boutique — AI Baby Name Generator" on the section page)* |
+| Hospital bag | Multiple Checklists *(landing card)* — or **Hospital Bag** *(sidebar item)* |
 | Birth plan | Birth Plan Builder |
-| Partner sharing | **Real-Time Partner Sync** *(was "Partner Sync"; now sells WebRTC + encrypted cloud)* |
+| Partner sharing | **Real-Time Partner Sync** *(was "Partner Sync"; sells WebRTC + encrypted cloud)* |
 | Notes | Notes & Journal |
 | Cloud backup | Cloud Sync |
-| Health record export | **FHIR R4 EHR Export** |
-| Biometric labor prediction | **Labor Readiness Score** |
+| Health record export | **FHIR R4 EHR Export** *(also "FHIR R4 EHR Doctor Report Exports" on the Premium pricing card)* |
+| Biometric labor prediction | **Labor Readiness** *(no longer "Score" in-app H2 — but "Labor Readiness Score" on marketing)*. **Always paired with the "Conceptual Demonstration" disclaimer.** |
 | Calm Mode | Calm Mode |
 | Dark Mode | Dark Mode (sometimes shown as "Calm/Dark Mode") |
-| Medical record upload + AI summary | **Medical Reports** *(new May 2026 — AI Medical Report Summarizer + Prescription Decipherer)* |
-| Wearable sync | **Wearable Integrations** *(new May 2026 — Apple Health, Oura Ring, Google Fit, Garmin Connect, Fitbit)* |
-| Multilingual support | **Language Selector** *(new May 2026 — 11 Indian languages via Google Translate)* |
-| Daily knowledge | Daily Knowledge Drop |
-| Vaccination reminders | Vaccination Reminders *(referenced in testimonials)* |
+| Medical record upload + AI summary | **Medical Reports** *(secure cloud storage; AI summary is a Premium feature)* |
+| Wearable sync | **Wearable Integrations** *(Apple Health, Oura Ring, Google Fit, Garmin Connect, Fitbit — primarily powers Labor Readiness)* |
+| Multilingual support | **Language Selector** *(12 languages as of June 2026: 11 Indian + German)* |
+| Daily knowledge | **Daily Knowledge Drop** — always with a myth/fact split card and a **streak pill** ("N Day Streak" 🔥) |
+| Vaccination reminders | Vaccination Reminders |
+| Travel guidance | **Safe Travel Guide** *(new June 2026 — Smart Tools sidebar item; includes risk calculator)* |
+| Government scheme index | **Government Schemes** *(Medical & Govt sidebar item — 6 schemes: PMSMA, JSY, PMMVY, JSSK, PMJAY/Ayushman Bharat, ICDS)* |
+| Fourth trimester content | **Early Parenthood** *(Labor & Postpartum sidebar item — "Fourth Trimester" checklists + guides)* |
+| Onboarding wizard | **Adjust Setup** *(sidebar button — opens the personalization form to change trimester, risk flags, work situation)* |
+| Premium subscription indicator | **AI Premium Active** *(Sage / Saffron pill in sidebar when Premium tier is on)* |
+| Financial planning tools | **Financial Planning** — Budget Tracker Items · Checklist and Budget |
+| Decisions tracker | **Key Decisions** *(birth setting, pain relief, feeding, cord clamping, skin-to-skin, childcare)* |
+| Sidebar search | **Search features…** *(new June 2026 — sidebar utility input)* |
+| Admin submissions viewer | **Admin: Feedbacks** *(admin-only sidebar item)* |
 
 ## Wearable device names — use these exact strings
 
@@ -97,6 +106,27 @@ The product integrates with these wearables. Use the exact device name:
 - **Google Fit** (Android activity, heart rate, steps)
 - **Garmin Connect** (all-day HR, body battery, sleep, steps)
 - **Fitbit** (steps, sleep quality, active zone minutes)
+
+## Language names — 12 languages ship (June 2026)
+
+Always show the English name **and** the native script side by side. The Language Selector shows a two-column list — English label left, native script right in slightly muted color.
+
+| English label | Native script | Locale |
+|---|---|---|
+| English | English | en |
+| Hindi | हिन्दी | hi |
+| Punjabi | ਪੰਜਾਬੀ | pa |
+| Gujarati | ગુજરાતી | gu |
+| Marathi | मराठी | mr |
+| Bengali | বাংলা | bn |
+| Tamil | தமிழ் | ta |
+| Kannada | ಕನ್ನಡ | kn |
+| Telugu | తెలుగు | te |
+| Malayalam | മലയാളം | ml |
+| Urdu | اردو | ur |
+| **German** | **Deutsch** | de |
+
+**Rule:** don't machine-translate the brand name "Our Pregnancy" or feature product names (Bloom AI, JSY, PMMVY, etc.) — they carry `.notranslate` in the shipped code.
 
 When referring to the feature as a category: **Wearable Sync** or **Wearable Integrations**. Avoid "smartwatch integration" or "fitness tracker integration" — too generic.
 
@@ -113,9 +143,11 @@ The brand promises **specific** value, not vague benefit. Every claim should hav
 | Lots of food coverage | AI-scanned safety check for hundreds of Indian dishes |
 | Comprehensive | 11-tile feature grid covering tracking, AI, labor readiness, and EHR export |
 
-## Retired claims (May 2026) — never use
+## Retired claims — never use
 
-The brand walked back several absolutes in commits `8d70c3d` and `fdb6ada`. These phrases were live on the homepage; they are no longer:
+Two waves of retirement:
+
+### May 2026 (v1.2) — absolute claims walked back
 
 | ❌ Retired | Why |
 |---|---|
@@ -128,9 +160,22 @@ The brand walked back several absolutes in commits `8d70c3d` and `fdb6ada`. Thes
 | "Stored locally" / "Local-first" | Now: "Encrypted and only accessible by you" |
 | "No account needed" | Modal flow requires email/Google sign-in |
 | "Free and offline" (as a unit) | Now: "Core features free", "Works offline via PWA" |
-| "Never touches a centralized database" | Now using Firebase Firestore (commit `8d70c3d`) |
+| "Never touches a centralized database" | Now using Firebase Firestore |
 
-If you find these in older marketing, replace them with the equivalent current phrase.
+### June 2026 (v1.5) — audience broadened, AI shipped
+
+| ❌ Retired | Why | ✅ Say instead |
+|---|---|---|
+| "Made for Indian mothers 🇮🇳" | Audience broadened to global expectant mothers; Indian context stays as feature depth | "Made for expectant mothers" (marketing surfaces) OR keep "Made for Indian mothers 🇮🇳" only in India-specific ads / testimonials |
+| "AI tools coming soon" | AI features ship today in the Premium tier with real pricing | "AI tools included with Premium (₹499/mo)" or "Bloom AI · Standard tier and above" |
+| "Ask Bloom 24/7" | Rebranded to "Bloom AI" in June 2026 | "Bloom AI" (in-app + Premium card + marketing) |
+| "Indian Foods Database" (as feature name) | Section title dropped "Indian"; content still Indian | "Foods Database" (title) — body may still reference dal, ragi, paneer |
+| "Vitals Tracker" (as feature name) | Rebranded to "Health Metrics" in the sidebar | "Health Metrics" (sidebar / in-app), "Vitals Tracker" (landing feature card) |
+| "Free" as a stand-alone product pitch | Free is a tier, not the product | "Free Plan (₹0)" or "3-tier pricing" |
+| "for Indian mothers" (as a category tagline) | Dropped from footer, India-section title, feature grid | "for expectant mothers" (marketing) — Indian nouns still in feature body copy |
+| "11 Indian languages" | German (Deutsch) added in June 2026 — now 12 languages | "12 languages" or "11 Indian languages + German" |
+
+If you find any of these in older marketing, replace them with the equivalent current phrase.
 
 ## What we never say
 

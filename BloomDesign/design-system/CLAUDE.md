@@ -19,13 +19,24 @@
 
 ## Identity in one line
 
-> A pregnancy companion app for Indian mothers — empathetic older sister, not strict doctor. Core features free; AI tools coming soon.
+> A pregnancy companion app for expectant mothers — empathetic older sister, not strict doctor. Free tier for core tracking; Standard and Premium tiers for AI + medical planning.
 
 **Product name:** Our Pregnancy (always — never "Project Bloom" externally).
 **Domain:** ourpregnancy.in
 **Tagline:** *Your pregnancy companion — secure & synced.*
-**Pricing line:** *Core features, always free. AI tools coming soon.*
-**AI chatbot product name:** *Ask Bloom* (the only sanctioned external use of "Bloom").
+**Pricing line:** *Simple, transparent pricing. No hidden fees or contracts.*
+**AI chatbot product name:** *Bloom AI* (rebranded from "Ask Bloom 24/7" as of June 2026 — still the only sanctioned external use of "Bloom").
+**Audience:** *Expectant mothers* (globally welcoming) — Indian context still central to features (JSY, PMMVY, PMSMA, PMJAY, ICDS, JSSK schemes; Indian foods database; 108/112 helplines) but the language of marketing dropped "Indian" from the audience description in June 2026.
+
+## Pricing tiers (live)
+
+| Tier | Price | Overline | Positioning |
+|---|---|---|---|
+| **Free Plan** | ₹0 / month | STARTER | Essential tracking tools for everyday updates, completely free. |
+| **Standard Plan** | ₹199 / month | MATERNAL CARE PACK · **MOST POPULAR** | Comprehensive tracking with complete medical guides & postpartum care. |
+| **Premium Plan** | ₹499 / month | AI ULTIMATE | Full access to advanced AI support tools & clinical report exports. |
+
+**Rule:** the "Core features, always free" H2 still ships (under the pricing grid) as a reinforcing message — but the primary pricing story is now the 3-card grid, not a claim of "free forever."
 
 ---
 

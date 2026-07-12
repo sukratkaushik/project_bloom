@@ -141,6 +141,56 @@ Same scheme names; reduced absolute "free" framing.
 
 ---
 
+## v1.5 reconciliation — June 2026 (screenshot-driven)
+
+Unlike v1.0–v1.3 (which relied on Firecrawl + code diffs), this refresh was driven by a **57-screenshot capture** of the live app in `shipped-screens/`. When the docs and the screenshots disagreed, the screenshots won.
+
+### The four biggest shifts
+
+1. **Audience broadened from "Indian mothers" to "expectant mothers".** Every marketing surface dropped "Indian" from the *audience* framing while keeping Indian *feature depth*. See `foundations/vocabulary.md` → June 2026 retired-claims table for the full swap list.
+
+2. **3-tier pricing shipped.** Free (₹0) · Standard (₹199) · Premium (₹499). "AI tools coming soon" is retired; AI tools are Premium features shipping today. See `voice/homepage-copy.md` → PACKAGES section for verbatim card copy.
+
+3. **AI chatbot rebranded** "Ask Bloom 24/7" → **"Bloom AI"**. Applied across in-app H2, landing feature card, and Premium tier feature list.
+
+4. **12 languages, not 11.** German (Deutsch) added to the Language Selector. Signals the broader audience shift.
+
+### Other rebrands captured
+
+| v1.4 doc | v1.5 (in-app) | Reason |
+|---|---|---|
+| Vitals Tracker | **Health Metrics** | Screenshot shows sidebar label rebrand |
+| AI Food Safety Scanner | **Our Pregnancy AI Food Guide** | In-app H2; marketing card kept old name |
+| Ask Bloom 24/7 | **Bloom AI** | In-app H2 + Premium tier card |
+| Labor Readiness Score | **Labor Readiness** | In-app; marketing kept "Score" |
+| Pregnancy Timeline | **Pregnancy Tracker** | In-app H2; marketing kept "Timeline" |
+| Multiple Checklists | **Hospital Bag** | In-app sidebar |
+
+Docs now clearly distinguish **marketing name** vs **in-app name**.
+
+### Framing that got much tighter
+
+- **Labor Readiness** now ships with an explicit "**Conceptual Demonstration**" info card + the disclaimer *"There is currently no ACOG/WHO guideline validating the use of consumer wearables to predict labor onset. Do not use this for medical decisions."* This is now the canonical example of how to talk about biometric/AI features honestly.
+
+### New surfaces documented from screenshots
+
+- Safe Travel Guide (Smart Tools sidebar)
+- Sidebar search input ("Search features…")
+- Streak gamification pill ("N Day Streak" 🔥)
+- Adjust Setup button
+- AI Premium Active pill
+- Financial Planning + Key Decisions sections
+- Early Parenthood / Fourth Trimester
+- 6 government schemes (was 3) — PMSMA, JSY, PMMVY, JSSK, PMJAY/Ayushman Bharat, ICDS
+
+### Sources for v1.5
+
+- **`shipped-screens/`** — 57 canonical PNGs captured June 2026. Primary source.
+- **`firecrawl-latest.json`** — for meta tags + branding extraction that Firecrawl surfaces cleanly.
+- Live scroll-through of ourpregnancy.in for animation / interaction confirmation.
+
+---
+
 ## Open questions / never resolved
 
 These didn't get definitive answers from the live site. Flagged for future review.

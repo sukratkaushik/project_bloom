@@ -1,14 +1,16 @@
 # Our Pregnancy — Brand at a glance
 
-**A pregnancy companion app for Indian mothers — secure, synced, and culturally rooted.**
+**A pregnancy companion app for expectant mothers — secure, synced, and culturally rooted.**
 
 | | |
 |---|---|
 | **Product** | Our Pregnancy ([ourpregnancy.in](https://ourpregnancy.in/)) |
-| **For** | Expectant mothers in India (English-speaking, smartphone-first, 20–35) |
+| **For** | Expectant mothers (globally welcoming; Indian context deeply built in — 12 languages, JSY/PMMVY/PMSMA/PMJAY/ICDS/JSSK schemes, Indian foods database) |
 | **Promise** | Track everything that matters. Sync securely. Stay calm. |
 | **Tagline** | *Your pregnancy companion — secure & synced.* |
-| **Pricing line** | Core features, always free. AI tools coming soon. |
+| **Pricing** | 3-tier: Free (₹0) · Standard ₹199/mo · Premium ₹499/mo |
+| **Pricing line** | Simple, transparent pricing. No hidden fees or contracts. |
+| **Reinforcement H2** | Core features, always free. |
 | **Archetype** | Caregiver × Sage — empathetic older sister meets quiet doctor. |
 | **Vibe** | Reassuring · modern · maternal · culturally rooted · airy · never clinical |
 
@@ -63,22 +65,32 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 
 ## The features (what we sell)
 
-**Core (free, always):**
-- Pregnancy Timeline · Kick Counter · Contraction Timer · Vitals Tracker
-- Hospital bag (Multiple Checklists) · Birth Plan Builder
-- Real-Time Partner Sync (WebRTC + encrypted cloud)
-- Indian Foods Database · Govt Scheme Guide (JSY/PMMVY/JSSK)
-- Emergency Ready (108/112/iCall) · FHIR R4 EHR Export
-- Medical Reports (upload + secure storage) · Wearable Integrations (Apple Health, Oura, Google Fit, Garmin, Fitbit)
-- Language Selector (11 Indian languages) · Daily Knowledge Drop · Vaccination Reminders
-- Calm Mode · Dark Mode · Cloud Sync
+### Free Plan — ₹0/month — STARTER
+"Essential tracking tools for everyday updates, completely free."
+- Basic pregnancy weekly tracker (Pregnancy Timeline)
+- Daily symptom logs & timeline
+- Kick counter & contraction timer
+- Hospital bag checklist (Multiple Checklists)
+- Offline-first sync capabilities
 
-**Premium (AI tools coming soon):**
-- Ask Bloom 24/7 (AI chatbot, fine-tuned)
-- AI Food Safety Scanner (Gemini + Qwen2.5-VL, tailored to Indian cuisine)
-- AI Name Generator
-- AI Medical Report Summarizer + Prescription Decipherer
-- Labor Readiness Score (HRV / RHR / Braxton Hicks biometrics)
+### Standard Plan — ₹199/month — MATERNAL CARE PACK · MOST POPULAR
+"Comprehensive tracking with complete medical guides & postpartum care."
+- Everything in Free
+- Complete Medical tasks & vaccines tracker
+- Detailed Government Schemes guide (PMSMA, JSY, PMMVY, JSSK, PMJAY/Ayushman Bharat, ICDS)
+- Postpartum & Early Parenthood support (Fourth Trimester)
+- Encrypted real-time Partner Sync (WebRTC)
+
+### Premium Plan — ₹499/month — AI ULTIMATE
+"Full access to advanced AI support tools & clinical report exports."
+- Everything in Standard
+- **Bloom AI** prenatal chatbot support 24/7 (ACOG + WHO grounded)
+- Gemini-powered AI Food Safety Scanner (Foods Database — Indian cuisine focus)
+- FHIR R4 EHR Doctor Report Exports
+- Priority feature request channel
+
+### Also in-app (across tiers)
+- Foods Database, Emergency Ready (108/112/iCall), Language Selector (12 languages — 11 Indian + German), Daily Knowledge Drop with streak, Wearable Integrations (Apple Health, Oura, Google Fit, Garmin, Fitbit — Labor Readiness only), Vaccination Reminders, Safe Travel Guide, Notes & Journal, Medical Reports, Calm Mode, Dark Mode
 
 ## The non-negotiables
 
@@ -86,9 +98,11 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 2. Never "ERROR" copy — always warm recovery copy.
 3. Never AI-generated humans or glowing-orb "AI" visuals.
 4. Never hype words (revolutionary, 10x, transform, leverage…).
-5. Always second person. Always Indian context. Always sentence case.
+5. Always second person. Always sentence case. Indian context deeply present but audience is "expectant mothers" (not "Indian mothers") in marketing.
 6. Never recreate the lotus logo — always embed `logo/logo.png`.
-7. **Never claim "free forever / no hidden costs / privacy-first"** — we walked those back in May 2026. Use "core features free" and "private & secure" instead.
+7. **Never claim "free forever / no hidden costs / privacy-first"** as absolute pitches — Free is a tier, not the whole product. Use "3-tier pricing", "core tracking is free", "encrypted and only accessible by you".
+8. **Never call AI features "coming soon"** — Standard + Premium ship today with real pricing. That phrasing was retired in June 2026 (v1.5).
+9. **Labor Readiness Score is always framed as "Conceptual / Simulated"** — no ACOG/WHO guideline validates it. Always paired with the "Do not use for medical decisions" disclaimer.
 
 ## The asset surfaces
 
