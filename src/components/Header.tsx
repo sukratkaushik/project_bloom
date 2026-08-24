@@ -20,7 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
 
   return (
-    <header className="bg-white border-b border-border sticky top-0 md:top-[14px] z-50 shadow-sm no-print overflow-hidden md:rounded-[14px]">
+    <header className="bg-white border-b border-border sticky top-0 md:top-[14px] z-50 shadow-sm no-print md:rounded-[14px]">
       <PromoBanner />
       <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px] px-4 md:px-10 lg:px-12">
 

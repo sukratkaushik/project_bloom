@@ -12,7 +12,7 @@ export const PromoBanner: React.FC = () => {
   return (
     <div 
       onClick={handleClick}
-      className="w-full bg-gradient-to-r from-sage-dark via-sage to-gold text-white py-1.5 overflow-hidden select-none border-b border-border/20 cursor-pointer no-print relative z-[60] flex items-center"
+      className="w-full bg-gradient-to-r from-sage-dark via-sage to-gold text-white py-1.5 overflow-hidden select-none border-b border-border/20 cursor-pointer no-print relative z-[60] flex items-center rounded-t-[inherit]"
       title="Click to claim offer"
     >
       <div className="flex w-max animate-marquee whitespace-nowrap text-[10px] md:text-[11px] font-bold tracking-wider uppercase">

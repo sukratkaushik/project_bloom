@@ -98,7 +98,7 @@ export const LanguageSelector: React.FC = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-[180px] max-h-[300px] overflow-y-auto bg-white border-[1.5px] border-border rounded-[14px] shadow-[0_12px_32px_rgba(44,62,80,0.15)] z-50 overscroll-contain animate-in fade-in slide-in-from-top-2 notranslate">
+        <div className="absolute right-0 mt-2 w-[180px] max-h-[300px] overflow-y-auto bg-white border-[1.5px] border-border rounded-[14px] shadow-[0_12px_32px_rgba(44,62,80,0.15)] z-[100] overscroll-contain animate-in fade-in slide-in-from-top-2 notranslate">
           <div className="py-1 notranslate">
             {LANGUAGES.map((lang) => (
               <button
