@@ -426,7 +426,7 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
       )}
-      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4.5rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 overflow-hidden ${isScrolled
+      <header className={`fixed left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-[calc(100%-4.5rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md transition-all duration-300 ${isScrolled
         ? 'top-2 md:top-[22px] shadow-[0_12px_32px_rgba(0,0,0,0.08)] border-sage-light/20'
         : 'top-4 md:top-[30px] shadow-[0_4px_20px_rgba(0,0,0,0.04)]'
         }`}>

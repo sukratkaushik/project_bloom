@@ -46,7 +46,7 @@ export const TeamPage: React.FC = () => {
       <div className="absolute bottom-20 left-1/4 w-96 h-96 bg-gold-pale/35 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000 -z-10" />
 
       {/* Header */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+      <header className="fixed top-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-[1200px] z-50 rounded-[20px] border border-border/80 bg-white/90 backdrop-blur-md shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
         <PromoBanner />
         <div className="py-2 px-4">
           <nav className="w-full flex items-center justify-between">
