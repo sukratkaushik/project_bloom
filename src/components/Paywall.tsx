@@ -9,7 +9,8 @@ interface PaywallProps {
   featureName: 'AskOurPregnancy' | 'FoodScanner' | 'MaternalCare' | 'GovernmentSchemes' | 'Postpartum' | 'PartnerSync' | 'EhrExports';
 }
 
-const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature: string) => {
+const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature: string, isAdmin: boolean = false) => {
+  if (isAdmin) return true;
   const premiumFeatures = ['AskOurPregnancy', 'FoodScanner', 'EhrExports'];
   const standardFeatures = ['MaternalCare', 'GovernmentSchemes', 'Postpartum', 'PartnerSync'];
 
@@ -24,7 +25,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const [months, setMonths] = useState(3); // default to 3 months for best value
 
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
-  const hasAccess = checkAccess(planTier, featureName);
+  const hasAccess = checkAccess(planTier, featureName, state.isAdmin);
 
   if (hasAccess) {
     return <>{children}</>;

@@ -89,6 +89,40 @@ export const Profile: React.FC = () => {
                 </button>
               </div>
             </div>
+
+            <div className="pt-2 border-t border-border">
+              <label className="block text-[12px] font-semibold tracking-wide uppercase text-light mb-1.5">Membership Plan</label>
+              <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-charcoal/20 border border-border rounded-[12px]">
+                <div className="flex items-center gap-2.5">
+                  {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? (
+                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[12px] uppercase tracking-wider border border-purple-300">
+                      👑 Admin / App Owner (Lifetime Access)
+                    </span>
+                  ) : state.planTier === 'premium' || state.isPremium ? (
+                    <span className="px-3 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-gold/30">
+                      ✨ Premium Plan Active
+                    </span>
+                  ) : state.planTier === 'standard' ? (
+                    <span className="px-3 py-1 bg-sage-pale text-sage-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-sage/30">
+                      🌿 Standard Maternal Plan Active
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-gray-200 text-charcoal font-semibold rounded-full text-[12px]">
+                      Free Starter Plan
+                    </span>
+                  )}
+                </div>
+
+                {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
+                  <button
+                    onClick={() => { window.location.hash = '#pricing'; }}
+                    className="text-[12px] font-bold text-sage hover:underline cursor-pointer"
+                  >
+                    View Plans →
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
         </section>
 

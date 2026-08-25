@@ -134,6 +134,21 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         try {
           // 1. Check for cloud user profile first
           const profile = await getUserProfile(user.uid);
+          const isUserAdmin = user.email === 'sukrat.kaushik@gmail.com' || profile?.role === 'admin';
+          
+          let planTier: 'free' | 'standard' | 'premium' = 'free';
+          let isPremium = false;
+
+          if (isUserAdmin) {
+            planTier = 'premium';
+            isPremium = true;
+          } else if (profile?.planTier) {
+            // Check plan expiry if set
+            if (!profile.planExpiry || profile.planExpiry > Date.now()) {
+              planTier = profile.planTier;
+              isPremium = (planTier === 'premium');
+            }
+          }
 
           if (profile && profile.isSetup && profile.activeJourneyId) {
             // 2. If already setup in cloud, fetch that journey
@@ -142,6 +157,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
             if (docSnap.exists()) {
               const cloudData = docSnap.data();
+
+              // If journey also had plan tier, merge it gracefully
+              if (!isUserAdmin && !profile.planTier && cloudData.planTier) {
+                planTier = cloudData.planTier;
+                isPremium = (planTier === 'premium');
+              }
 
               // 3. Restore all tracking data (logs, vitals, etc.)
               const trackingRef = collection(firestoreDb, 'journeys', profile.activeJourneyId, 'trackingData');
@@ -155,7 +176,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 isCalmModeActive: prev.isCalmModeActive,
                 isDarkModeActive: prev.isDarkModeActive,
                 isSetup: true,
-                activeJourneyId: profile.activeJourneyId
+                activeJourneyId: profile.activeJourneyId,
+                role: isUserAdmin ? 'admin' : (profile.role || 'user'),
+                isAdmin: isUserAdmin,
+                planTier,
+                isPremium,
+                planExpiry: profile.planExpiry || null,
               }));
 
               // Immediately persist state to Dexie
@@ -168,16 +194,38 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     isCalmModeActive: state.isCalmModeActive,
                     isDarkModeActive: state.isDarkModeActive,
                     isSetup: true,
-                    activeJourneyId: profile.activeJourneyId
+                    activeJourneyId: profile.activeJourneyId,
+                    role: isUserAdmin ? 'admin' : (profile.role || 'user'),
+                    isAdmin: isUserAdmin,
+                    planTier,
+                    isPremium,
+                    planExpiry: profile.planExpiry || null,
                   }),
                   updatedAt: Date.now(),
                 }).catch(console.error);
               }
             }
+          } else {
+            // User logged in but not finished setup
+            setState(prev => ({
+              ...prev,
+              role: isUserAdmin ? 'admin' : (profile?.role || 'user'),
+              isAdmin: isUserAdmin,
+              planTier,
+              isPremium,
+              planExpiry: profile?.planExpiry || null,
+            }));
           }
         } catch (error) {
           console.error("Error restoring session from cloud:", error);
         }
+      } else {
+        // User logged out
+        setState(prev => ({
+          ...prev,
+          role: 'user',
+          isAdmin: false,
+        }));
       }
     });
     return () => unsubscribe();

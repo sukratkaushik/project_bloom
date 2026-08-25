@@ -167,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'notes', icon: '📝', label: 'Notes & Journal' },
     { id: 'profile', icon: '⚙️', label: 'Settings & Profile', hideFavorite: true },
     { id: 'feedback', icon: '💬', label: 'Feedback & Support', hideFavorite: true },
-    ...(auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? [{ id: 'admin-feedbacks', icon: '👑', label: 'Admin: Feedbacks', hideFavorite: true }] : []),
+    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', hideFavorite: true }] : []),
   ];
 
   const isSearching = searchQuery.trim().length > 0;
@@ -318,14 +318,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               </span>
             </button>
 
-            {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
+            {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
               <button
-                onClick={() => setActivePage('admin-feedbacks')}
+                onClick={() => setActivePage('admin-panel')}
                 className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                  ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
+                  ${activePage === 'admin-panel' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
               >
                 <span className="flex items-center gap-2">
-                  <span className="text-[16px]">👑</span> Admin: Feedbacks
+                  <span className="text-[16px]">👑</span> Admin Suite
                 </span>
               </button>
             )}
@@ -520,14 +520,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </span>
           </button>
 
-          {auth.currentUser?.email === 'sukrat.kaushik@gmail.com' && (
+          {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
             <button
-              onClick={() => setActivePage('admin-feedbacks')}
+              onClick={() => setActivePage('admin-panel')}
               className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                ${activePage === 'admin-feedbacks' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
+                ${activePage === 'admin-panel' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
             >
               <span className="flex items-center gap-2">
-                <span className="text-[16px]">👑</span> Admin: Feedbacks
+                <span className="text-[16px]">👑</span> Admin Suite
               </span>
             </button>
           )}
