@@ -11,8 +11,6 @@ admin.initializeApp();
 const hfApiKey = defineSecret("HUGGINGFACE_API_KEY");
 const razorpayKeyId = defineSecret("RAZORPAY_KEY_ID");
 const razorpayKeySecret = defineSecret("RAZORPAY_KEY_SECRET");
-const smtpUser = defineSecret("SMTP_USER");
-const smtpPass = defineSecret("SMTP_PASS");
 
 function isQueryDueDateInvalid(message: string): boolean {
   const clean = message.toLowerCase();
@@ -558,7 +556,7 @@ export const verifyPaymentSignature = onCall(
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
 export const sendPlanChangeNotificationEmail = onCall(
-  { secrets: [smtpUser, smtpPass], region: "asia-south1" },
+  { region: "asia-south1" },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Authentication is required.");
@@ -579,12 +577,12 @@ export const sendPlanChangeNotificationEmail = onCall(
       throw new HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
 
-    const userVal = smtpUser.value() || process.env.SMTP_USER;
-    const passVal = smtpPass.value() || process.env.SMTP_PASS;
+    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const passVal = process.env.SMTP_PASS;
 
-    if (!userVal || !passVal) {
-      console.warn("SMTP credentials not configured in Firebase Secret Manager. Skipping email dispatch.");
-      return { success: false, message: "SMTP credentials not configured." };
+    if (!passVal) {
+      console.warn("SMTP_PASS environment variable not yet configured. Skipping live SMTP dispatch.");
+      return { success: false, message: "SMTP credentials not yet configured." };
     }
 
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "Expectant Mother";
