@@ -152,7 +152,7 @@ export const NutritionTracker: React.FC = () => {
     return (
       <div className="p-6 bg-white border border-border rounded-2xl shadow-sm text-center">
         <Pill className="w-12 h-12 text-medium mx-auto mb-4" />
-        <h2 className="font-serif text-2xl text-charcoal mb-2">Nutrition & Supplements</h2>
+        <h2 className="font-serif text-2xl text-charcoal mb-2">Nutrition</h2>
         <p className="text-medium text-[15px]">Please complete setup first.</p>
       </div>
     );
