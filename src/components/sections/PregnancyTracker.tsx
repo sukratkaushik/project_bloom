@@ -48,9 +48,24 @@ const MOTIVATIONAL_QUOTES = [
   "The wait is almost over. You are about to meet the love of your life!" // 40
 ];
 
+const calculateCurrentWeek = (dueDate?: string): number => {
+  if (!dueDate) return 1;
+  const due = new Date(dueDate);
+  if (isNaN(due.getTime())) return 1;
+  const lmp = new Date(due.getTime() - 280 * 24 * 60 * 60 * 1000);
+  const today = new Date();
+  const diffTime = Math.abs(today.getTime() - lmp.getTime());
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  let currentWeek = Math.floor(diffDays / 7) + 1;
+
+  if (currentWeek < 1) currentWeek = 1;
+  if (currentWeek > 40) currentWeek = 40;
+  return currentWeek;
+};
+
 export const PregnancyTracker: React.FC = () => {
   const { state, updateState } = usePlanner();
-  const [selectedWeek, setSelectedWeek] = useState<number>(1);
+  const [selectedWeek, setSelectedWeek] = useState<number>(() => calculateCurrentWeek(state.dueDate));
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [tempDate, setTempDate] = useState(state.dueDate || '');
 
@@ -65,17 +80,7 @@ export const PregnancyTracker: React.FC = () => {
   // Calculate current week based on due date
   useEffect(() => {
     if (state.dueDate) {
-      const due = new Date(state.dueDate);
-      const lmp = new Date(due.getTime() - 280 * 24 * 60 * 60 * 1000);
-      const today = new Date();
-      const diffTime = Math.abs(today.getTime() - lmp.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      let currentWeek = Math.floor(diffDays / 7) + 1;
-
-      if (currentWeek < 1) currentWeek = 1;
-      if (currentWeek > 40) currentWeek = 40;
-
-      setSelectedWeek(currentWeek);
+      setSelectedWeek(calculateCurrentWeek(state.dueDate));
     }
   }, [state.dueDate]);
 
@@ -176,7 +181,7 @@ export const PregnancyTracker: React.FC = () => {
             <ChevronLeft size={20} />
           </button>
 
-          <div className="text-center">
+          <div className="text-center" key={`week-header-${selectedWeek}`}>
             <h3 className="font-serif text-[24px] font-medium text-charcoal">Week {selectedWeek}</h3>
             <span className="text-[12px] font-semibold tracking-[1px] uppercase text-medium">
               Trimester {selectedWeek <= 13 ? '1' : selectedWeek <= 27 ? '2' : '3'}
@@ -233,11 +238,11 @@ export const PregnancyTracker: React.FC = () => {
           </motion.div>
         </div>
 
-        <h3 className="font-serif text-[26px] font-medium text-charcoal mb-1 relative z-10 flex items-center gap-2 justify-center">
+        <h3 key={`size-title-${selectedWeek}`} className="font-serif text-[26px] font-medium text-charcoal mb-1 relative z-10 flex items-center gap-2 justify-center">
           Size of a <span className="text-sage font-semibold">{weekData.babySizeAnalogy}</span>
         </h3>
 
-        <div className="flex items-center gap-3 mt-3 mb-6 relative z-10">
+        <div key={`measurements-${selectedWeek}`} className="flex items-center gap-3 mt-3 mb-6 relative z-10">
           <div className="px-4 py-1.5 rounded-full bg-sage-pale/40 text-sage-dark text-[13px] font-bold border border-sage/20 shadow-xs flex items-center gap-1.5">
             <span>📏 Length:</span> <span className="font-sans font-medium text-charcoal">{weekData.length}</span>
           </div>
@@ -246,7 +251,7 @@ export const PregnancyTracker: React.FC = () => {
           </div>
         </div>
 
-        <p className="text-[14px] text-medium leading-relaxed max-w-[480px] mb-6 relative z-10">
+        <p key={`baby-dev-desc-${selectedWeek}`} className="text-[14px] text-medium leading-relaxed max-w-[480px] mb-6 relative z-10">
           {weekData.babyDev}
         </p>
 
@@ -259,6 +264,7 @@ export const PregnancyTracker: React.FC = () => {
       {/* Development & Body Changes */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <motion.div
+          key={`baby-dev-block-${selectedWeek}`}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.4 }}
@@ -276,6 +282,7 @@ export const PregnancyTracker: React.FC = () => {
         </motion.div>
 
         <motion.div
+          key={`body-changes-block-${selectedWeek}`}
           initial={{ opacity: 0, x: 10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 }}
