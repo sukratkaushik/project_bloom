@@ -98,6 +98,28 @@ export const setUserRole = async (targetUid: string, role: 'admin' | 'user') => 
   }
 };
 
+export const sendPlanChangeEmail = async (
+  targetEmail: string,
+  targetName: string | null | undefined,
+  planTier: 'standard' | 'premium',
+  durationMonths: number | null
+) => {
+  try {
+    const { httpsCallable } = await import('firebase/functions');
+    const fn = httpsCallable(functions, 'sendPlanChangeNotificationEmail');
+    const res = await fn({
+      targetEmail,
+      targetName: targetName || '',
+      planTier,
+      durationMonths,
+    });
+    return res.data as { success: boolean; message?: string; error?: string };
+  } catch (error) {
+    console.error("Error sending plan change notification email:", error);
+    return { success: false, error: String(error) };
+  }
+};
+
 // Initialize Analytics safely
 export const analyticsPromise = isSupported().then(yes => yes ? getAnalytics(app) : null);
 
