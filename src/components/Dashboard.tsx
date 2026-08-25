@@ -106,7 +106,7 @@ export const Dashboard: React.FC = () => {
   const progressPct = filteredTasks.length ? Math.round((doneCount / filteredTasks.length) * 100) : 0;
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream">
+    <div className="flex flex-col min-h-screen md:h-screen md:overflow-hidden bg-cream">
       <Header
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -114,9 +114,9 @@ export const Dashboard: React.FC = () => {
       />
 
       {/* Body */}
-      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 pb-[100px] grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start w-full relative">
-        {/* Desktop Sidebar (Rendered inline) */}
-        <div className="hidden md:block w-full md:w-auto sticky top-[95px] self-start">
+      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full md:flex-1 md:min-h-0 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start relative">
+        {/* Desktop Sidebar (Rendered inline with independent scroll) */}
+        <div className="hidden md:flex md:flex-col md:h-full md:overflow-y-auto overscroll-contain pr-2 pb-16 custom-scrollbar">
           <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
         </div>
 
@@ -145,108 +145,72 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 sticky top-[95px] self-start">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activePage}
-              initial={{ opacity: 0, scale: 0.995 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.995 }}
-              transition={{
-                duration: 0.25,
-                ease: "easeInOut"
-              }}
-              className="fill-mode-both"
-            >
-              {activePage === 'tracker' && <PregnancyTracker />}
-              {activePage === 'dev' && <Development filterTasks={filterTasks} />}
-              {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
-              {activePage === 'medical-reports' && <MedicalReports />}
-              {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
-              {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
-              {activePage === 'decisions' && <Decisions />}
-              {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
-              {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
-              {activePage === 'symptoms' && <SymptomLogger />}
-              {activePage === 'readiness' && <LaborReadiness setActivePage={setActivePage} />}
-              {activePage === 'foodscanner' && <FoodScanner />}
-              {activePage === 'askourpregnancy' && <AskOurPregnancy />}
-              {activePage === 'kickcounter' && <KickCounter />}
-              {activePage === 'contractions' && <ContractionTimer />}
-              {activePage === 'vitals' && <VitalsTracker />}
-              {activePage === 'mood' && <MoodTracker />}
-              {activePage === 'hydration' && <HydrationTracker />}
-              {activePage === 'nutrition' && <NutritionTracker />}
-              {activePage === 'hospitalbag' && <HospitalBag />}
-              {activePage === 'birthplan' && <BirthPlanBuilder />}
-              {activePage === 'schemes' && <GovernmentSchemes />}
-              {activePage === 'babynames' && <BabyNames />}
-              {activePage === 'travel' && <SafeTravel />}
-              {activePage === 'partnersync' && <PartnerSync />}
-              {activePage === 'feedback' && <Feedback />}
-              {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
-              {activePage === 'notes' && <Notes />}
-              {activePage === 'profile' && <Profile />}
-            </motion.div>
-          </AnimatePresence>
+        {/* Right Main Content Panel (Independent scroll) */}
+        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 md:h-full md:overflow-y-auto overscroll-contain pb-[100px] md:pb-16 custom-scrollbar flex flex-col">
+          <div className="flex-1">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activePage}
+                initial={{ opacity: 0, scale: 0.995 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.995 }}
+                transition={{
+                  duration: 0.25,
+                  ease: "easeInOut"
+                }}
+                className="fill-mode-both"
+              >
+                {activePage === 'tracker' && <PregnancyTracker />}
+                {activePage === 'dev' && <Development filterTasks={filterTasks} />}
+                {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
+                {activePage === 'medical-reports' && <MedicalReports />}
+                {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
+                {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
+                {activePage === 'decisions' && <Decisions />}
+                {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
+                {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
+                {activePage === 'symptoms' && <SymptomLogger />}
+                {activePage === 'readiness' && <LaborReadiness setActivePage={setActivePage} />}
+                {activePage === 'foodscanner' && <FoodScanner />}
+                {activePage === 'askourpregnancy' && <AskOurPregnancy />}
+                {activePage === 'kickcounter' && <KickCounter />}
+                {activePage === 'contractions' && <ContractionTimer />}
+                {activePage === 'vitals' && <VitalsTracker />}
+                {activePage === 'mood' && <MoodTracker />}
+                {activePage === 'hydration' && <HydrationTracker />}
+                {activePage === 'nutrition' && <NutritionTracker />}
+                {activePage === 'hospitalbag' && <HospitalBag />}
+                {activePage === 'birthplan' && <BirthPlanBuilder />}
+                {activePage === 'schemes' && <GovernmentSchemes />}
+                {activePage === 'babynames' && <BabyNames />}
+                {activePage === 'travel' && <SafeTravel />}
+                {activePage === 'partnersync' && <PartnerSync />}
+                {activePage === 'feedback' && <Feedback />}
+                {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
+                {activePage === 'notes' && <Notes />}
+                {activePage === 'profile' && <Profile />}
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Dashboard Footer (Inside main scroll area) */}
+          <footer className="mt-12 border-t border-border py-8 text-[13px] text-medium no-print w-full">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <span className="font-serif text-[18px] text-sage font-semibold tracking-wide notranslate">Our Pregnancy</span>
+                <span className="opacity-60 hidden sm:inline">|</span>
+                <span className="opacity-80">Made with ❤️ for expectant mothers</span>
+              </div>
+
+              <div className="flex items-center gap-6">
+                <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
+                <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
+                <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-sage transition-colors">Support</a>
+              </div>
+            </div>
+          </footer>
         </main>
       </div>
-
-      {/* Mobile Bottom Navigation Bar (Floating/Glassmorphic) */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/80 dark:bg-[#2C3E50]/80 backdrop-blur-md border-t border-border py-2 px-4 flex justify-around items-center md:hidden no-print shadow-[0_-4px_16px_rgba(0,0,0,0.04)]">
-        <button
-          onClick={() => setActivePage('tracker')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'tracker' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
-        >
-          <span className="text-[18px]">📅</span>
-          <span>Tracker</span>
-        </button>
-        <button
-          onClick={() => setActivePage('vitals')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'vitals' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
-        >
-          <span className="text-[18px]">💙</span>
-          <span>Vitals</span>
-        </button>
-        <button
-          onClick={() => setActivePage('readiness')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'readiness' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
-        >
-          <span className="text-[18px]">🔮</span>
-          <span>Readiness</span>
-        </button>
-        <button
-          onClick={() => setActivePage('askourpregnancy')}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${activePage === 'askourpregnancy' ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
-        >
-          <span className="text-[18px]">✨</span>
-          <span>AI Guide</span>
-        </button>
-        <button
-          onClick={() => setIsMobileMenuOpen(true)}
-          className={`flex flex-col items-center gap-0.5 py-1 text-[11.5px] font-semibold transition-colors cursor-pointer ${isMobileMenuOpen ? 'text-sage-dark dark:text-sage font-bold' : 'text-charcoal/70'}`}
-        >
-          <span className="text-[18px]">☰</span>
-          <span>Menu</span>
-        </button>
-      </div>
-
-      {/* Dashboard Footer */}
-      <footer className="mt-auto border-t border-border bg-cream py-8 px-6 no-print w-full z-10 relative">
-        <div className="max-w-[1000px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-medium">
-          <div className="flex items-center gap-2">
-            <span className="font-serif text-[18px] text-sage font-semibold tracking-wide notranslate">Our Pregnancy</span>
-            <span className="opacity-60 hidden sm:inline">|</span>
-            <span className="opacity-80">Made with ❤️ for expectant mothers</span>
-          </div>
-
-          <div className="flex items-center gap-6">
-            <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
-            <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
-            <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-sage transition-colors">Support</a>
-          </div>
-        </div>
-      </footer>
 
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
