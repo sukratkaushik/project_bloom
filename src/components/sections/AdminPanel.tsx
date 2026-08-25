@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { db, auth, getAllUsersForAdmin, updateUserSubscription, setUserRole, UserProfile } from '../../firebase';
+import { db, auth, getAllUsersForAdmin, updateUserSubscription, setUserRole, sendPlanChangeEmail, UserProfile } from '../../firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { usePlanner } from '../../store';
 import { 
@@ -45,12 +45,13 @@ export const AdminPanel: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
   const [planOption, setPlanOption] = useState<'free' | 'standard' | 'premium'>('premium');
   const [durationMonths, setDurationMonths] = useState<number | null>(null); // null = lifetime
+  const [sendEmailNotification, setSendEmailNotification] = useState<boolean>(true);
 
   const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com';
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
+    setTimeout(() => setToastMsg(null), 4000);
   };
 
   const fetchUsers = async () => {
@@ -96,7 +97,26 @@ export const AdminPanel: React.FC = () => {
     setUpdatingUid(selectedUser.uid);
     try {
       await updateUserSubscription(selectedUser.uid, planOption, durationMonths);
-      showToast(`Successfully updated plan for ${selectedUser.email || selectedUser.uid} to ${planOption.toUpperCase()}!`);
+      
+      let emailSuccessText = "";
+      // If upgraded to standard or premium and user has email, send welcome email
+      if (sendEmailNotification && selectedUser.email && (planOption === 'standard' || planOption === 'premium')) {
+        try {
+          const emailRes = await sendPlanChangeEmail(
+            selectedUser.email,
+            selectedUser.displayName,
+            planOption,
+            durationMonths
+          );
+          if (emailRes.success) {
+            emailSuccessText = " & email sent";
+          }
+        } catch (e) {
+          console.warn("Could not dispatch plan email:", e);
+        }
+      }
+
+      showToast(`Updated plan for ${selectedUser.email || selectedUser.uid} to ${planOption.toUpperCase()}${emailSuccessText}!`);
       
       // Update local state
       setUsers(prev => prev.map(u => {
@@ -520,6 +540,22 @@ export const AdminPanel: React.FC = () => {
                   ))}
                 </div>
               </div>
+            )}
+
+            {/* Email Notification Option */}
+            {planOption !== 'free' && selectedUser.email && (
+              <label className="flex items-center gap-2.5 p-3 bg-cream dark:bg-[#0F172A] border border-border rounded-xl cursor-pointer text-[12.5px] text-charcoal dark:text-white">
+                <input
+                  type="checkbox"
+                  checked={sendEmailNotification}
+                  onChange={(e) => setSendEmailNotification(e.target.checked)}
+                  className="w-4 h-4 rounded text-sage focus:ring-sage"
+                />
+                <span className="flex items-center gap-1.5 font-medium">
+                  <Mail className="w-3.5 h-3.5 text-sage" />
+                  <span>Send warm invitation email to <strong>{selectedUser.email}</strong></span>
+                </span>
+              </label>
             )}
 
             {/* Actions */}

@@ -36,17 +36,20 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
 const crypto_1 = __importDefault(require("crypto"));
+const nodemailer_1 = __importDefault(require("nodemailer"));
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 // Define the secure secret that we will store in Firebase Secret Manager
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
 const razorpayKeyId = (0, params_1.defineSecret)("RAZORPAY_KEY_ID");
 const razorpayKeySecret = (0, params_1.defineSecret)("RAZORPAY_KEY_SECRET");
+const smtpUser = (0, params_1.defineSecret)("SMTP_USER");
+const smtpPass = (0, params_1.defineSecret)("SMTP_PASS");
 function isQueryDueDateInvalid(message) {
     const clean = message.toLowerCase();
     // 1. Check if the message contains a year 2028 or later
@@ -511,5 +514,160 @@ exports.verifyPaymentSignature = (0, https_1.onCall)({ secrets: [razorpayKeySecr
         updatedAt: admin.firestore.FieldValue.serverTimestamp()
     }, { merge: true });
     return { success: true, planTier, expiry: expiry.toISOString() };
+});
+/**
+ * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
+ */
+exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ secrets: [smtpUser, smtpPass], region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    // Verify caller is admin
+    const callerEmail = request.auth.token.email;
+    const db = admin.firestore();
+    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    if (!isCallerAdmin) {
+        throw new https_1.HttpsError("permission-denied", "Only administrators can send plan notifications.");
+    }
+    const { targetEmail, targetName, planTier, durationMonths } = request.data;
+    if (!targetEmail || !planTier) {
+        throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
+    }
+    const userVal = smtpUser.value() || process.env.SMTP_USER;
+    const passVal = smtpPass.value() || process.env.SMTP_PASS;
+    if (!userVal || !passVal) {
+        console.warn("SMTP credentials not configured in Firebase Secret Manager. Skipping email dispatch.");
+        return { success: false, message: "SMTP credentials not configured." };
+    }
+    const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "Expectant Mother";
+    const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate Pack)" : "Standard Plan (Maternal Care Pack)";
+    const durationText = durationMonths ? `${durationMonths} Month${durationMonths > 1 ? "s" : ""} Access` : "Lifetime / Perpetual Access";
+    const standardBenefits = `
+      <li style="margin-bottom: 8px;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step assistance with PMMVY, JSY, and financial benefits.</li>
+      <li style="margin-bottom: 8px;">🌿 <strong>Postpartum & Early Parenthood Recovery</strong> — Guided recovery logs and daily newborn care checklists.</li>
+      <li style="margin-bottom: 8px;">🤝 <strong>Encrypted Partner Sync</strong> — Keep your partner connected with real-time updates and reminders.</li>
+      <li style="margin-bottom: 8px;">🏥 <strong>Complete Clinical & Vaccine Checklists</strong> — Full clinic schedules and immunization trackers.</li>
+    `;
+    const premiumBenefits = `
+      <li style="margin-bottom: 8px;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, comforting answers to any pregnancy question, symptom, or doubt.</li>
+      <li style="margin-bottom: 8px;">🥗 <strong>AI Food Safety Scanner</strong> — Scan and check Indian & international foods, snacks, and ingredients for safety.</li>
+      <li style="margin-bottom: 8px;">📋 <strong>FHIR R4 Doctor EHR Medical Exports</strong> — Formatted clinical summaries ready for your OB-GYN visits.</li>
+      <li style="margin-bottom: 8px;">🏛️ <strong>Government Maternity Schemes Guide</strong> (PMMVY, JSY)</li>
+      <li style="margin-bottom: 8px;">🌿 <strong>Postpartum & Early Parenthood Recovery Guides</strong></li>
+      <li style="margin-bottom: 8px;">🤝 <strong>Encrypted Partner Sync & Collaboration</strong></li>
+    `;
+    const benefitItemsHtml = planTier === "premium" ? premiumBenefits : standardBenefits;
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Our Pregnancy Upgrade</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FDFBF7; color: #2C3E50;">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 40px 15px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #E8E6E1;">
+          <tr>
+            <td style="background-color: #8AB6A3; padding: 35px 30px; text-align: center;">
+              <h1 style="margin: 0; font-size: 26px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; font-family: Georgia, serif;">
+                Our Pregnancy 🌸
+              </h1>
+              <p style="margin: 6px 0 0 0; color: rgba(255,255,255,0.92); font-size: 14px;">
+                Gentle, science-backed guidance for your motherhood journey
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding: 35px 30px;">
+              <p style="font-size: 16px; line-height: 1.6; color: #2C3E50; margin: 0 0 16px 0;">
+                Dear <strong>${recipientName}</strong>,
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 20px 0;">
+                We hope you are having a serene and joyful pregnancy journey today. ✨
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 24px 0;">
+                As part of our mission to support expectant mothers and families with gentle, science-backed guidance, we have <strong>gifted you full access to the Our Pregnancy ${tierTitle}</strong> (${durationText})!
+              </p>
+
+              <table role="presentation" width="100%" style="background-color: ${planTier === 'premium' ? '#FEF9EE' : '#E9F5E9'}; border-radius: 14px; border: 1px solid ${planTier === 'premium' ? '#F4A261' : '#8AB6A3'}; margin-bottom: 25px;">
+                <tr>
+                  <td style="padding: 20px;">
+                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #2C3E50; font-family: Georgia, serif;">
+                      🎁 What’s now unlocked for you:
+                    </h3>
+                    <ul style="margin: 0; padding-left: 20px; color: #2C3E50; font-size: 14px; line-height: 1.8;">
+                      ${benefitItemsHtml}
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 30px 0 20px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="https://ourpregnancy.in/#dashboard" style="background-color: #8AB6A3; color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: bold; text-decoration: none; display: inline-block; box-shadow: 0 3px 10px rgba(138, 182, 163, 0.35);">
+                      ✨ Open My Dashboard & Start Exploring
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 13px; color: #718096; line-height: 1.6; margin: 20px 0 0 0; text-align: center;">
+                <em>No credit card or payment required. This access is activated directly on your account.</em>
+              </p>
+            </td>
+          </tr>
+
+          <tr>
+            <td style="background-color: #FDFBF7; border-top: 1px solid #E8E6E1; padding: 25px 30px; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 14px; color: #2C3E50; font-weight: 600;">
+                With love & care,
+              </p>
+              <p style="margin: 0 0 10px 0; font-size: 13px; color: #4A5568;">
+                <strong>Our Pregnancy Team</strong><br>
+                <em>Made with ❤️ for expectant mothers</em>
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #A0AEC0;">
+                Have questions? Just reply directly to this email at <a href="mailto:hello@ourpregnancy.in" style="color: #8AB6A3; text-decoration: underline;">hello@ourpregnancy.in</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+    const transporter = nodemailer_1.default.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: userVal,
+            pass: passVal,
+        },
+    });
+    const mailOptions = {
+        from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+        replyTo: "hello@ourpregnancy.in",
+        to: targetEmail,
+        subject: `🌸 A special gift for your pregnancy journey: You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}!`,
+        html: emailHtml,
+    };
+    try {
+        await transporter.sendMail(mailOptions);
+        console.log(`Plan notification email sent successfully to ${targetEmail}`);
+        return { success: true, message: `Email sent to ${targetEmail}` };
+    }
+    catch (err) {
+        console.error("Failed to send email via SMTP:", err);
+        return { success: false, error: err.message };
+    }
 });
 //# sourceMappingURL=index.js.map
