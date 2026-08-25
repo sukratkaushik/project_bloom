@@ -313,9 +313,9 @@ export const exportToPDF = async (state: PlannerState) => {
   }
 
   // ---------------------------------------------------------
-  // Daily Health & Tracking (Vitals)
+  // Tracking (Vitals)
   // ---------------------------------------------------------
-  addHeader('Daily Health & Tracking (Vitals)');
+  addHeader('Tracking (Vitals)');
   if (state.activeJourneyId) {
     try {
       const vitals = await db.vitalsLogs

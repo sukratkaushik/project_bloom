@@ -15,7 +15,7 @@ type SidebarProps = {
 
 const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   daily: {
-    label: "Daily Health & Tracking",
+    label: "Tracking",
     items: ['kickcounter', 'contractions', 'vitals', 'mood', 'hydration', 'nutrition', 'symptoms']
   },
   smart: {
@@ -450,7 +450,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           )}
 
-          <SectionHeader id="daily" label="Daily Health & Tracking" />
+          <SectionHeader id="daily" label="Tracking" />
           {expandedSections['daily'] && (
             <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
               {CATEGORIES.daily.items.map(itemId => {

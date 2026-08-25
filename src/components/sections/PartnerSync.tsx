@@ -66,7 +66,7 @@ export const PartnerSync: React.FC = () => {
       ]
     },
     {
-      title: 'Daily Health & Tracking',
+      title: 'Tracking',
       items: [
         { key: 'kickcounter', label: 'Kick Counter', desc: 'Kick sessions history' },
         { key: 'contractions', label: 'Contraction Timer', desc: 'Contraction logs' },
