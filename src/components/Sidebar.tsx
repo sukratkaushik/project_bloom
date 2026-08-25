@@ -145,7 +145,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'vitals', icon: '💙', label: 'Health Metrics' },
     { id: 'mood', icon: '😊', label: 'Mood Tracker' },
     { id: 'hydration', icon: '💧', label: 'Hydration' },
-    { id: 'nutrition', icon: '🥗', label: 'Nutrition & Supplements' },
+    { id: 'nutrition', icon: '🥗', label: 'Nutrition' },
     { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
     { id: 'askourpregnancy', icon: '✨', label: 'Bloom AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
