@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getFunctions } from 'firebase/functions';
 import firebaseConfig from '../firebase-applet-config.json';
@@ -17,6 +17,9 @@ export interface UserProfile {
   activeJourneyId?: string;
   email: string | null;
   displayName: string | null;
+  role?: 'admin' | 'user';
+  planTier?: 'free' | 'standard' | 'premium';
+  planExpiry?: number | null; // timestamp in ms, or null for lifetime
   createdAt: number;
   updatedAt: number;
 }
@@ -45,6 +48,53 @@ export const saveUserProfile = async (uid: string, profile: Partial<UserProfile>
     }, { merge: true });
   } catch (error) {
     handleFirestoreError(error, OperationType.WRITE, `users/${uid}`);
+  }
+};
+
+// Admin Functions
+export const getAllUsersForAdmin = async (): Promise<UserProfile[]> => {
+  try {
+    const usersRef = collection(db, 'users');
+    const q = query(usersRef, orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => doc.data() as UserProfile);
+  } catch (error) {
+    console.error("Error fetching all users for admin:", error);
+    throw error;
+  }
+};
+
+export const updateUserSubscription = async (
+  targetUid: string,
+  planTier: 'free' | 'standard' | 'premium',
+  months: number | null
+) => {
+  try {
+    const userRef = doc(db, 'users', targetUid);
+    const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
+    await setDoc(userRef, {
+      planTier,
+      planExpiry,
+      updatedAt: Date.now()
+    }, { merge: true });
+    return { planTier, planExpiry };
+  } catch (error) {
+    console.error("Error updating user subscription:", error);
+    throw error;
+  }
+};
+
+export const setUserRole = async (targetUid: string, role: 'admin' | 'user') => {
+  try {
+    const userRef = doc(db, 'users', targetUid);
+    await setDoc(userRef, {
+      role,
+      updatedAt: Date.now()
+    }, { merge: true });
+    return role;
+  } catch (error) {
+    console.error("Error updating user role:", error);
+    throw error;
   }
 };
 

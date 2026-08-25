@@ -33,6 +33,7 @@ import { PregnancyTracker } from './sections/PregnancyTracker';
 import { PartnerSync } from './sections/PartnerSync';
 import { Feedback } from './sections/Feedback';
 import { AdminFeedbacks } from './sections/AdminFeedbacks';
+import { AdminPanel } from './sections/AdminPanel';
 
 import { Profile } from './sections/Profile';
 import { FloatingChatbot } from './FloatingChatbot';
@@ -186,7 +187,8 @@ export const Dashboard: React.FC = () => {
                 {activePage === 'travel' && <SafeTravel />}
                 {activePage === 'partnersync' && <PartnerSync />}
                 {activePage === 'feedback' && <Feedback />}
-                {activePage === 'admin-feedbacks' && <AdminFeedbacks />}
+                {activePage === 'admin-feedbacks' && <AdminPanel />}
+                {activePage === 'admin-panel' && <AdminPanel />}
                 {activePage === 'notes' && <Notes />}
                 {activePage === 'profile' && <Profile />}
               </motion.div>
