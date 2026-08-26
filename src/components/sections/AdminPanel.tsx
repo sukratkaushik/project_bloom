@@ -218,16 +218,10 @@ export const AdminPanel: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <div className="flex items-center gap-2.5">
-            <span className="text-[26px]">👑</span>
-            <h1 className="font-serif text-[clamp(24px,3.5vw,32px)] text-charcoal dark:text-white font-semibold tracking-tight">
-              Admin Suite
-            </h1>
-            <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2.5 py-0.5 text-[11px] font-bold rounded-full uppercase tracking-wider">
-              Owner Mode
-            </span>
-          </div>
-          <p className="text-medium text-[13.5px] mt-0.5">
+          <h1 className="font-serif text-[clamp(24px,3.5vw,32px)] text-charcoal dark:text-white font-semibold tracking-tight whitespace-nowrap">
+            Admin Suite
+          </h1>
+          <p className="text-medium text-[13.5px] mt-1">
             Manage user subscriptions, grant instant tier access, and review community feedbacks.
           </p>
         </div>
