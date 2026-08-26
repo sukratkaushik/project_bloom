@@ -48,8 +48,6 @@ admin.initializeApp();
 const hfApiKey = (0, params_1.defineSecret)("HUGGINGFACE_API_KEY");
 const razorpayKeyId = (0, params_1.defineSecret)("RAZORPAY_KEY_ID");
 const razorpayKeySecret = (0, params_1.defineSecret)("RAZORPAY_KEY_SECRET");
-const smtpUser = (0, params_1.defineSecret)("SMTP_USER");
-const smtpPass = (0, params_1.defineSecret)("SMTP_PASS");
 function isQueryDueDateInvalid(message) {
     const clean = message.toLowerCase();
     // 1. Check if the message contains a year 2028 or later
@@ -518,7 +516,7 @@ exports.verifyPaymentSignature = (0, https_1.onCall)({ secrets: [razorpayKeySecr
 /**
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
-exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ secrets: [smtpUser, smtpPass], region: "asia-south1" }, async (request) => {
+exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
     if (!request.auth) {
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
@@ -534,11 +532,11 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ secrets: [smtpUs
     if (!targetEmail || !planTier) {
         throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
-    const userVal = smtpUser.value() || process.env.SMTP_USER;
-    const passVal = smtpPass.value() || process.env.SMTP_PASS;
-    if (!userVal || !passVal) {
-        console.warn("SMTP credentials not configured in Firebase Secret Manager. Skipping email dispatch.");
-        return { success: false, message: "SMTP credentials not configured." };
+    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const passVal = process.env.SMTP_PASS;
+    if (!passVal) {
+        console.warn("SMTP_PASS environment variable not yet configured. Skipping live SMTP dispatch.");
+        return { success: false, message: "SMTP credentials not yet configured." };
     }
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "Expectant Mother";
     const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate Pack)" : "Standard Plan (Maternal Care Pack)";
