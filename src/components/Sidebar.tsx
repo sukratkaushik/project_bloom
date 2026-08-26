@@ -505,92 +505,93 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           )}
 
-          <div className="h-px bg-border my-4" />
-          <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
-
-          <button
-            onClick={() => setActivePage('feedback')}
-            className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:border-sage hover:bg-sage-pale/40 hover:text-sage-dark flex items-center justify-between
-              ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage-dark font-bold' : ''}`}
-          >
-            <span className="flex items-center gap-2">
-              <span className="text-[16px]">💬</span> Feedback & Support
-            </span>
-          </button>
-
-          {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
-            <button
-              onClick={() => setActivePage('admin-panel')}
-              className={`w-full mt-2 p-2.5 bg-white border border-border rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                ${activePage === 'admin-panel' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-[16px]">👑</span> Admin Suite
-              </span>
-            </button>
-          )}
+          <div className="h-px bg-border my-3" />
+          <div className="space-y-0.5">
+            <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
+            <NavItem id="feedback" icon="💬" label="Feedback & Support" hideFavorite />
+            {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
+              <NavItem id="admin-panel" icon="👑" label="Admin Suite" hideFavorite />
+            )}
+          </div>
         </>
       )}
 
-      <div className="h-px bg-border my-4" />
-
-      <button
-        onClick={toggleCalmMode}
-        className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage-dark font-bold' : 'bg-white border-border text-charcoal hover:border-sage-light'}`}
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-[16px]">🌿</span> Calm Mode
-        </span>
-        <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
-          <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isCalmModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
-        </div>
-      </button>
-
-      <button
-        onClick={() => { window.location.hash = '#setup'; }}
-        className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
-      >
-        ⚙️ Adjust Setup
-      </button>
-
-      {planTier === 'free' ? (
+      {/* Utilities Group (Calm Mode, Export PDF, Adjust Setup) */}
+      <div className="h-px bg-border my-3" />
+      <div className="space-y-1 bg-white/70 dark:bg-charcoal/20 p-2 rounded-2xl border border-border/80 shadow-2xs">
         <button
-          onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
-          className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13.5px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+          onClick={toggleCalmMode}
+          className={`w-full p-2 rounded-xl font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between ${
+            state.isCalmModeActive 
+              ? 'bg-sage-pale text-sage-dark dark:text-sage font-bold' 
+              : 'text-charcoal/85 hover:bg-black/5 dark:hover:bg-white/5'
+          }`}
         >
-          <span className="flex items-center gap-1.5">
-            <span>✨</span> Upgrade to Premium
+          <span className="flex items-center gap-2">
+            <span>🌿</span> Calm Mode
           </span>
-          <span>➜</span>
+          <div className={`w-7 h-3.5 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
+            <div className={`absolute top-[1.5px] w-2.5 h-2.5 rounded-full bg-white transition-all shadow-xs ${state.isCalmModeActive ? 'left-[15px]' : 'left-[1.5px]'}`} />
+          </div>
         </button>
-      ) : planTier === 'standard' ? (
-        <div className="w-full mt-2 p-2.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2">
-          <span>🩺</span> Standard Plan Active
-        </div>
-      ) : (
-        <div className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2">
-          <span>👑</span> AI Premium Active
-        </div>
-      )}
 
-      <button
-        onClick={() => {
-          import('../utils/pdfExport').then(module => {
-            module.exportToPDF(state);
-          });
-        }}
-        className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13.5px] font-medium text-sage-dark cursor-pointer transition-all hover:bg-sage-dark hover:text-white"
-      >
-        📄 Export Care Plan PDF
-      </button>
+        <button
+          onClick={() => {
+            import('../utils/pdfExport').then(module => {
+              module.exportToPDF(state);
+            });
+          }}
+          className="w-full p-2 rounded-xl font-sans text-[13px] font-medium text-charcoal/85 hover:text-sage-dark hover:bg-sage-pale/50 transition-all flex items-center gap-2 cursor-pointer text-left"
+        >
+          <span>📄</span>
+          <span>Export Care Plan PDF</span>
+        </button>
 
-      <button
-        onClick={handleLogout}
-        className="w-full mt-2 p-2.5 bg-white border-[1.5px] border-border rounded-[10px] font-sans text-[13.5px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
-      >
-        🚪 Log Out
-      </button>
+        <button
+          onClick={() => { window.location.hash = '#setup'; }}
+          className="w-full p-2 rounded-xl font-sans text-[13px] font-medium text-charcoal/85 hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 cursor-pointer text-left"
+        >
+          <span>⚙️</span>
+          <span>Adjust Setup</span>
+        </button>
+      </div>
+
+      {/* Membership Status & Logout Footer */}
+      <div className="pt-2 space-y-2">
+        {planTier === 'free' ? (
+          <button
+            onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+            className="w-full p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-xl font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-2xs animate-pulse"
+          >
+            <span className="flex items-center gap-1.5">
+              <span>✨</span> Upgrade to Premium
+            </span>
+            <span>➜</span>
+          </button>
+        ) : planTier === 'standard' ? (
+          <div className="p-2.5 bg-sage-pale/60 dark:bg-sage/10 border border-sage/30 rounded-xl font-sans text-[12.5px] font-semibold text-sage-dark dark:text-sage flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <span>🩺</span> Standard Plan
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-sage/20 px-2 py-0.5 rounded-full">Active</span>
+          </div>
+        ) : (
+          <div className="p-2.5 bg-gold-pale dark:bg-gold/10 border border-gold/30 rounded-xl font-sans text-[12.5px] font-bold text-gold-dark dark:text-gold flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <span>👑</span> AI Premium
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-gold/20 px-2 py-0.5 rounded-full">Active</span>
+          </div>
+        )}
+
+        <button
+          onClick={handleLogout}
+          className="w-full py-1.5 px-3 text-center rounded-xl font-sans text-[12.5px] font-medium text-critical/80 hover:text-critical hover:bg-critical-bg/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+        >
+          <span>🚪</span>
+          <span>Log Out</span>
+        </button>
+      </div>
 
     </div>
   );
