@@ -31,8 +31,6 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
           const isPast = byDate < today;
           const isDone = !!state.checked[t.id];
           
-          if (state.critFilter && !t.crit) return null;
-          
           return (
             <div 
               key={t.id}
@@ -56,10 +54,6 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
                 </div>
                 {!state.isCalmModeActive && (
                   <div className="flex gap-[7px] mt-[5px] flex-wrap items-center">
-                    <span className={`text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]
-                      ${t.crit ? 'bg-critical-bg text-critical' : 'bg-optional-bg text-optional'}`}>
-                      {t.crit ? 'Critical' : 'Optional'}
-                    </span>
                     <span className="text-[12px] text-light">{t.weeksBeforeDue} weeks before due date</span>
                     {!isDone && isPast && (
                       <span className="text-[11px] text-blush font-semibold">⚠ Past date — check if done</span>
