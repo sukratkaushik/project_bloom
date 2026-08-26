@@ -556,9 +556,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </button>
       </div>
 
-      {/* Membership Status & Logout Footer */}
+      {/* Footer & Logout */}
       <div className="pt-2 space-y-2">
-        {planTier === 'free' ? (
+        {planTier === 'free' && (
           <button
             onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
             className="w-full p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-xl font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-2xs animate-pulse"
@@ -568,25 +568,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </span>
             <span>➜</span>
           </button>
-        ) : planTier === 'standard' ? (
-          <div className="p-2.5 bg-sage-pale/60 dark:bg-sage/10 border border-sage/30 rounded-xl font-sans text-[12.5px] font-semibold text-sage-dark dark:text-sage flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <span>🩺</span> Standard Plan
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-sage/20 px-2 py-0.5 rounded-full">Active</span>
-          </div>
-        ) : (
-          <div className="p-2.5 bg-gold-pale dark:bg-gold/10 border border-gold/30 rounded-xl font-sans text-[12.5px] font-bold text-gold-dark dark:text-gold flex items-center justify-between">
-            <span className="flex items-center gap-1.5">
-              <span>👑</span> AI Premium
-            </span>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-gold/20 px-2 py-0.5 rounded-full">Active</span>
-          </div>
         )}
 
         <button
           onClick={handleLogout}
-          className="w-full py-1.5 px-3 text-center rounded-xl font-sans text-[12.5px] font-medium text-critical/80 hover:text-critical hover:bg-critical-bg/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+          className="w-full py-2 px-3 text-center rounded-xl font-sans text-[12.5px] font-semibold text-critical/80 hover:text-critical hover:bg-critical-bg/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
         >
           <span>🚪</span>
           <span>Log Out</span>

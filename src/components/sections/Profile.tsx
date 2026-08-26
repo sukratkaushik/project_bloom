@@ -90,36 +90,55 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-border">
-              <label className="block text-[12px] font-semibold tracking-wide uppercase text-light mb-1.5">Membership Plan</label>
-              <div className="flex items-center justify-between p-3.5 bg-gray-50 dark:bg-charcoal/20 border border-border rounded-[12px]">
-                <div className="flex items-center gap-2.5">
-                  {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? (
-                    <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[12px] uppercase tracking-wider border border-purple-300">
-                      👑 Admin / App Owner (Lifetime Access)
-                    </span>
-                  ) : state.planTier === 'premium' || state.isPremium ? (
-                    <span className="px-3 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-gold/30">
-                      ✨ Premium Plan Active
-                    </span>
-                  ) : state.planTier === 'standard' ? (
-                    <span className="px-3 py-1 bg-sage-pale text-sage-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-sage/30">
-                      🌿 Standard Maternal Plan Active
-                    </span>
-                  ) : (
-                    <span className="px-3 py-1 bg-gray-200 text-charcoal font-semibold rounded-full text-[12px]">
-                      Free Starter Plan
-                    </span>
+            <div className="pt-3 border-t border-border space-y-2">
+              <label className="block text-[12px] font-semibold tracking-wide uppercase text-light">Membership Plan</label>
+              
+              <div className="p-4 bg-gray-50 dark:bg-charcoal/20 border border-border rounded-2xl space-y-3">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="flex items-center gap-2">
+                    {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? (
+                      <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[12px] uppercase tracking-wider border border-purple-300">
+                        👑 Admin / App Owner (Lifetime Access)
+                      </span>
+                    ) : state.planTier === 'premium' || state.isPremium ? (
+                      <span className="px-3 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-gold/30">
+                        👑 AI Premium Active
+                      </span>
+                    ) : state.planTier === 'standard' ? (
+                      <span className="px-3 py-1 bg-sage-pale text-sage-dark font-bold rounded-full text-[12px] uppercase tracking-wider border border-sage/30">
+                        🩺 Standard Maternal Care Active
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 bg-gray-200 text-charcoal font-semibold rounded-full text-[12px]">
+                        Free Starter Plan
+                      </span>
+                    )}
+                  </div>
+
+                  {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
+                    <button
+                      onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+                      className="text-[12.5px] font-bold text-sage hover:underline cursor-pointer"
+                    >
+                      {state.planTier === 'premium' ? 'Manage Plan →' : 'Upgrade to Premium →'}
+                    </button>
                   )}
                 </div>
 
-                {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
-                  <button
-                    onClick={() => { window.location.hash = '#pricing'; }}
-                    className="text-[12px] font-bold text-sage hover:underline cursor-pointer"
-                  >
-                    View Plans →
-                  </button>
+                <p className="text-[12.5px] text-medium leading-relaxed">
+                  {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com'
+                    ? 'You have perpetual lifetime access to all 24/7 Bloom AI tools, clinical checklists, food safety scanner, and admin controls.'
+                    : state.planTier === 'premium' || state.isPremium
+                    ? 'All features unlocked: 24/7 Bloom AI prenatal assistant, smart food safety scanner, EHR medical exports, and partner sync.'
+                    : state.planTier === 'standard'
+                    ? 'Maternal care features unlocked: Government schemes, postpartum recovery guide, and partner sync.'
+                    : 'Free starter tier with core milestone checklists. Upgrade anytime for 24/7 AI prenatal guidance and smart scanner.'}
+                </p>
+
+                {state.planExpiry && !state.isAdmin && auth.currentUser?.email !== 'sukrat.kaushik@gmail.com' && (
+                  <div className="text-[11.5px] text-light pt-1 border-t border-border/50">
+                    Expires on: <strong>{new Date(state.planExpiry).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</strong>
+                  </div>
                 )}
               </div>
             </div>
