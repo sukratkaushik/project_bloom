@@ -335,8 +335,8 @@ export const AdminPanel: React.FC = () => {
                   <thead>
                     <tr className="border-b border-border bg-gray-50/70 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
                       <th className="py-3 px-4">User</th>
-                      <th className="py-3 px-4">Plan (Click to Edit)</th>
-                      <th className="py-3 px-4">Expiry / Status</th>
+                      <th className="py-3 px-4">Plan</th>
+                      <th className="py-3 px-4">Expiry</th>
                       <th className="py-3 px-4">Joined</th>
                       <th className="py-3 px-4 text-center">Admin</th>
                     </tr>
