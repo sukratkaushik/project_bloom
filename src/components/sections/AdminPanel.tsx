@@ -15,7 +15,11 @@ import {
   Check, 
   Clock, 
   Lock,
-  RefreshCw
+  RefreshCw,
+  Edit3,
+  ChevronDown,
+  UserCheck,
+  Shield
 } from 'lucide-react';
 
 interface FeedbackItem {
@@ -33,6 +37,7 @@ export const AdminPanel: React.FC = () => {
   // Users state
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [filterTier, setFilterTier] = useState<'all' | 'premium' | 'standard' | 'free' | 'admin'>('all');
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [updatingUid, setUpdatingUid] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -99,7 +104,6 @@ export const AdminPanel: React.FC = () => {
       await updateUserSubscription(selectedUser.uid, planOption, durationMonths);
       
       let emailSuccessText = "";
-      // If upgraded to standard or premium and user has email, send welcome email
       if (sendEmailNotification && selectedUser.email && (planOption === 'standard' || planOption === 'premium')) {
         try {
           const emailRes = await sendPlanChangeEmail(
@@ -109,14 +113,14 @@ export const AdminPanel: React.FC = () => {
             durationMonths
           );
           if (emailRes.success) {
-            emailSuccessText = " & email sent";
+            emailSuccessText = " & email notification sent";
           }
         } catch (e) {
           console.warn("Could not dispatch plan email:", e);
         }
       }
 
-      showToast(`Updated plan for ${selectedUser.email || selectedUser.uid} to ${planOption.toUpperCase()}${emailSuccessText}!`);
+      showToast(`Updated plan for ${selectedUser.displayName || selectedUser.email || selectedUser.uid} to ${planOption.toUpperCase()}${emailSuccessText}!`);
       
       // Update local state
       setUsers(prev => prev.map(u => {
@@ -139,14 +143,17 @@ export const AdminPanel: React.FC = () => {
   };
 
   const handleToggleAdminRole = async (targetUser: UserProfile) => {
+    const isOwner = targetUser.email === 'sukrat.kaushik@gmail.com';
+    if (isOwner) return;
+
     const newRole = targetUser.role === 'admin' ? 'user' : 'admin';
-    if (!window.confirm(`Are you sure you want to change ${targetUser.email}'s role to ${newRole.toUpperCase()}?`)) {
+    if (!window.confirm(`Are you sure you want to change ${targetUser.email || targetUser.displayName}'s role to ${newRole.toUpperCase()}?`)) {
       return;
     }
     setUpdatingUid(targetUser.uid);
     try {
       await setUserRole(targetUser.uid, newRole);
-      showToast(`Updated role for ${targetUser.email} to ${newRole.toUpperCase()}`);
+      showToast(`Updated role for ${targetUser.email || targetUser.displayName} to ${newRole.toUpperCase()}`);
       setUsers(prev => prev.map(u => u.uid === targetUser.uid ? { ...u, role: newRole } : u));
     } catch (err) {
       console.error("Failed to update role:", err);
@@ -154,6 +161,18 @@ export const AdminPanel: React.FC = () => {
     } finally {
       setUpdatingUid(null);
     }
+  };
+
+  const getInitials = (name?: string | null, email?: string | null) => {
+    if (name && name.trim()) {
+      const parts = name.trim().split(/\s+/);
+      if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+      return name.substring(0, 2).toUpperCase();
+    }
+    if (email && email.trim()) {
+      return email.substring(0, 2).toUpperCase();
+    }
+    return 'U';
   };
 
   if (!isAdmin) {
@@ -168,7 +187,23 @@ export const AdminPanel: React.FC = () => {
     );
   }
 
+  // Metric counts
+  const premiumCount = users.filter(u => u.planTier === 'premium' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com').length;
+  const standardCount = users.filter(u => u.planTier === 'standard' && u.email !== 'sukrat.kaushik@gmail.com' && u.role !== 'admin').length;
+  const freeCount = users.length - premiumCount - standardCount;
+  const adminCount = users.filter(u => u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com').length;
+
   const filteredUsers = users.filter(u => {
+    const isOwner = u.email === 'sukrat.kaushik@gmail.com';
+    const effectivePlan = isOwner ? 'premium' : (u.planTier || 'free');
+
+    // Filter by tier chips
+    if (filterTier === 'premium' && effectivePlan !== 'premium') return false;
+    if (filterTier === 'standard' && effectivePlan !== 'standard') return false;
+    if (filterTier === 'free' && effectivePlan !== 'free') return false;
+    if (filterTier === 'admin' && u.role !== 'admin' && !isOwner) return false;
+
+    // Filter by search query
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -178,51 +213,47 @@ export const AdminPanel: React.FC = () => {
     );
   });
 
-  const premiumCount = users.filter(u => u.planTier === 'premium' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com').length;
-  const standardCount = users.filter(u => u.planTier === 'standard').length;
-  const freeCount = users.length - premiumCount - standardCount;
-
   return (
-    <div className="animate-in fade-in duration-300 max-w-5xl space-y-6">
+    <div className="animate-in fade-in duration-300 max-w-5xl space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <div className="flex items-center gap-3">
-            <span className="text-[28px]">👑</span>
-            <h1 className="font-serif text-[clamp(26px,4vw,36px)] text-charcoal font-semibold tracking-tight">
+          <div className="flex items-center gap-2.5">
+            <span className="text-[26px]">👑</span>
+            <h1 className="font-serif text-[clamp(24px,3.5vw,32px)] text-charcoal dark:text-white font-semibold tracking-tight">
               Admin Suite
             </h1>
-            <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-3 py-1 text-[11px] font-bold rounded-full uppercase tracking-wider">
+            <span className="bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 px-2.5 py-0.5 text-[11px] font-bold rounded-full uppercase tracking-wider">
               Owner Mode
             </span>
           </div>
-          <p className="text-medium text-[14px] mt-1">
-            Manage user subscriptions, grant tier access, and review community feedbacks.
+          <p className="text-medium text-[13.5px] mt-0.5">
+            Manage user subscriptions, grant instant tier access, and review community feedbacks.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex bg-gray-100 dark:bg-charcoal/40 p-1 rounded-xl border border-border">
+        <div className="flex bg-gray-100 dark:bg-charcoal/40 p-1 rounded-xl border border-border shrink-0 self-start sm:self-auto">
           <button
             onClick={() => setActiveTab('users')}
-            className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'users'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-sm'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
                 : 'text-medium hover:text-charcoal'
             }`}
           >
-            <Users className="w-4 h-4" />
+            <Users className="w-3.5 h-3.5" />
             <span>Users & Plans ({users.length})</span>
           </button>
           <button
             onClick={() => setActiveTab('feedbacks')}
-            className={`flex items-center gap-2 px-4 py-2 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
               activeTab === 'feedbacks'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-sm'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
                 : 'text-medium hover:text-charcoal'
             }`}
           >
-            <MessageSquare className="w-4 h-4" />
+            <MessageSquare className="w-3.5 h-3.5" />
             <span>Feedbacks ({feedbacks.length})</span>
           </button>
         </div>
@@ -231,76 +262,89 @@ export const AdminPanel: React.FC = () => {
       {/* Toast Notification */}
       {toastMsg && (
         <div className="fixed bottom-8 right-8 z-[200] bg-charcoal text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 text-sm font-semibold animate-in slide-in-from-bottom-5 border border-white/20">
-          <CheckCircle className="w-5 h-5 text-sage" />
+          <CheckCircle className="w-5 h-5 text-sage shrink-0" />
           <span>{toastMsg}</span>
         </div>
       )}
 
       {/* TAB 1: USERS & PLANS */}
       {activeTab === 'users' && (
-        <div className="space-y-6">
-          {/* Quick Metrics */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-border shadow-xs flex flex-col">
-              <span className="text-light text-[12px] uppercase font-bold tracking-wider">Total Users</span>
-              <span className="text-2xl font-serif text-charcoal dark:text-white font-bold mt-1">{users.length}</span>
-            </div>
-            <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-gold/30 shadow-xs flex flex-col">
-              <span className="text-gold text-[12px] uppercase font-bold tracking-wider flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5" /> Premium
-              </span>
-              <span className="text-2xl font-serif text-charcoal dark:text-white font-bold mt-1">{premiumCount}</span>
-            </div>
-            <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-sage/30 shadow-xs flex flex-col">
-              <span className="text-sage text-[12px] uppercase font-bold tracking-wider">Standard</span>
-              <span className="text-2xl font-serif text-charcoal dark:text-white font-bold mt-1">{standardCount}</span>
-            </div>
-            <div className="bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-border shadow-xs flex flex-col">
-              <span className="text-medium text-[12px] uppercase font-bold tracking-wider">Free Starter</span>
-              <span className="text-2xl font-serif text-charcoal dark:text-white font-bold mt-1">{freeCount}</span>
-            </div>
-          </div>
-
-          {/* Search & Actions Bar */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-white dark:bg-[#1E293B] p-4 rounded-2xl border border-border">
-            <div className="relative w-full sm:w-80">
-              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-light" />
-              <input
-                type="text"
-                placeholder="Search user by email or name..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-cream dark:bg-[#0F172A] border border-border rounded-xl text-sm focus:outline-none focus:border-sage"
-              />
+        <div className="space-y-4">
+          {/* Quick Filter Chips & Refresh */}
+          <div className="flex flex-wrap items-center justify-between gap-2.5">
+            <div className="flex flex-wrap items-center gap-1.5">
+              {[
+                { key: 'all', label: `All (${users.length})` },
+                { key: 'premium', label: `✨ Premium (${premiumCount})` },
+                { key: 'standard', label: `🌿 Standard (${standardCount})` },
+                { key: 'free', label: `Free (${freeCount})` },
+                { key: 'admin', label: `👑 Admins (${adminCount})` },
+              ].map((chip) => (
+                <button
+                  key={chip.key}
+                  onClick={() => setFilterTier(chip.key as any)}
+                  className={`px-3 py-1 text-[12px] font-bold rounded-full transition-all cursor-pointer ${
+                    filterTier === chip.key
+                      ? 'bg-charcoal text-white dark:bg-white dark:text-charcoal shadow-xs'
+                      : 'bg-white dark:bg-[#1E293B] text-medium hover:text-charcoal dark:hover:text-white border border-border'
+                  }`}
+                >
+                  {chip.label}
+                </button>
+              ))}
             </div>
 
             <button
               onClick={fetchUsers}
               disabled={loadingUsers}
-              className="flex items-center gap-2 px-4 py-2 text-[13px] font-semibold bg-cream dark:bg-[#0F172A] hover:bg-gray-100 border border-border rounded-xl text-charcoal dark:text-white cursor-pointer transition-all disabled:opacity-50"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] hover:bg-gray-50 border border-border rounded-xl text-charcoal dark:text-white cursor-pointer transition-all disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${loadingUsers ? 'animate-spin' : ''}`} />
-              <span>Refresh List</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
+              <span>Refresh</span>
             </button>
+          </div>
+
+          {/* Search Box */}
+          <div className="relative w-full">
+            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-light pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search user by email or name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-[#1E293B] border border-border rounded-xl text-sm focus:outline-none focus:border-sage shadow-xs"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-light hover:text-charcoal text-sm cursor-pointer"
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {/* Users Table */}
           <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-border shadow-xs overflow-hidden">
             {loadingUsers ? (
-              <div className="p-12 text-center text-medium">Loading user database...</div>
+              <div className="p-12 text-center text-medium flex flex-col items-center gap-2">
+                <RefreshCw className="w-5 h-5 animate-spin text-sage" />
+                <span>Loading users database...</span>
+              </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="p-12 text-center text-medium">No users found matching "{searchQuery}".</div>
+              <div className="p-12 text-center text-medium">
+                No users found {searchQuery ? `matching "${searchQuery}"` : 'in this category'}.
+              </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-[13px] border-collapse">
                   <thead>
-                    <tr className="border-b border-border bg-gray-50/50 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
-                      <th className="py-3.5 px-4">User</th>
-                      <th className="py-3.5 px-4">Role</th>
-                      <th className="py-3.5 px-4">Plan Tier</th>
-                      <th className="py-3.5 px-4">Expiry</th>
-                      <th className="py-3.5 px-4">Joined</th>
-                      <th className="py-3.5 px-4 text-right">Actions</th>
+                    <tr className="border-b border-border bg-gray-50/70 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
+                      <th className="py-3 px-4">User</th>
+                      <th className="py-3 px-4">Plan (Click to Edit)</th>
+                      <th className="py-3 px-4">Expiry / Status</th>
+                      <th className="py-3 px-4">Joined</th>
+                      <th className="py-3 px-4 text-center">Admin</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -308,88 +352,105 @@ export const AdminPanel: React.FC = () => {
                       const isOwnerUser = user.email === 'sukrat.kaushik@gmail.com';
                       const effectivePlan = isOwnerUser ? 'premium' : (user.planTier || 'free');
                       const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
+                      const initials = getInitials(user.displayName, user.email);
 
                       return (
-                        <tr key={user.uid} className="hover:bg-cream/50 dark:hover:bg-white/5 transition-colors">
-                          <td className="py-3.5 px-4">
-                            <div className="flex flex-col">
-                              <span className="font-bold text-charcoal dark:text-white">
-                                {user.displayName || 'Unnamed User'}
-                              </span>
-                              <span className="text-light text-[12px]">{user.email || user.uid}</span>
+                        <tr key={user.uid} className="hover:bg-cream/50 dark:hover:bg-white/5 transition-colors group">
+                          {/* User Details */}
+                          <td className="py-3 px-4">
+                            <div className="flex items-center gap-2.5">
+                              {/* Avatar monogram */}
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                                isOwnerUser || user.role === 'admin'
+                                  ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                                  : effectivePlan === 'premium'
+                                  ? 'bg-gold-pale text-gold-dark border border-gold/30'
+                                  : effectivePlan === 'standard'
+                                  ? 'bg-sage-pale text-sage-dark border border-sage/30'
+                                  : 'bg-gray-100 dark:bg-charcoal/30 text-charcoal/80 dark:text-white/80'
+                              }`}>
+                                {initials}
+                              </div>
+
+                              <div className="flex flex-col min-w-0">
+                                <span className="font-bold text-charcoal dark:text-white truncate max-w-[160px] sm:max-w-[200px]" title={user.displayName || ''}>
+                                  {user.displayName || 'Unnamed User'}
+                                </span>
+                                <span className="text-light text-[11.5px] truncate max-w-[160px] sm:max-w-[200px]" title={user.email || user.uid}>
+                                  {user.email || user.uid}
+                                </span>
+                              </div>
                             </div>
                           </td>
 
-                          <td className="py-3.5 px-4">
-                            {user.role === 'admin' || isOwnerUser ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-700 border border-purple-300">
-                                👑 Admin
-                              </span>
-                            ) : (
-                              <span className="text-medium text-[12px]">User</span>
-                            )}
+                          {/* Plan Tier Pill (Interactive Clickable Badge) */}
+                          <td className="py-3 px-4">
+                            <button
+                              onClick={() => {
+                                setSelectedUser(user);
+                                setPlanOption((user.planTier as any) || 'premium');
+                                setDurationMonths(user.planExpiry ? 3 : null);
+                              }}
+                              title="Click to change plan"
+                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold cursor-pointer transition-all shadow-2xs hover:scale-105 active:scale-95 ${
+                                effectivePlan === 'premium'
+                                  ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
+                                  : effectivePlan === 'standard'
+                                  ? 'bg-sage-pale text-sage-dark border border-sage/40 hover:bg-sage/20'
+                                  : 'bg-gray-100 dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-gray-400'
+                              }`}
+                            >
+                              {effectivePlan === 'premium' && <Sparkles className="w-3 h-3 text-gold-dark" />}
+                              {effectivePlan === 'standard' && <span>🌿</span>}
+                              <span>{effectivePlan === 'premium' ? 'Premium' : effectivePlan === 'standard' ? 'Standard' : 'Free'}</span>
+                              <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                            </button>
                           </td>
 
-                          <td className="py-3.5 px-4">
-                            {effectivePlan === 'premium' ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gold-pale text-gold-dark border border-gold/30">
-                                <Sparkles className="w-3 h-3" /> Premium
-                              </span>
-                            ) : effectivePlan === 'standard' ? (
-                              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-sage-pale text-sage-dark border border-sage/30">
-                                Standard
-                              </span>
-                            ) : (
-                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-charcoal/70">
-                                Free
-                              </span>
-                            )}
-                          </td>
-
-                          <td className="py-3.5 px-4 text-medium text-[12px]">
+                          {/* Expiry / Status */}
+                          <td className="py-3 px-4 text-medium text-[12px]">
                             {isOwnerUser ? (
-                              <span className="text-sage-dark font-medium">Lifetime (Owner)</span>
+                              <span className="text-sage-dark dark:text-sage font-semibold">Lifetime (Owner)</span>
                             ) : user.planExpiry ? (
                               isExpired ? (
-                                <span className="text-critical font-medium">Expired</span>
+                                <span className="text-critical font-semibold">Expired</span>
                               ) : (
-                                <span>{new Date(user.planExpiry).toLocaleDateString()}</span>
+                                <span className="font-medium text-charcoal/80 dark:text-white/80">
+                                  {new Date(user.planExpiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                </span>
                               )
                             ) : effectivePlan !== 'free' ? (
-                              <span className="text-sage-dark font-medium">Lifetime</span>
+                              <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
                             ) : (
                               <span className="text-light">—</span>
                             )}
                           </td>
 
-                          <td className="py-3.5 px-4 text-light text-[12px]">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                          {/* Joined Date */}
+                          <td className="py-3 px-4 text-light text-[12px]">
+                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
                           </td>
 
-                          <td className="py-3.5 px-4 text-right">
-                            <div className="flex items-center justify-end gap-2">
+                          {/* Admin Role Toggle Icon */}
+                          <td className="py-3 px-4 text-center">
+                            {isOwnerUser ? (
+                              <span title="Primary Owner" className="text-purple-600 text-[16px] cursor-default">
+                                👑
+                              </span>
+                            ) : (
                               <button
-                                onClick={() => {
-                                  setSelectedUser(user);
-                                  setPlanOption((user.planTier as any) || 'premium');
-                                }}
+                                onClick={() => handleToggleAdminRole(user)}
                                 disabled={updatingUid === user.uid}
-                                className="px-3 py-1.5 bg-sage hover:bg-sage-dark text-white rounded-lg text-[12px] font-bold shadow-xs cursor-pointer transition-colors"
+                                title={user.role === 'admin' ? "Admin active (Click to revoke)" : "Click to grant Admin privileges"}
+                                className={`p-1.5 rounded-lg text-[14px] cursor-pointer transition-all ${
+                                  user.role === 'admin'
+                                    ? 'bg-purple-100 text-purple-700 border border-purple-300 shadow-2xs hover:bg-purple-200'
+                                    : 'opacity-30 hover:opacity-100 hover:bg-purple-50 text-purple-700'
+                                }`}
                               >
-                                Change Plan
+                                👑
                               </button>
-
-                              {!isOwnerUser && (
-                                <button
-                                  onClick={() => handleToggleAdminRole(user)}
-                                  disabled={updatingUid === user.uid}
-                                  title="Toggle Admin role"
-                                  className="p-1.5 hover:bg-purple-100 rounded-lg text-purple-700 cursor-pointer transition-colors"
-                                >
-                                  👑
-                                </button>
-                              )}
-                            </div>
+                            )}
                           </td>
                         </tr>
                       );
@@ -406,19 +467,22 @@ export const AdminPanel: React.FC = () => {
       {activeTab === 'feedbacks' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-serif text-xl text-charcoal dark:text-white">User Feedback & Inquiries</h3>
+            <h3 className="font-serif text-lg text-charcoal dark:text-white font-semibold">User Feedback & Inquiries</h3>
             <button
               onClick={fetchFeedbacks}
               disabled={loadingFeedbacks}
-              className="flex items-center gap-2 px-3.5 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] border border-border rounded-xl text-charcoal dark:text-white cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] border border-border rounded-xl text-charcoal dark:text-white cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${loadingFeedbacks ? 'animate-spin' : ''}`} />
-              <span>Refresh Feedbacks</span>
+              <span>Refresh</span>
             </button>
           </div>
 
           {loadingFeedbacks ? (
-            <div className="p-8 text-center text-medium">Loading feedbacks...</div>
+            <div className="p-8 text-center text-medium flex items-center justify-center gap-2">
+              <RefreshCw className="w-4 h-4 animate-spin text-sage" />
+              <span>Loading feedbacks...</span>
+            </div>
           ) : feedbacks.length === 0 ? (
             <div className="p-8 text-center text-medium bg-white dark:bg-[#1E293B] border border-border rounded-2xl">
               No feedbacks submitted yet.
@@ -426,10 +490,10 @@ export const AdminPanel: React.FC = () => {
           ) : (
             <div className="space-y-3">
               {feedbacks.map((item) => (
-                <div key={item.id} className="p-5 bg-white dark:bg-[#1E293B] border border-border rounded-2xl shadow-xs space-y-2">
+                <div key={item.id} className="p-4 bg-white dark:bg-[#1E293B] border border-border rounded-2xl shadow-2xs space-y-2">
                   <div className="flex items-center justify-between flex-wrap gap-2">
                     <div className="flex items-center gap-2">
-                      <span className={`px-2.5 py-0.5 text-[11px] font-bold rounded-md uppercase tracking-wider ${
+                      <span className={`px-2 py-0.5 text-[11px] font-bold rounded-md uppercase tracking-wider ${
                         item.type === 'bug' ? 'bg-amber-100 text-amber-800' :
                         item.type === 'feature' ? 'bg-sage-pale text-sage-dark' :
                         'bg-blue-50 text-blue-700'
@@ -439,10 +503,10 @@ export const AdminPanel: React.FC = () => {
                       <span className="text-[13px] font-semibold text-charcoal dark:text-white">{item.userEmail}</span>
                     </div>
                     <span className="text-[11.5px] text-light">
-                      {new Date(item.createdAt).toLocaleString()}
+                      {new Date(item.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                     </span>
                   </div>
-                  <div className="text-[14px] text-charcoal/90 dark:text-white/90 leading-relaxed whitespace-pre-wrap">
+                  <div className="text-[13.5px] text-charcoal/90 dark:text-white/90 leading-relaxed whitespace-pre-wrap">
                     {item.message}
                   </div>
                 </div>
@@ -455,17 +519,17 @@ export const AdminPanel: React.FC = () => {
       {/* PLAN CHANGE MODAL */}
       {selectedUser && (
         <div className="fixed inset-0 z-[150] bg-charcoal/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-border space-y-6 animate-in zoom-in-95">
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-border space-y-5 animate-in zoom-in-95">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-serif text-2xl text-charcoal dark:text-white font-bold">Assign Subscription Plan</h3>
-                <p className="text-light text-[13px] mt-0.5">
+                <h3 className="font-serif text-2xl text-charcoal dark:text-white font-bold">Assign Subscription</h3>
+                <p className="text-light text-[13px] mt-0.5 truncate max-w-[280px]">
                   {selectedUser.displayName || 'User'} ({selectedUser.email || selectedUser.uid})
                 </p>
               </div>
               <button
                 onClick={() => setSelectedUser(null)}
-                className="p-1 text-light hover:text-charcoal cursor-pointer text-lg"
+                className="p-1 text-light hover:text-charcoal dark:hover:text-white cursor-pointer text-lg"
               >
                 ✕
               </button>
@@ -473,14 +537,14 @@ export const AdminPanel: React.FC = () => {
 
             {/* Select Plan Tier */}
             <div className="space-y-2">
-              <label className="text-[12px] font-bold text-light uppercase tracking-wider">Select Tier</label>
+              <label className="text-[11px] font-bold text-light uppercase tracking-wider">Select Tier</label>
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setPlanOption('free')}
                   className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                     planOption === 'free'
-                      ? 'border-charcoal bg-gray-100 dark:bg-white/10 font-bold'
+                      ? 'border-charcoal dark:border-white bg-gray-100 dark:bg-white/10 font-bold'
                       : 'border-border hover:border-gray-300'
                   }`}
                 >
@@ -496,7 +560,7 @@ export const AdminPanel: React.FC = () => {
                       : 'border-border hover:border-sage'
                   }`}
                 >
-                  <span className="text-[13px] block">Standard</span>
+                  <span className="text-[13px] block">🌿 Standard</span>
                 </button>
 
                 <button
@@ -508,7 +572,7 @@ export const AdminPanel: React.FC = () => {
                       : 'border-border hover:border-gold'
                   }`}
                 >
-                  <span className="text-[13px] block">👑 Premium</span>
+                  <span className="text-[13px] block">✨ Premium</span>
                 </button>
               </div>
             </div>
@@ -516,7 +580,7 @@ export const AdminPanel: React.FC = () => {
             {/* Select Duration */}
             {planOption !== 'free' && (
               <div className="space-y-2">
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider">Duration</label>
+                <label className="text-[11px] font-bold text-light uppercase tracking-wider">Duration</label>
                 <div className="grid grid-cols-3 gap-2 text-[12px]">
                   {[
                     { label: '1 Month', val: 1 },
@@ -551,9 +615,9 @@ export const AdminPanel: React.FC = () => {
                   onChange={(e) => setSendEmailNotification(e.target.checked)}
                   className="w-4 h-4 rounded text-sage focus:ring-sage"
                 />
-                <span className="flex items-center gap-1.5 font-medium">
-                  <Mail className="w-3.5 h-3.5 text-sage" />
-                  <span>Send warm invitation email to <strong>{selectedUser.email}</strong></span>
+                <span className="flex items-center gap-1.5 font-medium truncate">
+                  <Mail className="w-3.5 h-3.5 text-sage shrink-0" />
+                  <span className="truncate">Send warm invitation email to <strong>{selectedUser.email}</strong></span>
                 </span>
               </label>
             )}
