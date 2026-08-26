@@ -175,6 +175,16 @@ export const AdminPanel: React.FC = () => {
     return 'U';
   };
 
+  const formatDateDDMMYY = (timestamp?: number | null): string => {
+    if (!timestamp) return '—';
+    const d = new Date(timestamp);
+    if (isNaN(d.getTime())) return '—';
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = String(d.getFullYear()).slice(-2);
+    return `${day}/${month}/${year}`;
+  };
+
   if (!isAdmin) {
     return (
       <div className="p-8 bg-critical-bg border border-critical/30 rounded-2xl text-critical flex items-center gap-4">
@@ -401,8 +411,8 @@ export const AdminPanel: React.FC = () => {
                             </button>
                           </td>
 
-                          {/* Expiry / Status */}
-                          <td className="py-3 px-4 text-medium text-[12px]">
+                          {/* Expiry */}
+                          <td className="py-3 px-4 text-medium text-[12px] whitespace-nowrap">
                             {isOwnerUser ? (
                               <span className="text-sage-dark dark:text-sage font-semibold">Lifetime (Owner)</span>
                             ) : user.planExpiry ? (
@@ -410,7 +420,7 @@ export const AdminPanel: React.FC = () => {
                                 <span className="text-critical font-semibold">Expired</span>
                               ) : (
                                 <span className="font-medium text-charcoal/80 dark:text-white/80">
-                                  {new Date(user.planExpiry).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })}
+                                  {formatDateDDMMYY(user.planExpiry)}
                                 </span>
                               )
                             ) : effectivePlan !== 'free' ? (
@@ -421,8 +431,8 @@ export const AdminPanel: React.FC = () => {
                           </td>
 
                           {/* Joined Date */}
-                          <td className="py-3 px-4 text-light text-[12px]">
-                            {user.createdAt ? new Date(user.createdAt).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' }) : 'N/A'}
+                          <td className="py-3 px-4 text-light text-[12px] whitespace-nowrap">
+                            {formatDateDDMMYY(user.createdAt)}
                           </td>
 
                           {/* Admin Role Toggle Icon */}
