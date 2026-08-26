@@ -147,7 +147,7 @@ export const Dashboard: React.FC = () => {
         </div>
 
         {/* Right Main Content Panel (Independent scroll) */}
-        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 md:h-full md:overflow-y-auto overscroll-contain pb-[100px] md:pb-16 custom-scrollbar flex flex-col">
+        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 md:h-full md:overflow-y-auto overscroll-contain pb-[100px] md:pb-16 custom-scrollbar flex flex-col outline-none focus:outline-none">
           <div className="flex-1">
             <AnimatePresence mode="wait">
               <motion.div
