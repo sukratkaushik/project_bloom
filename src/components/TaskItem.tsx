@@ -12,12 +12,6 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
   
   const isDone = !!state.checked[task.id];
   const isAssigned = !!state.assigned[task.id];
-  const assigneeNote = state.assigneeNotes[task.id] || '';
-  
-  if (state.critFilter && !task.crit) {
-    return null;
-  }
-
   // Hide partner tag if solo
   const isPartnerTask = task.partner && state.partnerSit !== 'solo';
   const canAssign = state.partnerSit !== 'solo';
@@ -37,13 +31,8 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
         <div className={`text-[14px] leading-[1.45] ${isDone ? 'line-through text-light' : 'text-charcoal'}`}>
           {task.text}
         </div>
-        {!state.isCalmModeActive && (
+        {!state.isCalmModeActive && (task.timing || isPartnerTask) && (
           <div className="flex items-center gap-[7px] mt-[5px] flex-wrap">
-            <span className={`text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]
-              ${task.crit ? 'bg-critical-bg text-critical' : 'bg-optional-bg text-optional'}`}>
-              {task.crit ? 'Critical' : 'Nice to have'}
-            </span>
-            
             {task.timing && (
               <span className="bg-gold-pale text-gold text-[11px] px-2 py-0.5 rounded-[10px] italic">
                 ⏰ {task.timing}

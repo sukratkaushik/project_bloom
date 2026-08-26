@@ -93,13 +93,6 @@ export const Header: React.FC<HeaderProps> = ({
               </div>
             )}
             <button
-              onClick={() => updateState({ critFilter: !state.critFilter })}
-              className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
-                ${state.critFilter ? 'border-critical text-critical bg-critical-bg' : 'border-border text-medium bg-transparent hover:border-sage-light'}`}
-            >
-              {state.critFilter ? '✓ Critical only' : 'Critical only'}
-            </button>
-            <button
               onClick={toggleDarkMode}
               className={`px-3 py-1.5 border-[1.5px] rounded-[20px] font-sans text-[12px] font-medium transition-all whitespace-nowrap
                 ${state.isDarkModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10 font-semibold' : 'border-border text-medium bg-transparent hover:border-charcoal'}`}
