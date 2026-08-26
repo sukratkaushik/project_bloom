@@ -550,19 +550,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       </button>
 
       <button
-        onClick={toggleDarkMode}
-        className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
-          ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage-dark font-bold' : 'bg-white border-border text-charcoal hover:border-charcoal'}`}
-      >
-        <span className="flex items-center gap-2">
-          <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
-        </span>
-        <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isDarkModeActive ? 'bg-sage' : 'bg-border'}`}>
-          <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isDarkModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
-        </div>
-      </button>
-
-      <button
         onClick={() => { window.location.hash = '#setup'; }}
         className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
       >
