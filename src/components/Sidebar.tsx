@@ -16,7 +16,7 @@ type SidebarProps = {
 const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   daily: {
     label: "Tracking",
-    items: ['kickcounter', 'contractions', 'vitals', 'mood', 'hydration', 'nutrition', 'symptoms']
+    items: ['kickcounter', 'contractions', 'vitals', 'mood', 'hydration', 'nutrition', 'symptoms', 'partnersync', 'notes']
   },
   smart: {
     label: "Smart Tools",
@@ -506,8 +506,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           )}
 
           <div className="h-px bg-border my-4" />
-          <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
-          <NavItem id="notes" icon="📝" label="Notes & Journal" />
           <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
 
           <button
