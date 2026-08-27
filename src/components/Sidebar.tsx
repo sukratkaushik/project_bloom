@@ -508,18 +508,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           )}
 
-          <div className="h-px bg-border my-3" />
-          <div className="space-y-0.5">
-            <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
-            <NavItem id="feedback" icon="💬" label="Feedback & Support" hideFavorite />
-            {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
-              <NavItem id="admin-panel" icon="👑" label="Admin Suite" hideFavorite />
-            )}
-          </div>
         </>
       )}
 
-      {/* Utilities Group (Calm Mode, Export PDF, Adjust Setup) */}
+      {/* Utilities Group (Calm Mode, Export PDF) */}
       <div className="h-px bg-border my-3" />
       <div className="space-y-1 bg-white/70 dark:bg-charcoal/20 p-2 rounded-2xl border border-border/80 shadow-2xs">
         <button
@@ -548,14 +540,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         >
           <span>📄</span>
           <span>Export Care Plan PDF</span>
-        </button>
-
-        <button
-          onClick={() => { navigate('/setup'); }}
-          className="w-full p-2 rounded-xl font-sans text-[13px] font-medium text-charcoal/85 hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 cursor-pointer text-left"
-        >
-          <span>⚙️</span>
-          <span>Adjust Setup</span>
         </button>
       </div>
 
