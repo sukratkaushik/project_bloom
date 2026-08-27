@@ -184,8 +184,8 @@ export const BirthPlanBuilder: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-[1fr_400px] gap-8 animate-in fade-in duration-300">
-      <div className="no-print space-y-6">
+    <div className="flex flex-col lg:flex-row gap-8 items-start animate-in fade-in duration-300 w-full max-w-full overflow-x-hidden">
+      <div className="flex-1 w-full min-w-0 no-print space-y-6">
         <div className="flex items-start justify-between gap-4 mb-2 flex-wrap">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
@@ -401,8 +401,8 @@ export const BirthPlanBuilder: React.FC = () => {
       </div>
 
       {/* Live Preview Panel (also used for Print) */}
-      <div className="print-visible xl:sticky xl:top-[80px] self-start w-full">
-        <div className="bg-white border-[1.5px] border-border/70 rounded-[20px] shadow-sm p-8 print:border-none print:shadow-none print:p-0">
+      <div className="print-visible lg:sticky lg:top-[100px] self-start w-full lg:w-[400px] xl:w-[450px] shrink-0 max-w-full">
+        <div className="bg-white border-[1.5px] border-border/70 rounded-[20px] shadow-sm p-6 lg:p-8 print:border-none print:shadow-none print:p-0 overflow-hidden">
           
           {/* Beautiful Elegant Botanical Crest */}
           <div className="flex flex-col items-center justify-center mb-6 text-sage/80">
