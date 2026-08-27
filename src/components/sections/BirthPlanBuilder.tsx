@@ -128,26 +128,24 @@ export const BirthPlanBuilder: React.FC = () => {
   };
 
   const CheckboxGroup = ({ options, fieldKey }: { options: string[], fieldKey: keyof BirthPlan }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 mb-4">
+    <div className="flex flex-wrap gap-[8px] mt-3 mb-5">
       {options.map(opt => {
         const isChecked = ((plan[fieldKey] as string[]) || []).includes(opt);
         return (
           <button 
             key={opt}
             onClick={() => toggleArrayItem(fieldKey, opt)}
-            className={`flex items-center gap-3 text-left p-3.5 rounded-[14px] border transition-all duration-300 cursor-pointer
+            className={`inline-flex items-center gap-2 p-[8px_16px] border-[1.5px] rounded-[24px] text-[13px] transition-all select-none cursor-pointer
               ${isChecked 
-                ? 'bg-sage-pale/40 border-sage/60 dark:bg-sage/10 text-sage-dark font-bold' 
-                : 'bg-transparent border-border/60 text-charcoal/80 hover:border-sage-light hover:bg-sage-pale/5'}`}
+                ? 'border-sage bg-sage-pale/40 text-sage-dark font-semibold shadow-sm' 
+                : 'border-border/80 bg-white text-charcoal/80 hover:border-sage-light hover:bg-sage-pale/10'}`}
           >
-            <div className={`w-5 h-5 rounded-[6px] border flex items-center justify-center shrink-0 transition-all duration-300
-              ${isChecked 
-                ? 'bg-sage border-sage text-white' 
-                : 'border-light/65 bg-white'}`}
+            <div className={`w-4 h-4 rounded-[4px] border flex items-center justify-center shrink-0 transition-all duration-300
+              ${isChecked ? 'bg-sage border-sage text-white' : 'border-light/65 bg-white'}`}
             >
-              {isChecked && <Check className="w-3.5 h-3.5 stroke-[3px]" />}
+              {isChecked && <Check className="w-3 h-3 stroke-[3px]" />}
             </div>
-            <span className="text-[13.5px] font-sans font-bold leading-snug">{opt}</span>
+            <span>{opt}</span>
           </button>
         )
       })}
@@ -155,26 +153,24 @@ export const BirthPlanBuilder: React.FC = () => {
   );
 
   const RadioGroup = ({ options, fieldKey }: { options: string[], fieldKey: keyof BirthPlan }) => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 mb-4">
+    <div className="flex flex-wrap gap-[8px] mt-3 mb-5">
       {options.map(opt => {
         const isChecked = plan[fieldKey] === opt;
         return (
           <button 
             key={opt}
             onClick={() => updateField(fieldKey, opt)}
-            className={`flex items-center gap-3 text-left p-3.5 rounded-[14px] border transition-all duration-300 cursor-pointer
+            className={`inline-flex items-center gap-2 p-[8px_16px] border-[1.5px] rounded-[24px] text-[13px] transition-all select-none cursor-pointer
               ${isChecked 
-                ? 'bg-sage-pale/40 border-sage/60 dark:bg-sage/10 text-sage-dark font-bold' 
-                : 'bg-transparent border-border/60 text-charcoal/80 hover:border-sage-light hover:bg-sage-pale/5'}`}
+                ? 'border-sage bg-sage-pale/40 text-sage-dark font-semibold shadow-sm' 
+                : 'border-border/80 bg-white text-charcoal/80 hover:border-sage-light hover:bg-sage-pale/10'}`}
           >
-            <div className={`w-5 h-5 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300
-              ${isChecked 
-                ? 'border-sage bg-white' 
-                : 'border-light/65 bg-white'}`}
+            <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 transition-all duration-300
+              ${isChecked ? 'border-sage bg-white' : 'border-light/65 bg-white'}`}
             >
-              {isChecked && <div className="w-2.5 h-2.5 rounded-full bg-sage animate-in zoom-in duration-200" />}
+              {isChecked && <div className="w-2 h-2 rounded-full bg-sage animate-in zoom-in duration-200" />}
             </div>
-            <span className="text-[13.5px] font-sans font-bold leading-snug">{opt}</span>
+            <span>{opt}</span>
           </button>
         )
       })}
@@ -280,7 +276,7 @@ export const BirthPlanBuilder: React.FC = () => {
             icon={Compass}
           >
             <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-2 mb-1.5">Environment</h4>
-            <CheckboxGroup options={['Hospital room', 'Birth centre', 'Home birth']} fieldKey="environment" />
+            <CheckboxGroup options={['Public hospital', 'Private hospital', 'Birth centre', 'Home birth', 'Undecided']} fieldKey="environment" />
             
             <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-4 mb-1.5">Atmosphere</h4>
             <CheckboxGroup options={['Dimmed lights', 'Quiet environment', 'Music allowed', 'Own clothes']} fieldKey="atmosphere" />
@@ -289,7 +285,7 @@ export const BirthPlanBuilder: React.FC = () => {
             <CheckboxGroup options={['Free to move', 'Birthing ball', 'Water immersion']} fieldKey="movement" />
             
             <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-4 mb-1.5">Who is present</h4>
-            <CheckboxGroup options={['Partner', 'Mother/Mother-in-law', 'Doula', 'No visitors during active labour']} fieldKey="present" />
+            <CheckboxGroup options={['Partner only', 'Partner + doula', 'Partner + family member', 'Solo / midwife-led']} fieldKey="present" />
 
             <div className="mt-5">
               <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Cultural or religious customs during labour</label>
@@ -310,7 +306,7 @@ export const BirthPlanBuilder: React.FC = () => {
             icon={HeartPulse}
           >
             <CheckboxGroup 
-              options={['Epidural', 'Gas and air', 'Pethidine/opioids', 'Water/hydrotherapy', 'TENS machine', 'Massage', 'Hypnobirthing', 'No pain relief unless I request it']} 
+              options={['Epidural available', 'Gas and air (Entonox)', 'Pethidine/opioids', 'Water/hydrotherapy', 'TENS machine', 'Massage / Hypnobirthing', 'Natural / low-intervention', 'Open to all options']} 
               fieldKey="painRelief" 
             />
             <div className="mt-5">
@@ -350,17 +346,19 @@ export const BirthPlanBuilder: React.FC = () => {
             num={5} 
             icon={Baby}
           >
-            <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-2 mb-1.5">Cord Clamping</h4>
-            <RadioGroup options={['Immediate', 'Delayed (≥1 minute)', 'Until cord stops pulsing']} fieldKey="cordClamping" />
+            <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-2 mb-1">Cord Clamping</h4>
+            <p className="text-[12px] text-medium mb-1.5 leading-snug">Delayed cord clamping (1–3 minutes) allows more blood to transfer to baby and is widely recommended.</p>
+            <RadioGroup options={['Delayed clamping (preferred)', 'Immediate clamping', 'Partner to cut cord', 'Care team decides']} fieldKey="cordClamping" />
 
-            <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-5 mb-1.5">Skin-to-Skin Contact</h4>
-            <RadioGroup options={['Immediate', 'After baby is cleaned and weighed', 'No preference']} fieldKey="skinToSkin" />
+            <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-5 mb-1">Skin-to-Skin Contact</h4>
+            <p className="text-[12px] text-medium mb-1.5 leading-snug">Immediate skin-to-skin contact supports bonding, temperature regulation, and breastfeeding.</p>
+            <RadioGroup options={['Immediate with birthing parent', 'With partner if I cannot', 'When medically ready', 'Happy with care team guidance']} fieldKey="skinToSkin" />
 
             <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-5 mb-1.5">Placenta</h4>
             <RadioGroup options={['Hospital can dispose of it', 'Would like to see it first', 'Keep for burial per customs']} fieldKey="placenta" />
 
             <h4 className="font-serif font-bold text-[14.5px] text-charcoal mt-5 mb-1.5">Feeding Method</h4>
-            <RadioGroup options={['Breastfeeding exclusively', 'Formula exclusively', 'Combination/Both', 'Undecided']} fieldKey="feeding" />
+            <RadioGroup options={['Breastfeeding (exclusive)', 'Breastfeeding + formula top-up', 'Formula from start', 'Combination', 'See how it goes']} fieldKey="feeding" />
 
             <div className="mt-5">
               <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Postnatal Customs/Diet</label>

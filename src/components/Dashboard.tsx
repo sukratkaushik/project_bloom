@@ -7,7 +7,6 @@ import { Development } from './sections/Development';
 import { Medical } from './sections/Medical';
 import { Preparation } from './sections/Preparation';
 import { Financial } from './sections/Financial';
-import { Decisions } from './sections/Decisions';
 import { Deadlines } from './sections/Deadlines';
 import { Postpartum } from './sections/Postpartum';
 import { Notes } from './sections/Notes';
@@ -167,7 +166,6 @@ export const Dashboard: React.FC = () => {
                 {activePage === 'medical-reports' && <MedicalReports />}
                 {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
                 {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
-                {activePage === 'decisions' && <Decisions />}
                 {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
                 {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
                 {activePage === 'symptoms' && <SymptomLogger />}
