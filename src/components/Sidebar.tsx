@@ -309,91 +309,65 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
             <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
             <NavItem id="notes" icon="📝" label="Notes & Journal" />
-            <NavItem id="profile" icon="⚙️" label="Settings & Profile" hideFavorite />
-
-            <button
-              onClick={() => setActivePage('feedback')}
-              className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:border-sage hover:bg-sage-pale/40 hover:text-sage-dark dark:hover:text-sage flex items-center justify-between
-                ${activePage === 'feedback' ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : ''}`}
-            >
-              <span className="flex items-center gap-2">
-                <span className="text-[16px]">💬</span> Feedback & Support
-              </span>
-            </button>
-
-            {(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
-              <button
-                onClick={() => setActivePage('admin-panel')}
-                className={`w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border border-border/60 dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:border-purple-400 hover:bg-purple-50 hover:text-purple-600 flex items-center justify-between
-                  ${activePage === 'admin-panel' ? 'bg-purple-50 border-purple-400 text-purple-600 font-bold' : ''}`}
-              >
-                <span className="flex items-center gap-2">
-                  <span className="text-[16px]">👑</span> Admin Suite
-                </span>
-              </button>
-            )}
           </>
         )}
 
         <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
 
-        <button
-          onClick={toggleDarkMode}
-          className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
-            ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal/85 hover:border-charcoal'}`}
-        >
-          <span className="flex items-center gap-2">
-            <span className="text-[16px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
-          </span>
-          <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isDarkModeActive ? 'bg-sage' : 'bg-border'}`}>
-            <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isDarkModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
-          </div>
-        </button>
-
-        <button
-          onClick={() => { navigate('/setup'); }}
-          className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
-        >
-          ⚙️ Adjust Setup
-        </button>
-
-        {planTier === 'free' ? (
+        <div className="space-y-2">
           <button
-            onClick={() => { navigate('/checkout?plan=premium'); }}
-            className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13.5px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
+            onClick={toggleDarkMode}
+            className={`w-full py-2.5 px-3.5 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between shadow-xs
+              ${state.isDarkModeActive ? 'bg-sage-pale/60 border-sage/40 text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/15 text-charcoal/85 hover:border-charcoal'}`}
           >
-            <span className="flex items-center gap-1.5">
-              <span>✨</span> Upgrade to Premium
+            <span className="flex items-center gap-2">
+              <span className="text-[15px]">{state.isDarkModeActive ? '🌙' : '☀️'}</span> Dark Mode
             </span>
-            <span>➜</span>
+            <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isDarkModeActive ? 'bg-sage' : 'bg-border'}`}>
+              <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isDarkModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
+            </div>
           </button>
-        ) : planTier === 'standard' ? (
-          <div className="w-full mt-2 p-2.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2">
-            <span>🩺</span> Standard Plan Active
-          </div>
-        ) : (
-          <div className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2">
-            <span>👑</span> AI Premium Active
-          </div>
-        )}
 
-        <button
-          onClick={() => {
-            import('../utils/pdfExport').then(module => {
-              module.exportToPDF(state);
-            });
-          }}
-          className="w-full mt-2 p-2.5 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13.5px] font-medium text-sage-dark dark:text-sage cursor-pointer transition-all hover:bg-sage-dark hover:text-white dark:hover:bg-sage dark:hover:text-charcoal"
-        >
-          📄 Export Care Plan PDF
-        </button>
+          {planTier === 'free' ? (
+            <button
+              onClick={() => { navigate('/checkout?plan=premium'); }}
+              className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
+            >
+              <span className="flex items-center gap-2">
+                <span>✨</span> Upgrade to Premium
+              </span>
+              <span>➜</span>
+            </button>
+          ) : planTier === 'standard' ? (
+            <div className="w-full py-2.5 px-3.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2 shadow-xs">
+              <span>🩺</span> Standard Plan Active
+            </div>
+          ) : (
+            <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
+              <span>👑</span> AI Premium Active
+            </div>
+          )}
 
-        <button
-          onClick={handleLogout}
-          className="w-full mt-2 p-2.5 bg-white dark:bg-charcoal/10 border-[1.5px] border-border dark:border-border/10 rounded-[10px] font-sans text-[13.5px] font-medium text-critical cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg"
-        >
-          🚪 Log Out
-        </button>
+          <button
+            onClick={() => {
+              import('../utils/pdfExport').then(module => {
+                module.exportToPDF(state);
+              });
+            }}
+            className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal/85 hover:text-sage-dark hover:bg-sage-pale/40 hover:border-sage/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
+          >
+            <span>📄</span>
+            <span>Export Care Plan PDF</span>
+          </button>
+
+          <button
+            onClick={handleLogout}
+            className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-critical/85 hover:text-critical hover:bg-critical-bg hover:border-critical/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
+          >
+            <span>🚪</span>
+            <span>Log Out</span>
+          </button>
+        </div>
       </div>
     );
   }
@@ -498,30 +472,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </>
       )}
 
-      {/* Utilities Group (Export PDF) */}
-      <div className="h-px bg-border my-3" />
-      <div className="space-y-1 bg-white/70 dark:bg-charcoal/20 p-2 rounded-2xl border border-border/80 shadow-2xs">
-        <button
-          onClick={() => {
-            import('../utils/pdfExport').then(module => {
-              module.exportToPDF(state);
-            });
-          }}
-          className="w-full p-2 rounded-xl font-sans text-[13px] font-medium text-charcoal/85 hover:text-sage-dark hover:bg-sage-pale/50 transition-all flex items-center gap-2 cursor-pointer text-left"
-        >
-          <span>📄</span>
-          <span>Export Care Plan PDF</span>
-        </button>
-      </div>
-
-      {/* Footer & Logout */}
-      <div className="pt-2 space-y-2">
+      {/* Utilities Group (Export PDF & Logout) */}
+      <div className="h-px bg-border my-4" />
+      <div className="space-y-2">
         {planTier === 'free' && (
           <button
             onClick={() => { navigate('/checkout?plan=premium'); }}
-            className="w-full p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-xl font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-2xs animate-pulse"
+            className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
           >
-            <span className="flex items-center gap-1.5">
+            <span className="flex items-center gap-2">
               <span>✨</span> Upgrade to Premium
             </span>
             <span>➜</span>
@@ -529,8 +488,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         )}
 
         <button
+          onClick={() => {
+            import('../utils/pdfExport').then(module => {
+              module.exportToPDF(state);
+            });
+          }}
+          className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-charcoal/85 hover:text-sage-dark hover:bg-sage-pale/40 hover:border-sage/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
+        >
+          <span>📄</span>
+          <span>Export Care Plan PDF</span>
+        </button>
+
+        <button
           onClick={handleLogout}
-          className="w-full py-2 px-3 text-center rounded-xl font-sans text-[12.5px] font-semibold text-critical/80 hover:text-critical hover:bg-critical-bg/50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+          className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-critical/85 hover:text-critical hover:bg-critical-bg hover:border-critical/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
         >
           <span>🚪</span>
           <span>Log Out</span>
