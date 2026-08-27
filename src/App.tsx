@@ -14,13 +14,18 @@ import { SplashScreen } from './components/SplashScreen';
 import { CheckoutPage } from './components/CheckoutPage';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
+import { normalizeLegacyHash } from './utils/navigation';
 
 const AppContent: React.FC = () => {
   const { state, updateState } = usePlanner();
   const [isAuthReady, setIsAuthReady] = useState(false);
   const [splashFinished, setSplashFinished] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
-  const [currentHash, setCurrentHash] = useState(window.location.hash);
+
+  // Normalize legacy #hash URLs if any into clean pathnames
+  normalizeLegacyHash();
+
+  const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -30,9 +35,17 @@ const AppContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const handleHashChange = () => setCurrentHash(window.location.hash);
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    const handleLocationChange = () => {
+      normalizeLegacyHash();
+      setCurrentPath(window.location.pathname);
+    };
+
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
   }, []);
 
   useEffect(() => {
@@ -49,24 +62,24 @@ const AppContent: React.FC = () => {
 
   let content = <LandingPage />;
 
-  if (currentHash === '#team') {
+  if (currentPath === '/team') {
     content = <TeamPage />;
-  } else if (currentHash === '#privacy') {
+  } else if (currentPath === '/privacy') {
     content = <PrivacyPolicy />;
-  } else if (currentHash === '#terms') {
+  } else if (currentPath === '/terms') {
     content = <TermsOfService />;
-  } else if (currentHash.startsWith('#checkout') || currentHash.startsWith('#payment')) {
+  } else if (currentPath.startsWith('/checkout') || currentPath.startsWith('/payment')) {
     content = <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
-  } else if (currentHash.startsWith('#dashboard') && state.isSetup) {
+  } else if (currentPath.startsWith('/dashboard') && state.isSetup) {
     content = <Dashboard />;
-  } else if (currentHash === '#setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
+  } else if (currentPath === '/setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
     content = <SetupScreen />;
   }
 
   return (
-    <div key={currentHash} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
+    <div key={currentPath} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
       {content}
       <div id="google_translate_element" className="hidden"></div>
     </div>

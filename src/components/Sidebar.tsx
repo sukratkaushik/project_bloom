@@ -5,6 +5,7 @@ import { Task } from '../types';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
+import { navigate } from '../utils/navigation';
 
 type SidebarProps = {
   activePage: string;
@@ -87,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         await signOut(auth);
       }
       resetPlan();
-      window.location.hash = '#';
+      navigate('/');
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -363,7 +364,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </button>
 
         <button
-          onClick={() => { window.location.hash = '#setup'; }}
+          onClick={() => { navigate('/setup'); }}
           className="w-full mt-2 p-2.5 bg-charcoal/5 border-[1.5px] border-charcoal/20 rounded-[10px] font-sans text-[13.5px] font-medium text-charcoal/85 cursor-pointer transition-all hover:bg-charcoal hover:text-cream"
         >
           ⚙️ Adjust Setup
@@ -371,7 +372,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         {planTier === 'free' ? (
           <button
-            onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+            onClick={() => { navigate('/checkout?plan=premium'); }}
             className="w-full mt-2 p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13.5px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs animate-pulse"
           >
             <span className="flex items-center gap-1.5">
@@ -550,7 +551,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </button>
 
         <button
-          onClick={() => { window.location.hash = '#setup'; }}
+          onClick={() => { navigate('/setup'); }}
           className="w-full p-2 rounded-xl font-sans text-[13px] font-medium text-charcoal/85 hover:bg-black/5 dark:hover:bg-white/5 transition-all flex items-center gap-2 cursor-pointer text-left"
         >
           <span>⚙️</span>
@@ -562,7 +563,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <div className="pt-2 space-y-2">
         {planTier === 'free' && (
           <button
-            onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+            onClick={() => { navigate('/checkout?plan=premium'); }}
             className="w-full p-2.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-xl font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-2xs animate-pulse"
           >
             <span className="flex items-center gap-1.5">

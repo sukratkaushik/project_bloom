@@ -1,4 +1,5 @@
 import React from 'react';
+import { navigate } from '../utils/navigation';
 
 export const PromoBanner: React.FC = () => {
   const promoText = "🎁 Special Offer: Get 3 Months of Premium Subscription for FREE! Use code BLOOM30 at checkout. Click to claim! ⚡";
@@ -6,7 +7,7 @@ export const PromoBanner: React.FC = () => {
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    window.location.hash = '#checkout?plan=premium&months=3&coupon=BLOOM30';
+    navigate('/checkout?plan=premium&months=3&coupon=BLOOM30');
   };
 
   return (

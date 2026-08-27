@@ -3,6 +3,7 @@ import { usePlanner } from '../store';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { CustomSelect } from './CustomSelect';
+import { navigate } from '../utils/navigation';
 
 // Custom Apple-style Wheel Picker Component
 const WheelPicker = ({ options, value, onChange, label }: { options: string[], value: string, onChange: (v: string) => void, label: string }) => {
@@ -154,7 +155,7 @@ export const SetupScreen: React.FC = () => {
       dietPref,
       flags,
     });
-    window.location.hash = '#dashboard';
+    navigate('/dashboard');
   };
 
   const handleLogout = async () => {
@@ -163,7 +164,7 @@ export const SetupScreen: React.FC = () => {
         await signOut(auth);
       }
       resetPlan();
-      window.location.hash = '#';
+      navigate('/');
     } catch (error) {
       console.error("Logout failed", error);
     }
@@ -291,7 +292,7 @@ export const SetupScreen: React.FC = () => {
               />
             </div>
             <span className="text-[13px] text-charcoal leading-snug">
-              I agree to the <a href="#/privacy" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Privacy Policy</a> and <a href="#/terms" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Terms of Service</a>. I understand that my data will be securely processed to personalise my plan.
+              I agree to the <a href="/privacy" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Privacy Policy</a> and <a href="/terms" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Terms of Service</a>. I understand that my data will be securely processed to personalise my plan.
             </span>
           </label>
         </div>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
+import { navigate } from '../utils/navigation';
 import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword } from '../firebase';
 import {
   ShieldCheck,
@@ -58,10 +59,10 @@ export const LandingPage: React.FC = () => {
       if (redirectUser) {
         const restored = await restoreJourney(redirectUser.uid);
         if (restored) {
-          window.location.hash = '#dashboard';
+          navigate('/dashboard');
         } else {
           updateState({ hasStartedOnboarding: true, isSetup: false });
-          window.location.hash = '#setup';
+          navigate('/setup');
         }
       }
     });
@@ -72,7 +73,7 @@ export const LandingPage: React.FC = () => {
   const handleStart = async () => {
     try {
       if (isSetupComplete) {
-        window.location.hash = '#dashboard';
+        navigate('/dashboard');
         return;
       }
 
@@ -83,7 +84,7 @@ export const LandingPage: React.FC = () => {
 
         // Check if there is an active journey locally
         if (state.isSetup && state.activeJourneyId) {
-          window.location.hash = '#dashboard';
+          navigate('/dashboard');
           return;
         }
 
@@ -91,10 +92,10 @@ export const LandingPage: React.FC = () => {
         const restored = await restoreJourney(user.uid);
 
         if (restored) {
-          window.location.hash = '#dashboard';
+          navigate('/dashboard');
         } else {
           updateState({ hasStartedOnboarding: true, isSetup: false });
-          window.location.hash = '#setup';
+          navigate('/setup');
         }
       }
     } catch (error: any) {
@@ -156,7 +157,7 @@ export const LandingPage: React.FC = () => {
 
   const handleEmailLoginClick = () => {
     if (isSetupComplete) {
-      window.location.hash = '#dashboard';
+      navigate('/dashboard');
       return;
     }
     setShowEmailModal(true);
@@ -212,17 +213,17 @@ export const LandingPage: React.FC = () => {
         clearModal();
         // New user — go to setup
         updateState({ hasStartedOnboarding: true, isSetup: false });
-        window.location.hash = '#setup';
+        navigate('/setup');
       } else {
         const existingUser = await signInWithEmail(emailInput, passwordInput);
         clearModal();
         // Try to restore existing journey
         const restored = await restoreJourney(existingUser.uid);
         if (restored) {
-          window.location.hash = '#dashboard';
+          navigate('/dashboard');
         } else {
           updateState({ hasStartedOnboarding: true, isSetup: false });
-          window.location.hash = '#setup';
+          navigate('/setup');
         }
       }
     } catch (error: any) {
@@ -444,7 +445,7 @@ export const LandingPage: React.FC = () => {
               <a href="#how-it-works" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">How it Works</a>
               <a href="#localized-care" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">About</a>
               <a href="#pricing" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Pricing</a>
-              <a href="#team" className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Team</a>
+              <a href="/team" onClick={(e) => { e.preventDefault(); navigate('/team'); }} className="text-[14px] font-semibold text-charcoal/80 hover:text-sage transition-all relative py-1 after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[2px] after:bg-sage after:transition-all hover:after:w-full">Team</a>
             </div>
 
             <div className="flex flex-nowrap justify-end items-center gap-1 sm:gap-2 md:gap-4">
@@ -1104,9 +1105,9 @@ export const LandingPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
-            <a href="#team" className="hover:text-white transition-colors">Meet the Team</a>
-            <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="/team" onClick={(e) => { e.preventDefault(); navigate('/team'); }} className="hover:text-white transition-colors">Meet the Team</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
           </div>
         </div>

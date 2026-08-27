@@ -3,6 +3,7 @@ import { usePlanner } from '../store';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 import { functions } from '../firebase';
 import { Bot, Sparkles, ShieldCheck, Loader2, Lock, Gift } from 'lucide-react';
+import { navigate } from '../utils/navigation';
 
 interface PaywallProps {
   children: React.ReactNode;
@@ -37,7 +38,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const totalPrice = basePrice * months - discount;
 
   const handlePayment = () => {
-    window.location.hash = `#checkout?plan=${isPremiumFeature ? 'premium' : 'standard'}&months=${months}`;
+    navigate(`/checkout?plan=${isPremiumFeature ? 'premium' : 'standard'}&months=${months}`);
   };
 
   return (

@@ -4,15 +4,15 @@ import { httpsCallable } from 'firebase/functions';
 import { functions, auth } from '../firebase';
 import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
 import { Header } from './Header';
+import { navigate } from '../utils/navigation';
 
 export const CheckoutPage: React.FC = () => {
   const { state, updateState, toggleDarkMode } = usePlanner();
 
-  // Get initial params from URL hash (e.g. #checkout?plan=premium&months=3)
+  // Get initial params from URL search or hash (e.g. /checkout?plan=premium&months=3)
   const getParams = () => {
-    const hash = window.location.hash;
-    const searchPart = hash.includes('?') ? hash.split('?')[1] : '';
-    const params = new URLSearchParams(searchPart);
+    const search = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+    const params = new URLSearchParams(search);
     return {
       plan: (params.get('plan') || 'premium') as 'standard' | 'premium',
       months: parseInt(params.get('months') || '3', 10),
@@ -211,7 +211,7 @@ export const CheckoutPage: React.FC = () => {
           <button
             onClick={() => {
               // Redirect back to dashboard if set up, else landing
-              window.location.hash = state.isSetup ? '#dashboard' : '#';
+              navigate(state.isSetup ? '/dashboard' : '/');
             }}
             className="flex items-center gap-2 text-[14px] font-bold text-medium hover:text-sage transition-colors"
           >
@@ -447,7 +447,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="pt-4 space-y-4">
               <button
                 onClick={() => {
-                  window.location.hash = '#dashboard';
+                  navigate('/dashboard');
                 }}
                 className="w-full py-4 bg-charcoal text-[#ffffff] dark:bg-[#ffffff] dark:text-[#0F172A] hover:bg-gray-800 dark:hover:bg-white/90 font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
               >

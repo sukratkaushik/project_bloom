@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { usePlanner } from '../../store';
 import { auth } from '../../firebase';
 import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck } from 'lucide-react';
+import { navigate } from '../../utils/navigation';
 
 export const Profile: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -117,7 +118,7 @@ export const Profile: React.FC = () => {
 
                   {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
                     <button
-                      onClick={() => { window.location.hash = '#checkout?plan=premium'; }}
+                      onClick={() => { navigate('/checkout?plan=premium'); }}
                       className="text-[12.5px] font-bold text-sage hover:underline cursor-pointer"
                     >
                       {state.planTier === 'premium' ? 'Manage Plan →' : 'Upgrade to Premium →'}
@@ -253,11 +254,11 @@ export const Profile: React.FC = () => {
               <span className="font-medium text-charcoal group-hover:text-sage">Medical Disclaimer</span>
               <span className="text-sage">→</span>
             </button>
-            <a href="#privacy" onClick={() => window.location.hash = '#privacy'} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Privacy Policy</span>
               <span className="text-sage">→</span>
             </a>
-            <a href="#terms" onClick={() => window.location.hash = '#terms'} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Terms of Service</span>
               <span className="text-sage">→</span>
             </a>
