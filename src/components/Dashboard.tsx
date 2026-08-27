@@ -63,7 +63,7 @@ const getPageFromPath = (): string => {
 };
 
 export const Dashboard: React.FC = () => {
-  const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
+  const { state, updateState, toggleDarkMode } = usePlanner();
   const [activePage, setActivePageState] = useState<string>(getPageFromPath);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);

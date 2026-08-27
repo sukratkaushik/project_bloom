@@ -26,12 +26,10 @@ export const Financial: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
     <div className="animate-in fade-in duration-300">
       <div className="mb-7">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Financial Planning</h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Insurance, leave, budget — no spreadsheet required.</p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Insurance, leave, budget — no spreadsheet required.</p>
       </div>
       
-      {!state.isCalmModeActive && <ContextBanner />}
+      <ContextBanner />
       
       <div className="mb-7">
         <div className="font-serif text-[20px] font-medium mb-1">Financial Checklist</div>
@@ -41,9 +39,7 @@ export const Financial: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
       <div className="h-px bg-border my-7" />
       
       <div className="font-serif text-[20px] font-medium mb-1">Budget Tracker</div>
-      {!state.isCalmModeActive && (
-        <div className="text-[12px] text-light italic mb-3.5">Enter estimated and actual costs — totals update live</div>
-      )}
+      <div className="text-[12px] text-light italic mb-3.5">Enter estimated and actual costs — totals update live</div>
       
       <div className="grid grid-cols-[1fr_110px_110px] gap-2.5 p-[8px_14px] text-[11px] font-semibold tracking-[0.8px] uppercase text-light mb-1">
         <div>Item</div>

@@ -466,9 +466,8 @@ export const ContractionTimer: React.FC = () => {
         )}
       </div>
 
-      {!state.isCalmModeActive && (
-        <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">
-          <div className="flex gap-4">
+      <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">
+        <div className="flex gap-4">
             <AlertCircle className="w-5 h-5 text-sage shrink-0" />
             <div>
               <p className="text-[14px] text-charcoal font-medium leading-relaxed mb-1.5">
@@ -480,7 +479,6 @@ export const ContractionTimer: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
     </div>
   );
 };

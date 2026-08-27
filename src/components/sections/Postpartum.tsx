@@ -14,16 +14,12 @@ export const Postpartum: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ f
       <div className="animate-in fade-in duration-300">
         <div className="mb-7">
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Early Parenthood</h2>
-          {!state.isCalmModeActive && (
-            <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">The fourth trimester and beyond — what to expect and prepare for after birth.</p>
-          )}
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">The fourth trimester and beyond — what to expect and prepare for after birth.</p>
         </div>
 
-        {!state.isCalmModeActive && (
-          <div className="bg-sage-pale border-l-[3px] border-sage rounded-[0_10px_10px_0] p-[13px_16px] text-[13px] text-medium mb-5 leading-[1.65]">
-            <strong className="text-charcoal">The fourth trimester (weeks 0–12 after birth)</strong> is a profound adjustment period for both baby and parents. Planning ahead for this time is just as important as preparing for birth.
-          </div>
-        )}
+        <div className="bg-sage-pale border-l-[3px] border-sage rounded-[0_10px_10px_0] p-[13px_16px] text-[13px] text-medium mb-5 leading-[1.65]">
+          <strong className="text-charcoal">The fourth trimester (weeks 0–12 after birth)</strong> is a profound adjustment period for both baby and parents. Planning ahead for this time is just as important as preparing for birth.
+        </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5">
           <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5">

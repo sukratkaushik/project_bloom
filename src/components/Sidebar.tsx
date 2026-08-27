@@ -38,7 +38,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks, isMobile = false }) => {
-  const { state, toggleCalmMode, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
+  const { state, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -113,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         >
           <span className="text-[16px] w-5 text-center shrink-0" translate="no" aria-hidden="true">{icon}</span>
           <span className="flex-1 leading-normal whitespace-normal break-words py-0.5">{label}</span>
-          {progress && !state.isCalmModeActive && progress.total > 0 && (
+          {progress && progress.total > 0 && (
             <div className="ml-auto w-12 flex flex-col gap-1 items-end">
               <span className={`text-[11px] font-bold leading-none
                 ${isActive ? 'text-sage-dark dark:text-sage' : 'text-charcoal/65'}`}>
@@ -338,19 +338,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
 
         <button
-          onClick={toggleCalmMode}
-          className={`w-full mt-3 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
-            ${state.isCalmModeActive ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal/85 hover:border-sage-light'}`}
-        >
-          <span className="flex items-center gap-2">
-            <span className="text-[16px]">🌿</span> Calm Mode
-          </span>
-          <div className={`w-8 h-4 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
-            <div className={`absolute top-[2px] w-3 h-3 rounded-full bg-white transition-all shadow-sm ${state.isCalmModeActive ? 'left-[18px]' : 'left-[2px]'}`} />
-          </div>
-        </button>
-
-        <button
           onClick={toggleDarkMode}
           className={`w-full mt-2 p-2.5 border-[1.5px] rounded-[10px] font-sans text-[13.5px] font-medium cursor-pointer transition-all flex items-center justify-between
             ${state.isDarkModeActive ? 'bg-sage-pale border-sage text-sage-dark dark:text-sage font-bold' : 'bg-white dark:bg-charcoal/10 border-border dark:border-border/10 text-charcoal/85 hover:border-charcoal'}`}
@@ -511,25 +498,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </>
       )}
 
-      {/* Utilities Group (Calm Mode, Export PDF) */}
+      {/* Utilities Group (Export PDF) */}
       <div className="h-px bg-border my-3" />
       <div className="space-y-1 bg-white/70 dark:bg-charcoal/20 p-2 rounded-2xl border border-border/80 shadow-2xs">
-        <button
-          onClick={toggleCalmMode}
-          className={`w-full p-2 rounded-xl font-sans text-[13px] font-medium cursor-pointer transition-all flex items-center justify-between ${
-            state.isCalmModeActive 
-              ? 'bg-sage-pale text-sage-dark dark:text-sage font-bold' 
-              : 'text-charcoal/85 hover:bg-black/5 dark:hover:bg-white/5'
-          }`}
-        >
-          <span className="flex items-center gap-2">
-            <span>🌿</span> Calm Mode
-          </span>
-          <div className={`w-7 h-3.5 rounded-full relative transition-colors ${state.isCalmModeActive ? 'bg-sage' : 'bg-border'}`}>
-            <div className={`absolute top-[1.5px] w-2.5 h-2.5 rounded-full bg-white transition-all shadow-xs ${state.isCalmModeActive ? 'left-[15px]' : 'left-[1.5px]'}`} />
-          </div>
-        </button>
-
         <button
           onClick={() => {
             import('../utils/pdfExport').then(module => {

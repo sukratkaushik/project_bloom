@@ -18,12 +18,10 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
     <div className="animate-in fade-in duration-300">
       <div className="mb-7">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Important Deadlines</h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Time-sensitive items calculated from your due date, sorted earliest to latest.</p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Time-sensitive items calculated from your due date, sorted earliest to latest.</p>
       </div>
       
-      {!state.isCalmModeActive && <ContextBanner />}
+      <ContextBanner />
       
       <div>
         {filtered.map(t => {
@@ -52,14 +50,12 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
                 <div className={`text-[14px] leading-[1.4] ${isDone ? 'line-through text-light' : 'text-charcoal'}`}>
                   {t.text}
                 </div>
-                {!state.isCalmModeActive && (
-                  <div className="flex gap-[7px] mt-[5px] flex-wrap items-center">
-                    <span className="text-[12px] text-light">{t.weeksBeforeDue} weeks before due date</span>
-                    {!isDone && isPast && (
-                      <span className="text-[11px] text-blush font-semibold">⚠ Past date — check if done</span>
-                    )}
-                  </div>
-                )}
+                <div className="flex gap-[7px] mt-[5px] flex-wrap items-center">
+                  <span className="text-[12px] text-light">{t.weeksBeforeDue} weeks before due date</span>
+                  {!isDone && isPast && (
+                    <span className="text-[11px] text-blush font-semibold">⚠ Past date — check if done</span>
+                  )}
+                </div>
               </div>
               <button
                 onClick={(e) => {

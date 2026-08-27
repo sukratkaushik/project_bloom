@@ -20,13 +20,20 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   **Top Tier:** Features the app logo, bold serif brand title `Our Pregnancy`, tagline `"Made with ❤️ for expectant mothers"`, and primary navigation links.
         *   **Bottom Tier:** Features copyright text on the left and clean dot-separated legal links (*Privacy Policy • Terms of Service • Support*) on the right.
 
-### **Task 3: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 3: Calm Mode Clean Removal & UI De-cluttering**
+*   **Details:**
+    *   **Eliminated Redundant Calm Mode:** Completely removed Calm Mode state, toggles, CSS overrides, and conditional gating across the entire application.
+    *   **Always Visible Milestone Timeline (`Header.tsx`):** The header now consistently renders LMP, T1 End, T2 End, Due Date, and gestational progress percentage without awkward replacement quotes.
+    *   **Cleaned Sidebar Utilities (`Sidebar.tsx`):** Removed the toggle switch from desktop & mobile drawers, streamlining the utilities group to Export Care Plan PDF and Log Out.
+    *   **Restored Educational Banners & Advisory Notes:** All milestone countdowns, medical tags, and health recommendations render naturally across all 15 feature modules.
+
+### **Task 4: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 4: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 5: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.

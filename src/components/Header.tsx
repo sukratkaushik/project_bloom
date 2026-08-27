@@ -17,7 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   progressPct,
   hideMenuIcon = false 
 }) => {
-  const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
+  const { state, updateState, toggleDarkMode } = usePlanner();
 
   return (
     <header className="bg-white border-b border-border sticky top-0 md:top-[14px] z-50 shadow-sm no-print md:rounded-[14px]">
@@ -42,30 +42,24 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         </div>
 
-        {state.isCalmModeActive ? (
-          <div className="hidden md:flex flex-1 items-center justify-center text-[14px] text-medium italic">
-            Taking it one day at a time.
+        <div className="hidden md:flex items-center justify-center gap-6 flex-1 px-4 min-w-max">
+          <div className="text-center">
+            <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
+            <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
           </div>
-        ) : (
-          <div className="hidden md:flex items-center justify-center gap-6 flex-1 px-4 min-w-max">
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">LMP (est.)</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.lmp)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T1 ends</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t1End)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T2 ends</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t2End)}</div>
-            </div>
-            <div className="text-center">
-              <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">Due date</div>
-              <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.dueDate)}</div>
-            </div>
+          <div className="text-center">
+            <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T1 ends</div>
+            <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t1End)}</div>
           </div>
-        )}
+          <div className="text-center">
+            <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">T2 ends</div>
+            <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.t2End)}</div>
+          </div>
+          <div className="text-center">
+            <div className="text-[9px] font-semibold tracking-[1.2px] uppercase text-light">Due date</div>
+            <div className="font-serif text-[16px] font-medium text-charcoal">{fmtShort(state.dueDate)}</div>
+          </div>
+        </div>
 
         <div className="flex items-center gap-3 shrink-0">
           <LanguageSelector />
@@ -81,7 +75,7 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
 
           <div className="hidden md:flex items-center gap-4 pl-4 border-l border-border">
-            {!state.isCalmModeActive && progressPct !== undefined && (
+            {progressPct !== undefined && (
               <div className="flex items-center gap-2.5">
                 <div className="w-[100px] h-[5px] bg-border rounded-[3px] overflow-hidden">
                   <div

@@ -560,7 +560,6 @@ export const VitalsTracker: React.FC = () => {
         </div>
       </div>
 
-      {!state.isCalmModeActive && (
         <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">
           <div className="flex gap-4">
             <AlertTriangle className="w-5 h-5 text-sage shrink-0" />
@@ -574,7 +573,6 @@ export const VitalsTracker: React.FC = () => {
             </div>
           </div>
         </div>
-      )}
         </>
       )}
     </div>

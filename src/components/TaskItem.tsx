@@ -31,7 +31,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
         <div className={`text-[14px] leading-[1.45] ${isDone ? 'line-through text-light' : 'text-charcoal'}`}>
           {task.text}
         </div>
-        {!state.isCalmModeActive && (task.timing || isPartnerTask) && (
+        {(task.timing || isPartnerTask) && (
           <div className="flex items-center gap-[7px] mt-[5px] flex-wrap">
             {task.timing && (
               <span className="bg-gold-pale text-gold text-[11px] px-2 py-0.5 rounded-[10px] italic">

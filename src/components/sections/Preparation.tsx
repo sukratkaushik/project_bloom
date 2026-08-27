@@ -14,29 +14,25 @@ export const Preparation: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
     <div className="animate-in fade-in duration-300">
       <div className="mb-7">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Preparation Tasks</h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Nursery, classes, equipment, and everything in between — organised by trimester.</p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Nursery, classes, equipment, and everything in between — organised by trimester.</p>
       </div>
       
-      {!state.isCalmModeActive && <ContextBanner />}
+      <ContextBanner />
       
-      {!state.isCalmModeActive && (
-        <div className="flex gap-[14px] flex-wrap p-[13px_16px] bg-white border-[1.5px] border-border rounded-[11px] mb-5">
-          <div className="flex items-center gap-[7px] text-[12px] text-medium">
-            <span className="bg-critical-bg text-critical text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Critical</span>
-            Important before baby arrives
-          </div>
-          <div className="flex items-center gap-[7px] text-[12px] text-medium">
-            <span className="bg-optional-bg text-optional text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Optional</span>
-            Helpful but flexible
-          </div>
-          <div className="flex items-center gap-[7px] text-[12px] text-medium">
-            <span className="bg-blush-pale text-blush text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">👥 Partner</span>
-            Involves your support person
-          </div>
+      <div className="flex gap-[14px] flex-wrap p-[13px_16px] bg-white border-[1.5px] border-border rounded-[11px] mb-5">
+        <div className="flex items-center gap-[7px] text-[12px] text-medium">
+          <span className="bg-critical-bg text-critical text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Critical</span>
+          Important before baby arrives
         </div>
-      )}
+        <div className="flex items-center gap-[7px] text-[12px] text-medium">
+          <span className="bg-optional-bg text-optional text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Optional</span>
+          Helpful but flexible
+        </div>
+        <div className="flex items-center gap-[7px] text-[12px] text-medium">
+          <span className="bg-blush-pale text-blush text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">👥 Partner</span>
+          Best done by or with your partner
+        </div>
+      </div>
 
       <div className="flex gap-1.5 mb-5">
         <button onClick={() => setTri('t1')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all ${tri === 't1' ? 'border-blush bg-blush-pale text-blush' : 'border-border bg-white text-medium'}`}>First Trimester</button>

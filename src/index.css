@@ -112,58 +112,7 @@ button,
   color: var(--color-charcoal);
 }
 
-/* Calm Mode Accessibility & Aesthetic Overrides */
-body.calm-mode {
-  /* A beautiful, spa-like, ultra-soothing palette */
-  --color-sage: #8ab6a3;
-  --color-sage-light: #b5d5c7;
-  --color-sage-pale: #f2f7f2;
 
-  --color-blush: #f4d0d9;
-  --color-blush-light: #fae6ec;
-  --color-blush-pale: #fdfafb;
-
-  --color-gold: #f2ba8f;
-  --color-gold-pale: #fcf6f0;
-
-  --color-cream: #fbfbf9;
-  --color-charcoal: #5c6c7a;
-  --color-border: #f0f0ed;
-
-  --color-critical: #d49898;
-  --color-critical-bg: #fdfaf9;
-  --color-optional: #8ab6a3;
-  --color-optional-bg: #f2f7f2;
-
-  /* Dyslexia-friendly typography */
-  --font-serif: 'Lexend', sans-serif;
-  --font-sans: 'Lexend', sans-serif;
-
-  background-color: var(--color-cream);
-  color: var(--color-charcoal);
-  line-height: 1.85;
-  letter-spacing: 0.03em;
-}
-
-/* Gentle, floating component feel */
-body.calm-mode * {
-  --tw-shadow: 0 10px 40px rgba(0, 0, 0, 0.02) !important;
-  --tw-shadow-colored: 0 10px 40px var(--tw-shadow-color) !important;
-}
-
-/* Make all entry animations drift in slowly and peacefully */
-body.calm-mode .animate-in {
-  animation-duration: 1.2s !important;
-  animation-timing-function: cubic-bezier(0.33, 1, 0.68, 1) !important;
-}
-
-/* Prevent harsh color changes on hover, create a soothing transition */
-body.calm-mode .transition-colors,
-body.calm-mode .transition-all,
-body.calm-mode .transition-opacity {
-  transition-duration: 0.6s !important;
-  transition-timing-function: ease-in-out !important;
-}
 
 /* --- JUICY MICRO-ANIMATIONS --- */
 
