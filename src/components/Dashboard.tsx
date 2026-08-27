@@ -147,7 +147,7 @@ export const Dashboard: React.FC = () => {
   const progressPct = filteredTasks.length ? Math.round((doneCount / filteredTasks.length) * 100) : 0;
 
   return (
-    <div className="flex flex-col min-h-screen md:h-screen md:overflow-hidden bg-cream">
+    <div className="flex flex-col min-h-screen bg-cream">
       <Header
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
@@ -155,9 +155,9 @@ export const Dashboard: React.FC = () => {
       />
 
       {/* Body */}
-      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full md:flex-1 md:min-h-0 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start relative">
-        {/* Desktop Sidebar (Rendered inline with independent scroll) */}
-        <div className="hidden md:flex md:flex-col md:h-full md:overflow-y-auto overscroll-contain pr-2 pb-16 custom-scrollbar">
+      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full flex-1 grid grid-cols-1 md:grid-cols-[220px_1fr] gap-4 md:gap-8 items-start relative pb-6">
+        {/* Desktop Sidebar (Sticky while scrolling page) */}
+        <div className="hidden md:flex md:flex-col sticky top-[100px] max-h-[calc(100vh-120px)] overflow-y-auto overscroll-contain pr-2 pb-6 custom-scrollbar">
           <Sidebar activePage={activePage} setActivePage={setActivePage} filterTasks={filterTasks} />
         </div>
 
@@ -186,8 +186,8 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Right Main Content Panel (Independent scroll) */}
-        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 md:h-full md:overflow-y-auto overscroll-contain pb-[100px] md:pb-16 custom-scrollbar flex flex-col outline-none focus:outline-none">
+        {/* Right Main Content Panel */}
+        <main className="pt-6 md:pt-8 print:pt-0 w-full min-w-0 flex flex-col outline-none focus:outline-none">
           <div className="flex-1">
             <AnimatePresence mode="wait">
               <motion.div
