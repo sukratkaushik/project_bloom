@@ -12,12 +12,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Rich State Schemes Database:** Added detailed benefits, eligibility criteria, and application steps for major state maternity benefits (Dr. Muthulakshmi Reddy, KCR Kit, MAMATA, Mathru Poorna, Kanya Sumangala, IGMPY, Ladli Laxmi, etc.).
     *   **User Persistence:** Stores the user's selected state in `localStorage` so their region remains saved.
 
-### **Task 2: Unified Header-Matched Footer Component**
+### **Task 2: Professional 2-Tier Streamlined Footer**
 *   **Details:**
-    *   **New Reusable Component (`src/components/Footer.tsx`):** Created a rounded card footer matching the exact format, design, size, shadow, and borders of the primary `<Header />`.
-    *   **Left Section:** Features the app logo, bold serif brand name `Our Pregnancy`, vertical divider `|`, and the tagline `"Made with ❤️ for expectant mothers"`.
-    *   **Right Section:** Features clean routing links to `Privacy Policy` (`/privacy`), `Terms of Service` (`/terms`), and a styled `💬 Support` button with mailto redirect and copy-to-clipboard toast feedback.
-    *   **Layout Integration:** Integrated across `Dashboard.tsx` and `CheckoutPage.tsx`.
+    *   **Redesigned Layout (`src/components/Footer.tsx`):** Designed a balanced 2-tier footer card matching the exact dimensions, borders, and margins of the header.
+    *   **Clean Typography & No Icons:** Removed all emoji clutter from feature links (*Adjust Setup, Settings & Profile, Feedback & Support, Admin Suite*).
+    *   **Organized Hierarchy:**
+        *   **Top Tier:** Features the app logo, bold serif brand title `Our Pregnancy`, tagline `"Made with ❤️ for expectant mothers"`, and primary navigation links.
+        *   **Bottom Tier:** Features copyright text on the left and clean dot-separated legal links (*Privacy Policy • Terms of Service • Support*) on the right.
 
 ### **Task 3: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
