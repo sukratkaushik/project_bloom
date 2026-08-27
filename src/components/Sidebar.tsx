@@ -54,15 +54,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   // Drill-down state (for mobile category view)
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  // Auto-set category based on activePage (only on mobile views)
+  // Auto-set category based on activePage (for mobile drawer AND desktop accordion auto-expand)
   useEffect(() => {
-    if (!isMobile) return;
     const foundCategory = Object.keys(CATEGORIES).find(catId =>
       CATEGORIES[catId].items.includes(activePage)
     );
     if (foundCategory) {
-      setActiveCategory(foundCategory);
-    } else if (activePage === 'tracker') {
+      if (isMobile) {
+        setActiveCategory(foundCategory);
+      } else {
+        setExpandedSections(prev => ({ ...prev, [foundCategory]: true }));
+      }
+    } else if (activePage === 'tracker' && isMobile) {
       setActiveCategory(null);
     }
   }, [activePage, isMobile]);

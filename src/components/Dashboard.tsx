@@ -40,11 +40,49 @@ import { LanguageSelector } from './LanguageSelector';
 import { Header } from './Header';
 import { MedicalReports } from './sections/MedicalReports';
 
+const VALID_PAGES = [
+  'tracker', 'dev', 'medical', 'medical-reports', 'prep', 'finance', 
+  'deadlines', 'postpartum', 'symptoms', 'readiness', 'foodscanner', 
+  'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
+  'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
+  'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
+  'admin-panel', 'notes', 'profile'
+];
+
+const getPageFromHash = (): string => {
+  const hash = window.location.hash;
+  if (!hash.startsWith('#dashboard')) return 'tracker';
+  const sub = hash.replace(/^#dashboard\/?/, '').split('?')[0].trim();
+  if (sub && VALID_PAGES.includes(sub)) {
+    return sub;
+  }
+  return 'tracker';
+};
+
 export const Dashboard: React.FC = () => {
   const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
-  const [activePage, setActivePage] = useState('tracker');
+  const [activePage, setActivePageState] = useState<string>(getPageFromHash);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Sync state -> hash when user clicks any tab or feature
+  const setActivePage = (page: string) => {
+    setActivePageState(page);
+    const targetHash = page === 'tracker' ? '#dashboard' : `#dashboard/${page}`;
+    if (window.location.hash !== targetHash) {
+      window.location.hash = targetHash;
+    }
+  };
+
+  // Sync hash -> state when user uses browser Back / Forward buttons or deep links
+  useEffect(() => {
+    const handleHashChange = () => {
+      const page = getPageFromHash();
+      setActivePageState(page);
+    };
+    window.addEventListener('hashchange', handleHashChange);
+    return () => window.removeEventListener('hashchange', handleHashChange);
+  }, []);
 
   const handleEmailClick = (email: string, e: React.MouseEvent) => {
     e.preventDefault();
