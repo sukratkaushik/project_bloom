@@ -8,16 +8,24 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 *   **Details:**
     *   **State & National Dropdown (`GovernmentSchemes.tsx`):** Added a dropdown selector featuring `National (All India)` and all 33 Indian States/UTs.
     *   **Scope Filtering Engine:** When selecting a specific state (e.g. Tamil Nadu, Telangana, Karnataka, Maharashtra, UP, Rajasthan, Odisha, WB, Bihar, MP, Gujarat, etc.), displays the state-specific schemes alongside Central Government schemes. When "National" is selected, filters strictly to all-India Central schemes.
+    *   **Priority Sort for State Schemes:** State-specific schemes are sorted and placed at the top of the grid above Central schemes for maximum visibility.
     *   **Rich State Schemes Database:** Added detailed benefits, eligibility criteria, and application steps for major state maternity benefits (Dr. Muthulakshmi Reddy, KCR Kit, MAMATA, Mathru Poorna, Kanya Sumangala, IGMPY, Ladli Laxmi, etc.).
     *   **User Persistence:** Stores the user's selected state in `localStorage` so their region remains saved.
 
-### **Task 2: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 2: Unified Header-Matched Footer Component**
+*   **Details:**
+    *   **New Reusable Component (`src/components/Footer.tsx`):** Created a rounded card footer matching the exact format, design, size, shadow, and borders of the primary `<Header />`.
+    *   **Left Section:** Features the app logo, bold serif brand name `Our Pregnancy`, vertical divider `|`, and the tagline `"Made with ❤️ for expectant mothers"`.
+    *   **Right Section:** Features clean routing links to `Privacy Policy` (`/privacy`), `Terms of Service` (`/terms`), and a styled `💬 Support` button with mailto redirect and copy-to-clipboard toast feedback.
+    *   **Layout Integration:** Integrated across `Dashboard.tsx` and `CheckoutPage.tsx`.
+
+### **Task 3: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 3: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 4: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
