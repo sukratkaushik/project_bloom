@@ -241,23 +241,21 @@ export const KickCounter: React.FC = () => {
         )}
       </div>
 
-      {!state.isCalmModeActive && (
-        <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">
-          <div className="flex gap-4">
-            <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
-              <Baby className="w-5 h-5 text-sage" />
-            </div>
-            <div>
-              <p className="text-[14px] text-charcoal font-medium leading-relaxed mb-1.5">
-                ACOG recommends counting fetal movements daily from 28 weeks. 10 movements within 2 hours is reassuring.
-              </p>
-              <p className="text-[13px] text-medium">
-                Your doctor or ASHA worker can advise you on kick counting.
-              </p>
-            </div>
+      <div className="bg-cream border-[1.5px] border-border rounded-[16px] p-5 shadow-inner">
+        <div className="flex gap-4">
+          <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm shrink-0">
+            <Baby className="w-5 h-5 text-sage" />
+          </div>
+          <div>
+            <p className="text-[14px] text-charcoal font-medium leading-relaxed mb-1.5">
+              ACOG recommends counting fetal movements daily from 28 weeks. 10 movements within 2 hours is reassuring.
+            </p>
+            <p className="text-[13px] text-medium">
+              Your doctor or ASHA worker can advise you on kick counting.
+            </p>
           </div>
         </div>
-      )}
+      </div>
 
       {/* Calendar View */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden mb-6">

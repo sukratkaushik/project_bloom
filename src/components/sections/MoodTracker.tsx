@@ -300,26 +300,24 @@ export const MoodTracker: React.FC = () => {
         </div>
       )}
 
-      {!state.isCalmModeActive && (
-        <div className="bg-blue-50/50 border-[1.5px] border-blue-100 rounded-[16px] p-6 shadow-inner">
-          <h3 className="font-semibold text-charcoal text-[15px] mb-3">Support Resources</h3>
-          <ul className="space-y-2 text-[14px] text-medium">
-            <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
-              <span>iCall (Psychosocial Helpline)</span>
-              <a href="tel:9152987821" className="font-semibold text-sage">9152987821</a>
-            </li>
-            <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
-              <span>Vandrevala Foundation (24/7)</span>
-              <a href="tel:18602662345" className="font-semibold text-sage">1860-2662-345</a>
-            </li>
-            <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
-              <span>NIMHANS Helpline</span>
-              <a href="tel:08046110007" className="font-semibold text-sage">080-46110007</a>
-            </li>
-          </ul>
-          <p className="mt-4 text-[13px] text-light italic text-center">Talk to your ASHA worker — they are trained to support you locally.</p>
-        </div>
-      )}
+      <div className="bg-blue-50/50 border-[1.5px] border-blue-100 rounded-[16px] p-6 shadow-inner">
+        <h3 className="font-semibold text-charcoal text-[15px] mb-3">Support Resources</h3>
+        <ul className="space-y-2 text-[14px] text-medium">
+          <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
+            <span>iCall (Psychosocial Helpline)</span>
+            <a href="tel:9152987821" className="font-semibold text-sage">9152987821</a>
+          </li>
+          <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
+            <span>Vandrevala Foundation (24/7)</span>
+            <a href="tel:18602662345" className="font-semibold text-sage">1860-2662-345</a>
+          </li>
+          <li className="flex justify-between items-center bg-white p-3 rounded-lg border border-border">
+            <span>NIMHANS Helpline</span>
+            <a href="tel:08046110007" className="font-semibold text-sage">080-46110007</a>
+          </li>
+        </ul>
+        <p className="mt-4 text-[13px] text-light italic text-center">Talk to your ASHA worker — they are trained to support you locally.</p>
+      </div>
     </div>
   );
 };

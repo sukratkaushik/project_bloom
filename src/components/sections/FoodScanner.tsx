@@ -85,11 +85,9 @@ export const FoodScanner: React.FC = () => {
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
             <Bot className="text-sage" size={32} /> Our Pregnancy AI Food Guide
           </h2>
-          {!state.isCalmModeActive && (
-            <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-              Upload a photo of your meal, local snack, or food label to get an AI nutritional breakdown and pregnancy safety check.
-            </p>
-          )}
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
+            Upload a photo of your meal, local snack, or food label to get an AI nutritional breakdown and pregnancy safety check.
+          </p>
         </div>
 
       <div className="bg-white p-6 rounded-[16px] border-[1.5px] border-border shadow-sm mb-8">

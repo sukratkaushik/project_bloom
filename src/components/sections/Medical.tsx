@@ -17,25 +17,21 @@ export const Medical: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filt
       <div className="animate-in fade-in duration-300">
         <div className="mb-7">
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Medical & Healthcare</h2>
-          {!state.isCalmModeActive && (
-            <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Your personalised appointment schedule and screening timeline.</p>
-          )}
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Your personalised appointment schedule and screening timeline.</p>
         </div>
 
-        {!state.isCalmModeActive && <ContextBanner />}
+        <ContextBanner />
 
-        {!state.isCalmModeActive && (
-          <div className="flex gap-[14px] flex-wrap p-[13px_16px] bg-white border-[1.5px] border-border rounded-[11px] mb-5">
-            <div className="flex items-center gap-[7px] text-[12px] text-medium">
-              <span className="bg-critical-bg text-critical text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Critical</span>
-              Medically recommended or time-sensitive
-            </div>
-            <div className="flex items-center gap-[7px] text-[12px] text-medium">
-              <span className="bg-optional-bg text-optional text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Optional</span>
-              Beneficial but flexible
-            </div>
+        <div className="flex gap-[14px] flex-wrap p-[13px_16px] bg-white border-[1.5px] border-border rounded-[11px] mb-5">
+          <div className="flex items-center gap-[7px] text-[12px] text-medium">
+            <span className="bg-critical-bg text-critical text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Critical</span>
+            Medically recommended or time-sensitive
           </div>
-        )}
+          <div className="flex items-center gap-[7px] text-[12px] text-medium">
+            <span className="bg-optional-bg text-optional text-[10px] font-semibold tracking-[0.7px] uppercase px-2 py-0.5 rounded-[10px]">Optional</span>
+            Beneficial but flexible
+          </div>
+        </div>
 
         <div className="flex gap-1.5 mb-5">
           <button onClick={() => setTri('t1')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all ${tri === 't1' ? 'border-blush bg-blush-pale text-blush' : 'border-border bg-white text-medium'}`}>First Trimester</button>

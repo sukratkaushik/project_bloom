@@ -26,7 +26,6 @@ type PlannerContextType = {
   generatePlan: (setupData: Partial<PlannerState>) => void;
   resetPlan: () => void;
   restoreJourney: (uid: string) => Promise<boolean>;
-  toggleCalmMode: () => void;
   toggleDarkMode: () => void;
   toggleFavoriteName: (name: string) => void;
   toggleFavoritePage: (id: string) => void;
@@ -56,7 +55,6 @@ const defaultState: PlannerState = {
   customTasks: {},
   notes: {},
   critFilter: false,
-  isCalmModeActive: false,
   isDarkModeActive: false,
   isPremium: false,
   hospitalBagItems: [],
@@ -80,7 +78,7 @@ const getInitialState = (): PlannerState => {
     const savedUi = localStorage.getItem('bloom_planner_ui');
     if (savedUi) {
       const parsed = JSON.parse(savedUi);
-      return { ...defaultState, isCalmModeActive: parsed.isCalmModeActive || false, isDarkModeActive: parsed.isDarkModeActive || false };
+      return { ...defaultState, isDarkModeActive: parsed.isDarkModeActive || false };
     }
   } catch (e) {
     // Ignore error
@@ -103,7 +101,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           setState(prev => ({
             ...prev,
             ...JSON.parse(record.stateJSON),
-            isCalmModeActive: prev.isCalmModeActive,
             isDarkModeActive: prev.isDarkModeActive
           }));
         } else {
@@ -113,7 +110,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             setState(prev => ({
               ...prev,
               ...JSON.parse(saved),
-              isCalmModeActive: prev.isCalmModeActive,
               isDarkModeActive: prev.isDarkModeActive
             }));
           }
@@ -173,7 +169,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               setState(prev => ({
                 ...prev,
                 ...cloudData,
-                isCalmModeActive: prev.isCalmModeActive,
                 isDarkModeActive: prev.isDarkModeActive,
                 isSetup: true,
                 activeJourneyId: profile.activeJourneyId,
@@ -191,7 +186,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   stateJSON: JSON.stringify({
                     ...state,
                     ...cloudData,
-                    isCalmModeActive: state.isCalmModeActive,
                     isDarkModeActive: state.isDarkModeActive,
                     isSetup: true,
                     activeJourneyId: profile.activeJourneyId,
@@ -236,7 +230,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     // Save minimal UI preferences to local storage for instant loading on refresh
     try {
       localStorage.setItem('bloom_planner_ui', JSON.stringify({
-        isCalmModeActive: state.isCalmModeActive,
         isDarkModeActive: state.isDarkModeActive,
       }));
     } catch (e) { }
@@ -517,7 +510,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const resetPlan = () => {
     setState((prev) => ({
       ...defaultState,
-      isCalmModeActive: prev.isCalmModeActive,
       isDarkModeActive: prev.isDarkModeActive
     }));
   };
@@ -536,7 +528,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             const newState = {
               ...prev,
               ...cloudData,
-              isCalmModeActive: prev.isCalmModeActive,
               isDarkModeActive: prev.isDarkModeActive,
               isSetup: true,
               activeJourneyId: profile.activeJourneyId
@@ -561,24 +552,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     }
   };
 
-  const toggleCalmMode = () => {
-    setState((prev) => {
-      const nextCalm = !prev.isCalmModeActive;
-      return {
-        ...prev,
-        isCalmModeActive: nextCalm,
-        isDarkModeActive: nextCalm ? false : prev.isDarkModeActive,
-      };
-    });
-  };
-
   const toggleDarkMode = () => {
     setState((prev) => {
       const nextDark = !prev.isDarkModeActive;
       return {
         ...prev,
         isDarkModeActive: nextDark,
-        isCalmModeActive: nextDark ? false : prev.isCalmModeActive,
       };
     });
   };
@@ -602,14 +581,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       return { ...prev, favoritePages: [...current, id] };
     });
   };
-
-  useEffect(() => {
-    if (state.isCalmModeActive) {
-      document.body.classList.add('calm-mode');
-    } else {
-      document.body.classList.remove('calm-mode');
-    }
-  }, [state.isCalmModeActive]);
 
   useEffect(() => {
     if (state.isDarkModeActive) {
@@ -640,7 +611,6 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         generatePlan,
         resetPlan,
         restoreJourney,
-        toggleCalmMode,
         toggleDarkMode,
         toggleFavoriteName,
         toggleFavoritePage,

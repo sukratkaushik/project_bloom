@@ -120,7 +120,7 @@ export const HydrationTracker: React.FC = () => {
         <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Hydration</h1>
       </div>
 
-      {showDehydrationWarning && !state.isCalmModeActive && (
+      {showDehydrationWarning && (
         <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-[12px] flex items-start gap-4 shadow-sm">
           <Flame className="w-6 h-6 shrink-0 mt-0.5" />
           <div>
@@ -130,7 +130,7 @@ export const HydrationTracker: React.FC = () => {
         </div>
       )}
 
-      {streak >= 3 && !state.isCalmModeActive && (
+      {streak >= 3 && (
         <div className="bg-green-50 border border-green-200 text-green-800 p-3 rounded-[12px] flex items-center justify-center gap-2 shadow-sm font-semibold text-[14px]">
           🔥 {streak} Day Streak! Keep it up!
         </div>

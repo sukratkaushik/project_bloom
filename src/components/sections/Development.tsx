@@ -15,12 +15,10 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
     <div className="animate-in fade-in duration-300">
       <div className="mb-7">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Development & Expectations</h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">What's happening in your body — and your baby's — each stage of the journey.</p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">What's happening in your body — and your baby's — each stage of the journey.</p>
       </div>
       
-      {!state.isCalmModeActive && <ContextBanner />}
+      <ContextBanner />
       
       <div className="flex gap-1.5 mb-5">
         <button onClick={() => setTri('t1')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all ${tri === 't1' ? 'border-blush bg-blush-pale text-blush' : 'border-border bg-white text-medium'}`}>First Trimester</button>
@@ -33,9 +31,7 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
           <div className="rounded-[14px] p-6 mb-5 relative overflow-hidden bg-gradient-to-br from-blush-pale to-[#fdf6f4] border-[1.5px] border-blush-light">
             <div className="text-[10px] font-semibold tracking-[2px] uppercase mb-1 text-blush">First Trimester · Weeks 1–12</div>
             <h3 className="font-serif text-[26px] font-normal mb-1">The Hidden Beginning</h3>
-            {!state.isCalmModeActive && (
-              <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.lmp)} — {fmtLong(state.t1End)}</div>
-            )}
+            <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.lmp)} — {fmtLong(state.t1End)}</div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 list-none mt-3.5">
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>Fertilisation and implantation occur</li>
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>Heart begins beating around week 6</li>
@@ -60,9 +56,7 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
           <div className="rounded-[14px] p-6 mb-5 relative overflow-hidden bg-gradient-to-br from-sage-pale to-[#f0f5f1] border-[1.5px] border-sage-light">
             <div className="text-[10px] font-semibold tracking-[2px] uppercase mb-1 text-sage">Second Trimester · Weeks 13–27</div>
             <h3 className="font-serif text-[26px] font-normal mb-1">The Golden Window</h3>
-            {!state.isCalmModeActive && (
-              <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.t1End)} — {fmtLong(state.t2End)}</div>
-            )}
+            <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.t1End)} — {fmtLong(state.t2End)}</div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 list-none mt-3.5">
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>Energy often returns as nausea eases</li>
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>First movements felt around weeks 18–22</li>
@@ -86,9 +80,7 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
           <div className="rounded-[14px] p-6 mb-5 relative overflow-hidden bg-gradient-to-br from-gold-pale to-cream border-[1.5px] border-gold">
             <div className="text-[10px] font-semibold tracking-[2px] uppercase mb-1 text-gold">Third Trimester · Weeks 28–40</div>
             <h3 className="font-serif text-[26px] font-normal mb-1">The Final Stretch</h3>
-            {!state.isCalmModeActive && (
-              <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.t2End)} — {fmtLong(state.dueDate)}</div>
-            )}
+            <div className="text-[12px] text-light italic mb-3.5">{fmtLong(state.t2End)} — {fmtLong(state.dueDate)}</div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 list-none mt-3.5">
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>Baby puts on most of their birth weight</li>
               <li className="text-[13px] text-medium flex items-start gap-1.5"><span className="text-sage-light text-[18px] leading-[1.3] shrink-0">·</span>Lungs mature around weeks 34–36</li>

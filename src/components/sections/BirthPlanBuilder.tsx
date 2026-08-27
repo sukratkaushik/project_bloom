@@ -354,11 +354,9 @@ export const BirthPlanBuilder: React.FC = () => {
           </div>
         </div>
 
-        {!state.isCalmModeActive && (
-          <div className="bg-sage-pale/50 border-l-[3px] border-sage rounded-r-[10px] p-3 text-[12.5px] text-medium mt-4 leading-[1.65]">
-            <strong className="text-charcoal">Remember:</strong> These are preferences, not contracts. Many can — and will — evolve as your pregnancy progresses. The goal is to think them through in advance, not lock them in.
-          </div>
-        )}
+        <div className="bg-sage-pale/50 border-l-[3px] border-sage rounded-r-[10px] p-3 text-[12.5px] text-medium mt-4 leading-[1.65]">
+          <strong className="text-charcoal">Remember:</strong> These are preferences, not contracts. Many can — and will — evolve as your pregnancy progresses. The goal is to think them through in advance, not lock them in.
+        </div>
       </div>
 
       {showPreview && (

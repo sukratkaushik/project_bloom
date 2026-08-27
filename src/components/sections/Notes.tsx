@@ -21,9 +21,7 @@ export const Notes: React.FC = () => {
       <div className="mb-7 flex justify-between items-start">
         <div>
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Notes & Journal</h2>
-          {!state.isCalmModeActive && (
-            <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">A space that's entirely yours — questions, thoughts, names, memories.</p>
-          )}
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">A space that's entirely yours — questions, thoughts, names, memories.</p>
         </div>
         <button 
           onClick={() => {

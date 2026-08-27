@@ -84,11 +84,9 @@ export const SymptomLogger: React.FC = () => {
     <div className="animate-in fade-in duration-300">
       <div className="mb-7">
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Symptom Log</h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-            Track your daily symptoms. This data is securely synced to your private cloud storage.
-          </p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
+          Track your daily symptoms. This data is securely synced to your private cloud storage.
+        </p>
       </div>
 
       <div className="bg-white p-6 rounded-[16px] border-[1.5px] border-border shadow-sm mb-8">

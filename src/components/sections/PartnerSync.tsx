@@ -248,14 +248,12 @@ export const PartnerSync: React.FC = () => {
           <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Partner Sync</h1>
         </div>
 
-        {!state.isCalmModeActive && (
-          <div className="bg-sage-pale/20 border border-sage/30 rounded-xl p-4 flex gap-4">
-            <ShieldCheck className="w-6 h-6 text-sage shrink-0" />
-            <div className="text-[14px] text-charcoal leading-relaxed">
-              <strong>End-to-End Encrypted.</strong> Partner Sync uses direct peer-to-peer WebRTC connections for real-time sharing between you and your partner.
-            </div>
+        <div className="bg-sage-pale/20 border border-sage/30 rounded-xl p-4 flex gap-4">
+          <ShieldCheck className="w-6 h-6 text-sage shrink-0" />
+          <div className="text-[14px] text-charcoal leading-relaxed">
+            <strong>End-to-End Encrypted.</strong> Partner Sync uses direct peer-to-peer WebRTC connections for real-time sharing between you and your partner.
           </div>
-        )}
+        </div>
 
         <div className="bg-white border-[1.5px] border-border rounded-2xl p-6 sm:p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">

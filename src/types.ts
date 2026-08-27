@@ -123,7 +123,6 @@ export type PlannerState = {
   notes: Record<string, string>;
   critFilter: boolean;
   activeJourneyId?: string;
-  isCalmModeActive: boolean;
   isDarkModeActive: boolean;
   birthPlan?: BirthPlan;
   hospitalBagItems?: HospitalBagItem[];

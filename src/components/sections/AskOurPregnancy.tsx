@@ -196,11 +196,9 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
           <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
             <Sparkles className="text-sage" size={32} /> Bloom AI
           </h2>
-          {!state.isCalmModeActive && (
-            <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-              Your personal, secure AI prenatal assistant. Ask questions based on ACOG and WHO guidelines.
-            </p>
-          )}
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
+            Your personal, secure AI prenatal assistant. Ask questions based on ACOG and WHO guidelines.
+          </p>
         </div>
 
         <div className="flex-1 bg-white border-[1.5px] border-border rounded-[16px] flex flex-col overflow-hidden shadow-sm">

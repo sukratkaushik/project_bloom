@@ -107,11 +107,9 @@ export const LaborReadiness: React.FC<LaborReadinessProps> = ({ setActivePage })
         <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
           <Activity className="text-sage" size={32} /> Labor Readiness
         </h2>
-        {!state.isCalmModeActive && (
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-            This conceptual algorithm analyzes your wearable biometric data to detect physiological shifts that often occur 7-10 days before spontaneous labor.
-          </p>
-        )}
+        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
+          This conceptual algorithm analyzes your wearable biometric data to detect physiological shifts that often occur 7-10 days before spontaneous labor.
+        </p>
       </div>
 
       {/* Disclaimer */}
