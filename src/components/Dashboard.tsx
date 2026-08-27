@@ -233,11 +233,11 @@ export const Dashboard: React.FC = () => {
               </motion.div>
             </AnimatePresence>
           </div>
-
-          {/* Dashboard Footer */}
-          <Footer onToast={setToastMessage} />
         </main>
       </div>
+
+      {/* Full-width Footer matching Header dimensions */}
+      <Footer onToast={setToastMessage} />
 
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
