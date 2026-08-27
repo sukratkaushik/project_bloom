@@ -113,8 +113,8 @@ export const PregnancyTracker: React.FC = () => {
         className="flex flex-col md:flex-row md:items-end justify-between gap-4"
       >
         <div>
-          <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Pregnancy Tracker</h2>
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Follow your baby's journey week by week.</p>
+          <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">My Journey</h2>
+          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">Follow your baby's growth and milestone countdowns week by week.</p>
         </div>
 
         <div className="bg-white border-[1.5px] border-border rounded-[12px] p-3 shadow-sm flex items-center gap-3">

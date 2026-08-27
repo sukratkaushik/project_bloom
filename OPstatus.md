@@ -31,13 +31,20 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Matched Button Design (`Sidebar.tsx`):** Harmonized `Export Care Plan PDF` and `Log Out` to share the exact same typography (`font-sans text-[13px] font-medium`), padding (`py-2.5 px-3.5`), border styling (`border border-border/80`), rounded corners (`rounded-[10px]`), elevation, and layout.
     *   **Mobile Drawer Parity:** Standardized all action buttons across both desktop and mobile navigation drawers.
 
-### **Task 5: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 5: Information Architecture & Navigation Restructuring**
+*   **Details:**
+    *   **Eliminated Single-Child "Overview" Header (`Sidebar.tsx`):** Removed the redundant `OVERVIEW` uppercase header.
+    *   **Primary Hub "My Journey" (`Sidebar.tsx`, `PregnancyTracker.tsx`):** Pinned `🌸 My Journey` as the primary home anchor at the top of the sidebar.
+    *   **Renamed Category to "Daily Logs" (`Sidebar.tsx`):** Renamed the second group from `Tracking` to `Daily Logs` to eliminate the semantic collision with `Tracker`.
+    *   **100% Backward Compatible:** Retained internal route ID `tracker` so all deep links, active state bindings, and local storage data remain fully intact.
+
+### **Task 6: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 6: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 7: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
