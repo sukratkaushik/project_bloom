@@ -16,7 +16,7 @@ type SidebarProps = {
 
 const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   daily: {
-    label: "Tracking",
+    label: "Daily Logs",
     items: ['kickcounter', 'contractions', 'vitals', 'mood', 'hydration', 'nutrition', 'symptoms', 'partnersync', 'notes']
   },
   smart: {
@@ -143,7 +143,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   };
 
   const ALL_NAV_ITEMS = [
-    { id: 'tracker', icon: '📅', label: 'Pregnancy Tracker', hideFavorite: true },
+    { id: 'tracker', icon: '🌸', label: 'My Journey', hideFavorite: true },
     { id: 'kickcounter', icon: '👣', label: 'Kick Counter' },
     { id: 'contractions', icon: '⏱', label: 'Contraction Timer' },
     { id: 'vitals', icon: '💙', label: 'Health Metrics' },
@@ -279,8 +279,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           renderSearchResults()
         ) : (
           <>
-            <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
-            <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
+            <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
 
             {state.favoritePages && state.favoritePages.length > 0 && (
               <div className="mt-4 mb-2">
@@ -396,8 +395,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         renderSearchResults()
       ) : (
         <>
-          <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-2 pl-3 leading-normal whitespace-normal">Overview</div>
-          <NavItem id="tracker" icon="📅" label="Pregnancy Tracker" hideFavorite />
+          <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
 
           {state.favoritePages && state.favoritePages.length > 0 && (
             <div className="mt-4 mb-2">
@@ -414,7 +412,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           )}
 
-          <SectionHeader id="daily" label="Tracking" />
+          <SectionHeader id="daily" label="Daily Logs" />
           {expandedSections['daily'] && (
             <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
               {CATEGORIES.daily.items.map(itemId => {
