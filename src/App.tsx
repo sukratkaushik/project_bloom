@@ -59,7 +59,7 @@ const AppContent: React.FC = () => {
     content = <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
-  } else if (currentHash === '#dashboard' && state.isSetup) {
+  } else if (currentHash.startsWith('#dashboard') && state.isSetup) {
     content = <Dashboard />;
   } else if (currentHash === '#setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
     content = <SetupScreen />;
