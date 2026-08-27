@@ -239,8 +239,13 @@ export const analyzeFood = onCall(
       throw new HttpsError("internal", "Server configuration error.");
     }
 
-    const systemPrompt = `You are an expert prenatal nutritionist and clinical AI assistant. Analyze the food image and return ONLY a valid JSON object with this exact structure (no markdown, no extra text):
+    const systemPrompt = `You are an expert prenatal nutritionist and clinical vision AI assistant.
+First, determine if the image contains edible food, a meal, dish, snack, beverage, ingredient, or food nutrition label.
+
+Return ONLY a valid JSON object with this exact structure (no markdown, no extra text):
 {
+  "isFood": true,
+  "nonFoodDescription": "",
   "identifiedItems": ["item1", "item2"],
   "macronutrients": { "protein_g": 0, "carbs_g": 0, "fats_g": 0, "fiber_g": 0 },
   "pregnancyCriticalMicronutrients": { "folate_mcg": 0, "iron_mg": 0, "calcium_mg": 0 },
@@ -249,11 +254,21 @@ export const analyzeFood = onCall(
 }
 
 Rules:
-1. List all visible food items in identifiedItems.
-2. Estimate macronutrients based on standard Indian portion sizes.
-3. Estimate folate (mcg), iron (mg), and calcium (mg).
-4. Set isSafeForPregnancy to false and fill hazardWarning if any of these are detected: raw/undercooked meat/eggs/seafood, unpasteurized dairy, high-mercury fish, raw sprouts, excessive caffeine (>200mg), or alcohol.
-5. If safe, leave hazardWarning as empty string.
+1. If the image is NOT food (e.g. it shows a person, child, face, selfie, pet, animal, household object, landscape, document, etc.):
+   - Set "isFood": false
+   - In "nonFoodDescription", clearly and politely describe what was seen (e.g. "This appears to be a photo of a child/person, not a food item. Please upload a photo of a meal, snack, or food label to check pregnancy safety.")
+   - Set "identifiedItems": []
+   - Set "isSafeForPregnancy": false
+   - Leave macros and micronutrients at 0
+2. If the image IS food:
+   - Set "isFood": true
+   - Set "nonFoodDescription": ""
+   - List all visible food items in "identifiedItems".
+   - Estimate macronutrients based on standard portion sizes.
+   - Estimate folate (mcg), iron (mg), and calcium (mg).
+   - Set "isSafeForPregnancy": false and fill "hazardWarning" if any pregnancy hazards are present: raw/undercooked meat/eggs/seafood, unpasteurized dairy/cheese, high-mercury fish, raw sprouts, excessive caffeine (>200mg), or alcohol.
+   - If safe, set "isSafeForPregnancy": true and leave "hazardWarning" empty.
+
 Return ONLY the JSON object.`;
 
     try {

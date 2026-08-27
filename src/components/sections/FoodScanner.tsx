@@ -6,6 +6,8 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 
 interface ScanResult {
+  isFood?: boolean;
+  nonFoodDescription?: string;
   identifiedItems: string[];
   macronutrients: {
     protein_g: number;
@@ -141,7 +143,21 @@ export const FoodScanner: React.FC = () => {
           </div>
         )}
 
-        {result && (
+        {result && result.isFood === false && (
+          <div className="mt-6 p-5 bg-sage-pale/60 border border-sage/30 rounded-[14px] flex items-start gap-3.5 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="w-10 h-10 rounded-full bg-sage/20 text-sage-dark flex items-center justify-center shrink-0">
+              <Bot size={22} />
+            </div>
+            <div>
+              <h4 className="font-serif font-bold text-[16px] text-charcoal mb-1">No Food or Dish Detected</h4>
+              <p className="text-[13.5px] text-medium leading-relaxed">
+                {result.nonFoodDescription || "This image does not appear to contain a meal, snack, or food label. Please upload a photo of your food dish to analyze its pregnancy nutrition and safety."}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {result && result.isFood !== false && (
           <div className="mt-6 space-y-5 animate-in slide-in-from-bottom-4 duration-500">
             {/* Safety Banner */}
             <div className={`p-4 rounded-[12px] flex items-start gap-3 ${result.isSafeForPregnancy ? 'bg-sage-pale border border-sage/20' : 'bg-critical-bg border border-critical/20'}`}>
