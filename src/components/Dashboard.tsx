@@ -38,6 +38,7 @@ import { Profile } from './sections/Profile';
 import { FloatingChatbot } from './FloatingChatbot';
 import { LanguageSelector } from './LanguageSelector';
 import { Header } from './Header';
+import { Footer } from './Footer';
 import { MedicalReports } from './sections/MedicalReports';
 
 import { navigate } from '../utils/navigation';
@@ -233,22 +234,8 @@ export const Dashboard: React.FC = () => {
             </AnimatePresence>
           </div>
 
-          {/* Dashboard Footer (Inside main scroll area) */}
-          <footer className="mt-12 border-t border-border py-8 text-[13px] text-medium no-print w-full">
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                <span className="font-serif text-[18px] text-sage font-semibold tracking-wide notranslate">Our Pregnancy</span>
-                <span className="opacity-60 hidden sm:inline">|</span>
-                <span className="opacity-80">Made with ❤️ for expectant mothers</span>
-              </div>
-
-              <div className="flex items-center gap-6">
-                <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-sage transition-colors">Privacy Policy</a>
-                <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-sage transition-colors">Terms of Service</a>
-                <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-sage transition-colors">Support</a>
-              </div>
-            </div>
-          </footer>
+          {/* Dashboard Footer */}
+          <Footer onToast={setToastMessage} />
         </main>
       </div>
 

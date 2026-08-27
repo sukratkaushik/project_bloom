@@ -4,6 +4,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions, auth } from '../firebase';
 import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
 import { Header } from './Header';
+import { Footer } from './Footer';
 import { navigate } from '../utils/navigation';
 
 export const CheckoutPage: React.FC = () => {
@@ -460,6 +461,10 @@ export const CheckoutPage: React.FC = () => {
             </div>
           </div>
         )}
+      </div>
+
+      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full pb-8">
+        <Footer />
       </div>
     </div>
   );
