@@ -258,9 +258,9 @@ Return ONLY a valid JSON object with this exact structure (no markdown, no extra
 }
 
 Rules:
-1. If the image is NOT food (e.g. it shows a person, child, face, selfie, pet, animal, household object, landscape, document, etc.):
+1. If the image is NOT food (e.g. it shows people, children, animals/pets, cars/vehicles, electronic devices, laptops, smartphones, furniture, clothes, toys, documents, landscapes, etc.):
    - Set "isFood": false
-   - In "nonFoodDescription", clearly and politely describe what was seen (e.g. "This appears to be a photo of a child/person, not a food item. Please upload a photo of a meal, snack, or food label to check pregnancy safety.")
+   - In "nonFoodDescription", identify the specific non-food subject clearly and politely (e.g. "This appears to be a photo of an animal/pet [or vehicle, electronic device, household object, person], not an edible food item. Please upload a clear photo of your meal, snack, or food label.")
    - Set "identifiedItems": []
    - Set "isSafeForPregnancy": false
    - Leave macros and micronutrients at 0

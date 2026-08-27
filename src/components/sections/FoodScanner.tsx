@@ -60,6 +60,15 @@ export const FoodScanner: React.FC = () => {
       const analyzeFood = httpsCallable(functions, 'analyzeFood');
       const response = await analyzeFood({ base64Data, mimeType });
       const parsedResult = response.data as ScanResult;
+
+      // Fallback safeguard: If identifiedItems is empty or isFood is false, treat as non-food
+      if (parsedResult.isFood === false || (!parsedResult.identifiedItems || parsedResult.identifiedItems.length === 0)) {
+        parsedResult.isFood = false;
+        if (!parsedResult.nonFoodDescription) {
+          parsedResult.nonFoodDescription = "This image does not appear to contain a meal, food dish, or snack. Please upload a clear photo of your food to analyze its pregnancy nutrition and safety.";
+        }
+      }
+
       setResult(parsedResult);
     } catch (err: any) {
       console.error("Error analyzing image:", err);
