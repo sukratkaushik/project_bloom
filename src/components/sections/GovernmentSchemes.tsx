@@ -1,150 +1,755 @@
-import React from 'react';
-import { Building, ExternalLink, HeartHandshake } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Building, ExternalLink, HeartHandshake, MapPin, Search, ShieldCheck, Sparkles, Filter } from 'lucide-react';
+import { Paywall } from '../Paywall';
 
-const SCHEMES = [
+export interface Scheme {
+  id: string;
+  name: string;
+  scope: 'national' | string; // 'national' or state name
+  badge: string;
+  badgeColor: string;
+  benefit: string;
+  who: string;
+  how: string;
+  icon: string;
+  link?: { label: string; url: string; domain: string };
+}
+
+export const INDIAN_STATES_AND_UTS = [
+  'National',
+  'Andhra Pradesh',
+  'Arunachal Pradesh',
+  'Assam',
+  'Bihar',
+  'Chhattisgarh',
+  'Delhi',
+  'Goa',
+  'Gujarat',
+  'Haryana',
+  'Himachal Pradesh',
+  'Jammu and Kashmir',
+  'Jharkhand',
+  'Karnataka',
+  'Kerala',
+  'Ladakh',
+  'Madhya Pradesh',
+  'Maharashtra',
+  'Manipur',
+  'Meghalaya',
+  'Mizoram',
+  'Nagaland',
+  'Odisha',
+  'Puducherry',
+  'Punjab',
+  'Rajasthan',
+  'Sikkim',
+  'Tamil Nadu',
+  'Telangana',
+  'Tripura',
+  'Uttar Pradesh',
+  'Uttarakhand',
+  'West Bengal'
+];
+
+export const SCHEMES_DATABASE: Scheme[] = [
+  // ================= NATIONAL (CENTRAL GOVT) SCHEMES =================
   {
     id: 'pmsma',
     name: 'PM Surakshit Matritva Abhiyan (PMSMA)',
+    scope: 'national',
     badge: 'FREE SERVICE',
     badgeColor: 'bg-sage text-white',
-    benefit: 'Free antenatal check-up every month on the 9th at government health facilities. Includes BP, weight, blood tests, urine test, ultrasound.',
-    who: 'All pregnant women',
-    how: 'Just visit nearest PHC/CHC/District Hospital on 9th of any month. No registration needed.',
-    icon: '🏥'
-  },
-  {
-    id: 'jsy',
-    name: 'Janani Suraksha Yojana (JSY)',
-    badge: '₹1,400 CASH',
-    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
-    benefit: '₹1,400 (rural) or ₹1,000 (urban) cash benefit for institutional delivery at government hospital',
-    who: 'BPL (Below Poverty Line), SC/ST women. All women in low-performing states (UP, Bihar, MP, Rajasthan, Jharkhand, Odisha, Uttarakhand, J&K, Chhattisgarh).',
-    how: 'Register at nearest PHC or with your ASHA worker during pregnancy.',
-    icon: '💰'
+    benefit: 'Free comprehensive antenatal check-up on the 9th of every month at government health facilities. Includes BP, weight, blood & urine tests, ultrasound, and high-risk pregnancy screening.',
+    who: 'All pregnant women in 2nd and 3rd trimesters.',
+    how: 'Visit your nearest PHC, CHC, or District Hospital on the 9th of any month. No advance registration needed.',
+    icon: '🏥',
+    link: { label: 'PMSMA Portal', url: 'https://pmsma.mohfw.gov.in', domain: 'pmsma.mohfw.gov.in' }
   },
   {
     id: 'pmmvy',
     name: 'Pradhan Mantri Matru Vandana Yojana (PMMVY)',
+    scope: 'national',
     badge: '₹5,000 CASH',
     badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
-    benefit: '₹5,000 in 3 instalments for first live birth (₹1,000 on pregnancy registration, ₹2,000 after 6 months ANC, ₹2,000 after delivery + first vaccination)',
-    who: 'All pregnant women for first live birth, aged 19+',
-    how: 'Register at Anganwadi centre or PHC with Aadhaar, bank account, and MCP card.',
-    icon: '🎁'
+    benefit: '₹5,000 direct cash benefit for first child (₹3,000 at ANC registration + ₹2,000 after child birth & first immunization cycle). Additional ₹6,000 for second child if girl.',
+    who: 'Pregnant women aged 19+ (excluding regular government employees).',
+    how: 'Register at your local Anganwadi Centre or through PMMVY Citizen Portal with Aadhaar and MCP card.',
+    icon: '🎁',
+    link: { label: 'PMMVY Official Portal', url: 'https://pmmvy.wcd.gov.in', domain: 'pmmvy.wcd.gov.in' }
+  },
+  {
+    id: 'jsy',
+    name: 'Janani Suraksha Yojana (JSY)',
+    scope: 'national',
+    badge: '₹1,400 CASH',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: '₹1,400 (rural) or ₹1,000 (urban) direct cash assistance for institutional delivery in public health facilities.',
+    who: 'BPL, SC/ST mothers. Universal for all pregnant women delivering in government hospitals across low-performing states (UP, Bihar, MP, Rajasthan, Odisha, Jharkhand, Chhattisgarh, Uttarakhand, J&K, Assam).',
+    how: 'Register with your local ASHA worker or primary health center during pregnancy.',
+    icon: '💰',
+    link: { label: 'NHM JSY Details', url: 'https://nhm.gov.in', domain: 'nhm.gov.in' }
   },
   {
     id: 'jssk',
     name: 'Janani Shishu Suraksha Karyakram (JSSK)',
-    badge: 'FREE DELIVERY',
+    scope: 'national',
+    badge: '100% FREE DELIVERY',
     badgeColor: 'bg-sage text-white',
-    benefit: 'Completely free delivery (including C-section), medicines, diagnostics, blood transfusion, diet, transport at government hospitals. Zero out-of-pocket expense.',
-    who: 'All pregnant women delivering at government facilities',
-    how: 'Just go to government hospital — entitlement is automatic.',
-    icon: '🆓'
+    benefit: 'Completely cashless and free delivery (including C-Section), medicines, lab tests, blood transfusions, food during hospital stay, and free drop-back transport for mother and infant.',
+    who: 'All pregnant women delivering at public health institutions, and sick newborns up to 1 year of age.',
+    how: 'Direct entitlement at all government hospitals and PHCs across India. Zero out-of-pocket payment.',
+    icon: '🆓',
+    link: { label: 'JSSK Guidelines', url: 'https://nhm.gov.in', domain: 'nhm.gov.in' }
   },
   {
     id: 'pmjay',
-    name: 'Pradhan Mantri Jan Arogya Yojana (PMJAY / Ayushman Bharat)',
+    name: 'Ayushman Bharat (PM-JAY)',
+    scope: 'national',
     badge: 'UP TO ₹5 LAKH',
     badgeColor: 'bg-blue-100 text-blue-800 border-[1.5px] border-blue-200',
-    benefit: 'Health insurance cover up to ₹5 lakh per family per year for hospitalisation including maternity care, C-section, NICU care.',
-    who: 'Families in SECC database (Socio-Economic Caste Census). Check eligibility at pmjay.gov.in.',
-    how: 'Visit nearest Ayushman Mitra or Empanelled hospital with Aadhaar.',
-    icon: '🛡️'
+    benefit: 'Annual cashless health insurance coverage up to ₹5,00,000 per family for secondary & tertiary hospitalization, including high-risk C-sections and neonatal ICU (NICU) care.',
+    who: 'Eligible families under SECC / PMJAY database across India.',
+    how: 'Check eligibility on pmjay.gov.in or visit nearest Ayushman Mitra at any empanelled hospital with Aadhaar.',
+    icon: '🛡️',
+    link: { label: 'PMJAY Beneficiary Portal', url: 'https://beneficiary.nha.gov.in', domain: 'nha.gov.in' }
   },
   {
     id: 'icds',
-    name: 'Integrated Child Development Services (ICDS)',
+    name: 'Integrated Child Development Services (ICDS / Poshan Abhiyaan)',
+    scope: 'national',
     badge: 'FREE NUTRITION',
     badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
-    benefit: 'Free supplementary nutrition, health check-ups, immunisation, and nutrition counselling for pregnant and lactating women.',
-    who: 'All pregnant and lactating women',
-    how: 'Register at nearest Anganwadi centre in your area.',
-    icon: '🥗'
+    benefit: 'Take-Home Rations (THR), hot nutritious meals, IFA (Iron Folic Acid) & calcium tablets, growth monitoring, and maternal nutrition counselling.',
+    who: 'All pregnant women and lactating mothers.',
+    how: 'Register at your local village/ward Anganwadi Centre.',
+    icon: '🥗',
+    link: { label: 'Poshan Tracker', url: 'https://poshantracker.in', domain: 'poshantracker.in' }
+  },
+
+  // ================= TAMIL NADU =================
+  {
+    id: 'tn-mrmbs',
+    name: 'Dr. Muthulakshmi Reddy Maternity Benefit Scheme (MRMBS)',
+    scope: 'Tamil Nadu',
+    badge: '₹18,000 + NUTRITION KIT',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Financial assistance of ₹14,000 in 5 cash instalments plus 2 Amma Maternity Nutrition Kits worth ₹4,000 containing health mix, IFA syrup, dates, protein powder, and towels.',
+    who: 'Pregnant women aged 19+ delivering in government hospitals in Tamil Nadu (up to 2 deliveries).',
+    how: 'Register in PICME (Pregnancy and Infant Cohort Monitoring and Evaluation) portal via Village Health Nurse (VHN) before 12 weeks.',
+    icon: '🌸',
+    link: { label: 'PICME Portal TN', url: 'https://picme.tn.gov.in', domain: 'picme.tn.gov.in' }
+  },
+  {
+    id: 'tn-babykit',
+    name: 'Amma Baby Care Kit Scheme',
+    scope: 'Tamil Nadu',
+    badge: 'FREE BABY KIT (16 ITEMS)',
+    badgeColor: 'bg-sage text-white',
+    benefit: 'Free premium kit containing 16 essential baby items: baby dress, towel, bed, mosquito net, napkin, baby oil (100ml), baby shampoo, soap with box, nail clipper, rattle toy, and maternal hand sanitizer.',
+    who: 'All mothers delivering in Tamil Nadu government hospitals.',
+    how: 'Delivered directly to mother at hospital discharge after delivery.',
+    icon: '👶'
+  },
+
+  // ================= TELANGANA =================
+  {
+    id: 'tg-kcrkit',
+    name: 'KCR Kit Scheme',
+    scope: 'Telangana',
+    badge: '₹12,000-₹13,000 + BABY KIT',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Financial aid of ₹12,000 for boy child / ₹13,000 for girl child in 4 instalments + KCR Kit with 16 essentials (soaps, baby oil, bed, clothes, mosquito net, powder, toys).',
+    who: 'Pregnant women delivering in government hospitals in Telangana (up to 2 live births).',
+    how: 'Register with ANM/ASHA worker or PHC during early pregnancy with Aadhaar.',
+    icon: '🎁',
+    link: { label: 'KCR Kit Portal', url: 'https://kcrkit.telangana.gov.in', domain: 'kcrkit.telangana.gov.in' }
+  },
+  {
+    id: 'tg-arogya',
+    name: 'Arogya Lakshmi Scheme',
+    scope: 'Telangana',
+    badge: 'DAILY NUTRITIOUS MEAL',
+    badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
+    benefit: 'One full hot nutritious meal every day (rice, dal/sambar, vegetable curry, 1 boiled egg, 200ml milk) at Anganwadi centers + IFA supplements.',
+    who: 'All pregnant and lactating women in Telangana.',
+    how: 'Enroll at nearest Anganwadi center in your locality.',
+    icon: '🍲'
+  },
+
+  // ================= ANDHRA PRADESH =================
+  {
+    id: 'ap-sampoorna',
+    name: 'YSR Sampoorna Poshana / Poshana Plus',
+    scope: 'Andhra Pradesh',
+    badge: 'FREE NUTRITION KIT & MEAL',
+    badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
+    benefit: 'Monthly nutritious food basket with eggs, milk, peanut-jaggery chikki, ragi flour, dried dates, plus daily hot cooked meals at Anganwadi centers.',
+    who: 'All pregnant and lactating mothers across rural, urban, and tribal AP.',
+    how: 'Register at nearest Anganwadi centre with Aadhaar and pregnancy card.',
+    icon: '🥛'
+  },
+
+  // ================= KARNATAKA =================
+  {
+    id: 'ka-mathru-poorna',
+    name: 'Mathru Poorna Scheme',
+    scope: 'Karnataka',
+    badge: 'DAILY HOT NOURISHING MEAL',
+    badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
+    benefit: 'Provides one full cooked nutritious meal every day (rice, dal/sambar, green leafy vegetables, 1 boiled egg or sprouted gram, 200ml milk, and chikki) for 15 months (pregnancy through 6 months postpartum).',
+    who: 'All pregnant women and lactating mothers in Karnataka.',
+    how: 'Register at local Anganwadi Centre.',
+    icon: '🍱'
+  },
+  {
+    id: 'ka-prasuti-araike',
+    name: 'Prasuti Araike Scheme',
+    scope: 'Karnataka',
+    badge: '₹2,000 CASH AID',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Cash incentive of ₹2,000 given in instalments for undergoing ANC check-ups and institutional delivery in government hospitals.',
+    who: 'BPL and rural pregnant women in Karnataka.',
+    how: 'Register with ASHA worker or at Government Taluk/District Hospital.',
+    icon: '💵'
+  },
+
+  // ================= MAHARASHTRA =================
+  {
+    id: 'mh-babykit',
+    name: 'Baby Care Kit Scheme (Maharashtra)',
+    scope: 'Maharashtra',
+    badge: '₹2,000 BABY KIT',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Comprehensive baby care kit worth ₹2,000 containing baby clothing, towel, plastic diaper mat, digital thermometer, baby oil, body wash, mosquito net, and baby blanket.',
+    who: 'Mothers having their first child delivered in public health centers in Maharashtra.',
+    how: 'Provided directly at the government hospital at time of discharge.',
+    icon: '🧸'
+  },
+  {
+    id: 'mh-matritva',
+    name: 'Matritva Anudan Yojana',
+    scope: 'Maharashtra',
+    badge: 'NUTRITION CASH AID',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Financial aid and counseling to ensure complete antenatal care, institutional delivery, and full infant immunizations for tribal and economically weaker mothers.',
+    who: 'Eligible pregnant women in rural & tribal regions of Maharashtra.',
+    how: 'Apply through local Gram Panchayat / PHC.',
+    icon: '🌿'
+  },
+
+  // ================= DELHI =================
+  {
+    id: 'dl-ladli',
+    name: 'Delhi Ladli Scheme',
+    scope: 'Delhi',
+    badge: 'UP TO ₹11,000 SAVINGS',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: '₹11,000 deposited in the name of the girl child if born in hospital (₹10,000 if born at home), followed by milestone educational savings deposits of ₹5,000 at key school stages.',
+    who: 'Residents of Delhi (3+ years residency) with annual family income up to ₹1,00,000 on birth of girl child.',
+    how: 'Apply through Women and Child Development Department (WCD) Delhi or nearby SB-eDistrict portal.',
+    icon: '👧',
+    link: { label: 'Delhi e-District', url: 'https://edistrict.delhigovt.nic.in', domain: 'edistrict.delhigovt.nic.in' }
+  },
+
+  // ================= UTTAR PRADESH =================
+  {
+    id: 'up-sumangala',
+    name: 'Mukhya Mantri Kanya Sumangala Yojana',
+    scope: 'Uttar Pradesh',
+    badge: '₹15,000 IN 6 PHASES',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Conditional cash transfer of ₹15,000: ₹2,000 on birth of girl child, ₹1,000 on full immunization, ₹2,000 on Class 1 admission, and higher tranches for secondary and degree education.',
+    who: 'Families resident of UP with annual income up to ₹3 Lakh (max 2 daughters per family).',
+    how: 'Apply online at mksy.up.gov.in or via CSC center.',
+    icon: '✨',
+    link: { label: 'UP Sumangala Portal', url: 'https://mksy.up.gov.in', domain: 'mksy.up.gov.in' }
+  },
+  {
+    id: 'up-matritva',
+    name: 'UP Matritva Shishu Evam Balika Madad Yojana',
+    scope: 'Uttar Pradesh',
+    badge: '₹20,000-₹25,000 AID',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Financial aid of ₹20,000 for birth of boy child or ₹25,000 for birth of girl child, plus 3 months minimum wage equivalent to mothers.',
+    who: 'Registered construction workers under the UP Building & Other Construction Workers Board (BOCW).',
+    how: 'Apply on the UP BOCW portal or nearest Labor Office with worker registration card.',
+    icon: '🏗️'
+  },
+
+  // ================= RAJASTHAN =================
+  {
+    id: 'rj-igmpy',
+    name: 'Indira Gandhi Matritva Poshan Yojana (IGMPY)',
+    scope: 'Rajasthan',
+    badge: '₹6,000 CASH (2ND CHILD)',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: '₹6,000 cash assistance paid in 5 stages upon the birth of the 2nd child (pregnant registration, ANC, institutional birth, immunizations, and family planning adoption) to reduce child malnutrition.',
+    who: 'All pregnant women expecting their second child in Rajasthan.',
+    how: 'Register at nearest Anganwadi centre or via Jan Aadhaar portal.',
+    icon: '🤱'
+  },
+  {
+    id: 'rj-rajshree',
+    name: 'Mukhyamantri Rajshree Yojana',
+    scope: 'Rajasthan',
+    badge: 'UP TO ₹50,000 FINANCIAL AID',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: '₹2,500 at birth in government hospital + ₹2,500 on 1-year vaccination, followed by educational milestone payouts up to ₹50,000.',
+    who: 'Girl children born in institutional health facilities in Rajasthan.',
+    how: 'Registered automatically at government hospital using Jan Aadhaar card.',
+    icon: '👑'
+  },
+
+  // ================= ODISHA =================
+  {
+    id: 'od-mamata',
+    name: 'MAMATA Scheme',
+    scope: 'Odisha',
+    badge: '₹5,000 CASH AID',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Conditional cash transfer of ₹5,000 transferred in two instalments (₹3,000 in 2nd trimester after ANC + ₹2,000 after 10-month child vaccination & exclusive breastfeeding).',
+    who: 'All pregnant women aged 19+ in Odisha for first 2 live births (excluding government employees).',
+    how: 'Enroll at your local Anganwadi Centre through the AWW/ASHA worker.',
+    icon: '🌺',
+    link: { label: 'MAMATA Odisha Portal', url: 'https://wcd.odisha.gov.in', domain: 'wcd.odisha.gov.in' }
+  },
+
+  // ================= WEST BENGAL =================
+  {
+    id: 'wb-matrimaa',
+    name: 'Matri Maa & Janani Suraksha Top-up',
+    scope: 'West Bengal',
+    badge: 'FREE DROP-BACK & NUTRITION',
+    badgeColor: 'bg-sage text-white',
+    benefit: 'Dedicated 102 Matri Yaan ambulance transport service for pregnant women to and from hospital, completely free institutional delivery, and comprehensive postnatal kits.',
+    who: 'All pregnant women across West Bengal.',
+    how: 'Dial 102 toll-free ambulance during labor or coordinate through ASHA/ANM worker.',
+    icon: '🚑'
+  },
+  {
+    id: 'wb-kanyashree',
+    name: 'Kanyashree Prakalpa',
+    scope: 'West Bengal',
+    badge: 'ANNUAL SCHOLARSHIP & SAVINGS',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Annual scholarship of ₹1,000 (K1) and one-time grant of ₹25,000 (K2) to protect, nurture, and educate girl children.',
+    who: 'Unmarried girl children in West Bengal.',
+    how: 'Apply through local educational institutions and WCD portal.',
+    icon: '👧',
+    link: { label: 'Kanyashree Portal', url: 'https://wbkanyashree.gov.in', domain: 'wbkanyashree.gov.in' }
+  },
+
+  // ================= BIHAR =================
+  {
+    id: 'br-kanya-utthan',
+    name: 'Mukhyamantri Kanya Utthan Yojana',
+    scope: 'Bihar',
+    badge: '₹2,000 + VACCINE CASH',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: '₹2,000 direct bank transfer on birth of girl child + ₹1,000 upon 1-year immunization completion, totaling up to ₹54,100 through graduation.',
+    who: 'All girl children born in Bihar (up to 2 girls per household).',
+    how: 'Register on the e-Kalyan Bihar portal or through Anganwadi Sevika.',
+    icon: '🎀',
+    link: { label: 'e-Kalyan Bihar', url: 'https://ekalyan.bih.nic.in', domain: 'ekalyan.bih.nic.in' }
+  },
+
+  // ================= MADHYA PRADESH =================
+  {
+    id: 'mp-prasooti',
+    name: 'Mukhyamantri Shramik Sewa Prasooti Sahayata Yojana',
+    scope: 'Madhya Pradesh',
+    badge: '₹16,000 CASH BENEFIT',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Total cash benefit of ₹16,000: ₹4,000 during the last trimester for nutritious diet + ₹12,000 post institutional delivery for infant care.',
+    who: 'Pregnant women registered under Sambal Yojana / Unorganized Workers Board.',
+    how: 'Submit pregnancy registration and Sambal Card at nearest government hospital or PHC.',
+    icon: '🌾'
+  },
+  {
+    id: 'mp-ladli-laxmi',
+    name: 'Ladli Laxmi Yojana 2.0',
+    scope: 'Madhya Pradesh',
+    badge: '₹1,43,000 ASSURANCE',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'Assurance certificate issued upon birth of girl child, with milestone educational payouts and final ₹1,00,000 lump sum at age 21.',
+    who: 'Native families of MP on birth of girl child.',
+    how: 'Register on ladlilaxmi.mp.gov.in through local Anganwadi.',
+    icon: '⭐',
+    link: { label: 'Ladli Laxmi Portal', url: 'https://ladlilaxmi.mp.gov.in', domain: 'ladlilaxmi.mp.gov.in' }
+  },
+
+  // ================= GUJARAT =================
+  {
+    id: 'gj-kpsy',
+    name: 'Kasturba Poshan Sahay Yojana (KPSY)',
+    scope: 'Gujarat',
+    badge: '₹6,000 CASH SUPPORT',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Financial aid of ₹6,000 in 3 instalments (₹2,000 at 1st trimester ANC registration, ₹2,000 after institutional delivery, ₹2,000 after primary child vaccination).',
+    who: 'BPL pregnant women in Gujarat for first two live deliveries.',
+    how: 'Register at nearest Sub-Centre / PHC using BPL ration card and Techo portal.',
+    icon: '🌻'
+  },
+  {
+    id: 'gj-chiranjeevi',
+    name: 'Chiranjeevi Yojana',
+    scope: 'Gujarat',
+    badge: 'FREE PRIVATE HOSPITAL DELIVERY',
+    badgeColor: 'bg-sage text-white',
+    benefit: 'Completely free delivery and emergency obstetric care (including C-sections) at empanelled private nursing homes and hospitals for vulnerable mothers.',
+    who: 'BPL and APL tribal pregnant women in Gujarat.',
+    how: 'Show BPL card / Mamta card at any empanelled private maternity hospital.',
+    icon: '🏥'
+  },
+
+  // ================= KERALA =================
+  {
+    id: 'kl-thalolam',
+    name: 'Thalolam & Snehasparsham Schemes',
+    scope: 'Kerala',
+    badge: 'FREE PEDIATRIC & MATERNAL AID',
+    badgeColor: 'bg-blue-100 text-blue-800 border-[1.5px] border-blue-200',
+    benefit: 'Complete financial assistance and free super-specialty treatment for newborns with congenital diseases or complications, plus monthly maternal support.',
+    who: 'Children under 18 and mothers in Kerala requiring specialized medical support.',
+    how: 'Apply through Social Security Mission Kerala at government medical college hospitals.',
+    icon: '🌿',
+    link: { label: 'Kerala Social Security', url: 'http://www.socialsecuritymission.gov.in', domain: 'socialsecuritymission.gov.in' }
+  },
+
+  // ================= ASSAM =================
+  {
+    id: 'as-mamoni',
+    name: 'Mamoni Scheme (Assam)',
+    scope: 'Assam',
+    badge: '₹5,000 NUTRITION CASH',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: '₹5,000 in two instalments for pregnant women who complete mandatory periodic ANC check-ups to encourage nutrition and institutional care.',
+    who: 'All pregnant women in Assam undergoing ANC at public health centers.',
+    how: 'Register with ASHA / ANM worker at local PHC.',
+    icon: '🍃'
+  },
+
+  // ================= HARYANA =================
+  {
+    id: 'hr-matrushakti',
+    name: 'Mukhyamantri Matru Shakti & Aapki Beti Hamari Beti',
+    scope: 'Haryana',
+    badge: '₹21,000 ONE-TIME GRANT',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    benefit: 'One-time financial deposit of ₹21,000 upon the birth of first/second daughter with interest accumulation for education and healthcare.',
+    who: 'Families in Haryana upon birth of girl child.',
+    how: 'Apply on Saral Haryana portal with Parivar Pehchan Patra (PPP).',
+    icon: '🏵️',
+    link: { label: 'Saral Haryana', url: 'https://saralharyana.gov.in', domain: 'saralharyana.gov.in' }
+  },
+
+  // ================= CHHATTISGARH =================
+  {
+    id: 'cg-kaushalya',
+    name: 'Kaushalya Matritva Yojana',
+    scope: 'Chhattisgarh',
+    badge: '₹5,000 ON 2ND DAUGHTER',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: '₹5,000 one-time direct bank transfer on the birth of a second girl child to support maternal health and girl child nutrition.',
+    who: 'Permanent resident mothers of Chhattisgarh.',
+    how: 'Apply via Anganwadi or District Women & Child Development Department.',
+    icon: '🌾'
+  },
+
+  // ================= PUNJAB =================
+  {
+    id: 'pb-mata-kaushalya',
+    name: 'Mata Kaushalya Kalyan Yojana',
+    scope: 'Punjab',
+    badge: '₹1,000 INSTITUTIONAL AID',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    benefit: 'Cash incentive of ₹1,000 for every pregnant woman who chooses institutional delivery in government hospitals in Punjab.',
+    who: 'All pregnant women delivering in government health facilities in Punjab.',
+    how: 'Entitlement processed directly at hospital discharge.',
+    icon: '🌻'
+  },
+
+  // ================= JHARKHAND =================
+  {
+    id: 'jh-janani',
+    name: 'Mukhyamantri Janani Shishu Swasthya Abhiyan',
+    scope: 'Jharkhand',
+    badge: 'FREE CARE & TRANSPORT',
+    badgeColor: 'bg-sage text-white',
+    benefit: 'Free ambulance transport, free hospital stay, medicines, diagnostic tests, and supplementary nutrition kits for mother and newborn.',
+    who: 'All pregnant mothers in Jharkhand.',
+    how: 'Call 108 for free transport or register at PHC/CHC.',
+    icon: '🌲'
   }
 ];
 
-const LINKS = [
-  { label: 'Check JSY eligibility', url: 'https://nhm.gov.in', domain: 'nhm.gov.in' },
-  { label: 'PMMVY registration', url: 'https://pmmvy.wcd.gov.in', domain: 'pmmvy.wcd.gov.in' },
-  { label: 'PMJAY eligibility', url: 'https://pmjay.gov.in', domain: 'pmjay.gov.in' },
-  { label: 'Find Anganwadi', url: 'https://wcd.nic.in', domain: 'wcd.nic.in' },
-];
-
-import { Paywall } from '../Paywall';
-
 export const GovernmentSchemes: React.FC = () => {
+  const [selectedState, setSelectedState] = useState<string>(() => {
+    return localStorage.getItem('op_selected_scheme_state') || 'National';
+  });
+  const [searchQuery, setSearchQuery] = useState<string>('');
+
+  useEffect(() => {
+    localStorage.setItem('op_selected_scheme_state', selectedState);
+  }, [selectedState]);
+
+  // Filter schemes according to user's dropdown choice & optional search query
+  const filteredSchemes = useMemo(() => {
+    return SCHEMES_DATABASE.filter(scheme => {
+      // 1. State / Scope filter:
+      // If "National": only show scope === 'national'
+      // If specific state: show scope === 'national' OR scope === selectedState
+      const matchesScope = selectedState === 'National'
+        ? scheme.scope === 'national'
+        : (scheme.scope === 'national' || scheme.scope.toLowerCase() === selectedState.toLowerCase());
+
+      if (!matchesScope) return false;
+
+      // 2. Search query filter
+      if (!searchQuery.trim()) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        scheme.name.toLowerCase().includes(q) ||
+        scheme.benefit.toLowerCase().includes(q) ||
+        scheme.who.toLowerCase().includes(q) ||
+        scheme.badge.toLowerCase().includes(q) ||
+        scheme.scope.toLowerCase().includes(q)
+      );
+    });
+  }, [selectedState, searchQuery]);
+
+  const nationalCount = filteredSchemes.filter(s => s.scope === 'national').length;
+  const stateCount = filteredSchemes.filter(s => s.scope !== 'national').length;
+
   return (
     <Paywall featureName="GovernmentSchemes">
       <div className="space-y-6 animate-in fade-in duration-300">
-        <div className="flex items-center gap-3">
-          <Building className="w-8 h-8 text-sage" />
-          <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Government Schemes</h1>
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-2xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
+              <Building className="w-6 h-6" />
+            </div>
+            <div>
+              <h1 className="font-serif text-[clamp(26px,4vw,36px)] font-normal text-charcoal leading-tight">
+                Maternity & Health Schemes
+              </h1>
+              <p className="text-[13.5px] text-medium">
+                Official Indian Central & State Government benefits for pregnancy, delivery, and newborn care.
+              </p>
+            </div>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {SCHEMES.map(scheme => (
-            <div key={scheme.id} className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage transition-colors">
-              <div className="p-5 border-b border-border bg-gray-50/50 flex items-start justify-between gap-4">
-                <div className="flex gap-3">
-                  <div className="text-[24px]">{scheme.icon}</div>
-                  <div>
-                    <h3 className="font-bold text-charcoal text-[15px] leading-tight mb-1">{scheme.name}</h3>
-                    <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full inline-block ${scheme.badgeColor}`}>
-                      {scheme.badge}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="p-5 space-y-4 flex-1">
-                <div>
-                  <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">Benefit</dt>
-                  <dd className="text-[14px] text-charcoal">{scheme.benefit}</dd>
-                </div>
-
-                <div className="bg-sage-pale/20 p-3 rounded-lg border border-sage-pale">
-                  <dt className="text-[11px] font-bold text-sage uppercase tracking-wider mb-0.5">Who Qualifies?</dt>
-                  <dd className="text-[13px] text-charcoal/90">{scheme.who}</dd>
-                </div>
-
-                <div>
-                  <dt className="text-[11px] font-bold text-light uppercase tracking-wider mb-1">How to Apply</dt>
-                  <dd className="text-[13px] text-medium">{scheme.how}</dd>
+        {/* Filter Controls Bar */}
+        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-4 sm:p-5 shadow-sm space-y-4">
+          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+            {/* State Selector Dropdown */}
+            <div className="sm:col-span-6 lg:col-span-5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
+                <MapPin size={13} className="text-sage" /> Select Your State / Region
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedState}
+                  onChange={(e) => setSelectedState(e.target.value)}
+                  className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all cursor-pointer appearance-none"
+                >
+                  <option value="National">🇮🇳 National (All-India Central Schemes)</option>
+                  <optgroup label="── States & Union Territories ──">
+                    {INDIAN_STATES_AND_UTS.filter(s => s !== 'National').map(state => (
+                      <option key={state} value={state}>
+                        📍 {state}
+                      </option>
+                    ))}
+                  </optgroup>
+                </select>
+                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-light">
+                  ▼
                 </div>
               </div>
             </div>
-          ))}
+
+            {/* Keyword Search */}
+            <div className="sm:col-span-6 lg:col-span-7">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
+                <Search size={13} className="text-sage" /> Search by Keyword
+              </label>
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="e.g. cash, nutrition, delivery, C-section, Aadhaar..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] pl-9 pr-3.5 py-2.5 text-[14px] text-charcoal placeholder:text-light focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all"
+                />
+                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-light" />
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] bg-charcoal/10 hover:bg-charcoal/20 px-2 py-0.5 rounded-full text-charcoal font-medium"
+                  >
+                    Clear
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Active Filter Pills / Summary */}
+          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border/70 text-[12.5px]">
+            <div className="flex items-center gap-2 text-charcoal">
+              <span className="font-medium">
+                Showing <strong className="text-sage-dark font-bold">{filteredSchemes.length}</strong> schemes
+              </span>
+              {selectedState !== 'National' ? (
+                <span className="text-light">
+                  ({nationalCount} Central Govt + {stateCount} {selectedState} State)
+                </span>
+              ) : (
+                <span className="text-light">
+                  (All Central Government Schemes)
+                </span>
+              )}
+            </div>
+
+            {selectedState !== 'National' && (
+              <button
+                onClick={() => setSelectedState('National')}
+                className="text-[11.5px] text-sage-dark font-medium hover:underline flex items-center gap-1"
+              >
+                Reset to National only
+              </button>
+            )}
+          </div>
         </div>
 
+        {/* Schemes Grid */}
+        {filteredSchemes.length === 0 ? (
+          <div className="bg-white border border-border rounded-[16px] p-12 text-center shadow-sm">
+            <div className="w-14 h-14 bg-sage-pale rounded-full flex items-center justify-center mx-auto mb-3 text-sage">
+              <Building size={26} />
+            </div>
+            <h3 className="font-serif text-[18px] text-charcoal mb-1">No matching schemes found</h3>
+            <p className="text-[13.5px] text-medium max-w-md mx-auto mb-4">
+              We couldn't find any schemes matching "{searchQuery}" for {selectedState}.
+            </p>
+            <button
+              onClick={() => { setSearchQuery(''); setSelectedState('National'); }}
+              className="px-4 py-2 bg-sage text-white rounded-[10px] text-[13px] font-semibold hover:bg-sage-dark transition-colors"
+            >
+              Reset Filters
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {filteredSchemes.map(scheme => (
+              <div
+                key={scheme.id}
+                className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage hover:shadow-md transition-all duration-200"
+              >
+                {/* Card Header */}
+                <div className="p-5 border-b border-border bg-gray-50/60 flex items-start justify-between gap-4">
+                  <div className="flex gap-3.5">
+                    <div className="text-[28px] shrink-0">{scheme.icon}</div>
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                        {scheme.scope === 'national' ? (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                            🇮🇳 Central Govt
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
+                            🏛️ State Scheme • {scheme.scope}
+                          </span>
+                        )}
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${scheme.badgeColor}`}>
+                          {scheme.badge}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-charcoal text-[15.5px] leading-snug">
+                        {scheme.name}
+                      </h3>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Card Body */}
+                <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
+                  <div className="space-y-3.5">
+                    <div>
+                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-1 flex items-center gap-1">
+                        <Sparkles size={12} className="text-sage" /> Benefit
+                      </dt>
+                      <dd className="text-[13.5px] text-charcoal leading-relaxed">{scheme.benefit}</dd>
+                    </div>
+
+                    <div className="bg-sage-pale/25 p-3 rounded-[10px] border border-sage-pale">
+                      <dt className="text-[10.5px] font-bold text-sage uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-sage" /> Who Qualifies?
+                      </dt>
+                      <dd className="text-[12.5px] text-charcoal/90 leading-relaxed">{scheme.who}</dd>
+                    </div>
+
+                    <div>
+                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-1">How to Apply</dt>
+                      <dd className="text-[12.5px] text-medium leading-relaxed">{scheme.how}</dd>
+                    </div>
+                  </div>
+
+                  {scheme.link && (
+                    <div className="pt-3 border-t border-border/70 flex justify-end">
+                      <a
+                        href={scheme.link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-sage-dark hover:underline"
+                      >
+                        {scheme.link.label} <ExternalLink size={12} />
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* ASHA Info Card */}
         <div className="bg-sage border border-sage-dark rounded-[16px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4 text-white text-center sm:text-left mt-8">
           <div className="bg-white/20 p-3 rounded-full shrink-0">
             <HeartHandshake className="w-8 h-8 text-white" />
           </div>
           <div>
-            <h3 className="font-serif text-[22px] mb-2">Your ASHA Worker is your best resource</h3>
-            <p className="text-[15px] opacity-90 leading-relaxed max-w-3xl">
-              Every village and urban ward has an ASHA (Accredited Social Health Activist) who can help you access all these schemes, accompany you to hospital for delivery, and answer your questions. Ask at your nearest PHC to find your ASHA worker.
+            <h3 className="font-serif text-[22px] mb-2">Your ASHA & Anganwadi Worker is your best guide</h3>
+            <p className="text-[14.5px] opacity-90 leading-relaxed max-w-3xl">
+              Every village and urban ward across India has dedicated ASHA (Accredited Social Health Activist) and Anganwadi workers. They help you register for Central (PMMVY, JSY) and State-specific maternity kits, assist with your MCP health card, and accompany you to the hospital for delivery.
             </p>
           </div>
         </div>
 
+        {/* Official Portals Footer */}
         <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6 mt-6">
-          <h3 className="font-semibold text-charcoal text-[15px] mb-4">Important Links</h3>
+          <h3 className="font-semibold text-charcoal text-[15px] mb-4">Official Central Government Portals</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {LINKS.map(link => (
+            {[
+              { label: 'PMMVY Official Registration', url: 'https://pmmvy.wcd.gov.in', domain: 'pmmvy.wcd.gov.in' },
+              { label: 'National Health Mission (JSY/JSSK)', url: 'https://nhm.gov.in', domain: 'nhm.gov.in' },
+              { label: 'Ayushman Bharat (PM-JAY)', url: 'https://pmjay.gov.in', domain: 'pmjay.gov.in' },
+              { label: 'Ministry of Women & Child Dev.', url: 'https://wcd.nic.in', domain: 'wcd.nic.in' },
+            ].map(link => (
               <a
                 key={link.url}
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col p-3 border border-border rounded-lg hover:bg-gray-50 hover:border-sage transition-all group"
+                className="flex flex-col p-3 border border-border rounded-[10px] hover:bg-cream/50 hover:border-sage transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-[14px] text-charcoal">{link.label}</span>
-                  <ExternalLink className="w-4 h-4 text-medium group-hover:text-sage" />
+                  <span className="font-medium text-[13.5px] text-charcoal group-hover:text-sage-dark">{link.label}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-medium group-hover:text-sage" />
                 </div>
-                <span className="text-[12px] text-medium">{link.domain}</span>
+                <span className="text-[11.5px] text-medium">{link.domain}</span>
               </a>
             ))}
           </div>
