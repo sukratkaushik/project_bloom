@@ -38,13 +38,20 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Renamed Category to "Daily Logs" (`Sidebar.tsx`):** Renamed the second group from `Tracking` to `Daily Logs` to eliminate the semantic collision with `Tracker`.
     *   **100% Backward Compatible:** Retained internal route ID `tracker` so all deep links, active state bindings, and local storage data remain fully intact.
 
-### **Task 6: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 6: Typography System Modernization (Inter + Playfair Display)**
+*   **Details:**
+    *   **Elevated Inter to Primary UI Sans (`index.html`, `index.css`):** Replaced casual rounded `Nunito` with crisp, modern, authoritative `Inter` across all UI controls, body copy, navigation, buttons, forms, and tables.
+    *   **Pruned Unused Font Assets:** Removed dead `Lexend` and `Nunito` network font imports (~120KB performance saving).
+    *   **Locked Monospace Tabular Figures:** Added `JetBrains Mono` for jitter-free contraction timers, kick counters, and countdown clocks.
+    *   **100% Backward Compatible:** Fully preserves all CSS variables (`--font-serif`, `--font-sans`, `--font-mono`) without altering any component structure or layout dimensions.
+
+### **Task 7: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 7: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 8: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
