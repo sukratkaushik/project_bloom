@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { navigate } from '../utils/navigation';
 
 export const PrivacyPolicy: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -37,7 +38,7 @@ export const PrivacyPolicy: React.FC = () => {
   return (
     <div className="min-h-screen bg-cream py-12 px-6 sm:px-12">
       <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
-        <a href="#" className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
+        <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </a>
         <h1 className="font-serif text-4xl text-charcoal mb-6">Privacy Policy</h1>
@@ -99,7 +100,7 @@ export const TermsOfService: React.FC = () => {
   return (
     <div className="min-h-screen bg-cream py-12 px-6 sm:px-12">
       <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
-        <a href="#" className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
+        <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
           <ArrowLeft className="w-4 h-4" /> Back to Home
         </a>
         <h1 className="font-serif text-4xl text-charcoal mb-6">Terms of Service</h1>

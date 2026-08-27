@@ -40,6 +40,8 @@ import { LanguageSelector } from './LanguageSelector';
 import { Header } from './Header';
 import { MedicalReports } from './sections/MedicalReports';
 
+import { navigate } from '../utils/navigation';
+
 const VALID_PAGES = [
   'tracker', 'dev', 'medical', 'medical-reports', 'prep', 'finance', 
   'deadlines', 'postpartum', 'symptoms', 'readiness', 'foodscanner', 
@@ -49,10 +51,10 @@ const VALID_PAGES = [
   'admin-panel', 'notes', 'profile'
 ];
 
-const getPageFromHash = (): string => {
-  const hash = window.location.hash;
-  if (!hash.startsWith('#dashboard')) return 'tracker';
-  const sub = hash.replace(/^#dashboard\/?/, '').split('?')[0].trim();
+const getPageFromPath = (): string => {
+  const path = window.location.pathname;
+  if (!path.startsWith('/dashboard')) return 'tracker';
+  const sub = path.replace(/^\/dashboard\/?/, '').split('?')[0].trim();
   if (sub && VALID_PAGES.includes(sub)) {
     return sub;
   }
@@ -61,27 +63,27 @@ const getPageFromHash = (): string => {
 
 export const Dashboard: React.FC = () => {
   const { state, updateState, toggleCalmMode, toggleDarkMode } = usePlanner();
-  const [activePage, setActivePageState] = useState<string>(getPageFromHash);
+  const [activePage, setActivePageState] = useState<string>(getPageFromPath);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Sync state -> hash when user clicks any tab or feature
+  // Sync state -> URL when user clicks any tab or feature
   const setActivePage = (page: string) => {
     setActivePageState(page);
-    const targetHash = page === 'tracker' ? '#dashboard' : `#dashboard/${page}`;
-    if (window.location.hash !== targetHash) {
-      window.location.hash = targetHash;
+    const targetPath = page === 'tracker' ? '/dashboard' : `/dashboard/${page}`;
+    if (window.location.pathname !== targetPath) {
+      navigate(targetPath);
     }
   };
 
-  // Sync hash -> state when user uses browser Back / Forward buttons or deep links
+  // Sync URL -> state when user uses browser Back / Forward buttons or deep links
   useEffect(() => {
-    const handleHashChange = () => {
-      const page = getPageFromHash();
+    const handleLocationChange = () => {
+      const page = getPageFromPath();
       setActivePageState(page);
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    window.addEventListener('popstate', handleLocationChange);
+    return () => window.removeEventListener('popstate', handleLocationChange);
   }, []);
 
   const handleEmailClick = (email: string, e: React.MouseEvent) => {
@@ -241,8 +243,8 @@ export const Dashboard: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-6">
-                <a href="#privacy" className="hover:text-sage transition-colors">Privacy Policy</a>
-                <a href="#terms" className="hover:text-sage transition-colors">Terms of Service</a>
+                <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-sage transition-colors">Privacy Policy</a>
+                <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-sage transition-colors">Terms of Service</a>
                 <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-sage transition-colors">Support</a>
               </div>
             </div>

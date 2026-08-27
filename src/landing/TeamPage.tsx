@@ -3,6 +3,7 @@ import { ArrowLeft, Linkedin, Sparkles, Shield, Heart, Wifi, Lock } from 'lucide
 import { usePlanner } from '../store';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { PromoBanner } from '../components/PromoBanner';
+import { navigate } from '../utils/navigation';
 
 export const TeamPage: React.FC = () => {
   const { state, toggleDarkMode } = usePlanner();
@@ -50,7 +51,7 @@ export const TeamPage: React.FC = () => {
         <PromoBanner />
         <div className="py-2 px-4">
           <nav className="w-full flex items-center justify-between">
-            <a href="#" className="flex items-center gap-2 shrink-0">
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="flex items-center gap-2 shrink-0">
               <img src="/logo.png" alt="Our Pregnancy Logo" className="w-8 h-8 sm:w-10 sm:h-10 object-contain" />
               <span className="font-serif text-[18px] sm:text-[22px] font-semibold text-sage tracking-wide notranslate">Our Pregnancy</span>
             </a>
@@ -65,7 +66,7 @@ export const TeamPage: React.FC = () => {
               >
                 <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
               </button>
-              <a href="#" className="inline-flex items-center gap-1.5 bg-charcoal text-cream rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap">
+              <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-1.5 bg-charcoal text-cream rounded-[10px] text-[13px] font-semibold px-4 py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap">
                 <ArrowLeft size={14} /> Back Home
               </a>
             </div>
@@ -292,7 +293,7 @@ export const TeamPage: React.FC = () => {
 
         {/* CTA to Main Page */}
         <section className="text-center pt-8">
-          <a href="#" className="inline-flex items-center gap-2 bg-sage hover:bg-sage-dark text-white rounded-full font-bold px-8 py-4 shadow-lg transition-all hover:-translate-y-0.5">
+          <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-2 bg-sage hover:bg-sage-dark text-white rounded-full font-bold px-8 py-4 shadow-lg transition-all hover:-translate-y-0.5">
             Start Your Journey Now <Sparkles size={18} />
           </a>
         </section>
@@ -311,9 +312,9 @@ export const TeamPage: React.FC = () => {
           </div>
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
-            <a href="#" className="hover:text-white transition-colors">Home</a>
-            <a href="#privacy" className="hover:text-white transition-colors">Privacy Policy</a>
-            <a href="#terms" className="hover:text-white transition-colors">Terms of Service</a>
+            <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-white transition-colors">Home</a>
+            <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
           </div>
         </div>
