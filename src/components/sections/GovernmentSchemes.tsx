@@ -493,9 +493,9 @@ export const GovernmentSchemes: React.FC = () => {
     localStorage.setItem('op_selected_scheme_state', selectedState);
   }, [selectedState]);
 
-  // Filter schemes according to user's dropdown choice & optional search query
+  // Filter and sort schemes according to user's dropdown choice & optional search query
   const filteredSchemes = useMemo(() => {
-    return SCHEMES_DATABASE.filter(scheme => {
+    const list = SCHEMES_DATABASE.filter(scheme => {
       // 1. State / Scope filter:
       // If "National": only show scope === 'national'
       // If specific state: show scope === 'national' OR scope === selectedState
@@ -515,6 +515,15 @@ export const GovernmentSchemes: React.FC = () => {
         scheme.badge.toLowerCase().includes(q) ||
         scheme.scope.toLowerCase().includes(q)
       );
+    });
+
+    // 3. Priority Sort: Show State-specific schemes at the very TOP, followed by Central Govt schemes
+    return list.sort((a, b) => {
+      const aIsState = a.scope.toLowerCase() === selectedState.toLowerCase() && selectedState !== 'National';
+      const bIsState = b.scope.toLowerCase() === selectedState.toLowerCase() && selectedState !== 'National';
+      if (aIsState && !bIsState) return -1;
+      if (!aIsState && bIsState) return 1;
+      return 0;
     });
   }, [selectedState, searchQuery]);
 
