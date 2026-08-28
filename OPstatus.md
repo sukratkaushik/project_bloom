@@ -45,13 +45,18 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Locked Monospace Tabular Figures:** Added `JetBrains Mono` for jitter-free contraction timers, kick counters, and countdown clocks.
     *   **100% Backward Compatible:** Fully preserves all CSS variables (`--font-serif`, `--font-sans`, `--font-mono`) without altering any component structure or layout dimensions.
 
-### **Task 7: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 7: Top Promo Ribbon Marquee Velocity Adjustment**
+*   **Details:**
+    *   **Gentle & Readable Velocity (`src/index.css`):** Relaxed the top promotional ribbon marquee animation duration from `30s` to `70s`.
+    *   **Comfortable Reading Speed:** Enables users to easily read offer details and coupon codes without rushed visual motion, while maintaining hover-to-pause functionality.
+
+### **Task 8: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 8: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 9: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
