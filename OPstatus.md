@@ -94,6 +94,19 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   Added a confirmation dialog with full summary of wiped assets before proceeding with deletion.
         *   Protected the primary owner account (`sukrat.kaushik@gmail.com`) from accidental deletion.
 
+### **Task 13: Zero-Trust Email Verification Route Gating & In-App Action Handler**
+*   **Details:**
+    *   **Protected Route Isolation (`App.tsx`):** Centralized all routing behind a zero-trust check (`isVerifiedUser`). Both `/dashboard/*` and `/setup` are completely inaccessible unless the user is actively authenticated AND has `emailVerified: true` (or is the verified owner).
+    *   **Dedicated Verification Gate (`EmailVerificationGate.tsx`):** Unverified users attempting to access protected routes are blocked and shown an interactive verification gate with:
+        *   Live **"Check Again"** status button (reloads user token from Firebase servers without requiring page reload).
+        *   Instant **"Resend Verification Link"** action.
+        *   Clean **"Sign Out / Switch Account"** option.
+    *   **Elimination of State Bypass Loopholes (`App.tsx`, `LandingPage.tsx`, `store.tsx`):**
+        *   Removed unconditional routing to `/dashboard` based on cached `state.isSetup` in localStorage.
+        *   Guarded `hasStartedOnboarding` in `onAuthStateChanged` so unverified accounts never transition into the setup wizard.
+        *   Gated the Landing Page "Go to Dashboard" button strictly to verified users (`isSetupComplete = state.isSetup && isVerified`).
+    *   **Root-Cause Diagnosis for Link Error:** Explained Microsoft SafeLinks pre-fetch consumption causing the "link expired or already used" warning in corporate Outlook/SAP mailboxes.
+
 ---
 
 ## 📅 2026-07-05

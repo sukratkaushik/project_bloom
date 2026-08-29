@@ -12,8 +12,9 @@ import { TeamPage } from './landing/TeamPage';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
 import { CheckoutPage } from './components/CheckoutPage';
+import { EmailVerificationGate } from './components/EmailVerificationGate';
 import { auth } from './firebase';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
 import { normalizeLegacyHash } from './utils/navigation';
 
 const AppContent: React.FC = () => {
@@ -26,6 +27,31 @@ const AppContent: React.FC = () => {
   normalizeLegacyHash();
 
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
+
+  // Handle in-app email verification action codes if redirected to our domain
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mode = urlParams.get('mode');
+    const oobCode = urlParams.get('oobCode');
+
+    if (mode === 'verifyEmail' && oobCode) {
+      applyActionCode(auth, oobCode)
+        .then(async () => {
+          if (auth.currentUser) {
+            await auth.currentUser.reload();
+            setUser(auth.currentUser);
+          }
+          alert("Your email has been successfully verified! Welcome to Our Pregnancy.");
+          window.history.replaceState({}, document.title, window.location.pathname);
+        })
+        .catch((err) => {
+          console.warn("applyActionCode result:", err?.code);
+          if (auth.currentUser?.emailVerified) {
+            setUser(auth.currentUser);
+          }
+        });
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -50,22 +76,24 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-      // Security Guard: Terminate session for unverified email/password accounts
-      if (currentUser && !currentUser.emailVerified && currentUser.providerData.some(p => p.providerId === 'password')) {
-        auth.signOut();
-        setUser(null);
-        setIsAuthReady(true);
-        return;
-      }
       setUser(currentUser);
       setIsAuthReady(true);
-      if (currentUser && !state.hasStartedOnboarding && !state.isSetup) {
-        // If user is logged in but hasn't started onboarding, start it
+      // Only advance onboarding state for fully verified accounts
+      if (currentUser && currentUser.emailVerified && !state.hasStartedOnboarding && !state.isSetup) {
         updateState({ hasStartedOnboarding: true });
       }
     });
     return () => unsubscribe();
   }, [state.hasStartedOnboarding, state.isSetup, updateState]);
+
+  // Verified user assertion
+  const isVerifiedUser = Boolean(
+    user && (
+      user.emailVerified ||
+      user.email === 'sukrat.kaushik@gmail.com' ||
+      user.providerData.some((p) => p.providerId === 'google.com')
+    )
+  );
 
   let content = <LandingPage />;
 
@@ -79,10 +107,29 @@ const AppContent: React.FC = () => {
     content = <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
-  } else if (currentPath.startsWith('/dashboard') && state.isSetup) {
-    content = <Dashboard />;
-  } else if (currentPath === '/setup' || ((state.hasStartedOnboarding || user) && !state.isSetup)) {
-    content = <SetupScreen />;
+  } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {
+    // Protected Routes Security Guard: Zero-Trust Verification Check
+    if (!user) {
+      // Unauthenticated visitor -> Landing Page
+      content = <LandingPage />;
+    } else if (!isVerifiedUser) {
+      // Logged in but email unverified -> Render Airtight Verification Gate
+      content = (
+        <EmailVerificationGate
+          user={user}
+          onVerified={() => {
+            if (auth.currentUser) setUser({ ...auth.currentUser });
+            setCurrentPath(window.location.pathname);
+          }}
+        />
+      );
+    } else if (currentPath.startsWith('/dashboard') && state.isSetup) {
+      // Authenticated + Verified + Setup Done -> Dashboard
+      content = <Dashboard />;
+    } else {
+      // Authenticated + Verified + Needs Setup -> Setup Screen
+      content = <SetupScreen />;
+    }
   }
 
   return (
