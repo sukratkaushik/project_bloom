@@ -20,6 +20,7 @@ export interface UserProfile {
   role?: 'admin' | 'user';
   planTier?: 'free' | 'standard' | 'premium';
   planExpiry?: number | null; // timestamp in ms, or null for lifetime
+  emailVerified?: boolean;
   createdAt: number;
   updatedAt: number;
 }
@@ -53,6 +54,19 @@ export const saveUserProfile = async (uid: string, profile: Partial<UserProfile>
 
 // Admin Functions
 export const getAllUsersForAdmin = async (): Promise<UserProfile[]> => {
+  // 1. Try server-side Cloud Function first (combines Firebase Auth + Firestore users)
+  try {
+    const { httpsCallable } = await import('firebase/functions');
+    const fn = httpsCallable(functions, 'getAdminUsersList');
+    const res = await fn() as { data: { users: UserProfile[] } };
+    if (res?.data?.users && Array.isArray(res.data.users)) {
+      return res.data.users;
+    }
+  } catch (fnErr) {
+    console.warn("Cloud function getAdminUsersList unreachable, using direct Firestore fallback:", fnErr);
+  }
+
+  // 2. Fallback: Direct Firestore collection query
   try {
     const usersRef = collection(db, 'users');
     const q = query(usersRef, orderBy('createdAt', 'desc'));
@@ -62,6 +76,13 @@ export const getAllUsersForAdmin = async (): Promise<UserProfile[]> => {
     console.error("Error fetching all users for admin:", error);
     throw error;
   }
+};
+
+export const deleteUserByAdminCallable = async (targetUid: string): Promise<{ success: boolean; message?: string }> => {
+  const { httpsCallable } = await import('firebase/functions');
+  const fn = httpsCallable(functions, 'deleteUserByAdmin');
+  const res = await fn({ targetUid }) as { data: { success: boolean; message?: string } };
+  return res.data;
 };
 
 export const updateUserSubscription = async (
@@ -162,6 +183,25 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName });
   
+  // Persist user record in Firestore immediately so Admin Suite sees them right away
+  try {
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = displayName.trim();
+    await setDoc(doc(db, 'users', result.user.uid), {
+      uid: result.user.uid,
+      email: cleanEmail,
+      displayName: cleanName,
+      role: 'user',
+      planTier: 'free',
+      planExpiry: null,
+      isSetup: false,
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    }, { merge: true });
+  } catch (fsErr) {
+    console.warn("Could not save initial user doc to Firestore:", fsErr);
+  }
+
   // Send verification email with redirect URL back to ourpregnancy.in
   const actionCodeSettings = {
     url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
