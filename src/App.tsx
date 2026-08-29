@@ -50,6 +50,13 @@ const AppContent: React.FC = () => {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      // Security Guard: Terminate session for unverified email/password accounts
+      if (currentUser && !currentUser.emailVerified && currentUser.providerData.some(p => p.providerId === 'password')) {
+        auth.signOut();
+        setUser(null);
+        setIsAuthReady(true);
+        return;
+      }
       setUser(currentUser);
       setIsAuthReady(true);
       if (currentUser && !state.hasStartedOnboarding && !state.isSetup) {

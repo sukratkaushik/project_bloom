@@ -127,6 +127,10 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
+        // Skip unverified email/password accounts
+        if (!user.emailVerified && user.providerData.some(p => p.providerId === 'password')) {
+          return;
+        }
         try {
           // 1. Check for cloud user profile first
           const profile = await getUserProfile(user.uid);

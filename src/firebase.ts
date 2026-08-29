@@ -161,14 +161,57 @@ export const handleRedirectResult = async () => {
 export const signUpWithEmail = async (email: string, password: string, displayName: string) => {
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName });
-  // Send verification email (non-blocking — user can proceed immediately)
-  sendEmailVerification(result.user).catch(console.error);
+  
+  // Send verification email with redirect URL back to ourpregnancy.in
+  const actionCodeSettings = {
+    url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
+    handleCodeInApp: false,
+  };
+  await sendEmailVerification(result.user, actionCodeSettings);
+
+  // Sign out immediately so unverified account is never logged in
+  await signOut(auth);
   return result.user;
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
   const result = await signInWithEmailAndPassword(auth, email, password);
+  if (!result.user.emailVerified) {
+    // Immediately terminate unverified session
+    await signOut(auth);
+    const error: any = new Error('Email not verified');
+    error.code = 'auth/email-not-verified';
+    throw error;
+  }
   return result.user;
+};
+
+export const resendVerificationEmail = async (email: string, password?: string) => {
+  // If user is already active and unverified
+  if (auth.currentUser && !auth.currentUser.emailVerified) {
+    const actionCodeSettings = {
+      url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
+      handleCodeInApp: false,
+    };
+    await sendEmailVerification(auth.currentUser, actionCodeSettings);
+    await signOut(auth);
+    return true;
+  }
+  
+  // Otherwise, authenticate temporarily to dispatch verification email
+  if (password) {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    if (!result.user.emailVerified) {
+      const actionCodeSettings = {
+        url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
+        handleCodeInApp: false,
+      };
+      await sendEmailVerification(result.user, actionCodeSettings);
+      await signOut(auth);
+      return true;
+    }
+  }
+  return false;
 };
 
 export const resetPassword = async (email: string) => {

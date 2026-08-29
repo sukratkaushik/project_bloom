@@ -70,6 +70,15 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
     *   **Clean Path URL Navigation (`src/utils/navigation.ts`, `App.tsx`, `Dashboard.tsx`):** Migrated from hash routing (`/#dashboard/feature`) to modern clean HTML5 paths (`/dashboard/feature`, `/privacy`, etc.) with full browser history support.
 
+### **Task 11: Mandatory Email Verification Link Enforcement**
+*   **Details:**
+    *   **Mandatory Activation on SignUp (`src/firebase.ts`, `LandingPage.tsx`):** When a user registers via email/password, a verification link is dispatched immediately and the user is signed out (`await signOut(auth)`), blocking immediate access until verified.
+    *   **Login Barrier for Unverified Accounts (`src/firebase.ts`):** In `signInWithEmail`, if `user.emailVerified === false`, the session is terminated immediately with an `auth/email-not-verified` error.
+    *   **Dedicated Verification Screen (`LandingPage.tsx`):** After signing up, modal transitions to a comforting "Check your inbox 📬" view displaying their email and a "Resend verification link" action with live feedback.
+    *   **One-Click Resend on Login (`LandingPage.tsx`):** If an unverified user tries to log in, a helpful alert offers an instant "Resend verification link" button.
+    *   **Session Security Guard (`App.tsx`, `store.tsx`):** On auth state change, any unverified password account is purged from active memory to prevent bypassing verification on refresh.
+    *   **Google Sign-In Unaffected:** Google OAuth users remain pre-verified by Google with zero friction or disruption.
+
 ---
 
 ## 📅 2026-07-05
