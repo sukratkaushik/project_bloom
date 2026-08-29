@@ -1,22 +1,39 @@
-# .github/workflows/devsecops.yml 
-name: DevGuard DevSecOps
+# .github/workflows/ci.yml
+name: CI
 
 on:
-    push:
-
-permissions:
-    contents: read
-    packages: write
-    id-token: write
-    attestations: write
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
 
 jobs:
-    call-devsecops:
-        uses: l3montree-dev/devguard-action/.github/workflows/full.yml@v1.3.0
-        with:
-            asset-name: "bloom/projects/bloom/assets/project_bloom"
-            api-url: "https://api.devguard.org"
-            web-ui: "https://app.devguard.org"
-        secrets:
-            devguard-token: "${{ secrets.DEVGUARD_TOKEN }}" # you need to create this secret in your GitHub repository settings
+  build:
+    name: Install, Lint & Build
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type-check (lint)
+        run: npm run lint
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 7
