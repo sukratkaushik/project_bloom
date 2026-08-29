@@ -2,12 +2,12 @@ import React from 'react';
 import { navigate } from '../utils/navigation';
 
 export const PromoBanner: React.FC = () => {
-  const promoText = "🎁 Special Offers: Get 30 Days Free with code OPIN30, or 90 Days Free with code VIPCARE90! Click to claim! ⚡";
-  const repeatedText = Array(6).fill(promoText).join("   •   ");
+  const promoText = "🎁 Special Offer: Get 30 Days of Premium Subscription for FREE! Use code OPIN30 at checkout. Click to claim! ⚡";
+  const repeatedText = Array(8).fill(promoText).join("   •   ");
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    navigate('/checkout?plan=premium&months=3&coupon=VIPCARE90');
+    navigate('/checkout?plan=premium&months=1&coupon=OPIN30');
   };
 
   return (

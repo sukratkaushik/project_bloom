@@ -425,7 +425,7 @@ export const CheckoutPage: React.FC = () => {
                 {couponError && <p className="text-[11.5px] text-red-500 font-semibold mt-2">{couponError}</p>}
                 {couponSuccess && <p className="text-[11.5px] text-green-600 dark:text-green-400 font-semibold mt-2">{couponSuccess}</p>}
                 <div className="text-[10px] text-light mt-2 italic">
-                  💡 Hint: Enter <span className="font-bold text-sage">OPIN30</span> for 30 days free, or <span className="font-bold text-sage">VIPCARE90</span> for 90 days of free VIP access!
+                  💡 Hint: Enter <span className="font-bold text-sage">OPIN30</span> to claim 30 days of Premium for free!
                 </div>
               </div>
             </div>
