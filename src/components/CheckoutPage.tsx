@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
-import { functions, auth } from '../firebase';
+import { functions, auth, updateUserSubscription } from '../firebase';
 import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
@@ -59,7 +59,23 @@ export const CheckoutPage: React.FC = () => {
       const initialDurationDiscount = Math.floor(params.months / 3) * 50;
       const initialRawSubtotal = initialBase * params.months - initialDurationDiscount;
       
-      if (promo === 'BLOOM30') {
+      if (promo === 'OPIN30') {
+        if (params.plan === 'premium') {
+          const discount = params.months <= 1 ? initialRawSubtotal : initialBase;
+          setAppliedDiscount(discount);
+          setCouponSuccess('Promo code OPIN30 applied! 30 Days (1 Month) of Premium for FREE.');
+        } else {
+          setCouponError('Promo code OPIN30 is only valid for Premium plans.');
+        }
+      } else if (promo === 'VIPCARE90') {
+        if (params.plan === 'premium') {
+          const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
+          setAppliedDiscount(discount);
+          setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of VIP Premium for FREE.');
+        } else {
+          setCouponError('Promo code VIPCARE90 is only valid for Premium plans.');
+        }
+      } else if (promo === 'BLOOM30') {
         if (params.plan === 'premium') {
           const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
           setAppliedDiscount(discount);
@@ -88,14 +104,22 @@ export const CheckoutPage: React.FC = () => {
     setCouponSuccess('');
     const cleanedCode = couponCode.trim().toUpperCase();
 
-    if (cleanedCode === 'BLOOM50') {
-      const discount = Math.round(rawSubtotal * 0.5);
-      setAppliedDiscount(discount);
-      setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
-    } else if (cleanedCode === 'WELCOME10') {
-      const discount = Math.round(rawSubtotal * 0.1);
-      setAppliedDiscount(discount);
-      setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
+    if (cleanedCode === 'OPIN30') {
+      if (selectedPlan !== 'premium') {
+        setCouponError('Promo code OPIN30 is only valid for Premium plans.');
+      } else {
+        const discount = months <= 1 ? rawSubtotal : basePrice;
+        setAppliedDiscount(discount);
+        setCouponSuccess('Promo code OPIN30 applied! 30 Days (1 Month) of Premium for FREE.');
+      }
+    } else if (cleanedCode === 'VIPCARE90') {
+      if (selectedPlan !== 'premium') {
+        setCouponError('Promo code VIPCARE90 is only valid for Premium plans.');
+      } else {
+        const discount = months <= 3 ? rawSubtotal : (basePrice * 3 - 50);
+        setAppliedDiscount(discount);
+        setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of VIP Premium for FREE.');
+      }
     } else if (cleanedCode === 'BLOOM30') {
       if (selectedPlan !== 'premium') {
         setCouponError('Promo code BLOOM30 is only valid for Premium plans.');
@@ -104,22 +128,67 @@ export const CheckoutPage: React.FC = () => {
         setAppliedDiscount(discount);
         setCouponSuccess('Promo code BLOOM30 applied! 3 months of Premium for free.');
       }
+    } else if (cleanedCode === 'BLOOM50') {
+      const discount = Math.round(rawSubtotal * 0.5);
+      setAppliedDiscount(discount);
+      setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
+    } else if (cleanedCode === 'WELCOME10') {
+      const discount = Math.round(rawSubtotal * 0.1);
+      setAppliedDiscount(discount);
+      setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
     } else if (cleanedCode === '') {
       setCouponError('Please enter a coupon code.');
     } else {
-      setCouponError('Invalid coupon code. Try BLOOM50 or BLOOM30.');
+      setCouponError('Invalid coupon code. Try OPIN30 or VIPCARE90.');
     }
   };
 
   const handlePaymentSubmit = async () => {
-
     // Start payment processing
     setCheckoutStep('processing');
 
     if (!auth.currentUser) {
-      alert('You must be signed in to complete this purchase. Please go back to the home screen and sign in.');
+      alert('You must be signed in to complete this order or claim your free access. Please sign in or create an account first.');
       setCheckoutStep('checkout');
       return;
+    }
+
+    const cleanedCode = couponCode.trim().toUpperCase();
+
+    // 100% Free Promo Pass Activation (Zero Gateway)
+    if (finalPrice === 0) {
+      try {
+        const freeMonths = (cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') ? Math.min(months, 3) : Math.min(months, 1);
+        const actualMonths = Math.max(1, freeMonths);
+
+        // Expiry in ms
+        const expiryTimestamp = Date.now() + actualMonths * 30 * 24 * 60 * 60 * 1000;
+        const expiryIso = new Date(expiryTimestamp).toISOString();
+
+        // Update Firestore user document
+        await updateUserSubscription(auth.currentUser.uid, selectedPlan, actualMonths);
+
+        // Update local planner state & Dexie
+        updateState({
+          planTier: selectedPlan,
+          isPremium: selectedPlan === 'premium',
+          premiumPlan: actualMonths >= 12 ? 'annual' : 'monthly',
+          planExpiry: expiryTimestamp,
+          premiumExpiry: expiryIso,
+        });
+
+        const freeTxn = `FREE_${cleanedCode || 'PROMO'}_${Date.now().toString(36).toUpperCase()}`;
+        setTxnId(freeTxn);
+        const computedExpiry = new Date(expiryTimestamp);
+        setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
+        setCheckoutStep('success');
+        return;
+      } catch (err: any) {
+        console.error("Free pass activation failed:", err);
+        alert(`Could not activate promo pass: ${err.message || 'Please try again.'}`);
+        setCheckoutStep('checkout');
+        return;
+      }
     }
 
     try {
@@ -158,6 +227,7 @@ export const CheckoutPage: React.FC = () => {
                 planTier: selectedPlan,
                 isPremium: selectedPlan === 'premium',
                 premiumPlan: months >= 12 ? 'annual' : 'monthly',
+                planExpiry: computedExpiry.getTime(),
                 premiumExpiry: verifyRes.data.expiry,
                 razorpayPaymentId: response.razorpay_payment_id,
               });
@@ -338,7 +408,7 @@ export const CheckoutPage: React.FC = () => {
                     <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-light" />
                     <input
                       type="text"
-                      placeholder="e.g. BLOOM50"
+                      placeholder="e.g. OPIN30 or VIPCARE90"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       className="w-full pl-9 pr-3 py-2 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13px] font-semibold text-charcoal dark:text-white focus:outline-none focus:border-sage uppercase"
@@ -355,28 +425,39 @@ export const CheckoutPage: React.FC = () => {
                 {couponError && <p className="text-[11.5px] text-red-500 font-semibold mt-2">{couponError}</p>}
                 {couponSuccess && <p className="text-[11.5px] text-green-600 dark:text-green-400 font-semibold mt-2">{couponSuccess}</p>}
                 <div className="text-[10px] text-light mt-2 italic">
-                  💡 Hint: Enter <span className="font-bold text-sage">BLOOM30</span> to claim 3 free months of Premium, or <span className="font-bold text-sage">BLOOM50</span> to claim a 50% discount!
+                  💡 Hint: Enter <span className="font-bold text-sage">OPIN30</span> for 30 days free, or <span className="font-bold text-sage">VIPCARE90</span> for 90 days of free VIP access!
                 </div>
               </div>
             </div>
 
             {/* Right Column: Checkout Action */}
             <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 shadow-sm flex flex-col justify-center items-center text-center">
-              <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white mb-4">Complete Your Upgrade</h2>
-              <p className="text-[14px] text-medium mb-8 max-w-[300px]">
-                You will be redirected to our secure payment gateway to complete your purchase using UPI, Card, Netbanking, or Wallet.
+              <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white mb-4">
+                {finalPrice === 0 ? 'Activate Free Premium' : 'Complete Your Upgrade'}
+              </h2>
+              <p className="text-[14px] text-medium mb-8 max-w-[340px]">
+                {finalPrice === 0
+                  ? 'Your promo pass covers 100% of this period! Click below to unlock your premium features immediately without a credit card.'
+                  : 'You will be redirected to our secure payment gateway to complete your purchase using UPI, Card, Netbanking, or Wallet.'}
               </p>
 
               <button
                 onClick={handlePaymentSubmit}
-                className={`w-full max-w-[320px] py-4 rounded-xl font-bold text-[15px] text-white transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0
-                  ${selectedPlan === 'premium' ? 'bg-gold hover:bg-yellow-500 text-charcoal shadow-gold/20' : 'bg-sage hover:bg-sage-dark shadow-sage/20'}`}
+                className={`w-full max-w-[320px] py-4 rounded-xl font-bold text-[15px] text-white transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer
+                  ${finalPrice === 0
+                    ? 'bg-sage-dark hover:bg-sage text-white shadow-sage/20'
+                    : selectedPlan === 'premium' ? 'bg-gold hover:bg-yellow-500 text-charcoal shadow-gold/20' : 'bg-sage hover:bg-sage-dark shadow-sage/20'}`}
               >
-                <ShieldCheck size={18} /> Proceed to Secure Checkout
+                {finalPrice === 0 ? <Sparkles size={18} /> : <ShieldCheck size={18} />}
+                {finalPrice === 0 ? 'Claim Free Premium Access' : 'Proceed to Secure Checkout'}
               </button>
 
               <div className="flex items-center justify-center gap-1 text-[11px] text-light mt-6">
-                <span>🔒 Secured by Razorpay | SSL encryption | PCI-DSS compliant</span>
+                {finalPrice === 0 ? (
+                  <span>⚡ Instant 100% Free Activation • No Credit Card Required</span>
+                ) : (
+                  <span>🔒 Secured by Razorpay | SSL encryption | PCI-DSS compliant</span>
+                )}
               </div>
             </div>
           </div>
@@ -390,14 +471,14 @@ export const CheckoutPage: React.FC = () => {
             </div>
             
             <div className="space-y-2">
-              <h2 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white">Connecting Payment Gateway</h2>
+              <h2 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white">Processing Subscription</h2>
               <p className="text-[14px] text-medium max-w-sm mx-auto leading-relaxed">
-                Please do not close this window or hit back. We are encrypting your transaction data and updating your account subscriptions.
+                Please do not close this window. We are verifying your promotional pass and activating your features.
               </p>
             </div>
 
             <div className="text-[11px] text-light border border-border/60 dark:border-white/5 rounded-xl p-3 bg-cream dark:bg-[#0F172A] italic">
-              Sending secure token to verification service...
+              Updating your pregnancy workspace...
             </div>
           </div>
         )}
@@ -411,10 +492,12 @@ export const CheckoutPage: React.FC = () => {
 
             <div className="space-y-2">
               <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white flex items-center justify-center gap-2">
-                Payment Successful! <Sparkles size={24} className="text-gold fill-gold" />
+                {txnId.startsWith('FREE_') ? 'Free Trial Activated!' : 'Payment Successful!'} <Sparkles size={24} className="text-gold fill-gold" />
               </h2>
               <p className="text-[14.5px] text-medium leading-relaxed">
-                Thank you for upgrading! Your subscription is active, and your pregnancy workspace has been updated.
+                {txnId.startsWith('FREE_')
+                  ? 'Thank you! Your complimentary VIP access has been activated, and your pregnancy workspace is upgraded.'
+                  : 'Thank you for upgrading! Your subscription is active, and your pregnancy workspace has been updated.'}
               </p>
             </div>
 
@@ -435,13 +518,13 @@ export const CheckoutPage: React.FC = () => {
                 <span className="font-semibold text-charcoal dark:text-white">{expiryDate}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-light font-medium">Transaction ID:</span>
+                <span className="text-light font-medium">{txnId.startsWith('FREE_') ? 'Activation Pass:' : 'Transaction ID:'}</span>
                 <span className="font-mono text-medium font-semibold select-all">{txnId}</span>
               </div>
               <div className="h-px bg-border dark:border-white/10 my-1" />
               <div className="flex justify-between">
-                <span className="text-light font-medium">Email Billing:</span>
-                <span className="font-semibold text-charcoal dark:text-white">{userEmail}</span>
+                <span className="text-light font-medium">Account:</span>
+                <span className="font-semibold text-charcoal dark:text-white">{auth.currentUser?.email || userEmail}</span>
               </div>
             </div>
 
@@ -450,7 +533,7 @@ export const CheckoutPage: React.FC = () => {
                 onClick={() => {
                   navigate('/dashboard');
                 }}
-                className="w-full py-4 bg-charcoal text-[#ffffff] dark:bg-[#ffffff] dark:text-[#0F172A] hover:bg-gray-800 dark:hover:bg-white/90 font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
+                className="w-full py-4 bg-charcoal text-[#ffffff] dark:bg-[#ffffff] dark:text-[#0F172A] hover:bg-gray-800 dark:hover:bg-white/90 font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
               >
                 Go to Dashboard
               </button>
