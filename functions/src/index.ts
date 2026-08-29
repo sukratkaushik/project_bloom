@@ -897,3 +897,205 @@ export const deleteUserByAdmin = onCall(
   }
 );
 
+/**
+ * Generates and dispatches a 6-digit numeric OTP for email verification.
+ * Immune to email crawlers, link pre-fetchers, and SafeLinks scanners.
+ */
+export const sendVerificationOtp = onCall(
+  { region: "asia-south1" },
+  async (request) => {
+    const { email, displayName, uid } = request.data || {};
+    if (!email || typeof email !== "string" || !email.includes("@")) {
+      throw new HttpsError("invalid-argument", "Valid email address is required.");
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = displayName && typeof displayName === "string" ? displayName.trim() : "there";
+    const db = admin.firestore();
+
+    // Check rate limit: 45s cooldown
+    const existingOtpDoc = await db.collection("emailOtps").doc(cleanEmail).get();
+    if (existingOtpDoc.exists) {
+      const data = existingOtpDoc.data()!;
+      if (Date.now() - (data.createdAt || 0) < 45 * 1000) {
+        throw new HttpsError("resource-exhausted", "Please wait 45 seconds before requesting another code.");
+      }
+    }
+
+    // Generate secure 6-digit OTP
+    const otpCode = crypto.randomInt(100000, 999999).toString();
+
+    // Persist OTP in Firestore emailOtps collection
+    await db.collection("emailOtps").doc(cleanEmail).set({
+      email: cleanEmail,
+      otp: otpCode,
+      uid: uid || null,
+      attempts: 0,
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
+    });
+
+    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const passVal = process.env.SMTP_PASS;
+
+    // In dev / before SMTP_PASS is configured, log code clearly for testing
+    if (!passVal) {
+      console.log("=========================================");
+      console.log(`[VERIFICATION OTP FOR ${cleanEmail}]: ${otpCode}`);
+      console.log("=========================================");
+      return {
+        success: true,
+        message: `Verification code generated for ${cleanEmail}.`,
+        devNotice: "SMTP_PASS not configured; OTP code logged to functions log.",
+      };
+    }
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Verification Code</title>
+</head>
+<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E35;">
+  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 32px 16px;">
+    <tr>
+      <td align="center">
+        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 540px; background-color: #FFFFFF; border: 1px solid #E8EDE9; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);">
+          <tr>
+            <td style="padding: 36px 32px 28px; text-align: center;">
+              <div style="font-size: 36px; margin-bottom: 12px;">🌸</div>
+              <h1 style="font-family: Georgia, serif; font-size: 24px; font-weight: bold; color: #2C3E35; margin: 0 0 8px;">Welcome to Our Pregnancy</h1>
+              <p style="font-size: 14px; color: #6A7B76; margin: 0 0 24px; line-height: 1.5;">
+                Hello <strong>${cleanName}</strong>,<br/>
+                Please use the following 6-digit verification code to confirm your email and activate your account:
+              </p>
+              <div style="background-color: #F4F7F5; border: 2px dashed #8AB6A3; border-radius: 14px; padding: 20px; text-align: center; margin: 0 0 24px;">
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: bold; letter-spacing: 12px; color: #2C3E35; padding-left: 12px;">
+                  ${otpCode}
+                </div>
+              </div>
+              <p style="font-size: 12.5px; color: #8F9E99; margin: 0 0 8px;">
+                This code is valid for <strong>10 minutes</strong>. Never share this code with anyone.
+              </p>
+              <p style="font-size: 11.5px; color: #B0BCB8; margin: 0;">
+                If you did not request this verification code, you can safely ignore this email.
+              </p>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 16px; text-align: center; font-size: 12px; color: #8F9E99;">
+              © ${new Date().getFullYear()} Our Pregnancy (Project Bloom). Dedicated to maternal care.
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: {
+        user: userVal,
+        pass: passVal,
+      },
+    });
+
+    const mailOptions = {
+      from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+      replyTo: "hello@ourpregnancy.in",
+      to: cleanEmail,
+      subject: `🌸 Your Our Pregnancy verification code: ${otpCode}`,
+      html: emailHtml,
+    };
+
+    try {
+      await transporter.sendMail(mailOptions);
+      console.log(`Verification OTP email delivered to ${cleanEmail}`);
+      return { success: true, message: `Verification code sent to ${cleanEmail}` };
+    } catch (err: any) {
+      console.error(`Failed to send OTP email to ${cleanEmail}:`, err);
+      throw new HttpsError("internal", "Could not dispatch verification email. Please try again.");
+    }
+  }
+);
+
+/**
+ * Validates a 6-digit OTP and marks the user as emailVerified in Firebase Authentication.
+ */
+export const verifyOtp = onCall(
+  { region: "asia-south1" },
+  async (request) => {
+    const { email, otp } = request.data || {};
+    if (!email || !otp) {
+      throw new HttpsError("invalid-argument", "Email and 6-digit OTP code are required.");
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanOtp = otp.toString().trim();
+    const db = admin.firestore();
+    const otpDocRef = db.collection("emailOtps").doc(cleanEmail);
+    const otpDoc = await otpDocRef.get();
+
+    if (!otpDoc.exists) {
+      throw new HttpsError("not-found", "No active verification code found for this email. Please request a new code.");
+    }
+
+    const data = otpDoc.data()!;
+
+    // Check expiry (10 minutes)
+    if (Date.now() > (data.expiresAt || 0)) {
+      await otpDocRef.delete();
+      throw new HttpsError("deadline-exceeded", "This verification code has expired. Please request a new one.");
+    }
+
+    // Rate-limit check: Max 5 incorrect attempts
+    if ((data.attempts || 0) >= 5) {
+      await otpDocRef.delete();
+      throw new HttpsError("resource-exhausted", "Too many incorrect attempts. Please request a new code.");
+    }
+
+    // Check code match
+    if (data.otp !== cleanOtp) {
+      await otpDocRef.update({ attempts: admin.firestore.FieldValue.increment(1) });
+      const remaining = 5 - ((data.attempts || 0) + 1);
+      throw new HttpsError(
+        "permission-denied",
+        `Incorrect code. ${remaining > 0 ? `${remaining} attempt${remaining > 1 ? "s" : ""} remaining.` : "Please request a new code."}`
+      );
+    }
+
+    // Correct OTP! Mark user as emailVerified in Firebase Authentication
+    let targetUid = data.uid;
+    try {
+      if (!targetUid) {
+        const userRec = await admin.auth().getUserByEmail(cleanEmail);
+        targetUid = userRec.uid;
+      }
+      await admin.auth().updateUser(targetUid, { emailVerified: true });
+    } catch (authErr: any) {
+      console.error(`Failed to mark emailVerified in Auth for ${cleanEmail}:`, authErr);
+      throw new HttpsError("internal", "Failed to update verification status.");
+    }
+
+    // Mark Firestore profile as verified
+    if (targetUid) {
+      await db.collection("users").doc(targetUid).set({
+        isEmailVerified: true,
+        updatedAt: Date.now(),
+      }, { merge: true }).catch(console.warn);
+    }
+
+    // Delete redeemed OTP
+    await otpDocRef.delete();
+
+    return { success: true, message: "Email successfully verified!" };
+  }
+);
+

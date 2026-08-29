@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { User, signOut, sendEmailVerification } from 'firebase/auth';
-import { auth } from '../firebase';
-import { MailCheck, CheckCircle2, RefreshCw, AlertCircle, LogOut, Send, ShieldCheck } from 'lucide-react';
+import { User, signOut } from 'firebase/auth';
+import { auth, verifyOtpCallable, sendVerificationOtpCallable } from '../firebase';
+import { ShieldCheck, CheckCircle2, RefreshCw, AlertCircle, LogOut, Send, Loader2 } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 
 interface Props {
@@ -10,51 +10,61 @@ interface Props {
 }
 
 export const EmailVerificationGate: React.FC<Props> = ({ user, onVerified }) => {
-  const [checking, setChecking] = useState(false);
+  const [otpInput, setOtpInput] = useState('');
+  const [verifying, setVerifying] = useState(false);
   const [resending, setResending] = useState(false);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
-  const handleCheckStatus = async () => {
-    setChecking(true);
+  const handleVerifyOtp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = otpInput.trim();
+    if (cleanCode.length !== 6) {
+      setErrorMsg("Please enter all 6 digits.");
+      return;
+    }
+    setVerifying(true);
     setErrorMsg(null);
     try {
-      // Force reload auth token to fetch latest emailVerified flag from Firebase servers
+      if (!user.email) {
+        throw new Error("No user email found.");
+      }
+      await verifyOtpCallable(user.email, cleanCode);
       await user.reload();
-      if (auth.currentUser?.emailVerified) {
-        if (onVerified) {
-          onVerified();
-        } else {
-          window.location.reload();
-        }
+      if (onVerified) {
+        onVerified();
       } else {
-        setErrorMsg("Email not verified yet. Please click the link in your email, then check again.");
+        window.location.reload();
       }
     } catch (err: any) {
-      setErrorMsg(err?.message || "Failed to check status. Please try again.");
+      setErrorMsg(err?.message || "Invalid or expired verification code. Please try again.");
     } finally {
-      setChecking(false);
+      setVerifying(false);
     }
   };
 
-  const handleResendLink = async () => {
+  const handleResendOtp = async () => {
+    if (resendCooldown > 0 || resending || !user.email) return;
     setResending(true);
     setErrorMsg(null);
     setResendSuccess(false);
     try {
-      const actionCodeSettings = {
-        url: window.location.origin + '/#login',
-        handleCodeInApp: false,
-      };
-      await sendEmailVerification(user, actionCodeSettings);
+      await sendVerificationOtpCallable(user.email, user.displayName || undefined, user.uid);
       setResendSuccess(true);
+      setResendCooldown(45);
+      const timer = setInterval(() => {
+        setResendCooldown((prev) => {
+          if (prev <= 1) {
+            clearInterval(timer);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
       setTimeout(() => setResendSuccess(false), 8000);
     } catch (err: any) {
-      if (err?.code === 'auth/too-many-requests') {
-        setErrorMsg("Too many requests. Please wait a few moments before requesting another link.");
-      } else {
-        setErrorMsg(err?.message || "Could not resend email. Please try again.");
-      }
+      setErrorMsg(err?.message || "Could not resend verification code. Please try again.");
     } finally {
       setResending(false);
     }
@@ -73,79 +83,94 @@ export const EmailVerificationGate: React.FC<Props> = ({ user, onVerified }) => 
     <div className="min-h-screen bg-cream flex items-center justify-center p-4 selection:bg-sage-pale selection:text-sage-dark">
       <div className="bg-white rounded-[28px] p-8 md:p-10 w-full max-w-[480px] shadow-2xl border border-border text-center animate-in zoom-in-95 duration-200">
         {/* Brand Icon */}
-        <div className="w-16 h-16 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-6 shadow-sm mx-auto">
-          <MailCheck size={32} />
+        <div className="w-16 h-16 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-5 shadow-sm mx-auto">
+          <ShieldCheck size={32} />
         </div>
 
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-[11px] font-bold uppercase tracking-wider mb-3">
-          <ShieldCheck size={13} />
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 border border-amber-200/80 rounded-full text-amber-800 text-[11px] font-bold uppercase tracking-wider mb-2">
           Verification Required
         </div>
 
         <h1 className="font-serif text-[24px] md:text-[26px] font-bold text-charcoal mb-2">
-          Verify your email address
+          Verify your email
         </h1>
 
-        <p className="text-[13.5px] text-medium mb-6 leading-relaxed">
-          To protect your pregnancy journey and sensitive health records, email verification is required before opening your dashboard.
+        <p className="text-[13.5px] text-medium mb-5 leading-relaxed">
+          Please enter the 6-digit verification code sent to<br />
+          <strong className="text-charcoal font-semibold break-all">{user.email || 'your registered email'}</strong>
         </p>
 
-        <div className="bg-cream/70 border border-border rounded-xl p-3.5 mb-6 text-left">
-          <span className="text-[11px] font-bold uppercase tracking-wider text-light block mb-0.5">
-            Verification link sent to:
-          </span>
-          <span className="font-semibold text-[14px] text-charcoal break-all">
-            {user.email || 'your registered email'}
-          </span>
-        </div>
-
-        {errorMsg && (
-          <div className="flex items-start gap-2 p-3 bg-red-50/90 border border-red-200 rounded-xl text-critical text-[12.5px] font-medium text-left mb-4">
-            <AlertCircle size={16} className="shrink-0 mt-0.5" />
-            <span>{errorMsg}</span>
+        <form onSubmit={handleVerifyOtp} className="space-y-4 mb-6">
+          <div>
+            <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block text-center">
+              6-Digit Security Code
+            </label>
+            <input
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={6}
+              value={otpInput}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                setOtpInput(val);
+                setErrorMsg(null);
+              }}
+              placeholder="••••••"
+              className="w-full text-center font-mono text-[28px] font-bold tracking-[12px] py-2.5 px-4 bg-cream/60 border-[2px] border-border focus:border-sage rounded-xl focus:outline-none focus:ring-1 focus:ring-sage transition-all placeholder:tracking-[8px]"
+              autoFocus
+              required
+            />
           </div>
-        )}
 
-        {resendSuccess && (
-          <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-[12.5px] font-medium text-left mb-4">
-            <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-green-600" />
-            <span>A fresh verification link has been sent to your email. Check your inbox and spam folder.</span>
-          </div>
-        )}
+          {errorMsg && (
+            <div className="flex items-start gap-2 p-3 bg-red-50/90 border border-red-200 rounded-xl text-critical text-[12.5px] font-medium text-left">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              <span>{errorMsg}</span>
+            </div>
+          )}
 
-        <div className="space-y-3">
-          {/* Check Verification Status Button */}
+          {resendSuccess && (
+            <div className="flex items-start gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-green-700 text-[12.5px] font-medium text-left">
+              <CheckCircle2 size={16} className="shrink-0 mt-0.5 text-green-600" />
+              <span>New 6-digit code sent! Check your inbox and spam folder.</span>
+            </div>
+          )}
+
           <button
-            type="button"
-            onClick={handleCheckStatus}
-            disabled={checking}
+            type="submit"
+            disabled={verifying || otpInput.length !== 6}
             className="w-full bg-charcoal hover:bg-black text-cream rounded-[12px] font-bold py-3 text-[14px] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            {checking ? (
+            {verifying ? (
               <>
-                <RefreshCw size={16} className="animate-spin" /> Checking Status...
+                <Loader2 size={16} className="animate-spin" /> Verifying...
               </>
             ) : (
               <>
-                <CheckCircle2 size={16} /> I've Clicked the Link (Check Again)
+                <CheckCircle2 size={16} /> Verify & Activate Account
               </>
             )}
           </button>
+        </form>
 
-          {/* Resend Link Button */}
+        <div className="space-y-3 pt-1 border-t border-border/60">
+          {/* Resend OTP Button */}
           <button
             type="button"
-            onClick={handleResendLink}
-            disabled={resending}
-            className="w-full border-[1.5px] border-border text-charcoal hover:bg-cream rounded-[12px] font-semibold py-2.5 text-[13.5px] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            onClick={handleResendOtp}
+            disabled={resending || resendCooldown > 0}
+            className="w-full border-[1.5px] border-border text-charcoal hover:bg-cream rounded-[12px] font-semibold py-2.5 text-[13px] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {resending ? (
               <>
                 <RefreshCw size={14} className="animate-spin" /> Sending...
               </>
+            ) : resendCooldown > 0 ? (
+              `Resend code in ${resendCooldown}s`
             ) : (
               <>
-                <Send size={14} /> Resend Verification Link
+                <Send size={14} /> Resend 6-Digit Code
               </>
             )}
           </button>
@@ -154,14 +179,14 @@ export const EmailVerificationGate: React.FC<Props> = ({ user, onVerified }) => 
           <button
             type="button"
             onClick={handleSignOut}
-            className="w-full text-light hover:text-charcoal py-2 text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+            className="w-full text-light hover:text-charcoal py-2 text-[12.5px] font-semibold transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
           >
             <LogOut size={13} /> Sign Out / Use Another Account
           </button>
         </div>
 
         <p className="text-[11px] text-light mt-6 italic">
-          💡 Can't find the email? Check your junk or spam folder. Verification links usually arrive in under 60 seconds.
+          💡 The verification code is valid for 10 minutes. If you don't receive it, please check your spam folder.
         </p>
       </div>
     </div>

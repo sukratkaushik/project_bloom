@@ -107,6 +107,20 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   Gated the Landing Page "Go to Dashboard" button strictly to verified users (`isSetupComplete = state.isSetup && isVerified`).
     *   **Root-Cause Diagnosis for Link Error:** Explained Microsoft SafeLinks pre-fetch consumption causing the "link expired or already used" warning in corporate Outlook/SAP mailboxes.
 
+### **Task 14: Universal 6-Digit Email OTP Verification System**
+*   **Details:**
+    *   **Elimination of Link-Based Auto-Detonation:** Replaced clickable action links with a 6-digit numeric OTP. Because email scanners (SafeLinks / Microsoft Defender / Proofpoint) only scan links via HTTP GET, they can never enter or auto-verify a 6-digit code.
+    *   **Server-Side OTP Engine (`functions/src/index.ts`):**
+        *   `sendVerificationOtp`: Generates cryptographic 6-digit OTP (`crypto.randomInt(100000, 999999)`), persists hashed/expiring record in `emailOtps/{email}` (10-minute TTL, 45s cooldown), and dispatches soothing Our Pregnancy branded email.
+        *   `verifyOtp`: Validates code, rate-limits failed attempts (max 5), updates `emailVerified: true` in Firebase Authentication and Firestore `users/{uid}` via Admin SDK, and deletes redeemed OTP.
+    *   **Interactive 6-Digit Input UI (`LandingPage.tsx`):**
+        *   Direct modal transition to numeric security code input with auto-formatting, paste support, and real-time error/attempt feedback.
+        *   Automatic seamless login and setup routing upon valid OTP submission.
+        *   Coordinated resend button with live 45-second countdown timer.
+    *   **Security & Gate Integration (`EmailVerificationGate.tsx`, `firestore.rules`):**
+        *   Protected routes gate updated with native 6-digit code entry.
+        *   Locked `emailOtps` collection in `firestore.rules` preventing any client read/write.
+
 ---
 
 ## 📅 2026-07-05

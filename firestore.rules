@@ -46,5 +46,10 @@ service cloud.firestore {
       allow create: if isAuthenticated() && request.resource.data.uid == request.auth.uid;
       allow read: if isAuthenticated() && (resource.data.uid == request.auth.uid || isAdmin());
     }
+
+    // Rules for Email OTPs (Server-side Cloud Functions only)
+    match /emailOtps/{docId} {
+      allow read, write: if false;
+    }
   }
 }
