@@ -69,7 +69,14 @@ export const LandingPage: React.FC = () => {
     });
   }, []);
 
-  const isSetupComplete = state.isSetup;
+  const isVerified = Boolean(
+    user && (
+      user.emailVerified ||
+      user.email === 'sukrat.kaushik@gmail.com' ||
+      user.providerData.some((p) => p.providerId === 'google.com')
+    )
+  );
+  const isSetupComplete = state.isSetup && isVerified;
 
   const handleStart = async () => {
     try {
