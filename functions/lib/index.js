@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -679,6 +679,143 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
     catch (err) {
         console.error("Failed to send email via SMTP:", err);
         return { success: false, error: err.message };
+    }
+});
+/**
+ * Fetches all registered users from both Firebase Auth and Firestore users collection.
+ * Automatically synchronizes any users who exist in Auth but were missing in Firestore.
+ */
+exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const callerEmail = request.auth.token.email;
+    const db = admin.firestore();
+    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    if (!isCallerAdmin) {
+        throw new https_1.HttpsError("permission-denied", "Only administrators can view the user directory.");
+    }
+    try {
+        // 1. Fetch all Firestore user documents
+        const firestoreUsersSnap = await db.collection("users").get();
+        const firestoreUserMap = new Map();
+        firestoreUsersSnap.docs.forEach((doc) => {
+            firestoreUserMap.set(doc.id, { id: doc.id, ...doc.data() });
+        });
+        // 2. Fetch all Firebase Auth users
+        const listUsersResult = await admin.auth().listUsers(1000);
+        const combinedUsers = [];
+        const seenUids = new Set();
+        for (const authUser of listUsersResult.users) {
+            seenUids.add(authUser.uid);
+            const existingDoc = firestoreUserMap.get(authUser.uid) || {};
+            // If Firestore document is missing, backfill it so it's persisted in the DB
+            if (!firestoreUserMap.has(authUser.uid)) {
+                const newProfile = {
+                    uid: authUser.uid,
+                    email: authUser.email || null,
+                    displayName: authUser.displayName || null,
+                    role: authUser.email === "sukrat.kaushik@gmail.com" ? "admin" : "user",
+                    planTier: "free",
+                    planExpiry: null,
+                    isSetup: false,
+                    createdAt: authUser.metadata.creationTime ? new Date(authUser.metadata.creationTime).getTime() : Date.now(),
+                    updatedAt: Date.now(),
+                };
+                db.collection("users").doc(authUser.uid).set(newProfile, { merge: true }).catch((e) => {
+                    console.warn(`Backfill failed for ${authUser.uid}:`, e);
+                });
+            }
+            combinedUsers.push({
+                uid: authUser.uid,
+                email: authUser.email || existingDoc.email || null,
+                displayName: authUser.displayName || existingDoc.displayName || null,
+                role: existingDoc.role || (authUser.email === "sukrat.kaushik@gmail.com" ? "admin" : "user"),
+                planTier: existingDoc.planTier || "free",
+                planExpiry: existingDoc.planExpiry || null,
+                isSetup: existingDoc.isSetup ?? false,
+                activeJourneyId: existingDoc.activeJourneyId || null,
+                emailVerified: authUser.emailVerified,
+                createdAt: existingDoc.createdAt || (authUser.metadata.creationTime ? new Date(authUser.metadata.creationTime).getTime() : Date.now()),
+                updatedAt: existingDoc.updatedAt || Date.now(),
+            });
+        }
+        // 3. Include any Firestore users not present in Auth
+        for (const [uid, fUser] of firestoreUserMap.entries()) {
+            if (!seenUids.has(uid)) {
+                combinedUsers.push({
+                    uid,
+                    ...fUser,
+                    emailVerified: true,
+                    createdAt: fUser.createdAt || Date.now(),
+                });
+            }
+        }
+        // Sort by newest joined first
+        combinedUsers.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        return { users: combinedUsers };
+    }
+    catch (error) {
+        console.error("Failed to list users for admin:", error);
+        throw new https_1.HttpsError("internal", error.message || "Failed to list users.");
+    }
+});
+/**
+ * Permanently deletes a user from Firebase Auth, Firestore profiles, journeys, trackingData, and feedback.
+ */
+exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const callerEmail = request.auth.token.email;
+    const db = admin.firestore();
+    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    if (!isCallerAdmin) {
+        throw new https_1.HttpsError("permission-denied", "Only administrators can delete users.");
+    }
+    const { targetUid } = request.data;
+    if (!targetUid) {
+        throw new https_1.HttpsError("invalid-argument", "targetUid is required.");
+    }
+    // Safety: Protect the primary owner account from deletion
+    if (targetUid === request.auth.uid || targetUid === "sukrat.kaushik@gmail.com") {
+        throw new https_1.HttpsError("failed-precondition", "Primary administrator account cannot be deleted.");
+    }
+    try {
+        // 1. Delete all journeys and nested tracking data for this user
+        const journeysSnap = await db.collection("journeys").where("uid", "==", targetUid).get();
+        for (const jDoc of journeysSnap.docs) {
+            const trackingSnap = await jDoc.ref.collection("trackingData").get();
+            if (!trackingSnap.empty) {
+                const batch = db.batch();
+                trackingSnap.docs.forEach((doc) => batch.delete(doc.ref));
+                await batch.commit();
+            }
+            await jDoc.ref.delete();
+        }
+        // 2. Delete any feedbacks submitted by user
+        const feedbackSnap = await db.collection("feedbacks").where("uid", "==", targetUid).get();
+        if (!feedbackSnap.empty) {
+            const fBatch = db.batch();
+            feedbackSnap.docs.forEach((doc) => fBatch.delete(doc.ref));
+            await fBatch.commit();
+        }
+        // 3. Delete user document in Firestore
+        await db.collection("users").doc(targetUid).delete();
+        // 4. Delete user account in Firebase Authentication
+        try {
+            await admin.auth().deleteUser(targetUid);
+        }
+        catch (authErr) {
+            console.warn(`Auth delete warning for ${targetUid}:`, authErr.message);
+        }
+        return { success: true, message: `User ${targetUid} and all associated data permanently deleted.` };
+    }
+    catch (err) {
+        console.error(`Failed to delete user ${targetUid}:`, err);
+        throw new https_1.HttpsError("internal", err.message || "Failed to delete user.");
     }
 });
 //# sourceMappingURL=index.js.map

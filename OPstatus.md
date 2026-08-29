@@ -79,6 +79,21 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Session Security Guard (`App.tsx`, `store.tsx`):** On auth state change, any unverified password account is purged from active memory to prevent bypassing verification on refresh.
     *   **Google Sign-In Unaffected:** Google OAuth users remain pre-verified by Google with zero friction or disruption.
 
+### **Task 12: Admin User Auto-Sync & Permanent User Account/Data Deletion**
+*   **Details:**
+    *   **Instant Registration Visibility (`src/firebase.ts`):** During `signUpWithEmail`, user profile document is immediately written to Firestore `users/{uid}` with `role: 'user'`, `planTier: 'free'`, and `isSetup: false` so new accounts appear instantaneously in the Admin Suite.
+    *   **Comprehensive Auth-Firestore Directory Sync (`functions/src/index.ts` `getAdminUsersList`):** Added a 2nd-gen Cloud Function that reconciles all accounts directly from Firebase Auth (`admin.auth().listUsers`) with Firestore user documents, automatically backfilling missing records and exposing `emailVerified` status to the admin.
+    *   **Permanent User Deletion Engine (`functions/src/index.ts` `deleteUserByAdmin`):** Built a secure server-side deletion function that completely purges:
+        1. Firebase Authentication login credentials (`admin.auth().deleteUser`).
+        2. Firestore user profile document (`users/{uid}`).
+        3. All pregnancy journeys and subcollection tracking records (kicks, vitals, daily logs, notes).
+        4. All feedback records submitted by the user.
+    *   **Admin Suite UI Actions (`AdminPanel.tsx`):**
+        *   Added **Actions** column with a dedicated red Delete Trash icon.
+        *   Added "Unverified" indicator badge for newly registered users pending verification.
+        *   Added a confirmation dialog with full summary of wiped assets before proceeding with deletion.
+        *   Protected the primary owner account (`sukrat.kaushik@gmail.com`) from accidental deletion.
+
 ---
 
 ## 📅 2026-07-05

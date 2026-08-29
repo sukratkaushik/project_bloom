@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { db, auth, getAllUsersForAdmin, updateUserSubscription, setUserRole, sendPlanChangeEmail, UserProfile } from '../../firebase';
+import { db, auth, getAllUsersForAdmin, updateUserSubscription, setUserRole, sendPlanChangeEmail, deleteUserByAdminCallable, UserProfile } from '../../firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { usePlanner } from '../../store';
 import { 
@@ -19,7 +19,9 @@ import {
   Edit3,
   ChevronDown,
   UserCheck,
-  Shield
+  Shield,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 
 interface FeedbackItem {
@@ -41,6 +43,8 @@ export const AdminPanel: React.FC = () => {
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [updatingUid, setUpdatingUid] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<UserProfile | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   // Feedbacks state
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
@@ -69,6 +73,22 @@ export const AdminPanel: React.FC = () => {
       console.error("Failed to load users for admin:", err);
     } finally {
       setLoadingUsers(false);
+    }
+  };
+
+  const handleDeleteUser = async () => {
+    if (!userToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteUserByAdminCallable(userToDelete.uid);
+      setUsers((prev) => prev.filter((u) => u.uid !== userToDelete.uid));
+      showToast(`User ${userToDelete.displayName || userToDelete.email} and all data permanently deleted.`);
+      setUserToDelete(null);
+    } catch (err: any) {
+      console.error("Failed to delete user:", err);
+      showToast(`Error: ${err.message || 'Could not delete user'}`);
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -349,6 +369,7 @@ export const AdminPanel: React.FC = () => {
                       <th className="py-3 px-4">Expiry</th>
                       <th className="py-3 px-4">Joined</th>
                       <th className="py-3 px-4 text-center">Admin</th>
+                      <th className="py-3 px-4 text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -377,9 +398,16 @@ export const AdminPanel: React.FC = () => {
                               </div>
 
                               <div className="flex flex-col min-w-0">
-                                <span className="font-bold text-charcoal dark:text-white truncate max-w-[160px] sm:max-w-[200px]" title={user.displayName || ''}>
-                                  {user.displayName || 'Unnamed User'}
-                                </span>
+                                <div className="flex items-center gap-1.5 flex-wrap">
+                                  <span className="font-bold text-charcoal dark:text-white truncate max-w-[150px] sm:max-w-[200px]" title={user.displayName || ''}>
+                                    {user.displayName || 'Unnamed User'}
+                                  </span>
+                                  {user.emailVerified === false && (
+                                    <span className="text-[9px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.2 rounded font-semibold shrink-0">
+                                      Unverified
+                                    </span>
+                                  )}
+                                </div>
                                 <span className="text-light text-[11.5px] truncate max-w-[160px] sm:max-w-[200px]" title={user.email || user.uid}>
                                   {user.email || user.uid}
                                 </span>
@@ -453,6 +481,21 @@ export const AdminPanel: React.FC = () => {
                                 }`}
                               >
                                 👑
+                              </button>
+                            )}
+                          </td>
+
+                          {/* Actions Column: Delete User */}
+                          <td className="py-3 px-4 text-center">
+                            {isOwnerUser || user.email === 'sukrat.kaushik@gmail.com' ? (
+                              <span className="text-[11px] text-light italic">—</span>
+                            ) : (
+                              <button
+                                onClick={() => setUserToDelete(user)}
+                                title="Delete user and all data"
+                                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all cursor-pointer"
+                              >
+                                <Trash2 size={16} />
                               </button>
                             )}
                           </td>
@@ -642,6 +685,65 @@ export const AdminPanel: React.FC = () => {
                 className="flex-1 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-sm font-bold shadow-md cursor-pointer transition-colors disabled:opacity-50"
               >
                 {updatingUid === selectedUser.uid ? 'Saving...' : 'Confirm Plan'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete User Confirmation Modal */}
+      {userToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-border space-y-4">
+            <div className="flex items-center gap-3 text-critical">
+              <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
+                <AlertTriangle size={22} className="text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-serif font-bold text-[18px] text-charcoal dark:text-white">Delete User Account</h3>
+                <p className="text-[12px] text-light">This action is permanent and cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="p-3.5 bg-red-50/70 dark:bg-red-950/20 border border-red-200/80 dark:border-red-900/40 rounded-xl space-y-2 text-[12.5px] text-charcoal/90 dark:text-white/90">
+              <p>
+                Are you sure you want to permanently delete <strong className="text-red-700 dark:text-red-400">{userToDelete.displayName || userToDelete.email}</strong>?
+              </p>
+              <p className="text-[11.5px] text-light">
+                This will completely remove:
+              </p>
+              <ul className="list-disc list-inside text-[11.5px] text-light space-y-0.5 pl-1">
+                <li>Firebase Authentication login credentials</li>
+                <li>User profile and pregnancy configurations</li>
+                <li>All pregnancy tracking history (kicks, vitals, logs)</li>
+                <li>All submitted feedback records</li>
+              </ul>
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setUserToDelete(null)}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 border border-border rounded-xl text-sm font-semibold text-charcoal dark:text-white hover:bg-gray-50 cursor-pointer disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteUser}
+                disabled={isDeleting}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold shadow-md cursor-pointer transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {isDeleting ? (
+                  <>
+                    <RefreshCw size={15} className="animate-spin" /> Deleting...
+                  </>
+                ) : (
+                  <>
+                    <Trash2 size={15} /> Delete Permanently
+                  </>
+                )}
               </button>
             </div>
           </div>
