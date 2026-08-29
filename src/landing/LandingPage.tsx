@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
-import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail } from '../firebase';
+import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable } from '../firebase';
 import {
   ShieldCheck,
   WifiOff,
@@ -125,6 +125,11 @@ export const LandingPage: React.FC = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [showVerifyNotice, setShowVerifyNotice] = useState(false);
   const [registeredEmail, setRegisteredEmail] = useState('');
+  const [cachedPassword, setCachedPassword] = useState('');
+  const [otpInput, setOtpInput] = useState('');
+  const [otpError, setOtpError] = useState('');
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [resendMessage, setResendMessage] = useState('');
   const [nameInput, setNameInput] = useState('');
@@ -148,30 +153,10 @@ export const LandingPage: React.FC = () => {
 
   const handleEmailClick = (email: string, e: React.MouseEvent) => {
     e.preventDefault();
-    // Attempt standard mailto redirect
-    window.location.href = `mailto:${email}`;
-
-    // Copy to clipboard fallback
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(email).then(() => {
-        setToastMessage("Email copied to clipboard!");
-        setTimeout(() => setToastMessage(null), 3000);
-      }).catch((err) => {
-        console.error("Could not copy email: ", err);
-      });
-    } else {
-      try {
-        const tempInput = document.createElement("input");
-        tempInput.value = email;
-        document.body.appendChild(tempInput);
-        tempInput.select();
-        document.execCommand("copy");
-        document.body.removeChild(tempInput);
-        setToastMessage("Email copied to clipboard!");
-        setTimeout(() => setToastMessage(null), 3000);
-      } catch (err) {
-        console.error("Fallback copy failed: ", err);
-      }
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(email);
+      setToastMessage("Email copied to clipboard!");
+      setTimeout(() => setToastMessage(null), 3000);
     }
   };
 
@@ -189,6 +174,11 @@ export const LandingPage: React.FC = () => {
     setShowVerifyNotice(false);
     setResendStatus('idle');
     setResendMessage('');
+    setCachedPassword('');
+    setOtpInput('');
+    setOtpError('');
+    setIsVerifyingOtp(false);
+    setResendCooldown(0);
     setNameInput('');
     setEmailInput('');
     setPasswordInput('');
@@ -202,7 +192,7 @@ export const LandingPage: React.FC = () => {
 
   const getFirebaseErrorMessage = (code: string) => {
     switch (code) {
-      case 'auth/email-not-verified': return 'Your email address is not verified yet. Please check your inbox and click the verification link.';
+      case 'auth/email-not-verified': return 'Your email address is not verified yet. Please enter the 6-digit verification code sent to your inbox.';
       case 'auth/email-already-in-use': return 'This email is already registered. Try logging in instead.';
       case 'auth/invalid-email': return 'Please enter a valid email address.';
       case 'auth/weak-password': return 'Password must be at least 6 characters.';
@@ -213,6 +203,43 @@ export const LandingPage: React.FC = () => {
       case 'auth/network-request-failed': return 'Network error. Please check your connection.';
       case 'auth/operation-not-allowed': return 'Email/Password sign-in is not enabled in your Firebase Console. Please enable it in Authentication > Sign-in method.';
       default: return `Something went wrong (${code || 'Unknown Error'}). Please try again.`;
+    }
+  };
+
+  const handleVerifyOtpSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = otpInput.trim();
+    if (cleanCode.length !== 6) {
+      setOtpError('Please enter all 6 digits.');
+      return;
+    }
+    setOtpError('');
+    setIsVerifyingOtp(true);
+
+    try {
+      await verifyOtpCallable(registeredEmail, cleanCode);
+      // Successful verification!
+      if (cachedPassword) {
+        const user = await signInWithEmail(registeredEmail, cachedPassword);
+        clearModal();
+        const restored = await restoreJourney(user.uid);
+        if (restored) {
+          navigate('/dashboard');
+        } else {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+          navigate('/setup');
+        }
+      } else {
+        setShowVerifyNotice(false);
+        setIsRegistering(false);
+        setEmailInput(registeredEmail);
+        setAuthError('');
+        alert('Email verified successfully! Please enter your password to log in.');
+      }
+    } catch (err: any) {
+      setOtpError(err?.message || 'Invalid or expired verification code. Please try again.');
+    } finally {
+      setIsVerifyingOtp(false);
     }
   };
 
@@ -234,6 +261,7 @@ export const LandingPage: React.FC = () => {
           setIsSubmitting(false);
           return;
         }
+        setCachedPassword(passwordInput);
         await signUpWithEmail(emailInput, passwordInput, nameInput);
         setRegisteredEmail(emailInput);
         setShowVerifyNotice(true);
@@ -241,6 +269,8 @@ export const LandingPage: React.FC = () => {
         setPasswordInput('');
         setConfirmPasswordInput('');
         setAuthError('');
+        setOtpInput('');
+        setOtpError('');
         setResendStatus('idle');
         setResendMessage('');
       } else {
@@ -296,71 +326,111 @@ export const LandingPage: React.FC = () => {
             </div>
 
             {showVerifyNotice ? (
-              /* Verification Email Sent Notice */
+              /* 6-Digit OTP Verification Screen */
               <div className="text-center animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-14 h-14 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm mx-auto">
-                  <MailCheck size={28} />
+                <div className="w-14 h-14 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-3 shadow-sm mx-auto">
+                  <ShieldCheck size={28} />
                 </div>
-                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-2">Check your inbox 📬</h2>
-                <p className="text-[13.5px] text-medium mb-5 leading-relaxed">
-                  We've sent a verification link to <strong className="text-charcoal block mt-1 font-semibold break-all">{registeredEmail}</strong>
-                  Please click the link in your email to verify your account before logging in.
+                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1.5">Enter 6-Digit Code</h2>
+                <p className="text-[13px] text-medium mb-5 leading-relaxed">
+                  We've sent a 6-digit verification code to<br />
+                  <strong className="text-charcoal font-semibold break-all">{registeredEmail}</strong>
                 </p>
 
-                <div className="space-y-3">
-                  <button
-                    type="button"
-                    onClick={async () => {
-                      if (resendStatus === 'sending') return;
-                      setResendStatus('sending');
-                      setResendMessage('');
-                      try {
-                        await resendVerificationEmail(registeredEmail, passwordInput);
-                        setResendStatus('sent');
-                        setResendMessage('Verification link resent! Check your inbox.');
-                      } catch (err: any) {
-                        setResendStatus('error');
-                        setResendMessage('Could not resend link. Please try logging in below.');
-                      }
-                    }}
-                    disabled={resendStatus === 'sending'}
-                    className="w-full border-[1.5px] border-border text-charcoal hover:bg-cream rounded-[10px] font-bold py-2.5 transition-all text-[13px] flex items-center justify-center gap-2 cursor-pointer"
-                  >
-                    {resendStatus === 'sending' ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" /> Sending...
-                      </>
-                    ) : resendStatus === 'sent' ? (
-                      <>
-                        <CheckCircle2 size={16} className="text-green-600" /> Link Resent!
-                      </>
-                    ) : (
-                      "Didn't receive email? Resend link"
-                    )}
-                  </button>
+                <form onSubmit={handleVerifyOtpSubmit} className="space-y-4 text-left">
+                  <div>
+                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block text-center">
+                      Security Code
+                    </label>
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      pattern="[0-9]*"
+                      maxLength={6}
+                      value={otpInput}
+                      onChange={(e) => {
+                        const val = e.target.value.replace(/\D/g, '').slice(0, 6);
+                        setOtpInput(val);
+                        setOtpError('');
+                      }}
+                      placeholder="••••••"
+                      className="w-full text-center font-mono text-[28px] font-bold tracking-[12px] py-2.5 px-4 bg-cream/60 border-[2px] border-border focus:border-sage rounded-xl focus:outline-none focus:ring-1 focus:ring-sage transition-all placeholder:tracking-[8px]"
+                      autoFocus
+                      required
+                    />
+                  </div>
 
-                  {resendMessage && (
-                    <p className={`text-[12px] text-center font-medium ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
-                      {resendMessage}
-                    </p>
+                  {otpError && (
+                    <div className="text-[12.5px] text-critical font-medium bg-red-50 border border-red-200 p-2.5 rounded-lg text-center leading-snug">
+                      {otpError}
+                    </div>
                   )}
 
                   <button
-                    type="button"
-                    onClick={() => {
-                      setShowVerifyNotice(false);
-                      setIsRegistering(false);
-                      setEmailInput(registeredEmail);
-                      setAuthError('');
-                    }}
-                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all shadow-sm text-[14px] cursor-pointer"
+                    type="submit"
+                    disabled={isVerifyingOtp || otpInput.length !== 6}
+                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
-                    Proceed to Log In →
+                    {isVerifyingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
+                    Verify & Activate Account
                   </button>
-                </div>
 
-                <p className="text-[11px] text-light mt-4 italic">
-                  💡 Tip: Be sure to check your spam/junk folder if you don't see it within 2 minutes.
+                  <div className="flex items-center justify-between text-[12px] pt-1">
+                    <button
+                      type="button"
+                      onClick={async () => {
+                        if (resendCooldown > 0 || resendStatus === 'sending') return;
+                        setResendStatus('sending');
+                        setOtpError('');
+                        setResendMessage('');
+                        try {
+                          await sendVerificationOtpCallable(registeredEmail);
+                          setResendStatus('sent');
+                          setResendMessage('New 6-digit code sent! Check inbox.');
+                          setResendCooldown(45);
+                          const timer = setInterval(() => {
+                            setResendCooldown((prev) => {
+                              if (prev <= 1) {
+                                clearInterval(timer);
+                                return 0;
+                              }
+                              return prev - 1;
+                            });
+                          }, 1000);
+                        } catch (err: any) {
+                          setResendStatus('error');
+                          setResendMessage(err?.message || 'Could not resend code. Please try again.');
+                        }
+                      }}
+                      disabled={resendCooldown > 0 || resendStatus === 'sending'}
+                      className="text-sage font-bold hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowVerifyNotice(false);
+                        setIsRegistering(false);
+                        setEmailInput(registeredEmail);
+                        setAuthError('');
+                      }}
+                      className="text-medium hover:text-charcoal font-semibold transition-colors cursor-pointer"
+                    >
+                      Back to Log In
+                    </button>
+                  </div>
+
+                  {resendMessage && (
+                    <p className={`text-[12px] font-medium text-center ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
+                      {resendMessage}
+                    </p>
+                  )}
+                </form>
+
+                <p className="text-[11px] text-light mt-5 italic">
+                  💡 Tip: The 6-digit code expires in 10 minutes. Please check your junk/spam folder if you don't see it.
                 </p>
               </div>
             ) : showForgotPassword ? (
@@ -489,29 +559,31 @@ export const LandingPage: React.FC = () => {
                     <div className="space-y-1.5 p-3 bg-red-50/80 border border-red-200/60 rounded-[10px]">
                       <div className="text-[12.5px] text-critical font-medium leading-snug">{authError}</div>
                       {authError.includes('not verified') && (
-                        <button
-                          type="button"
-                          onClick={async () => {
-                            if (!emailInput || !passwordInput) {
-                              setResendMessage('Please enter your password above to resend.');
-                              return;
-                            }
-                            setResendStatus('sending');
-                            setResendMessage('');
-                            try {
-                              await resendVerificationEmail(emailInput, passwordInput);
-                              setResendStatus('sent');
-                              setResendMessage('Fresh verification link sent! Check your inbox.');
-                            } catch (err: any) {
-                              setResendStatus('error');
-                              setResendMessage('Could not resend link. Please check your password.');
-                            }
-                          }}
-                          disabled={resendStatus === 'sending'}
-                          className="text-[12px] text-sage font-bold hover:underline inline-block text-left cursor-pointer"
-                        >
-                          {resendStatus === 'sending' ? 'Sending link...' : 'Resend verification link'}
-                        </button>
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              if (!emailInput) {
+                                setResendMessage('Please enter your email above.');
+                                return;
+                              }
+                              setRegisteredEmail(emailInput);
+                              setCachedPassword(passwordInput);
+                              setShowVerifyNotice(true);
+                              setOtpInput('');
+                              setOtpError('');
+                              setResendMessage('');
+                              try {
+                                await sendVerificationOtpCallable(emailInput);
+                              } catch (err) {
+                                console.warn("Auto-resend OTP error:", err);
+                              }
+                            }}
+                            className="text-[12.5px] text-sage font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            Enter 6-digit verification code →
+                          </button>
+                        </div>
                       )}
                       {resendMessage && (
                         <p className={`text-[11.5px] font-medium ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>

@@ -183,10 +183,11 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
   const result = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(result.user, { displayName });
   
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanName = displayName.trim();
+
   // Persist user record in Firestore immediately so Admin Suite sees them right away
   try {
-    const cleanEmail = email.trim().toLowerCase();
-    const cleanName = displayName.trim();
     await setDoc(doc(db, 'users', result.user.uid), {
       uid: result.user.uid,
       email: cleanEmail,
@@ -195,6 +196,7 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
       planTier: 'free',
       planExpiry: null,
       isSetup: false,
+      isEmailVerified: false,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     }, { merge: true });
@@ -202,16 +204,30 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
     console.warn("Could not save initial user doc to Firestore:", fsErr);
   }
 
-  // Send verification email with redirect URL back to ourpregnancy.in
-  const actionCodeSettings = {
-    url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
-    handleCodeInApp: false,
-  };
-  await sendEmailVerification(result.user, actionCodeSettings);
+  // Dispatch 6-digit OTP to user's email
+  try {
+    await sendVerificationOtpCallable(cleanEmail, cleanName, result.user.uid);
+  } catch (otpErr) {
+    console.error("Failed to dispatch verification OTP:", otpErr);
+  }
 
   // Sign out immediately so unverified account is never logged in
   await signOut(auth);
   return result.user;
+};
+
+export const sendVerificationOtpCallable = async (email: string, displayName?: string, uid?: string) => {
+  const { httpsCallable } = await import('firebase/functions');
+  const fn = httpsCallable(functions, 'sendVerificationOtp');
+  const res = await fn({ email, displayName, uid }) as { data: { success: boolean; message?: string; devNotice?: string } };
+  return res.data;
+};
+
+export const verifyOtpCallable = async (email: string, otp: string) => {
+  const { httpsCallable } = await import('firebase/functions');
+  const fn = httpsCallable(functions, 'verifyOtp');
+  const res = await fn({ email, otp }) as { data: { success: boolean; message?: string } };
+  return res.data;
 };
 
 export const signInWithEmail = async (email: string, password: string) => {
@@ -227,31 +243,14 @@ export const signInWithEmail = async (email: string, password: string) => {
 };
 
 export const resendVerificationEmail = async (email: string, password?: string) => {
-  // If user is already active and unverified
-  if (auth.currentUser && !auth.currentUser.emailVerified) {
-    const actionCodeSettings = {
-      url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
-      handleCodeInApp: false,
-    };
-    await sendEmailVerification(auth.currentUser, actionCodeSettings);
-    await signOut(auth);
+  // Dispatches fresh 6-digit OTP code to the email
+  try {
+    await sendVerificationOtpCallable(email);
     return true;
+  } catch (err) {
+    console.error("Failed to resend OTP:", err);
+    return false;
   }
-  
-  // Otherwise, authenticate temporarily to dispatch verification email
-  if (password) {
-    const result = await signInWithEmailAndPassword(auth, email, password);
-    if (!result.user.emailVerified) {
-      const actionCodeSettings = {
-        url: (typeof window !== 'undefined' ? window.location.origin : 'https://ourpregnancy.in') + '/#login',
-        handleCodeInApp: false,
-      };
-      await sendEmailVerification(result.user, actionCodeSettings);
-      await signOut(auth);
-      return true;
-    }
-  }
-  return false;
 };
 
 export const resetPassword = async (email: string) => {
