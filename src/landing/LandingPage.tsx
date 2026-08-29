@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
-import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword } from '../firebase';
+import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail } from '../firebase';
 import {
   ShieldCheck,
   WifiOff,
@@ -22,6 +22,7 @@ import {
   Calendar,
   Sparkles,
   Mail,
+  MailCheck,
   X,
   Moon,
   Linkedin
@@ -115,6 +116,10 @@ export const LandingPage: React.FC = () => {
 
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
+  const [showVerifyNotice, setShowVerifyNotice] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [resendMessage, setResendMessage] = useState('');
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
@@ -125,6 +130,14 @@ export const LandingPage: React.FC = () => {
   const [resetSent, setResetSent] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Auto-open login modal if arriving with #login or ?login
+  React.useEffect(() => {
+    if (window.location.hash.includes('login') || window.location.search.includes('login')) {
+      setShowEmailModal(true);
+      setIsRegistering(false);
+    }
+  }, []);
 
   const handleEmailClick = (email: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -166,6 +179,9 @@ export const LandingPage: React.FC = () => {
   const clearModal = () => {
     setShowEmailModal(false);
     setIsRegistering(false);
+    setShowVerifyNotice(false);
+    setResendStatus('idle');
+    setResendMessage('');
     setNameInput('');
     setEmailInput('');
     setPasswordInput('');
@@ -179,6 +195,7 @@ export const LandingPage: React.FC = () => {
 
   const getFirebaseErrorMessage = (code: string) => {
     switch (code) {
+      case 'auth/email-not-verified': return 'Your email address is not verified yet. Please check your inbox and click the verification link.';
       case 'auth/email-already-in-use': return 'This email is already registered. Try logging in instead.';
       case 'auth/invalid-email': return 'Please enter a valid email address.';
       case 'auth/weak-password': return 'Password must be at least 6 characters.';
@@ -195,6 +212,7 @@ export const LandingPage: React.FC = () => {
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError('');
+    setResendMessage('');
     setIsSubmitting(true);
 
     try {
@@ -209,11 +227,15 @@ export const LandingPage: React.FC = () => {
           setIsSubmitting(false);
           return;
         }
-        const newUser = await signUpWithEmail(emailInput, passwordInput, nameInput);
-        clearModal();
-        // New user — go to setup
-        updateState({ hasStartedOnboarding: true, isSetup: false });
-        navigate('/setup');
+        await signUpWithEmail(emailInput, passwordInput, nameInput);
+        setRegisteredEmail(emailInput);
+        setShowVerifyNotice(true);
+        setIsRegistering(false);
+        setPasswordInput('');
+        setConfirmPasswordInput('');
+        setAuthError('');
+        setResendStatus('idle');
+        setResendMessage('');
       } else {
         const existingUser = await signInWithEmail(emailInput, passwordInput);
         clearModal();
@@ -266,7 +288,75 @@ export const LandingPage: React.FC = () => {
               <Mail size={20} />
             </div>
 
-            {showForgotPassword ? (
+            {showVerifyNotice ? (
+              /* Verification Email Sent Notice */
+              <div className="text-center animate-in fade-in zoom-in-95 duration-200">
+                <div className="w-14 h-14 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm mx-auto">
+                  <MailCheck size={28} />
+                </div>
+                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-2">Check your inbox 📬</h2>
+                <p className="text-[13.5px] text-medium mb-5 leading-relaxed">
+                  We've sent a verification link to <strong className="text-charcoal block mt-1 font-semibold break-all">{registeredEmail}</strong>
+                  Please click the link in your email to verify your account before logging in.
+                </p>
+
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (resendStatus === 'sending') return;
+                      setResendStatus('sending');
+                      setResendMessage('');
+                      try {
+                        await resendVerificationEmail(registeredEmail, passwordInput);
+                        setResendStatus('sent');
+                        setResendMessage('Verification link resent! Check your inbox.');
+                      } catch (err: any) {
+                        setResendStatus('error');
+                        setResendMessage('Could not resend link. Please try logging in below.');
+                      }
+                    }}
+                    disabled={resendStatus === 'sending'}
+                    className="w-full border-[1.5px] border-border text-charcoal hover:bg-cream rounded-[10px] font-bold py-2.5 transition-all text-[13px] flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    {resendStatus === 'sending' ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" /> Sending...
+                      </>
+                    ) : resendStatus === 'sent' ? (
+                      <>
+                        <CheckCircle2 size={16} className="text-green-600" /> Link Resent!
+                      </>
+                    ) : (
+                      "Didn't receive email? Resend link"
+                    )}
+                  </button>
+
+                  {resendMessage && (
+                    <p className={`text-[12px] text-center font-medium ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
+                      {resendMessage}
+                    </p>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowVerifyNotice(false);
+                      setIsRegistering(false);
+                      setEmailInput(registeredEmail);
+                      setAuthError('');
+                    }}
+                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all shadow-sm text-[14px] cursor-pointer"
+                  >
+                    Proceed to Log In →
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-light mt-4 italic">
+                  💡 Tip: Be sure to check your spam/junk folder if you don't see it within 2 minutes.
+                </p>
+              </div>
+            ) : showForgotPassword ? (
               /* Forgot Password View */
               <>
                 <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">Reset password</h2>
@@ -387,11 +477,47 @@ export const LandingPage: React.FC = () => {
                       />
                     </div>
                   )}
-                  {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
+
+                  {authError && (
+                    <div className="space-y-1.5 p-3 bg-red-50/80 border border-red-200/60 rounded-[10px]">
+                      <div className="text-[12.5px] text-critical font-medium leading-snug">{authError}</div>
+                      {authError.includes('not verified') && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!emailInput || !passwordInput) {
+                              setResendMessage('Please enter your password above to resend.');
+                              return;
+                            }
+                            setResendStatus('sending');
+                            setResendMessage('');
+                            try {
+                              await resendVerificationEmail(emailInput, passwordInput);
+                              setResendStatus('sent');
+                              setResendMessage('Fresh verification link sent! Check your inbox.');
+                            } catch (err: any) {
+                              setResendStatus('error');
+                              setResendMessage('Could not resend link. Please check your password.');
+                            }
+                          }}
+                          disabled={resendStatus === 'sending'}
+                          className="text-[12px] text-sage font-bold hover:underline inline-block text-left cursor-pointer"
+                        >
+                          {resendStatus === 'sending' ? 'Sending link...' : 'Resend verification link'}
+                        </button>
+                      )}
+                      {resendMessage && (
+                        <p className={`text-[11.5px] font-medium ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
+                          {resendMessage}
+                        </p>
+                      )}
+                    </div>
+                  )}
+
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50"
+                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
                   >
                     {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
                     {isRegistering ? 'Create Account' : 'Log In'}
@@ -399,8 +525,8 @@ export const LandingPage: React.FC = () => {
                   <div className="text-center mt-1.5 mb-1.5">
                     <button
                       type="button"
-                      onClick={() => { setIsRegistering(!isRegistering); setAuthError(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
-                      className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors"
+                      onClick={() => { setIsRegistering(!isRegistering); setAuthError(''); setResendMessage(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
+                      className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors cursor-pointer"
                     >
                       {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
                     </button>
