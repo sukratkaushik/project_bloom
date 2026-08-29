@@ -53,9 +53,9 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 ### **Task 8: OPIN30 & VIPCARE90 Free Access Promo Passes**
 *   **Details:**
     *   **30-Day Free Pass (`OPIN30`):** Grants 30 Days (1 Month) of Premium AI tools for 100% free with instant activation.
-    *   **90-Day VIP Trimester Pass (`VIPCARE90`):** Grants 90 Days (3 Months) of full Premium AI access for 100% free.
+    *   **90-Day VIP Trimester Pass (`VIPCARE90`):** Grants 90 Days (3 Months) of full Premium AI access for 100% free (reserved for confidential partner/doctor distribution).
     *   **Zero-Friction Gateway Bypass (`CheckoutPage.tsx`):** When a promo code covers 100% of the cost (`finalPrice === 0`), users can activate their trial with 1 click without entering payment card details or triggering gateway failures.
-    *   **Top Ribbon Integration (`PromoBanner.tsx`):** Displays both promo codes on the gliding top ribbon for seamless discovery.
+    *   **Public Top Ribbon Focus (`PromoBanner.tsx`):** Focuses the public marquee ribbon cleanly on `OPIN30` (30 Days Free) to avoid broadcasting the VIP partner code to general traffic.
     *   **100% Backward Compatible:** Retained legacy codes (`BLOOM30`, `BLOOM50`, `WELCOME10`) without breaking existing links or database subscriptions.
 
 ### **Task 9: AI Vision Multi-Subject & Non-Food Detection**
