@@ -50,13 +50,21 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Gentle & Readable Velocity (`src/index.css`):** Relaxed the top promotional ribbon marquee animation duration from `30s` to `70s`.
     *   **Comfortable Reading Speed:** Enables users to easily read offer details and coupon codes without rushed visual motion, while maintaining hover-to-pause functionality.
 
-### **Task 8: AI Vision Multi-Subject & Non-Food Detection**
+### **Task 8: OPIN30 & VIPCARE90 Free Access Promo Passes**
+*   **Details:**
+    *   **30-Day Free Pass (`OPIN30`):** Grants 30 Days (1 Month) of Premium AI tools for 100% free with instant activation.
+    *   **90-Day VIP Trimester Pass (`VIPCARE90`):** Grants 90 Days (3 Months) of full Premium AI access for 100% free.
+    *   **Zero-Friction Gateway Bypass (`CheckoutPage.tsx`):** When a promo code covers 100% of the cost (`finalPrice === 0`), users can activate their trial with 1 click without entering payment card details or triggering gateway failures.
+    *   **Top Ribbon Integration (`PromoBanner.tsx`):** Displays both promo codes on the gliding top ribbon for seamless discovery.
+    *   **100% Backward Compatible:** Retained legacy codes (`BLOOM30`, `BLOOM50`, `WELCOME10`) without breaking existing links or database subscriptions.
+
+### **Task 9: AI Vision Multi-Subject & Non-Food Detection**
 *   **Details:**
     *   **Food Scanner Vision AI (`functions/src/index.ts`, `FoodScanner.tsx`):** Upgraded the `analyzeFood` Cloud Function to validate whether an uploaded image contains food or non-food objects.
     *   **Comprehensive Subject Recognition:** Correctly detects children/people, animals/pets, vehicles/automobiles, electronic devices, household objects, and scenery.
     *   **Graceful UI Notification:** Prevents displaying false "Looks safe for pregnancy" badges or empty nutrient tables for non-food images, showing a polite and clear non-food notification instead.
 
-### **Task 9: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
+### **Task 10: Bloom AI 3rd Trimester Comprehension & Clean Path Routing**
 *   **Details:**
     *   **Classifier Gate Fix (`pregnancyClassifier.ts`):** Removed brittle client-side substring gating that falsely rejected valid prenatal questions (e.g. 8th month travel queries).
     *   **Clinical Prompt Refinement:** Updated `chatWithAI` system instructions to ground answers in ACOG/WHO travel guidelines without dumping repetitive disclaimers.
