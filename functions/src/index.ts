@@ -11,6 +11,8 @@ admin.initializeApp();
 const hfApiKey = defineSecret("HUGGINGFACE_API_KEY");
 const razorpayKeyId = defineSecret("RAZORPAY_KEY_ID");
 const razorpayKeySecret = defineSecret("RAZORPAY_KEY_SECRET");
+const smtpUserSecret = defineSecret("SMTP_USER");
+const smtpPassSecret = defineSecret("SMTP_PASS");
 
 function isQueryDueDateInvalid(message: string): boolean {
   const clean = message.toLowerCase();
@@ -569,7 +571,7 @@ export const verifyPaymentSignature = onCall(
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
 export const sendPlanChangeNotificationEmail = onCall(
-  { region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] },
+  { region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Authentication is required.");
@@ -590,12 +592,22 @@ export const sendPlanChangeNotificationEmail = onCall(
       throw new HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
 
-    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
-    const passVal = process.env.SMTP_PASS;
+    let userVal = "sukrat.kaushik@gmail.com";
+    let passVal = "";
+    try {
+      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    } catch {
+      userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    }
+    try {
+      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
+    } catch {
+      passVal = process.env.SMTP_PASS || "";
+    }
 
     if (!passVal) {
-      console.warn("SMTP_PASS environment variable not yet configured. Skipping live SMTP dispatch.");
-      return { success: false, message: "SMTP credentials not yet configured." };
+      console.error("[SMTP ERROR]: SMTP_PASS secret is missing or empty. Cannot send plan upgrade email.");
+      throw new HttpsError("failed-precondition", "Email delivery credentials (SMTP_PASS) are not configured.");
     }
 
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
@@ -738,12 +750,12 @@ export const sendPlanChangeNotificationEmail = onCall(
     };
 
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Plan notification email sent successfully to ${targetEmail}`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[SMTP SUCCESS]: Plan notification email sent to ${targetEmail}. Message ID: ${info.messageId}`);
       return { success: true, message: `Email sent to ${targetEmail}` };
     } catch (err: any) {
-      console.error("Failed to send email via SMTP:", err);
-      return { success: false, error: err.message };
+      console.error(`[SMTP ERROR]: Failed to send plan change email to ${targetEmail}:`, err?.message || err, err?.code, err?.response);
+      return { success: false, error: err?.message || "SMTP transmission error" };
     }
   }
 );
@@ -914,7 +926,7 @@ export const deleteUserByAdmin = onCall(
  * Immune to email crawlers, link pre-fetchers, and SafeLinks scanners.
  */
 export const sendVerificationOtp = onCall(
-  { region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] },
+  { region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] },
   async (request) => {
     const { email, displayName, uid } = request.data || {};
     if (!email || typeof email !== "string" || !email.includes("@")) {
@@ -947,19 +959,22 @@ export const sendVerificationOtp = onCall(
       expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
     });
 
-    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
-    const passVal = process.env.SMTP_PASS;
+    let userVal = "sukrat.kaushik@gmail.com";
+    let passVal = "";
+    try {
+      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    } catch {
+      userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    }
+    try {
+      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
+    } catch {
+      passVal = process.env.SMTP_PASS || "";
+    }
 
-    // In dev / before SMTP_PASS is configured, log code clearly for testing
     if (!passVal) {
-      console.log("=========================================");
-      console.log(`[VERIFICATION OTP FOR ${cleanEmail}]: ${otpCode}`);
-      console.log("=========================================");
-      return {
-        success: true,
-        message: `Verification code generated for ${cleanEmail}.`,
-        devNotice: "SMTP_PASS not configured; OTP code logged to functions log.",
-      };
+      console.error(`[SMTP ERROR]: SMTP_PASS secret is missing or empty. Cannot dispatch OTP to ${cleanEmail}`);
+      throw new HttpsError("failed-precondition", "Email delivery credentials (SMTP_PASS) are not configured.");
     }
 
     const emailHtml = `
@@ -1060,12 +1075,12 @@ export const sendVerificationOtp = onCall(
     };
 
     try {
-      await transporter.sendMail(mailOptions);
-      console.log(`Verification OTP email delivered to ${cleanEmail}`);
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[SMTP SUCCESS]: Verification OTP email delivered to ${cleanEmail}. Message ID: ${info.messageId}`);
       return { success: true, message: `Verification code sent to ${cleanEmail}` };
     } catch (err: any) {
-      console.error(`Failed to send OTP email to ${cleanEmail}:`, err);
-      throw new HttpsError("internal", "Could not dispatch verification email. Please try again.");
+      console.error(`[SMTP ERROR]: Failed to send OTP email to ${cleanEmail}:`, err?.message || err, err?.code, err?.response);
+      throw new HttpsError("internal", `Could not dispatch verification email: ${err?.message || "SMTP transmission error"}`);
     }
   }
 );
