@@ -590,7 +590,7 @@ export const sendPlanChangeNotificationEmail = onCall(
       throw new HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
 
-    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     const passVal = process.env.SMTP_PASS;
 
     if (!passVal) {
@@ -718,7 +718,7 @@ export const sendPlanChangeNotificationEmail = onCall(
     });
 
     const mailOptions = {
-      from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+      from: `"Our Pregnancy Team" <${userVal}>`,
       replyTo: "hello@ourpregnancy.in",
       to: targetEmail,
       subject: `🌸 A special gift for your pregnancy journey: You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}!`,
@@ -935,7 +935,7 @@ export const sendVerificationOtp = onCall(
       expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
     });
 
-    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     const passVal = process.env.SMTP_PASS;
 
     // In dev / before SMTP_PASS is configured, log code clearly for testing
@@ -1008,7 +1008,7 @@ export const sendVerificationOtp = onCall(
     });
 
     const mailOptions = {
-      from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+      from: `"Our Pregnancy Team" <${userVal}>`,
       replyTo: "hello@ourpregnancy.in",
       to: cleanEmail,
       subject: `🌸 Your Our Pregnancy verification code: ${otpCode}`,
