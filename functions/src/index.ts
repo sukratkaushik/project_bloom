@@ -598,24 +598,24 @@ export const sendPlanChangeNotificationEmail = onCall(
       return { success: false, message: "SMTP credentials not yet configured." };
     }
 
-    const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "Expectant Mother";
-    const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate Pack)" : "Standard Plan (Maternal Care Pack)";
-    const durationText = durationMonths ? `${durationMonths} Month${durationMonths > 1 ? "s" : ""} Access` : "Lifetime / Perpetual Access";
+    const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
+    const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate)" : "Standard Plan (Maternal Care)";
+    const durationText = durationMonths ? `${durationMonths} month${durationMonths > 1 ? "s" : ""} access` : "lifetime access";
 
     const standardBenefits = `
-      <li style="margin-bottom: 8px;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step assistance with PMMVY, JSY, and financial benefits.</li>
-      <li style="margin-bottom: 8px;">🌿 <strong>Postpartum & Early Parenthood Recovery</strong> — Guided recovery logs and daily newborn care checklists.</li>
-      <li style="margin-bottom: 8px;">🤝 <strong>Encrypted Partner Sync</strong> — Keep your partner connected with real-time updates and reminders.</li>
-      <li style="margin-bottom: 8px;">🏥 <strong>Complete Clinical & Vaccine Checklists</strong> — Full clinic schedules and immunization trackers.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step guidance on PMMVY, JSY, and financial benefits.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery</strong> — Guided recovery logs and daily newborn care checklists.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync</strong> — Real-time synchronization of vitals and appointments.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏥 <strong>Complete Clinical &amp; Vaccine Checklists</strong> — Full clinic schedules and immunization trackers.</li>
     `;
 
     const premiumBenefits = `
-      <li style="margin-bottom: 8px;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, comforting answers to any pregnancy question, symptom, or doubt.</li>
-      <li style="margin-bottom: 8px;">🥗 <strong>AI Food Safety Scanner</strong> — Scan and check Indian & international foods, snacks, and ingredients for safety.</li>
-      <li style="margin-bottom: 8px;">📋 <strong>FHIR R4 Doctor EHR Medical Exports</strong> — Formatted clinical summaries ready for your OB-GYN visits.</li>
-      <li style="margin-bottom: 8px;">🏛️ <strong>Government Maternity Schemes Guide</strong> (PMMVY, JSY)</li>
-      <li style="margin-bottom: 8px;">🌿 <strong>Postpartum & Early Parenthood Recovery Guides</strong></li>
-      <li style="margin-bottom: 8px;">🤝 <strong>Encrypted Partner Sync & Collaboration</strong></li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Check Indian &amp; international foods and ingredients for pregnancy safety.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>FHIR R4 Doctor EHR Medical Exports</strong> — Formatted clinical summaries ready for OB-GYN visits.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — PMMVY, JSY, and financial support.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery Guides</strong></li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync &amp; Collaboration</strong></li>
     `;
 
     const benefitItemsHtml = planTier === "premium" ? premiumBenefits : standardBenefits;
@@ -626,76 +626,88 @@ export const sendPlanChangeNotificationEmail = onCall(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Our Pregnancy Upgrade</title>
+  <title>A gift for your pregnancy journey</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #FDFBF7; color: #2C3E50;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 40px 15px;">
+<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
+  <!-- Preheader for inbox preview -->
+  <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
+    You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'} (${durationText}).
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.06); border: 1px solid #E8E6E1;">
+        <table role="presentation" width="100%" style="max-width: 560px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px -4px rgba(44, 62, 80, 0.05); border: 1px solid #E8EDE9;">
+          <!-- Header with Canonical Lotus Logo -->
           <tr>
-            <td style="background-color: #8AB6A3; padding: 35px 30px; text-align: center;">
-              <h1 style="margin: 0; font-size: 26px; font-weight: 700; color: #ffffff; letter-spacing: 0.5px; font-family: Georgia, serif;">
-                Our Pregnancy 🌸
-              </h1>
-              <p style="margin: 6px 0 0 0; color: rgba(255,255,255,0.92); font-size: 14px;">
-                Gentle, science-backed guidance for your motherhood journey
+            <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #F4F2EC;">
+              <a href="https://ourpregnancy.in" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img src="https://ourpregnancy.in/logo.png" width="48" height="48" alt="Our Pregnancy" style="display: block; margin: 0 auto; width: 48px; height: 48px; border: 0;" />
+              </a>
+              <h2 style="margin: 10px 0 2px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 500; color: #2C3E50; letter-spacing: 0.2px;">
+                Our Pregnancy
+              </h2>
+              <p style="margin: 0; font-size: 12.5px; color: #6B7A87; font-family: 'Nunito', Helvetica, Arial, sans-serif;">
+                Your pregnancy companion — secure &amp; synced
               </p>
             </td>
           </tr>
 
+          <!-- Body Content -->
           <tr>
-            <td style="padding: 35px 30px;">
-              <p style="font-size: 16px; line-height: 1.6; color: #2C3E50; margin: 0 0 16px 0;">
-                Dear <strong>${recipientName}</strong>,
+            <td style="padding: 32px 32px 28px;">
+              <h1 style="margin: 0 0 16px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 25px; font-weight: 600; color: #2C3E50; line-height: 1.35;">
+                A gift for your pregnancy journey
+              </h1>
+              <p style="font-size: 15.5px; line-height: 1.6; color: #2C3E50; margin: 0 0 14px 0;">
+                Hello ${recipientName},
               </p>
-              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 20px 0;">
-                We hope you are having a serene and joyful pregnancy journey today. ✨
-              </p>
-              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 24px 0;">
-                As part of our mission to support expectant mothers and families with gentle, science-backed guidance, we have <strong>gifted you full access to the Our Pregnancy ${tierTitle}</strong> (${durationText})!
+              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 22px 0;">
+                As part of our commitment to supporting expectant mothers and families with gentle, science-backed guidance, we have gifted you full access to the <strong>Our Pregnancy ${tierTitle}</strong> with ${durationText}.
               </p>
 
-              <table role="presentation" width="100%" style="background-color: ${planTier === 'premium' ? '#FEF9EE' : '#E9F5E9'}; border-radius: 14px; border: 1px solid ${planTier === 'premium' ? '#F4A261' : '#8AB6A3'}; margin-bottom: 25px;">
+              <!-- Feature Highlight Card -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: ${planTier === 'premium' ? '#FEF9EE' : '#E9F5E9'}; border-radius: 14px; border: 1px solid ${planTier === 'premium' ? '#F4A261' : '#8AB6A3'}; margin-bottom: 26px;">
                 <tr>
-                  <td style="padding: 20px;">
-                    <h3 style="margin: 0 0 12px 0; font-size: 16px; color: #2C3E50; font-family: Georgia, serif;">
-                      🎁 What’s now unlocked for you:
+                  <td style="padding: 20px 22px;">
+                    <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #2C3E50; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+                      🎁 What's now unlocked for you:
                     </h3>
-                    <ul style="margin: 0; padding-left: 20px; color: #2C3E50; font-size: 14px; line-height: 1.8;">
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.75;">
                       ${benefitItemsHtml}
                     </ul>
                   </td>
                 </tr>
               </table>
 
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 30px 0 20px 0;">
+              <!-- CTA Button (Pill shaped, Sage) -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 28px 0 16px 0;">
                 <tr>
                   <td align="center">
-                    <a href="https://ourpregnancy.in/#dashboard" style="background-color: #8AB6A3; color: #ffffff; padding: 14px 32px; border-radius: 12px; font-size: 15px; font-weight: bold; text-decoration: none; display: inline-block; box-shadow: 0 3px 10px rgba(138, 182, 163, 0.35);">
-                      ✨ Open My Dashboard & Start Exploring
+                    <a href="https://ourpregnancy.in/#dashboard" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
+                      Open my dashboard
                     </a>
                   </td>
                 </tr>
               </table>
 
-              <p style="font-size: 13px; color: #718096; line-height: 1.6; margin: 20px 0 0 0; text-align: center;">
+              <p style="font-size: 13px; color: #6B7A87; line-height: 1.6; margin: 16px 0 0 0; text-align: center;">
                 <em>No credit card or payment required. This access is activated directly on your account.</em>
               </p>
             </td>
           </tr>
 
+          <!-- Footer -->
           <tr>
-            <td style="background-color: #FDFBF7; border-top: 1px solid #E8E6E1; padding: 25px 30px; text-align: center;">
-              <p style="margin: 0 0 6px 0; font-size: 14px; color: #2C3E50; font-weight: 600;">
-                With love & care,
+            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 22px 32px; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 13.5px; color: #2C3E50; font-weight: 600;">
+                With care,
               </p>
-              <p style="margin: 0 0 10px 0; font-size: 13px; color: #4A5568;">
-                <strong>Our Pregnancy Team</strong><br>
-                <em>Made with ❤️ for expectant mothers</em>
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #6B7A87;">
+                Our Pregnancy Team &middot; Made with &#x1F90D; for expectant mothers
               </p>
-              <p style="margin: 0; font-size: 12px; color: #A0AEC0;">
-                Have questions? Just reply directly to this email at <a href="mailto:hello@ourpregnancy.in" style="color: #8AB6A3; text-decoration: underline;">hello@ourpregnancy.in</a>
+              <p style="margin: 0; font-size: 12px; color: #8F9E99;">
+                Questions? Reach out to <a href="mailto:hello@ourpregnancy.in" style="color: #8AB6A3; text-decoration: underline;">hello@ourpregnancy.in</a>
               </p>
             </td>
           </tr>
@@ -721,7 +733,7 @@ export const sendPlanChangeNotificationEmail = onCall(
       from: `"Our Pregnancy Team" <${userVal}>`,
       replyTo: "hello@ourpregnancy.in",
       to: targetEmail,
-      subject: `🌸 A special gift for your pregnancy journey: You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}!`,
+      subject: `🌸 You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
       html: emailHtml,
     };
 
@@ -956,37 +968,69 @@ export const sendVerificationOtp = onCall(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Your Verification Code</title>
+  <title>Your verification code</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
-<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E35;">
-  <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 32px 16px;">
+<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
+  <!-- Preheader for inbox preview -->
+  <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
+    Your 6-digit Our Pregnancy verification code is ${otpCode}.
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
     <tr>
       <td align="center">
-        <table width="100%" border="0" cellspacing="0" cellpadding="0" style="max-width: 540px; background-color: #FFFFFF; border: 1px solid #E8EDE9; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);">
+        <table role="presentation" width="100%" style="max-width: 540px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px -4px rgba(44, 62, 80, 0.05); border: 1px solid #E8EDE9;">
+          <!-- Header with Canonical Lotus Logo -->
           <tr>
-            <td style="padding: 36px 32px 28px; text-align: center;">
-              <div style="font-size: 36px; margin-bottom: 12px;">🌸</div>
-              <h1 style="font-family: Georgia, serif; font-size: 24px; font-weight: bold; color: #2C3E35; margin: 0 0 8px;">Welcome to Our Pregnancy</h1>
-              <p style="font-size: 14px; color: #6A7B76; margin: 0 0 24px; line-height: 1.5;">
-                Hello <strong>${cleanName}</strong>,<br/>
-                Please use the following 6-digit verification code to confirm your email and activate your account:
+            <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #F4F2EC;">
+              <a href="https://ourpregnancy.in" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img src="https://ourpregnancy.in/logo.png" width="48" height="48" alt="Our Pregnancy" style="display: block; margin: 0 auto; width: 48px; height: 48px; border: 0;" />
+              </a>
+              <h2 style="margin: 10px 0 2px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 500; color: #2C3E50; letter-spacing: 0.2px;">
+                Our Pregnancy
+              </h2>
+              <p style="margin: 0; font-size: 12.5px; color: #6B7A87; font-family: 'Nunito', Helvetica, Arial, sans-serif;">
+                Your pregnancy companion — secure &amp; synced
               </p>
-              <div style="background-color: #F4F7F5; border: 2px dashed #8AB6A3; border-radius: 14px; padding: 20px; text-align: center; margin: 0 0 24px;">
-                <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: bold; letter-spacing: 12px; color: #2C3E35; padding-left: 12px;">
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 32px 32px 28px; text-align: center;">
+              <h1 style="margin: 0 0 12px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 600; color: #2C3E50; line-height: 1.3;">
+                Your verification code
+              </h1>
+              <p style="font-size: 15px; color: #6B7A87; margin: 0 0 24px 0; line-height: 1.5;">
+                Hello <strong>${cleanName}</strong>,<br/>
+                Please use the following 6-digit code to confirm your email and activate your account:
+              </p>
+
+              <!-- OTP Code Box in Tulsi Mint Pale with Sage dashed border -->
+              <div style="background-color: #E9F5E9; border: 2px dashed #8AB6A3; border-radius: 14px; padding: 20px 16px; text-align: center; margin: 0 0 24px;">
+                <div style="font-family: 'Courier New', Courier, monospace; font-size: 38px; font-weight: 700; letter-spacing: 12px; color: #2C3E50; padding-left: 12px;">
                   ${otpCode}
                 </div>
               </div>
-              <p style="font-size: 12.5px; color: #8F9E99; margin: 0 0 8px;">
+
+              <p style="font-size: 13px; color: #6B7A87; margin: 0 0 8px; line-height: 1.5;">
                 This code is valid for <strong>10 minutes</strong>. Never share this code with anyone.
               </p>
-              <p style="font-size: 11.5px; color: #B0BCB8; margin: 0;">
+              <p style="font-size: 12px; color: #8F9E99; margin: 0;">
                 If you did not request this verification code, you can safely ignore this email.
               </p>
             </td>
           </tr>
+
+          <!-- Footer -->
           <tr>
-            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 16px; text-align: center; font-size: 12px; color: #8F9E99;">
-              © ${new Date().getFullYear()} Our Pregnancy (Project Bloom). Dedicated to maternal care.
+            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 20px 32px; text-align: center; font-size: 12.5px; color: #6B7A87;">
+              <p style="margin: 0 0 4px 0; font-size: 13px; color: #6B7A87;">
+                Our Pregnancy &middot; Made with &#x1F90D; for expectant mothers
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #8F9E99;">
+                &copy; ${new Date().getFullYear()} Our Pregnancy. Dedicated to maternal care.
+              </p>
             </td>
           </tr>
         </table>

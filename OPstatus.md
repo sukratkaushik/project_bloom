@@ -2,6 +2,19 @@
 
 This file tracks the ongoing development, bug fixes, and deployment tasks for the Project Bloom / Our Pregnancy application.
 
+## 📅 2026-08-30
+
+### **Task: Brand Design System Alignment for Email Communications**
+*   **Details:**
+    *   **Audit against `Project_Bloom_Design`:** Audited transactional email templates against `/Users/D067208/gitclones/Project_Bloom_Design/BloomDesign/design-system/applications/email.md` and `BRAND-SUMMARY.md`.
+    *   **Canonical Lotus Logo Header:** Embedded the canonical high-resolution Our Pregnancy lotus logo (`https://ourpregnancy.in/logo.png`) centered at 48×48px with serif brand title and tagline, replacing raw Unicode emojis (`🌸`) and solid harsh green banners.
+    *   **Typography & Color System:** Applied Playfair Display (Georgia fallback) for sentence-case headings and Nunito (Helvetica/Arial fallback) for body copy. Standardized text colors to Deep Charcoal (`#2C3E50`) and Medium (`#6B7A87`) on Sandalwood (`#FDFBF7`) background.
+    *   **Tulsi Mint OTP Box:** Redesigned the 6-digit verification code container with Tulsi Mint Pale background (`#E9F5E9`), 2px dashed Sage border (`#8AB6A3`), and monospace typography with 12px letter spacing.
+    *   **Sage Pill CTA Button:** Styled the plan upgrade call-to-action as a full pill button with Sage background (`#8AB6A3`), white bold text, and subtle warm shadow.
+    *   **Deliverability & Subject Lines:** Shortened subject lines to conform with the 50-character mobile client cutoff.
+
+---
+
 ## 📅 2026-08-27
 
 ### **Task 1: Government Schemes State & National Multi-Tier Filter**
