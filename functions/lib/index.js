@@ -694,7 +694,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
         from: `"Our Pregnancy Team" <${userVal}>`,
         replyTo: "hello@ourpregnancy.in",
         to: targetEmail,
-        subject: `🌸 You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
+        subject: `You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
         html: emailHtml,
     };
     try {
@@ -984,7 +984,7 @@ exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1", secre
         from: `"Our Pregnancy Team" <${userVal}>`,
         replyTo: "hello@ourpregnancy.in",
         to: cleanEmail,
-        subject: `🌸 Your Our Pregnancy verification code: ${otpCode}`,
+        subject: `Your verification code: ${otpCode} — Our Pregnancy`,
         html: emailHtml,
     };
     try {

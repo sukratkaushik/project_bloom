@@ -745,7 +745,7 @@ export const sendPlanChangeNotificationEmail = onCall(
       from: `"Our Pregnancy Team" <${userVal}>`,
       replyTo: "hello@ourpregnancy.in",
       to: targetEmail,
-      subject: `🌸 You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
+      subject: `You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
       html: emailHtml,
     };
 
@@ -1070,7 +1070,7 @@ export const sendVerificationOtp = onCall(
       from: `"Our Pregnancy Team" <${userVal}>`,
       replyTo: "hello@ourpregnancy.in",
       to: cleanEmail,
-      subject: `🌸 Your Our Pregnancy verification code: ${otpCode}`,
+      subject: `Your verification code: ${otpCode} — Our Pregnancy`,
       html: emailHtml,
     };
 
