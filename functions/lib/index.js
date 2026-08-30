@@ -529,7 +529,7 @@ exports.verifyPaymentSignature = (0, https_1.onCall)({ secrets: [razorpayKeySecr
 /**
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
-exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] }, async (request) => {
     if (!request.auth) {
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
@@ -545,7 +545,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
     if (!targetEmail || !planTier) {
         throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
-    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     const passVal = process.env.SMTP_PASS;
     if (!passVal) {
         console.warn("SMTP_PASS environment variable not yet configured. Skipping live SMTP dispatch.");
@@ -665,7 +665,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
         },
     });
     const mailOptions = {
-        from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+        from: `"Our Pregnancy Team" <${userVal}>`,
         replyTo: "hello@ourpregnancy.in",
         to: targetEmail,
         subject: `🌸 A special gift for your pregnancy journey: You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}!`,
@@ -822,7 +822,7 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
  * Generates and dispatches a 6-digit numeric OTP for email verification.
  * Immune to email crawlers, link pre-fetchers, and SafeLinks scanners.
  */
-exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] }, async (request) => {
     const { email, displayName, uid } = request.data || {};
     if (!email || typeof email !== "string" || !email.includes("@")) {
         throw new https_1.HttpsError("invalid-argument", "Valid email address is required.");
@@ -849,7 +849,7 @@ exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1" }, asy
         createdAt: Date.now(),
         expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
     });
-    const userVal = process.env.SMTP_USER || "notifications@ourpregnancy.in";
+    const userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     const passVal = process.env.SMTP_PASS;
     // In dev / before SMTP_PASS is configured, log code clearly for testing
     if (!passVal) {
@@ -918,7 +918,7 @@ exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1" }, asy
         },
     });
     const mailOptions = {
-        from: '"Our Pregnancy Team" <notifications@ourpregnancy.in>',
+        from: `"Our Pregnancy Team" <${userVal}>`,
         replyTo: "hello@ourpregnancy.in",
         to: cleanEmail,
         subject: `🌸 Your Our Pregnancy verification code: ${otpCode}`,
