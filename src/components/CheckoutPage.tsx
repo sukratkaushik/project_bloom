@@ -139,7 +139,7 @@ export const CheckoutPage: React.FC = () => {
     } else if (cleanedCode === '') {
       setCouponError('Please enter a coupon code.');
     } else {
-      setCouponError('Invalid coupon code. Try OPIN30 or VIPCARE90.');
+      setCouponError('Invalid coupon code.');
     }
   };
 
@@ -408,7 +408,6 @@ export const CheckoutPage: React.FC = () => {
                     <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-light" />
                     <input
                       type="text"
-                      placeholder="e.g. OPIN30 or VIPCARE90"
                       value={couponCode}
                       onChange={(e) => setCouponCode(e.target.value)}
                       className="w-full pl-9 pr-3 py-2 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13px] font-semibold text-charcoal dark:text-white focus:outline-none focus:border-sage uppercase"
@@ -424,9 +423,6 @@ export const CheckoutPage: React.FC = () => {
                 </div>
                 {couponError && <p className="text-[11.5px] text-red-500 font-semibold mt-2">{couponError}</p>}
                 {couponSuccess && <p className="text-[11.5px] text-green-600 dark:text-green-400 font-semibold mt-2">{couponSuccess}</p>}
-                <div className="text-[10px] text-light mt-2 italic">
-                  💡 Hint: Enter <span className="font-bold text-sage">OPIN30</span> to claim 30 days of Premium for free!
-                </div>
               </div>
             </div>
 

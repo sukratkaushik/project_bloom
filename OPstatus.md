@@ -134,6 +134,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   Protected routes gate updated with native 6-digit code entry.
         *   Locked `emailOtps` collection in `firestore.rules` preventing any client read/write.
 
+### **Task 15: Clean Checkout Coupon Box & Remove Promotional Code Leaks**
+*   **Details:**
+    *   **Removed Text Inside Coupon Input (`CheckoutPage.tsx`):** Removed the placeholder (`"e.g. OPIN30 or VIPCARE90"`) inside the "Have a coupon?" text box so it is clean and blank.
+    *   **Removed Promo Code Leakage (`CheckoutPage.tsx`):** Removed the promo hint (`"💡 Hint: Enter OPIN30..."`) and sanitized invalid code error feedback from suggesting secret promotional codes (`"Invalid coupon code."`).
+
 ---
 
 ## 📅 2026-07-05
