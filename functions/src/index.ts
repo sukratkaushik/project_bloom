@@ -569,7 +569,7 @@ export const verifyPaymentSignature = onCall(
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
 export const sendPlanChangeNotificationEmail = onCall(
-  { region: "asia-south1" },
+  { region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Authentication is required.");
@@ -902,7 +902,7 @@ export const deleteUserByAdmin = onCall(
  * Immune to email crawlers, link pre-fetchers, and SafeLinks scanners.
  */
 export const sendVerificationOtp = onCall(
-  { region: "asia-south1" },
+  { region: "asia-south1", secrets: ["SMTP_USER", "SMTP_PASS"] },
   async (request) => {
     const { email, displayName, uid } = request.data || {};
     if (!email || typeof email !== "string" || !email.includes("@")) {
