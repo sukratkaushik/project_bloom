@@ -12,7 +12,7 @@
 
 | Field | Value |
 | :--- | :--- |
-| **Subject** | `A personal note from the team behind Our Pregnancy 🌸` |
+| **Subject** | `A personal note from the team behind Our Pregnancy` |
 | **From Name** | `Our Pregnancy Team` |
 | **Sender Mailbox** | `sukrat.kaushik@gmail.com` (authenticated via Gmail SMTP) |
 | **Reply-To** | `hello@ourpregnancy.in` |
@@ -24,7 +24,7 @@
 
 **From:** `Our Pregnancy Team`  
 **Reply-To:** `hello@ourpregnancy.in`  
-**Subject:** `A personal note from the team behind Our Pregnancy 🌸`  
+**Subject:** `A personal note from the team behind Our Pregnancy`  
 
 Hi [Name],
 
@@ -49,7 +49,7 @@ If you ever have any questions, suggestions, or need assistance, please visit th
 
 Wishing you and your little one radiant health and happiness,
 
-**Our Pregnancy Team 🌸**  
+**Our Pregnancy Team**  
 [ourpregnancy.in](https://ourpregnancy.in)
 
 ---
