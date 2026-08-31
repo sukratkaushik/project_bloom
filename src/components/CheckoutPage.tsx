@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
 import { functions, auth, updateUserSubscription } from '../firebase';
-import { ArrowLeft, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { navigate } from '../utils/navigation';
@@ -33,6 +33,8 @@ export const CheckoutPage: React.FC = () => {
   const [checkoutStep, setCheckoutStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
   const [txnId, setTxnId] = useState('');
   const [expiryDate, setExpiryDate] = useState('');
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [isApplyingFreePass, setIsApplyingFreePass] = useState(false);
 
   // Auto-fill user email/name if available
   const userEmail = state.userName ? `${state.userName.toLowerCase().replace(/\s+/g, '')}@example.com` : "hello@ourpregnancy.in";
@@ -99,36 +101,62 @@ export const CheckoutPage: React.FC = () => {
   const rawSubtotal = basePrice * months - durationDiscount;
   const finalPrice = Math.max(0, rawSubtotal - appliedDiscount);
 
-  const applyCoupon = () => {
+  const applyCoupon = async () => {
     setCouponError('');
     setCouponSuccess('');
     const cleanedCode = couponCode.trim().toUpperCase();
 
-    if (cleanedCode === 'OPIN30') {
-      if (selectedPlan !== 'premium') {
-        setCouponError('Promo code OPIN30 is only valid for Premium plans.');
-      } else {
-        const discount = months <= 1 ? rawSubtotal : basePrice;
-        setAppliedDiscount(discount);
-        setCouponSuccess('Promo code OPIN30 applied! 30 Days (1 Month) of Premium for FREE.');
+    if (!cleanedCode) {
+      setCouponError('Please enter a coupon code.');
+      return;
+    }
+
+    if (cleanedCode === 'OPIN30' || cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') {
+      if (!auth.currentUser) {
+        setCouponError('Please sign in or create an account first to claim your free access.');
+        return;
       }
-    } else if (cleanedCode === 'VIPCARE90') {
-      if (selectedPlan !== 'premium') {
-        setCouponError('Promo code VIPCARE90 is only valid for Premium plans.');
-      } else {
-        const discount = months <= 3 ? rawSubtotal : (basePrice * 3 - 50);
+
+      setIsApplyingFreePass(true);
+      try {
+        const freeMonths = (cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') ? 3 : 1;
+        setSelectedPlan('premium');
+        setMonths(freeMonths);
+        const freeBasePrice = 499;
+        const discount = freeMonths <= 1 ? freeBasePrice : (freeBasePrice * 3 - 50);
         setAppliedDiscount(discount);
-        setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of VIP Premium for FREE.');
+
+        const expiryTimestamp = Date.now() + freeMonths * 30 * 24 * 60 * 60 * 1000;
+        const expiryIso = new Date(expiryTimestamp).toISOString();
+
+        // Update Firestore user document
+        await updateUserSubscription(auth.currentUser.uid, 'premium', freeMonths);
+
+        // Update local planner state & Dexie
+        updateState({
+          planTier: 'premium',
+          isPremium: true,
+          premiumPlan: freeMonths >= 12 ? 'annual' : 'monthly',
+          planExpiry: expiryTimestamp,
+          premiumExpiry: expiryIso,
+        });
+
+        const freeTxn = `FREE_${cleanedCode}_${Date.now().toString(36).toUpperCase()}`;
+        setTxnId(freeTxn);
+        const computedExpiry = new Date(expiryTimestamp);
+        setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
+        setCouponSuccess(`Promo code ${cleanedCode} applied! Free Premium activated.`);
+        setShowSuccessModal(true);
+      } catch (err: any) {
+        console.error("Free pass activation failed:", err);
+        setCouponError(`Could not activate promo pass: ${err.message || 'Please try again.'}`);
+      } finally {
+        setIsApplyingFreePass(false);
       }
-    } else if (cleanedCode === 'BLOOM30') {
-      if (selectedPlan !== 'premium') {
-        setCouponError('Promo code BLOOM30 is only valid for Premium plans.');
-      } else {
-        const discount = months <= 3 ? rawSubtotal : (basePrice * 3 - 50);
-        setAppliedDiscount(discount);
-        setCouponSuccess('Promo code BLOOM30 applied! 3 months of Premium for free.');
-      }
-    } else if (cleanedCode === 'BLOOM50') {
+      return;
+    }
+
+    if (cleanedCode === 'BLOOM50') {
       const discount = Math.round(rawSubtotal * 0.5);
       setAppliedDiscount(discount);
       setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
@@ -136,8 +164,6 @@ export const CheckoutPage: React.FC = () => {
       const discount = Math.round(rawSubtotal * 0.1);
       setAppliedDiscount(discount);
       setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
-    } else if (cleanedCode === '') {
-      setCouponError('Please enter a coupon code.');
     } else {
       setCouponError('Invalid coupon code.');
     }
@@ -416,8 +442,10 @@ export const CheckoutPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={applyCoupon}
-                    className="px-4 py-2 bg-charcoal dark:bg-white dark:text-charcoal hover:bg-gray-800 dark:hover:bg-white/95 text-white font-bold text-[12px] rounded-xl transition-all"
+                    disabled={isApplyingFreePass}
+                    className="px-4 py-2 bg-charcoal dark:bg-white dark:text-charcoal hover:bg-gray-800 dark:hover:bg-white/95 text-white font-bold text-[12px] rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50"
                   >
+                    {isApplyingFreePass ? <Loader2 size={14} className="animate-spin" /> : null}
                     Apply
                   </button>
                 </div>
@@ -545,6 +573,61 @@ export const CheckoutPage: React.FC = () => {
       <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full pb-8">
         <Footer />
       </div>
+
+      {/* Free Promo Activation Pop-up Modal */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 z-[200] bg-charcoal/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 max-w-md w-full shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200">
+            {/* Celebration Icon */}
+            <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-sm">
+              <Check size={32} className="stroke-[3]" />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-[12px] font-bold uppercase tracking-wider">
+                <Sparkles size={13} className="text-gold fill-gold" /> Promo Code Applied
+              </div>
+              <h3 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white">
+                {months === 1 ? '30 Days Free Premium Unlocked!' : `${months * 30} Days Free Premium Unlocked!`}
+              </h3>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Code <strong className="font-mono text-charcoal dark:text-white">{couponCode.trim().toUpperCase()}</strong> has been activated on your account. All Premium features are now unlocked for you.
+              </p>
+            </div>
+
+            {/* Feature Pills */}
+            <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-4 text-left text-[13px] space-y-2.5">
+              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
+                <span className="text-base">🤖</span>
+                <span>24/7 Bloom AI Prenatal Guide</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
+                <span className="text-base">🥗</span>
+                <span>AI Food Safety Scanner</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
+                <span className="text-base">📋</span>
+                <span>Doctor-Ready EHR Medical Summaries</span>
+              </div>
+              <div className="flex justify-between items-center pt-2 border-t border-border/60 dark:border-white/10 text-[12px] text-medium">
+                <span>Free Access Expiry:</span>
+                <span className="font-bold text-charcoal dark:text-white">{expiryDate}</span>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <button
+                onClick={() => {
+                  navigate('/dashboard');
+                }}
+                className="w-full py-3.5 bg-sage hover:bg-sage-dark text-white font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                Go to Dashboard <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
