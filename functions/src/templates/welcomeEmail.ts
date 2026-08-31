@@ -5,7 +5,7 @@
  * joining via Google Sign-In, Email OTP verification, or any other method.
  */
 
-export const WELCOME_EMAIL_SUBJECT = "A personal note from the team behind Our Pregnancy 🌸";
+export const WELCOME_EMAIL_SUBJECT = "A personal note from the team behind Our Pregnancy";
 export const WELCOME_EMAIL_SENDER_NAME = "Our Pregnancy Team";
 export const WELCOME_EMAIL_REPLY_TO = "hello@ourpregnancy.in";
 
@@ -98,7 +98,7 @@ export function renderWelcomeEmailHtml(recipientFirstName: string): string {
 
               <p style="margin: 0; font-size: 14.5px; color: #2C3E50; line-height: 1.5;">
                 Wishing you and your little one radiant health and happiness,<br>
-                <strong>Our Pregnancy Team</strong> 🌸<br>
+                <strong>Our Pregnancy Team</strong><br>
                 <a href="https://ourpregnancy.in" style="color: #8AB6A3; text-decoration: none; font-size: 12.5px;">ourpregnancy.in</a>
               </p>
 

@@ -8,7 +8,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WELCOME_EMAIL_REPLY_TO = exports.WELCOME_EMAIL_SENDER_NAME = exports.WELCOME_EMAIL_SUBJECT = void 0;
 exports.renderWelcomeEmailHtml = renderWelcomeEmailHtml;
-exports.WELCOME_EMAIL_SUBJECT = "A personal note from the team behind Our Pregnancy 🌸";
+exports.WELCOME_EMAIL_SUBJECT = "A personal note from the team behind Our Pregnancy";
 exports.WELCOME_EMAIL_SENDER_NAME = "Our Pregnancy Team";
 exports.WELCOME_EMAIL_REPLY_TO = "hello@ourpregnancy.in";
 function renderWelcomeEmailHtml(recipientFirstName) {
@@ -98,7 +98,7 @@ function renderWelcomeEmailHtml(recipientFirstName) {
 
               <p style="margin: 0; font-size: 14.5px; color: #2C3E50; line-height: 1.5;">
                 Wishing you and your little one radiant health and happiness,<br>
-                <strong>Our Pregnancy Team</strong> 🌸<br>
+                <strong>Our Pregnancy Team</strong><br>
                 <a href="https://ourpregnancy.in" style="color: #8AB6A3; text-decoration: none; font-size: 12.5px;">ourpregnancy.in</a>
               </p>
 
