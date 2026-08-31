@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyOtp = exports.sendVerificationOtp = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.triggerWelcomeEmailIfNew = exports.verifyOtp = exports.sendVerificationOtp = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -1050,10 +1050,11 @@ exports.verifyOtp = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpU
         console.error(`Failed to mark emailVerified in Auth for ${cleanEmail}:`, authErr);
         throw new https_1.HttpsError("internal", "Failed to update verification status.");
     }
-    // Mark Firestore profile as verified
+    // Mark Firestore profile as verified and flag welcome email
     if (targetUid) {
         await db.collection("users").doc(targetUid).set({
             isEmailVerified: true,
+            welcomeEmailSent: true,
             updatedAt: Date.now(),
         }, { merge: true }).catch(console.warn);
     }
@@ -1271,4 +1272,33 @@ async function sendWelcomeFounderEmail(targetEmail, targetName) {
     const info = await transporter.sendMail(mailOptions);
     console.log(`[WELCOME EMAIL SUCCESS]: Founder welcome email delivered to ${targetEmail}. Message ID: ${info.messageId}`);
 }
+/**
+ * Ensures newly authenticated users (e.g. via Google Sign-In or other OAuth)
+ * receive their Concept 3 Founder Welcome Email.
+ * Idempotent: checks welcomeEmailSent flag in Firestore users collection.
+ */
+exports.triggerWelcomeEmailIfNew = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication required.");
+    }
+    const uid = request.auth.uid;
+    const email = request.auth.token.email;
+    if (!email) {
+        return { sent: false, reason: "No email associated with account." };
+    }
+    const db = admin.firestore();
+    const userDocRef = db.collection("users").doc(uid);
+    const userDoc = await userDocRef.get();
+    const data = userDoc.exists ? userDoc.data() : null;
+    if (data?.welcomeEmailSent) {
+        return { sent: false, reason: "Welcome email already dispatched." };
+    }
+    const name = request.auth.token.name || data?.displayName || "there";
+    await sendWelcomeFounderEmail(email, name);
+    await userDocRef.set({
+        welcomeEmailSent: true,
+        updatedAt: Date.now(),
+    }, { merge: true });
+    return { sent: true, message: `Welcome email dispatched to ${email}` };
+});
 //# sourceMappingURL=index.js.map

@@ -146,6 +146,14 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Sender Configuration:** Configured to dispatch via `smtp.gmail.com:465` with Display Name `"Our Pregnancy Team"` <`sukrat.kaushik@gmail.com`> and Reply-To `hello@ourpregnancy.in`.
     *   **Deployment:** Compiled and deployed updated `verifyOtp` function to GCP `asia-south1`.
 
+### **Task 17: Universal Welcome Email Trigger for Google Sign-In & All OAuth Users**
+*   **Details:**
+    *   **Root-Cause Resolution for Google Sign-In:** Google Sign-In accounts arrive with pre-verified emails (`emailVerified: true`), entirely bypassing the `verifyOtp` route.
+    *   **Dedicated Cloud Function (`triggerWelcomeEmailIfNew`):** Created an idempotent backend Cloud Function that checks if `welcomeEmailSent` is already marked on `users/{uid}`. If not, it dispatches the Concept 3 Founder Welcome Email immediately and marks `welcomeEmailSent: true`.
+    *   **Frontend Integration (`App.tsx`, `LandingPage.tsx`, `firebase.ts`):** Triggered upon Google login completion and in `onAuthStateChanged` for verified sessions.
+    *   **Manual Delivery Confirmation:** Dispatched welcome email directly to `distantsolutions@gmail.com` (Message ID: `<e75cb3ed...>` ).
+    *   **Deployment:** Deployed `triggerWelcomeEmailIfNew` and web assets to Firebase Hosting.
+
 ---
 
 ## 📅 2026-07-05
