@@ -147,6 +147,15 @@ export const CheckoutPage: React.FC = () => {
         setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
         setCouponSuccess(`Promo code ${cleanedCode} applied! Free Premium activated.`);
         setShowSuccessModal(true);
+
+        // Dispatch promo confirmation email to user's inbox
+        try {
+          const sendPromoEmail = httpsCallable(functions, 'sendPromoActivationEmail');
+          sendPromoEmail({ promoCode: cleanedCode, planTier: 'premium', durationMonths: freeMonths })
+            .catch((e) => console.warn('[PROMO EMAIL WARNING]:', e));
+        } catch (emailErr) {
+          console.warn('[PROMO EMAIL TRIGGER FAILED]:', emailErr);
+        }
       } catch (err: any) {
         console.error("Free pass activation failed:", err);
         setCouponError(`Could not activate promo pass: ${err.message || 'Please try again.'}`);
