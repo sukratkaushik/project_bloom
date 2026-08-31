@@ -767,6 +767,181 @@ export const sendPlanChangeNotificationEmail = onCall(
 );
 
 /**
+ * Dispatches a confirmation email when an authenticated user successfully
+ * applies a 100% free promo pass (like OPIN30 or VIPCARE90).
+ * Restricted to the authenticated user's own email address.
+ */
+export const sendPromoActivationEmail = onCall(
+  { region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const email = request.auth.token.email;
+    if (!email) {
+      throw new HttpsError("failed-precondition", "No email associated with account.");
+    }
+
+    const { promoCode, durationMonths } = request.data || {};
+    const cleanPromo = promoCode ? String(promoCode).trim().toUpperCase() : "OPIN30";
+    const months = Number(durationMonths) || 1;
+    const durationText = `${months * 30} days`;
+
+    let userVal = "sukrat.kaushik@gmail.com";
+    let passVal = "";
+    try {
+      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    } catch {
+      userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+    }
+    try {
+      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
+    } catch {
+      passVal = process.env.SMTP_PASS || "";
+    }
+
+    if (!passVal) {
+      console.warn("[PROMO EMAIL]: SMTP_PASS missing. Skipping email.");
+      return { sent: false, reason: "SMTP credentials not configured." };
+    }
+
+    const recipientName = request.auth.token.name || "there";
+
+    const premiumBenefits = `
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, gentle answers to your daily pregnancy and lifestyle questions.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant safety checks for Indian and global foods &amp; ingredients.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor-Ready EHR Summaries</strong> — 1-click clinical summaries formatted for your OB-GYN checkups.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step guidance on PMMVY and JSY benefits.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync</strong> — Share milestones, journals, and appointments with your partner.</li>
+    `;
+
+    const emailHtml = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Free Premium Access is Active</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
+  <!-- Preheader for inbox preview -->
+  <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
+    Your promo code ${cleanPromo} is active! Enjoy ${durationText} of Our Pregnancy Premium.
+  </div>
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="100%" style="max-width: 560px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px -4px rgba(44, 62, 80, 0.05); border: 1px solid #E8EDE9;">
+          <!-- Header with Canonical Lotus Logo -->
+          <tr>
+            <td style="padding: 32px 32px 20px; text-align: center; border-bottom: 1px solid #F4F2EC;">
+              <a href="https://ourpregnancy.in" target="_blank" style="text-decoration: none; display: inline-block;">
+                <img src="https://ourpregnancy.in/logo.png" width="48" height="48" alt="Our Pregnancy" style="display: block; margin: 0 auto; width: 48px; height: 48px; border: 0;" />
+              </a>
+              <h2 style="margin: 10px 0 2px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 22px; font-weight: 500; color: #2C3E50; letter-spacing: 0.2px;">
+                Our Pregnancy
+              </h2>
+              <p style="margin: 0; font-size: 12.5px; color: #6B7A87; font-family: 'Nunito', Helvetica, Arial, sans-serif;">
+                Your pregnancy companion — secure &amp; synced
+              </p>
+            </td>
+          </tr>
+
+          <!-- Body Content -->
+          <tr>
+            <td style="padding: 32px 32px 28px;">
+              <h1 style="margin: 0 0 16px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 25px; font-weight: 600; color: #2C3E50; line-height: 1.35;">
+                Your Premium Access is Active
+              </h1>
+              <p style="font-size: 15.5px; line-height: 1.6; color: #2C3E50; margin: 0 0 14px 0;">
+                Hello ${recipientName},
+              </p>
+              <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 22px 0;">
+                Congratulations! Promo code <strong>${cleanPromo}</strong> has been successfully applied to your account. You now have <strong>${durationText} of complimentary access</strong> to all Our Pregnancy Premium features.
+              </p>
+
+              <!-- Feature Highlight Card -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FEF9EE; border-radius: 14px; border: 1px solid #F4A261; margin-bottom: 26px;">
+                <tr>
+                  <td style="padding: 20px 22px;">
+                    <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #2C3E50; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+                      🎁 What's now unlocked for you:
+                    </h3>
+                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.75;">
+                      ${premiumBenefits}
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- CTA Button -->
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 28px 0 16px 0;">
+                <tr>
+                  <td align="center">
+                    <a href="https://ourpregnancy.in/dashboard" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
+                      Open my dashboard
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <p style="font-size: 13px; color: #6B7A87; line-height: 1.6; margin: 16px 0 0 0; text-align: center;">
+                <em>No credit card required. No hidden auto-renewals. This access has been activated directly on your account.</em>
+              </p>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 22px 32px; text-align: center;">
+              <p style="margin: 0 0 6px 0; font-size: 13.5px; color: #2C3E50; font-weight: 600;">
+                With care,
+              </p>
+              <p style="margin: 0 0 8px 0; font-size: 13px; color: #6B7A87;">
+                Our Pregnancy Team &middot; Made with &#x1F90D; for expectant mothers
+              </p>
+              <p style="margin: 0; font-size: 12px; color: #8F9E99;">
+                Questions? Visit the Feedback &amp; Support section in your app footer.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `;
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
+      auth: { user: userVal, pass: passVal },
+    });
+
+    const mailOptions = {
+      from: `"Our Pregnancy Team" <${userVal}>`,
+      replyTo: "hello@ourpregnancy.in",
+      to: email,
+      subject: `🎁 You've unlocked ${durationText} of Our Pregnancy Premium!`,
+      html: emailHtml,
+    };
+
+    try {
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[PROMO CONFIRMATION EMAIL]: Delivered to ${email}. Message ID: ${info.messageId}`);
+      return { success: true, messageId: info.messageId };
+    } catch (err: any) {
+      console.error(`[PROMO EMAIL ERROR]: Failed to send to ${email}:`, err?.message || err);
+      return { success: false, error: err?.message };
+    }
+  }
+);
+
+/**
  * Fetches all registered users from both Firebase Auth and Firestore users collection.
  * Automatically synchronizes any users who exist in Auth but were missing in Firestore.
  */
