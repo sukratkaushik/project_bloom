@@ -139,6 +139,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Removed Text Inside Coupon Input (`CheckoutPage.tsx`):** Removed the placeholder (`"e.g. OPIN30 or VIPCARE90"`) inside the "Have a coupon?" text box so it is clean and blank.
     *   **Removed Promo Code Leakage (`CheckoutPage.tsx`):** Removed the promo hint (`"💡 Hint: Enter OPIN30..."`) and sanitized invalid code error feedback from suggesting secret promotional codes (`"Invalid coupon code."`).
 
+### **Task 16: Automated Founder Welcome Email (Concept 3)**
+*   **Details:**
+    *   **Automated Verification Trigger (`functions/src/index.ts`):** Wired `sendWelcomeFounderEmail` into `verifyOtp` so newly verified users automatically receive the personal Founder's Letter upon successful 6-digit OTP submission.
+    *   **Production-Grade HTML Template:** Designed with Our Pregnancy's canonical lotus branding, Playfair Display / Nunito typography, Tulsi Mint (`#8AB6A3`) & Sandalwood palette, 5 core feature highlights, `OPIN30` 30-day free trial card, and encrypted health data trust seals.
+    *   **Sender Configuration:** Configured to dispatch via `smtp.gmail.com:465` with Display Name `"Our Pregnancy Team"` <`sukrat.kaushik@gmail.com`> and Reply-To `hello@ourpregnancy.in`.
+    *   **Deployment:** Compiled and deployed updated `verifyOtp` function to GCP `asia-south1`.
+
 ---
 
 ## 📅 2026-07-05
