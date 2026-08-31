@@ -42,6 +42,7 @@ const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
 const crypto_1 = __importDefault(require("crypto"));
 const nodemailer_1 = __importDefault(require("nodemailer"));
+const welcomeEmail_1 = require("./templates/welcomeEmail");
 // Initialize Firebase Admin SDK
 admin.initializeApp();
 // Define the secure secret that we will store in Firebase Secret Manager
@@ -647,7 +648,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 28px 0 16px 0;">
                 <tr>
                   <td align="center">
-                    <a href="https://ourpregnancy.in/#dashboard" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
+                    <a href="https://ourpregnancy.in/dashboard" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
                       Open my dashboard
                     </a>
                   </td>
@@ -1091,168 +1092,7 @@ async function sendWelcomeFounderEmail(targetEmail, targetName) {
     const cleanFirstName = targetName && targetName.trim().length > 0 && targetName.toLowerCase() !== "there"
         ? targetName.trim().split(" ")[0]
         : "there";
-    const emailHtml = `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Our Pregnancy</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
-</head>
-<body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
-  <!-- Preheader preview text -->
-  <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
-    No ads, no data selling, no 2 AM panic. Just calm, private prenatal care for you and your baby.
-  </div>
-
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
-    <tr>
-      <td align="center">
-        <!-- Main Card Container -->
-        <table role="presentation" width="100%" style="max-width: 580px; background-color: #FFFFFF; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 24px -4px rgba(44, 62, 80, 0.06); border: 1px solid #E8EDE9;">
-          
-          <!-- Top Brand Header with Lotus Logo -->
-          <tr>
-            <td style="padding: 36px 36px 22px; text-align: center; border-bottom: 1px solid #F4F2EC;">
-              <a href="https://ourpregnancy.in" target="_blank" style="text-decoration: none; display: inline-block;">
-                <img src="https://ourpregnancy.in/logo.png" width="48" height="48" alt="Our Pregnancy" style="display: block; margin: 0 auto; width: 48px; height: 48px; border: 0;" />
-              </a>
-              <h2 style="margin: 10px 0 2px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 500; color: #2C3E50; letter-spacing: 0.2px;">
-                Our Pregnancy
-              </h2>
-              <p style="margin: 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #8AB6A3;">
-                A Calm Sanctuary for Expectant Parents
-              </p>
-            </td>
-          </tr>
-
-          <!-- Letter Content -->
-          <tr>
-            <td style="padding: 32px 36px; font-size: 14.5px; line-height: 1.65; color: #4A5B55;">
-              <p style="margin: 0 0 16px; font-size: 16px; color: #2C3E50; font-weight: 600;">
-                Hi ${cleanFirstName},
-              </p>
-              
-              <p style="margin: 0 0 16px;">
-                First of all — <strong>congratulations</strong>. You are carrying life, and that is nothing short of miraculous.
-              </p>
-
-              <p style="margin: 0 0 16px;">
-                I wanted to send a quick personal note to welcome you to our family and share why <em>Our Pregnancy</em> was born.
-              </p>
-
-              <p style="margin: 0 0 20px;">
-                When we started this journey, we looked at existing pregnancy apps and noticed two very frustrating things:
-              </p>
-
-              <!-- Problem Box -->
-              <div style="background-color: #F8FAF9; border-left: 3px solid #8AB6A3; border-radius: 0 12px 12px 0; padding: 16px 20px; margin: 0 0 24px; font-size: 13.5px; color: #4A5B55;">
-                <p style="margin: 0 0 8px;">1. Most apps are cluttered with loud ads and invasive trackers that sell your health data to brokers.</p>
-                <p style="margin: 0;">2. When mothers have questions at midnight, search engines return terrifying worst-case scenarios instead of calm, qualified reassurance.</p>
-              </div>
-
-              <p style="margin: 0 0 24px;">
-                We wanted to build something fundamentally different: a <strong>private, ad-free sanctuary</strong> that treats expectant parents with clinical precision and heartfelt dignity.
-              </p>
-
-              <h2 style="font-family: 'Playfair Display', Georgia, serif; font-size: 19px; color: #2C3E50; margin: 0 0 16px; border-bottom: 1px solid #F0F4F2; padding-bottom: 8px;">
-                Here is what is now in your corner:
-              </h2>
-
-              <!-- Feature Highlights -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="margin-bottom: 24px;">
-                <tr>
-                  <td style="padding: 10px 0; vertical-align: top; width: 28px; font-size: 18px;">🌿</td>
-                  <td style="padding: 10px 0 10px 8px; vertical-align: top; font-size: 13.5px; line-height: 1.5; color: #4A5B55;">
-                    <strong style="color: #2C3E50;">24/7 Bloom AI Prenatal Guide</strong> — Instant, gentle answers to any symptom doubt without 2 AM Google panic.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; vertical-align: top; width: 28px; font-size: 18px;">🥗</td>
-                  <td style="padding: 10px 0 10px 8px; vertical-align: top; font-size: 13.5px; line-height: 1.5; color: #4A5B55;">
-                    <strong style="color: #2C3E50;">AI Food Safety Scanner</strong> — Instant safety verdicts tailored for both Indian and global ingredients (papaya, saffron, street food, and teas).
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; vertical-align: top; width: 28px; font-size: 18px;">🏛️</td>
-                  <td style="padding: 10px 0 10px 8px; vertical-align: top; font-size: 13.5px; line-height: 1.5; color: #4A5B55;">
-                    <strong style="color: #2C3E50;">Up to ₹6,000 in Govt Benefits</strong> — Step-by-step checklists to claim financial support under PMMVY and JSY.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; vertical-align: top; width: 28px; font-size: 18px;">🤝</td>
-                  <td style="padding: 10px 0 10px 8px; vertical-align: top; font-size: 13.5px; line-height: 1.5; color: #4A5B55;">
-                    <strong style="color: #2C3E50;">Encrypted Partner Sync</strong> — Share your milestones and clinic appointments in real time so you're never in this alone.
-                  </td>
-                </tr>
-                <tr>
-                  <td style="padding: 10px 0; vertical-align: top; width: 28px; font-size: 18px;">📋</td>
-                  <td style="padding: 10px 0 10px 8px; vertical-align: top; font-size: 13.5px; line-height: 1.5; color: #4A5B55;">
-                    <strong style="color: #2C3E50;">Doctor-Ready EHR Exports</strong> — 1-click clinical summaries formatted for your OB-GYN checkups.
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Promo Gift Box -->
-              <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color: #FAFBF9; border: 1.5px dashed #8AB6A3; border-radius: 16px; margin: 0 0 28px;">
-                <tr>
-                  <td style="padding: 20px 24px; text-align: center;">
-                    <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #8AB6A3; margin-bottom: 6px;">
-                      🎁 A Welcome Gift for Your Journey
-                    </div>
-                    <div style="font-size: 14px; color: #2C3E50; font-weight: 600; margin-bottom: 8px;">
-                      Enjoy 30 Days of Free Premium Access
-                    </div>
-                    <div style="display: inline-block; background-color: #FFFFFF; border: 1px solid #8AB6A3; border-radius: 8px; padding: 6px 16px; font-family: 'Courier New', Courier, monospace; font-size: 17px; font-weight: bold; color: #2C3E50; letter-spacing: 2.5px; margin-bottom: 8px;">
-                      OPIN30
-                    </div>
-                    <div style="font-size: 11.5px; color: #7B8C86;">
-                      Enter code at checkout. No credit card required. No hidden auto-renewals.
-                    </div>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Primary CTA Button -->
-              <div style="text-align: center; margin-bottom: 28px;">
-                <a href="https://ourpregnancy.in/#dashboard" style="display: inline-block; background-color: #2C3E50; color: #FDFBF7; text-decoration: none; font-size: 14.5px; font-weight: 700; padding: 14px 34px; border-radius: 12px; box-shadow: 0 4px 12px rgba(44, 62, 80, 0.15);">
-                  ✨ Open My Pregnancy Dashboard
-                </a>
-              </div>
-
-              <p style="margin: 0 0 20px; font-size: 13.5px; line-height: 1.6;">
-                If you ever have suggestions, need advice, or just want to share how your journey is unfolding, simply hit reply to this email. I read and answer every note.
-              </p>
-
-              <p style="margin: 0; font-size: 14.5px; color: #2C3E50; line-height: 1.5;">
-                Wishing you and your little one radiant health,<br>
-                <strong>Sukrat &amp; The Our Pregnancy Family</strong> 🌸<br>
-                <a href="https://ourpregnancy.in" style="color: #8AB6A3; text-decoration: none; font-size: 12.5px;">ourpregnancy.in</a>
-              </p>
-
-            </td>
-          </tr>
-
-          <!-- Footer Trust Seals -->
-          <tr>
-            <td style="background-color: #FAFBF9; border-top: 1px solid #E8EDE9; padding: 20px 36px; text-align: center; font-size: 11.5px; color: #8F9E99; line-height: 1.5;">
-              <p style="margin: 0 0 6px;">
-                🔒 <strong>100% Encrypted &amp; Private</strong> &nbsp;•&nbsp; 🚫 <strong>Zero Advertisements</strong> &nbsp;•&nbsp; 🇮🇳 <strong>Dedicated to Maternal Health</strong>
-              </p>
-              <p style="margin: 0;">
-                © ${new Date().getFullYear()} Our Pregnancy (Project Bloom). All rights reserved.
-              </p>
-            </td>
-          </tr>
-
-        </table>
-      </td>
-    </tr>
-  </table>
-</body>
-</html>
-  `;
+    const emailHtml = (0, welcomeEmail_1.renderWelcomeEmailHtml)(cleanFirstName);
     const transporter = nodemailer_1.default.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -1263,14 +1103,14 @@ async function sendWelcomeFounderEmail(targetEmail, targetName) {
         },
     });
     const mailOptions = {
-        from: `"Our Pregnancy Team" <${userVal}>`,
-        replyTo: "hello@ourpregnancy.in",
+        from: `"${welcomeEmail_1.WELCOME_EMAIL_SENDER_NAME}" <${userVal}>`,
+        replyTo: welcomeEmail_1.WELCOME_EMAIL_REPLY_TO,
         to: targetEmail,
-        subject: `A personal note from the team behind Our Pregnancy 🌸`,
+        subject: welcomeEmail_1.WELCOME_EMAIL_SUBJECT,
         html: emailHtml,
     };
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[WELCOME EMAIL SUCCESS]: Founder welcome email delivered to ${targetEmail}. Message ID: ${info.messageId}`);
+    console.log(`[WELCOME EMAIL SUCCESS]: Canonical welcome email delivered to ${targetEmail}. Message ID: ${info.messageId}`);
 }
 /**
  * Ensures newly authenticated users (e.g. via Google Sign-In or other OAuth)
