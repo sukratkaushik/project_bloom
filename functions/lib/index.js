@@ -1128,17 +1128,43 @@ exports.triggerWelcomeEmailIfNew = (0, https_1.onCall)({ region: "asia-south1", 
     }
     const db = admin.firestore();
     const userDocRef = db.collection("users").doc(uid);
-    const userDoc = await userDocRef.get();
-    const data = userDoc.exists ? userDoc.data() : null;
-    if (data?.welcomeEmailSent) {
+    // 1. Existing user safeguard: verify account creation timestamp from Firebase Auth.
+    // Existing users who created accounts in past sessions must NEVER receive a welcome email.
+    try {
+        const userRecord = await admin.auth().getUser(uid);
+        if (userRecord.metadata.creationTime) {
+            const creationTimeMs = new Date(userRecord.metadata.creationTime).getTime();
+            const accountAgeMinutes = (Date.now() - creationTimeMs) / (1000 * 60);
+            if (accountAgeMinutes > 15) {
+                console.log(`[WELCOME EMAIL SKIPPED]: User ${email} account was created ${accountAgeMinutes.toFixed(1)} mins ago. Skipping existing user.`);
+                await userDocRef.set({ welcomeEmailSent: true }, { merge: true });
+                return { sent: false, reason: "Existing user account." };
+            }
+        }
+    }
+    catch (authErr) {
+        console.warn(`[WELCOME EMAIL]: Could not verify auth creation time for ${uid}:`, authErr);
+    }
+    // 2. Concurrency safeguard: atomic transaction claims lock BEFORE sending email.
+    // Prevents parallel requests from sending multiple copies to the same user.
+    const shouldSend = await db.runTransaction(async (transaction) => {
+        const userDoc = await transaction.get(userDocRef);
+        const data = userDoc.exists ? userDoc.data() : null;
+        if (data?.welcomeEmailSent) {
+            return false;
+        }
+        transaction.set(userDocRef, {
+            welcomeEmailSent: true,
+            welcomeEmailSentAt: Date.now(),
+        }, { merge: true });
+        return true;
+    });
+    if (!shouldSend) {
+        console.log(`[WELCOME EMAIL SKIPPED]: Welcome email already dispatched or in progress for ${email}.`);
         return { sent: false, reason: "Welcome email already dispatched." };
     }
-    const name = request.auth.token.name || data?.displayName || "there";
+    const name = request.auth.token.name || "there";
     await sendWelcomeFounderEmail(email, name);
-    await userDocRef.set({
-        welcomeEmailSent: true,
-        updatedAt: Date.now(),
-    }, { merge: true });
     return { sent: true, message: `Welcome email dispatched to ${email}` };
 });
 //# sourceMappingURL=index.js.map
