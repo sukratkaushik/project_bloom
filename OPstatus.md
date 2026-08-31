@@ -161,7 +161,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Path-Based URLs (No `#`):** Updated all dashboard destinations to `https://ourpregnancy.in/dashboard` across both welcome emails and plan change notification emails.
     *   **OPIN30 Placement:** Integrated the `OPIN30` 30-day free trial offer immediately following the opening vision paragraph.
     *   **Support Routing:** Directed customer feedback and inquiries to the **Feedback & Support** section in the app footer.
-    *   **Documentation Reference (`docs/WELCOME_EMAIL_TEMPLATE.md`):** Added complete markdown reference documentation for team visibility.
+### **Task 19: Instant Free Promo Activation & Success Pop-Up Modal (`CheckoutPage.tsx`)**
+*   **Details:**
+    *   **Instant Activation on Apply:** When a user applies a 100% free pass coupon (`OPIN30`, `VIPCARE90`, `BLOOM30`), it immediately sets duration to the free period, updates Firestore subscription directly, and updates the local planner store without requiring manual navigation through the checkout flow.
+    *   **Celebratory Success Pop-Up Modal:** Rendered a modern modal popup displaying celebration badges, promo code confirmation, unlocked features summary (Bloom AI, Food Scanner, EHR Exports), and an explicit **[ Go to Dashboard ]** button (`navigate('/dashboard')`).
+    *   **Button Loading State:** Added loading indicator on the Apply button while activating the user's free subscription in Firestore.
 
 ---
 
