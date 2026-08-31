@@ -1,6 +1,6 @@
 # Canonical Welcome Email Template — Our Pregnancy (OPIN)
 
-> **Status:** Final & Canonical  
+> **Status:** Updated with Care-Centric Structure & Design Layout  
 > **Source Module:** [`functions/src/templates/welcomeEmail.ts`](../functions/src/templates/welcomeEmail.ts)  
 > **Trigger Points:**
 > 1. Completed 6-digit OTP verification (`verifyOtp`)
@@ -28,39 +28,48 @@
 
 Hi [Name],
 
-First of all — **congratulations**. Carrying life is a truly extraordinary journey.
+First of all — **congratulations**. You are carrying life, and that is nothing short of miraculous.
 
-I wanted to send a quick personal note to welcome you to Our Pregnancy and share a little bit about why we built this.
+I wanted to send a quick personal note to welcome you to our family and share why *Our Pregnancy* was born.
 
-Pregnancy brings so many new feelings, questions, and decisions. We created Our Pregnancy to give expectant parents a calm, reliable companion with science-backed guidance, helpful medical tools, and compassionate support every step of the way.
+Based on our research on expectant parents, we noticed two major challenges:
 
-To help you experience everything Our Pregnancy has to offer, you can use code **OPIN30** at checkout to unlock full Premium features for your first 30 days.
+> **1. Overwhelming & Generic Advice** — Most information online is one-size-fits-all and doesn't account for Indian dietary habits, traditional practices, or cultural nuances.  
+> **2. Information & Document Clutter** — Managing medical reports, test schedules, immunization dates, and scattered pregnancy notes across different clinics quickly becomes chaotic and stressful.
 
-Whether this is your very first week or you are entering your final trimester: we are honored to walk beside you.
+We wanted to build something fundamentally different: a **calm, organized companion** designed to simplify your pregnancy journey and provide gentle reassurance at every step.
 
-**Three simple things you can try today:**
-1. **Ask Bloom AI** any pregnancy or symptom question on your mind for gentle, instant guidance.
-2. **Check your daily timeline** to see how your baby is developing today.
-3. **Explore the dashboard** and tools designed to make your journey smoother.
+### Here is how we’re here to support you every day:
 
-[ **Open my dashboard** ] (`https://ourpregnancy.in/dashboard`)
+* 🌿 **24/7 Bloom AI Prenatal Guide** — Instant, gentle answers to your daily pregnancy and lifestyle questions whenever you need reassurance.
+* 🥗 **AI Food Safety Scanner** — Instant safety verdicts tailored for both Indian and global ingredients (papaya, saffron, street food, and teas).
+* 🏛️ **Up to ₹6,000 in Govt Benefits** — Step-by-step checklists to claim financial support under PMMVY and JSY.
+* 🤝 **Encrypted Partner Sync** — Share milestones, journals, and clinic appointments in real time so you're never in this alone.
+* 📋 **Doctor-Ready EHR Summaries** — 1-click clinical summaries formatted for your OB-GYN checkups, keeping all your records in one place.
+
+---
+
+**🎁 A WELCOME GIFT FOR YOUR JOURNEY**  
+**Enjoy 30 Days of Free Premium Access**  
+`OPIN30`  
+*Enter code at checkout. No credit card required. No hidden auto-renewals.*
+
+<br>
+
+<div align="center">
+
+[ **✨ Open My Pregnancy Dashboard** ] (`https://ourpregnancy.in/dashboard`)
+
+</div>
+
+<br>
 
 If you ever have any questions, suggestions, or need assistance, please visit the **Feedback & Support** section in your app footer — our team reviews every message.
 
-Wishing you and your little one radiant health and happiness,
-
+Wishing you and your little one radiant health,  
 **Our Pregnancy Team**  
 [ourpregnancy.in](https://ourpregnancy.in)
 
 ---
-*Our Pregnancy · Made with 🤍 for expectant mothers*  
+🇮🇳 **Dedicated to Maternal Health** • 🤍 **Made with care for expectant mothers**  
 *© 2026 Our Pregnancy. Dedicated to maternal care.*
-
----
-
-## 3. Brand & Content Compliance Rules
-
-1. **No Absolute Claims**: Never use claims like *"a private, ad-free, Zero Advertisements"* or mention data selling or trackers in email communication.
-2. **Path-Based URLs**: All navigation URLs use path-based routing (e.g. `https://ourpregnancy.in/dashboard`), never legacy `#` hash anchors.
-3. **Feedback Channel**: Always direct users to the **Feedback & Support** section in the app footer.
-4. **Canonical Logo**: Uses `https://ourpregnancy.in/logo.png` (never re-generate or overwrite logos).
