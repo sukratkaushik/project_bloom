@@ -154,6 +154,15 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Manual Delivery Confirmation:** Dispatched welcome email directly to `distantsolutions@gmail.com` (Message ID: `<e75cb3ed...>` ).
     *   **Deployment:** Deployed `triggerWelcomeEmailIfNew` and web assets to Firebase Hosting.
 
+### **Task 18: Canonical Modular Welcome Email Template & Compliance Alignment**
+*   **Details:**
+    *   **Dedicated Template Module (`functions/src/templates/welcomeEmail.ts`):** Modularized the canonical welcome email into its own file with clean function `renderWelcomeEmailHtml(recipientFirstName)` and exported constants (`WELCOME_EMAIL_SUBJECT`, `WELCOME_EMAIL_SENDER_NAME = "Our Pregnancy Team"`, `WELCOME_EMAIL_REPLY_TO = "hello@ourpregnancy.in"`).
+    *   **Removal of Absolute Claims:** Removed all claims of "a private, ad-free, Zero Advertisements", trackers, and data selling from all email templates and communications.
+    *   **Path-Based URLs (No `#`):** Updated all dashboard destinations to `https://ourpregnancy.in/dashboard` across both welcome emails and plan change notification emails.
+    *   **OPIN30 Placement:** Integrated the `OPIN30` 30-day free trial offer immediately following the opening vision paragraph.
+    *   **Support Routing:** Directed customer feedback and inquiries to the **Feedback & Support** section in the app footer.
+    *   **Documentation Reference (`docs/WELCOME_EMAIL_TEMPLATE.md`):** Added complete markdown reference documentation for team visibility.
+
 ---
 
 ## 📅 2026-07-05
