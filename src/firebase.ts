@@ -230,6 +230,15 @@ export const verifyOtpCallable = async (email: string, otp: string) => {
   return res.data;
 };
 
+export const triggerWelcomeEmailIfNewCallable = async () => {
+  try {
+    const fn = httpsCallable(functions, 'triggerWelcomeEmailIfNew');
+    await fn();
+  } catch (err) {
+    console.warn('Welcome email trigger skipped or error:', err);
+  }
+};
+
 export const signInWithEmail = async (email: string, password: string) => {
   const result = await signInWithEmailAndPassword(auth, email, password);
   if (!result.user.emailVerified) {

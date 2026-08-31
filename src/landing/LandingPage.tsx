@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
-import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable } from '../firebase';
+import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
 import {
   ShieldCheck,
   WifiOff,
@@ -88,6 +88,7 @@ export const LandingPage: React.FC = () => {
       setIsLoggingIn(true);
       const user = await signInWithGoogle();
       if (user) {
+        triggerWelcomeEmailIfNewCallable();
         setShowEmailModal(false);
 
         // Check if there is an active journey locally

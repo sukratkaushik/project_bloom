@@ -13,7 +13,7 @@ import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
 import { CheckoutPage } from './components/CheckoutPage';
 import { EmailVerificationGate } from './components/EmailVerificationGate';
-import { auth } from './firebase';
+import { auth, triggerWelcomeEmailIfNewCallable } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
 import { normalizeLegacyHash } from './utils/navigation';
 
@@ -78,6 +78,9 @@ const AppContent: React.FC = () => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsAuthReady(true);
+      if (currentUser && (currentUser.emailVerified || currentUser.providerData.some((p) => p.providerId === 'google.com'))) {
+        triggerWelcomeEmailIfNewCallable();
+      }
       // Only advance onboarding state for fully verified accounts
       if (currentUser && currentUser.emailVerified && !state.hasStartedOnboarding && !state.isSetup) {
         updateState({ hasStartedOnboarding: true });
