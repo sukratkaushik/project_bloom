@@ -81,10 +81,10 @@ button,
   /* Rich Slate-800 instead of flat charcoal #2C3E50 */
   --color-border: #334155;
   /* Slate-700 instead of #3A4F63 */
-  --color-medium: #94A3B8;
-  /* Slate-400 instead of #8096A8 */
-  --color-light: #64748B;
-  /* Slate-500 instead of #52687A */
+  --color-medium: #CBD5E1;
+  /* Slate-300 instead of #8096A8 for crisp, readable secondary text */
+  --color-light: #94A3B8;
+  /* Slate-400 instead of #52687A for accessible, legible captions & dates */
 
   --color-sage: #96C1AE;
   --color-sage-light: #6E9484;

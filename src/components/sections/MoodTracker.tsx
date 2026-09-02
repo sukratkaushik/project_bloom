@@ -204,25 +204,37 @@ export const MoodTracker: React.FC = () => {
           <h3 className="font-semibold text-charcoal text-[17px]">14-Day Mood Trend</h3>
         </div>
         
-        <div className="h-[120px] relative w-full flex items-end justify-between px-2">
+        <div className="h-[130px] relative w-full flex items-end justify-between gap-1 px-1 sm:px-2">
           {chartData.map((val, i) => {
-            if (val === null) return (
-              <div key={i} className="flex flex-col items-center justify-end h-full w-full opacity-30">
-                <div className="text-[10px] text-light mt-auto mb-1">{last14Days[i].slice(8, 10)}/{last14Days[i].slice(5, 7)}</div>
-              </div>
-            );
-            
-            const height = `${(val / 5) * 100}%`;
+            const hasData = val !== null;
+            const height = hasData ? `${Math.max((val / 5) * 100, 14)}%` : '0%';
+            const dayMonth = `${last14Days[i].slice(8, 10)}/${last14Days[i].slice(5, 7)}`;
+
             return (
-              <div key={i} className="flex flex-col items-center justify-end h-full w-full group relative">
-                <div 
-                  className="w-full max-w-[20px] rounded-t-sm transition-all duration-500 ease-out"
-                  style={{ height, backgroundColor: color }}
-                />
-                <div className="absolute bottom-[calc(100%+8px)] opacity-0 group-hover:opacity-100 bg-charcoal text-white text-[12px] px-2 py-1 rounded transition-opacity whitespace-nowrap z-10 pointer-events-none">
-                  {scaleOptions[0].mood[val - 1]} ({val}/5)
+              <div key={i} className="flex flex-col items-center justify-end h-full flex-1 group relative">
+                {/* Bar area (occupies space above date) */}
+                <div className="w-full flex items-end justify-center h-[90px] mb-2">
+                  {hasData ? (
+                    <div 
+                      className="w-full max-w-[18px] sm:max-w-[22px] rounded-t-md transition-all duration-500 ease-out shadow-xs group-hover:brightness-110"
+                      style={{ height, backgroundColor: color }}
+                    />
+                  ) : (
+                    <div className="w-1.5 h-1.5 rounded-full bg-border/80 dark:bg-slate-700 mb-0.5" />
+                  )}
                 </div>
-                <div className="text-[10px] text-medium mt-auto mb-1 pt-2">{last14Days[i].slice(8, 10)}/{last14Days[i].slice(5, 7)}</div>
+
+                {/* Tooltip on hover */}
+                {hasData && (
+                  <div className="absolute bottom-[calc(100%+4px)] opacity-0 group-hover:opacity-100 bg-charcoal text-white dark:bg-slate-800 dark:text-slate-100 text-[11.5px] font-medium px-2.5 py-1 rounded-md transition-opacity whitespace-nowrap z-20 pointer-events-none shadow-md border border-white/10">
+                    {scaleOptions[0].mood[val - 1]} ({val}/5) • {dayMonth}
+                  </div>
+                )}
+
+                {/* Date label */}
+                <span className="text-[10px] font-semibold text-medium dark:text-slate-300 tracking-tight select-none">
+                  {dayMonth}
+                </span>
               </div>
             );
           })}
