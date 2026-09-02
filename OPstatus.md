@@ -188,6 +188,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         6. Universal Free Nutrition & Cash Grants (`Section 4`, National Food Security Act, 2013).
     *   **Structured Format:** For each benefit, clearly delineated: (a) *Benefit Provided by Government*, (b) *Key Protection* (highlighted in callout with shield icon), and (c) *Legal Source (hyperlinked)* linking directly to official government portals (`labour.gov.in`, `nfsa.gov.in`).
 
+### **Task 23: Fix Legal Protections GUI & Dark Mode Polish (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Fixed Squished Title & Badge Overlap:** Resolved the issue where card titles were wrapping character-by-character into 6 vertical lines because badges were placed side-by-side with long multi-word titles. Restructured the card header to a vertical stack with a top meta row (icon + category tag on left, status badge on right) and the title occupying 100% of the card width below it.
+    *   **Comprehensive Dark Mode Styling:** Fixed low-contrast dark text on dark backgrounds (`dark:text-white`, `dark:text-gray-200`, `dark:text-gray-300`, `dark:bg-[#1E293B]`, `dark:bg-white/[0.03]`, `dark:border-white/10`).
+    *   **Dark-Mode Harmonized Badges:** Updated all statutory badges to support both light and dark modes with proper background tints, readable text, and subtle borders.
+    *   **Official Portals Dark Theme:** Styled the "Official Central Government Portals" footer card for full dark mode contrast.
+
 ---
 
 ## 📅 2026-07-05

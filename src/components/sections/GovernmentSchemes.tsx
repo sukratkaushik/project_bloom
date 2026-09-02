@@ -513,8 +513,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'paid-leave',
     title: '26 Weeks Fully Paid Maternity Leave',
-    badge: '26 WEEKS PAID LEAVE',
-    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    badge: '26 Weeks Paid Leave',
+    badgeColor: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/60',
     iconName: 'briefcase',
     benefit: 'Legally guarantees 26 weeks (6.5 months) of fully paid absence from work for up to 2 surviving children (12 weeks for 3+ children). Up to 8 weeks can be availed before the expected date of delivery, and the remainder postpartum, paid at 100% average daily wages with zero deduction.',
     legalSource: {
@@ -528,8 +528,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'dismissal-protection',
     title: 'Absolute Immunity from Dismissal or Termination',
-    badge: 'STRICT DISMISSAL IMMUNITY',
-    badgeColor: 'bg-rose-100 text-rose-800 border-[1.5px] border-rose-200',
+    badge: 'Dismissal Immunity',
+    badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/60',
     iconName: 'shield',
     benefit: 'Provides complete statutory job security throughout pregnancy and the leave period. Employers are strictly barred from terminating, discharging, demoting, or altering terms of employment to the disadvantage of a pregnant employee.',
     legalSource: {
@@ -543,8 +543,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'arduous-work',
     title: 'Exemption from Heavy, Standing, or Hazardous Duties',
-    badge: 'WORKPLACE SAFETY SAFEGUARD',
-    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    badge: 'Safety Safeguard',
+    badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60',
     iconName: 'heart',
     benefit: 'Expectant mothers have the statutory right to request reassignment away from strenuous tasks. Employers must legally excuse them from long hours of standing, heavy lifting, or exposure to toxic chemicals, machinery, and radiation.',
     legalSource: {
@@ -558,8 +558,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'creche-nursing',
     title: 'Mandatory Nursing Breaks & Crèche Access',
-    badge: 'CHILDCARE & NURSING RIGHTS',
-    badgeColor: 'bg-blue-100 text-blue-800 border-[1.5px] border-blue-200',
+    badge: 'Childcare & Nursing',
+    badgeColor: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/60',
     iconName: 'baby',
     benefit: 'Working mothers are entitled to 2 paid nursing breaks during each workday until the infant attains 15 months of age. Establishments with 50+ staff must maintain an accessible crèche within 500 meters.',
     legalSource: {
@@ -573,8 +573,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'miscarriage-leave',
     title: 'Paid Recovery Leave for Miscarriage or Complications',
-    badge: '6 WEEKS PAID RECOVERY',
-    badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
+    badge: '6 Weeks Recovery',
+    badgeColor: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60',
     iconName: 'clock',
     benefit: 'Provides 6 weeks of fully paid leave immediately following a miscarriage or Medical Termination of Pregnancy (MTP). For pregnancy-induced illness or premature birth complications, an additional 1 month of paid leave can be claimed.',
     legalSource: {
@@ -588,8 +588,8 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'universal-nutrition',
     title: 'Universal Free Nutrition & Cash Grants',
-    badge: 'UNIVERSAL STATUTORY RIGHT',
-    badgeColor: 'bg-emerald-100 text-emerald-800 border-[1.5px] border-emerald-200',
+    badge: 'Universal Right',
+    badgeColor: 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800/60',
     iconName: 'scale',
     benefit: 'Statutory guarantee for all pregnant and lactating women (non-govt employees) to receive free daily hot cooked meals and Take-Home Rations via Anganwadi centres throughout pregnancy and 6 months postpartum, plus minimum ₹6,000 direct cash benefit (PMMVY/JSY).',
     legalSource: {
@@ -835,8 +835,8 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
         </div>
 
         {/* Official Portals Footer */}
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6 mt-6">
-          <h3 className="font-semibold text-charcoal text-[15px] mb-4">Official Central Government Portals</h3>
+        <div className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[16px] shadow-sm p-6 mt-6">
+          <h3 className="font-semibold text-charcoal dark:text-white text-[15px] mb-4">Official Central Government Portals</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {[
               { label: 'PMMVY Official Registration', url: 'https://pmmvy.wcd.gov.in', domain: 'pmmvy.wcd.gov.in' },
@@ -849,35 +849,35 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col p-3 border border-border rounded-[10px] hover:bg-cream/50 hover:border-sage transition-all group"
+                className="flex flex-col p-3 border border-border dark:border-white/10 rounded-[10px] hover:bg-cream/50 dark:hover:bg-white/5 hover:border-sage transition-all group"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-[13.5px] text-charcoal group-hover:text-sage-dark">{link.label}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-medium group-hover:text-sage" />
+                  <span className="font-medium text-[13.5px] text-charcoal dark:text-white group-hover:text-sage-dark dark:group-hover:text-sage-light">{link.label}</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-medium dark:text-gray-400 group-hover:text-sage" />
                 </div>
-                <span className="text-[11.5px] text-medium">{link.domain}</span>
+                <span className="text-[11.5px] text-medium dark:text-gray-400">{link.domain}</span>
               </a>
             ))}
           </div>
         </div>
 
         {/* Statutory Legal Rights & Workplace Protections */}
-        <div className="bg-white border-[1.5px] border-border rounded-[20px] shadow-sm p-6 sm:p-8 mt-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 pb-5">
+        <div className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[20px] shadow-sm p-6 sm:p-8 mt-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 dark:border-white/10 pb-5">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
                 <Scale className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal leading-tight">
+                <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal dark:text-white leading-tight">
                   Legal Rights &amp; Workplace Protections for Pregnant Women
                 </h3>
-                <p className="text-[13.5px] text-medium">
+                <p className="text-[13.5px] text-medium dark:text-gray-300">
                   Statutory rights, mandatory paid leave, dismissal immunity, and healthcare protections enacted under Indian law.
                 </p>
               </div>
             </div>
-            <span className="self-start sm:self-auto px-3.5 py-1 bg-sage-pale/60 text-sage-dark text-[11.5px] font-bold rounded-full border border-sage/20 uppercase tracking-wider">
+            <span className="self-start sm:self-auto px-3.5 py-1 bg-sage-pale/60 dark:bg-sage/20 text-sage-dark dark:text-sage-pale text-[11.5px] font-bold rounded-full border border-sage/20 dark:border-sage/30 uppercase tracking-wider">
               Statutory Rights
             </span>
           </div>
@@ -896,55 +896,61 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
               return (
                 <div
                   key={item.id}
-                  className="bg-cream/40 border-[1.5px] border-border rounded-[16px] p-5 flex flex-col justify-between hover:border-sage hover:shadow-sm transition-all group"
+                  className="bg-cream/40 dark:bg-white/[0.03] border-[1.5px] border-border dark:border-white/10 rounded-[16px] p-5 sm:p-6 flex flex-col justify-between hover:border-sage dark:hover:border-sage/50 hover:shadow-sm transition-all group"
                 >
-                  <div className="space-y-3.5">
-                    {/* Header */}
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
-                          <IconComp className="w-4.5 h-4.5" />
+                  <div className="space-y-4">
+                    {/* Header: Meta bar (Icon + Category + Badge) on top, Title below with 100% width */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-8 h-8 rounded-lg bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+                            <IconComp className="w-4 h-4" />
+                          </div>
+                          <span className="text-[11px] font-bold tracking-wider uppercase text-sage dark:text-sage-pale">
+                            Statutory Entitlement
+                          </span>
                         </div>
-                        <h4 className="font-serif text-[16.5px] font-semibold text-charcoal group-hover:text-sage-dark transition-colors leading-snug">
-                          {item.title}
-                        </h4>
+                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
+                          {item.badge}
+                        </span>
                       </div>
-                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
-                        {item.badge}
-                      </span>
+
+                      <h4 className="font-serif text-[17.5px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
+                        {item.title}
+                      </h4>
                     </div>
 
                     {/* Benefit Provided by Government */}
                     <div>
-                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-0.5">
+                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">
                         Benefit Provided by Government
                       </dt>
-                      <dd className="text-[13px] text-charcoal leading-relaxed">
+                      <dd className="text-[13.5px] text-charcoal dark:text-gray-200 leading-relaxed">
                         {item.benefit}
                       </dd>
                     </div>
 
                     {/* Key Protection */}
-                    <div className="bg-sage-pale/25 p-3 rounded-[10px] border border-sage-pale">
-                      <dt className="text-[10.5px] font-bold text-sage uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                        <ShieldCheck size={12} className="text-sage" /> Key Protection
+                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-3.5 rounded-[12px] border border-sage-pale dark:border-sage/25">
+                      <dt className="text-[10.5px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <ShieldCheck size={13} className="text-sage dark:text-sage-pale" /> Key Protection
                       </dt>
-                      <dd className="text-[12px] text-charcoal/90 leading-relaxed font-medium">
+                      <dd className="text-[12.5px] text-charcoal/90 dark:text-gray-200 leading-relaxed font-medium">
                         {item.keyProtection}
                       </dd>
                     </div>
                   </div>
 
                   {/* Legal Source Hyperlink */}
-                  <div className="pt-3 mt-3.5 border-t border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[12px]">
-                    <span className="text-light text-[11px]">
+                  <div className="pt-3.5 mt-3.5 border-t border-border/70 dark:border-white/10 flex flex-wrap items-center justify-between gap-1.5 text-[12px]">
+                    <span className="text-light dark:text-gray-400 text-[11px]">
                       Legal Source:
                     </span>
                     <a
                       href={item.legalSource.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-semibold text-sage-dark hover:underline"
+                      className="inline-flex items-center gap-1 font-semibold text-sage-dark dark:text-sage-pale hover:underline"
                     >
                       {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={11} />
                     </a>
@@ -955,10 +961,16 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
           </div>
 
           {/* Legal Enforcement Note */}
-          <div className="p-4 bg-cream/70 border border-border rounded-[12px] flex items-start gap-3 text-[12.5px] text-medium">
-            <FileText className="w-4 h-4 text-sage shrink-0 mt-0.5" />
+          <div className="p-4 sm:p-5 bg-cream/70 dark:bg-white/[0.04] border border-border dark:border-white/10 rounded-[14px] flex items-start gap-3.5 text-[13px] text-medium dark:text-gray-300">
+            <div className="p-2 rounded-lg bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale shrink-0 mt-0.5">
+              <FileText className="w-4 h-4" />
+            </div>
             <p className="leading-relaxed">
-              <strong className="text-charcoal">Enforcement &amp; Redressal:</strong> These statutory entitlements are enacted by the Parliament of India and are non-negotiable. If an employer denies paid maternity leave, terminates employment during pregnancy, or refuses required health adjustments, formal complaints can be filed with the <strong>Office of the State Labour Commissioner</strong>, the <strong>Chief Labour Commissioner (Central)</strong>, or the <strong>National Commission for Women (NCW)</strong>.
+              <strong className="text-charcoal dark:text-white font-semibold">Enforcement &amp; Redressal:</strong>{' '}
+              These statutory entitlements are enacted by the Parliament of India and are non-negotiable. If an employer denies paid maternity leave, terminates employment during pregnancy, or refuses required health adjustments, formal complaints can be filed with the{' '}
+              <strong className="text-charcoal dark:text-white">Office of the State Labour Commissioner</strong>, the{' '}
+              <strong className="text-charcoal dark:text-white">Chief Labour Commissioner (Central)</strong>, or the{' '}
+              <strong className="text-charcoal dark:text-white">National Commission for Women (NCW)</strong>.
             </p>
           </div>
         </div>
