@@ -863,23 +863,18 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
 
         {/* Statutory Legal Rights & Workplace Protections */}
         <div className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[20px] shadow-sm p-6 sm:p-8 mt-8 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 dark:border-white/10 pb-5">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
-                <Scale className="w-6 h-6" />
-              </div>
-              <div>
-                <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal dark:text-white leading-tight">
-                  Legal Rights &amp; Workplace Protections for Pregnant Women
-                </h3>
-                <p className="text-[13.5px] text-medium dark:text-gray-300">
-                  Statutory rights, mandatory paid leave, dismissal immunity, and healthcare protections enacted under Indian law.
-                </p>
-              </div>
+          <div className="flex items-center gap-3.5 border-b border-border/70 dark:border-white/10 pb-5">
+            <div className="w-12 h-12 rounded-2xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+              <Scale className="w-6 h-6" />
             </div>
-            <span className="self-start sm:self-auto px-3.5 py-1 bg-sage-pale/60 dark:bg-sage/20 text-sage-dark dark:text-sage-pale text-[11.5px] font-bold rounded-full border border-sage/20 dark:border-sage/30 uppercase tracking-wider">
-              Statutory Rights
-            </span>
+            <div>
+              <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal dark:text-white leading-tight">
+                Legal Rights &amp; Workplace Protections for Pregnant Women
+              </h3>
+              <p className="text-[13.5px] text-medium dark:text-gray-300">
+                Mandatory paid leave, dismissal immunity, and healthcare protections enacted under Indian law.
+              </p>
+            </div>
           </div>
 
           <div className="flex flex-col gap-6">
@@ -905,14 +900,9 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                         <div className="w-11 h-11 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
                           <IconComp className="w-5 h-5" />
                         </div>
-                        <div>
-                          <div className="text-[11px] font-bold tracking-wider uppercase text-sage dark:text-sage-pale mb-0.5">
-                            Statutory Entitlement
-                          </div>
-                          <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
-                            {item.title}
-                          </h4>
-                        </div>
+                        <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
+                          {item.title}
+                        </h4>
                       </div>
                       <span className={`self-start sm:self-auto text-[11px] font-bold px-3 py-1 rounded-full border uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
                         {item.badge}

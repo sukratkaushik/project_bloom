@@ -200,6 +200,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Single Box Per Row:** Replaced the 2-column grid (`md:grid-cols-2`) with a full-width single-box-per-row layout (`flex flex-col gap-6`).
     *   **Full End-to-End Expansion:** Each legal benefit card now expands across 100% of the container width (`w-full`), giving maximum breathing room for titles, complete benefit explanations, callout boxes, and legal source citations without any horizontal truncation or squishing.
 
+### **Task 25: Remove Redundant STATUTORY RIGHTS Badge & Subtitle (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Removed Header Badge:** Removed the green `STATUTORY RIGHTS` badge from the top-right of the Legal Rights section header.
+    *   **Eliminated Repetitive Words:** Removed the redundant `Statutory Entitlement` eyebrow from each card and adjusted the section subtitle to avoid word repetition, creating a cleaner, more streamlined header and card layout.
+
 ---
 
 ## 📅 2026-07-05
