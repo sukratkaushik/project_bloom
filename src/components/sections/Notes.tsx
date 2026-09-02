@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
-import { Plus, Trash2, Sparkles, X, Check, BookOpen } from 'lucide-react';
+import { Plus, Trash2, Sparkles, X, Check, BookOpen, AlertCircle } from 'lucide-react';
 
 const SUGGESTED_TOPICS = [
   { title: 'Postpartum Meal Prep & Freezing', placeholder: 'Meals to freeze, grocery delivery notes, snack ideas...' },
@@ -226,10 +226,18 @@ export const Notes: React.FC = () => {
                   value={newTitle}
                   onChange={(e) => {
                     setNewTitle(e.target.value);
-                    setError('');
+                    if (error) setError('');
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTopic();
+                    }
                   }}
                   placeholder="e.g., Doula Questions, Postpartum Meal Prep, Baby Shower Wishes..."
-                  className="w-full p-3 bg-cream border border-border rounded-xl text-[14px] text-charcoal outline-none focus:border-sage"
+                  className={`w-full p-3 bg-cream border rounded-xl text-[14px] text-charcoal outline-none transition-colors ${
+                    error ? 'border-critical focus:border-critical ring-2 ring-critical/10' : 'border-border focus:border-sage'
+                  }`}
                   autoFocus
                 />
               </div>
@@ -242,12 +250,23 @@ export const Notes: React.FC = () => {
                   type="text"
                   value={newPlaceholder}
                   onChange={(e) => setNewPlaceholder(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddTopic();
+                    }
+                  }}
                   placeholder="e.g., What recipes to freeze? Who will drop off groceries?"
                   className="w-full p-3 bg-cream border border-border rounded-xl text-[14px] text-charcoal outline-none focus:border-sage"
                 />
               </div>
 
-              {error && <p className="text-[12.5px] text-critical font-medium">{error}</p>}
+              {error && (
+                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-[12.5px] text-critical font-medium">
+                  <AlertCircle size={15} className="shrink-0" />
+                  <span>{error}</span>
+                </div>
+              )}
             </div>
 
             <div className="flex justify-end gap-2.5 pt-2">
@@ -262,8 +281,12 @@ export const Notes: React.FC = () => {
                 Cancel
               </button>
               <button
-                type="submit"
-                className="px-5 py-2 bg-sage hover:bg-sage-dark text-white rounded-xl text-[13px] font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  handleAddTopic();
+                }}
+                className="px-5 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-[13px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
               >
                 <Check size={15} /> Save Topic
               </button>
