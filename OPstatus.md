@@ -210,6 +210,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Removed Card Badges:** Removed all individual badge pills (`26 WEEKS PAID LEAVE`, `DISMISSAL IMMUNITY`, `SAFETY SAFEGUARD`, `CHILDCARE & NURSING`, `6 WEEKS RECOVERY`, `Universal Right`) from the legal protection card headers.
     *   **Clean Headline Alignment:** With the badge pills removed, the card headers now feature a minimalist, balanced layout consisting of the category icon paired directly with the full-width serif title.
 
+### **Task 27: Remove Small Badge Pills from Maternity & Health Schemes Cards (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Removed Scheme Header Badges:** Removed all small badge pills (`Central Govt`, `State Scheme`, `FREE SERVICE`, `₹5,000 CASH`, `₹1,400 CASH`, `100% FREE DELIVERY`, `UP TO ₹5 LAKH`, `FREE NUTRITION`, etc.) from the scheme cards in the "Maternity & Health Schemes" grid.
+    *   **Polished Card Headers & Dark Mode:** Redesigned scheme card headers to feature a prominent icon paired directly with the scheme name in a clean, uncluttered layout with dark mode contrast classes applied.
+
 ---
 
 ## 📅 2026-07-05

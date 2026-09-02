@@ -738,31 +738,15 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
             {filteredSchemes.map(scheme => (
               <div
                 key={scheme.id}
-                className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage hover:shadow-md transition-all duration-200"
+                className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage dark:hover:border-sage/50 hover:shadow-md transition-all duration-200"
               >
                 {/* Card Header */}
-                <div className="p-5 border-b border-border bg-gray-50/60 flex items-start justify-between gap-4">
-                  <div className="flex gap-3.5">
+                <div className="p-5 border-b border-border dark:border-white/10 bg-gray-50/60 dark:bg-white/[0.03] flex items-center justify-between gap-4">
+                  <div className="flex items-center gap-3.5">
                     <div className="text-[28px] shrink-0">{scheme.icon}</div>
-                    <div>
-                      <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
-                        {scheme.scope === 'national' ? (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                            🇮🇳 Central Govt
-                          </span>
-                        ) : (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 border border-purple-200">
-                            🏛️ State Scheme • {scheme.scope}
-                          </span>
-                        )}
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${scheme.badgeColor}`}>
-                          {scheme.badge}
-                        </span>
-                      </div>
-                      <h3 className="font-bold text-charcoal text-[15.5px] leading-snug">
-                        {scheme.name}
-                      </h3>
-                    </div>
+                    <h3 className="font-bold text-charcoal dark:text-white text-[16px] leading-snug">
+                      {scheme.name}
+                    </h3>
                   </div>
                 </div>
 
@@ -770,32 +754,32 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                 <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
                   <div className="space-y-3.5">
                     <div>
-                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-1 flex items-center gap-1">
+                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
                         <Sparkles size={12} className="text-sage" /> Benefit
                       </dt>
-                      <dd className="text-[13.5px] text-charcoal leading-relaxed">{scheme.benefit}</dd>
+                      <dd className="text-[13.5px] text-charcoal dark:text-gray-200 leading-relaxed">{scheme.benefit}</dd>
                     </div>
 
-                    <div className="bg-sage-pale/25 p-3 rounded-[10px] border border-sage-pale">
-                      <dt className="text-[10.5px] font-bold text-sage uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                        <ShieldCheck size={12} className="text-sage" /> Who Qualifies?
+                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-3 rounded-[10px] border border-sage-pale dark:border-sage/25">
+                      <dt className="text-[10.5px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-sage dark:text-sage-pale" /> Who Qualifies?
                       </dt>
-                      <dd className="text-[12.5px] text-charcoal/90 leading-relaxed">{scheme.who}</dd>
+                      <dd className="text-[12.5px] text-charcoal/90 dark:text-gray-300 leading-relaxed">{scheme.who}</dd>
                     </div>
 
                     <div>
-                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-1">How to Apply</dt>
-                      <dd className="text-[12.5px] text-medium leading-relaxed">{scheme.how}</dd>
+                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">How to Apply</dt>
+                      <dd className="text-[12.5px] text-medium dark:text-gray-300 leading-relaxed">{scheme.how}</dd>
                     </div>
                   </div>
 
                   {scheme.link && (
-                    <div className="pt-3 border-t border-border/70 flex justify-end">
+                    <div className="pt-3 border-t border-border/70 dark:border-white/10 flex justify-end">
                       <a
                         href={scheme.link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-sage-dark hover:underline"
+                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-sage-dark dark:text-sage-pale hover:underline"
                       >
                         {scheme.link.label} <ExternalLink size={12} />
                       </a>
