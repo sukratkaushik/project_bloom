@@ -277,11 +277,12 @@ export const NutritionTracker: React.FC = () => {
 
       {/* Foods DB */}
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border bg-gray-50/50">
+        <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex items-center justify-between">
           <h3 className="font-semibold text-charcoal text-[17px]">Pregnancy Food Guide</h3>
+          <span className="text-[12px] text-medium">Evidence-based safety reference</span>
         </div>
         <div className="p-4 sm:p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col gap-5">
             {['AVOID', 'CAUTION', 'SAFE'].map(tier => {
               const tierFoods = FOOD_DATABASE.filter(f => f.type === tier);
               if (tierFoods.length === 0) return null;
@@ -292,18 +293,18 @@ export const NutritionTracker: React.FC = () => {
               else { icon = '✅'; color = 'text-green-800'; bg = 'bg-green-50 border-green-200'; }
 
               return (
-                <div key={tier} className={`p-4 rounded-[12px] border ${bg} md:col-span-1`}>
-                  <h4 className={`font-bold text-[14px] flex items-center gap-2 mb-3 uppercase tracking-wide ${color}`}>
+                <div key={tier} className={`p-5 sm:p-6 rounded-[14px] border ${bg} w-full shadow-2xs`}>
+                  <h4 className={`font-bold text-[15px] flex items-center gap-2 mb-4 uppercase tracking-wider ${color}`}>
                     {icon} {tier}
                   </h4>
-                  <ul className="space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
                     {tierFoods.map(food => (
-                      <li key={food.name} className="flex flex-col">
+                      <div key={food.name} className="flex flex-col p-3 rounded-xl bg-white/70 dark:bg-white/[0.04] border border-black/5 dark:border-white/5">
                         <span className="font-semibold text-[14px] text-charcoal">{food.name}</span>
-                        <span className="text-[13px] text-medium">{food.desc}</span>
-                      </li>
+                        <span className="text-[12.5px] text-medium mt-0.5 leading-snug">{food.desc}</span>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               );
             })}

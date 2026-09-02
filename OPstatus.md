@@ -215,6 +215,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Removed Scheme Header Badges:** Removed all small badge pills (`Central Govt`, `State Scheme`, `FREE SERVICE`, `₹5,000 CASH`, `₹1,400 CASH`, `100% FREE DELIVERY`, `UP TO ₹5 LAKH`, `FREE NUTRITION`, etc.) from the scheme cards in the "Maternity & Health Schemes" grid.
     *   **Polished Card Headers & Dark Mode:** Redesigned scheme card headers to feature a prominent icon paired directly with the scheme name in a clean, uncluttered layout with dark mode contrast classes applied.
 
+### **Task 28: Single Box Per Row Layout for Pregnancy Food Guide (`NutritionTracker.tsx`)**
+*   **Details:**
+    *   **Full-Width Single Box Per Row:** Replaced the uneven 2-column grid with a stacked single-box-per-row layout (`flex flex-col gap-5`), giving each food safety tier (`AVOID`, `CAUTION`, `SAFE`) an end-to-end full-width box (`w-full`).
+    *   **Responsive Multi-Column Food Grid:** Formatted food items inside each tier into a clean responsive multi-column grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5`) with polished item cards and full dark mode support, eliminating awkward whitespace.
+
 ---
 
 ## 📅 2026-07-05
