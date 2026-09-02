@@ -165,7 +165,10 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 *   **Details:**
     *   **Instant Activation on Apply:** When a user applies a 100% free pass coupon (`OPIN30`, `VIPCARE90`, `BLOOM30`), it immediately sets duration to the free period, updates Firestore subscription directly, and updates the local planner store without requiring manual navigation through the checkout flow.
     *   **Celebratory Success Pop-Up Modal:** Rendered a modern modal popup displaying celebration badges, promo code confirmation, unlocked features summary (Bloom AI, Food Scanner, EHR Exports), and an explicit **[ Go to Dashboard ]** button (`navigate('/dashboard')`).
-    *   **Button Loading State:** Added loading indicator on the Apply button while activating the user's free subscription in Firestore.
+### **Task 20: Streamline Government Schemes Filtering (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Removed 'Search by Keyword' Input:** Cleaned up the filter control section by removing the keyword search text box and redundant icons, simplifying navigation for users to focus directly on State / Central government scheme filters.
+    *   **Full Backward Compatibility:** Maintained the component interface with `GovernmentSchemesProps` supporting optional `initialSearchQuery` and `initialState`, preserving `localStorage` state retention and fallback filter logic.
 
 ---
 

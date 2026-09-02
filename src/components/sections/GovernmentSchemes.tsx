@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Building, ExternalLink, HeartHandshake, MapPin, Search, ShieldCheck, Sparkles, Filter } from 'lucide-react';
+import { Building, ExternalLink, HeartHandshake, MapPin, ShieldCheck, Sparkles, Filter } from 'lucide-react';
 import { Paywall } from '../Paywall';
 
 export interface Scheme {
@@ -483,11 +483,16 @@ export const SCHEMES_DATABASE: Scheme[] = [
   }
 ];
 
-export const GovernmentSchemes: React.FC = () => {
+export interface GovernmentSchemesProps {
+  initialSearchQuery?: string;
+  initialState?: string;
+}
+
+export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSearchQuery = '', initialState }) => {
   const [selectedState, setSelectedState] = useState<string>(() => {
-    return localStorage.getItem('op_selected_scheme_state') || 'National';
+    return initialState || localStorage.getItem('op_selected_scheme_state') || 'National';
   });
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(initialSearchQuery);
 
   useEffect(() => {
     localStorage.setItem('op_selected_scheme_state', selectedState);
@@ -552,60 +557,33 @@ export const GovernmentSchemes: React.FC = () => {
 
         {/* Filter Controls Bar */}
         <div className="bg-white border-[1.5px] border-border rounded-[16px] p-4 sm:p-5 shadow-sm space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+          <div className="max-w-md">
             {/* State Selector Dropdown */}
-            <div className="sm:col-span-6 lg:col-span-5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
-                <MapPin size={13} className="text-sage" /> Select Your State / Region
-              </label>
-              <div className="relative">
-                <select
-                  value={selectedState}
-                  onChange={(e) => setSelectedState(e.target.value)}
-                  className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all cursor-pointer appearance-none"
-                >
-                  <option value="National">🇮🇳 National (All-India Central Schemes)</option>
-                  <optgroup label="── States & Union Territories ──">
-                    {INDIAN_STATES_AND_UTS.filter(s => s !== 'National').map(state => (
-                      <option key={state} value={state}>
-                        📍 {state}
-                      </option>
-                    ))}
-                  </optgroup>
-                </select>
-                <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-light">
-                  ▼
-                </div>
-              </div>
-            </div>
-
-            {/* Keyword Search */}
-            <div className="sm:col-span-6 lg:col-span-7">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
-                <Search size={13} className="text-sage" /> Search by Keyword
-              </label>
-              <div className="relative">
-                <input
-                  type="text"
-                  placeholder="e.g. cash, nutrition, delivery, C-section, Aadhaar..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] pl-9 pr-3.5 py-2.5 text-[14px] text-charcoal placeholder:text-light focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all"
-                />
-                <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-light" />
-                {searchQuery && (
-                  <button
-                    onClick={() => setSearchQuery('')}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] bg-charcoal/10 hover:bg-charcoal/20 px-2 py-0.5 rounded-full text-charcoal font-medium"
-                  >
-                    Clear
-                  </button>
-                )}
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
+              <MapPin size={13} className="text-sage" /> Select Your State / Region
+            </label>
+            <div className="relative">
+              <select
+                value={selectedState}
+                onChange={(e) => setSelectedState(e.target.value)}
+                className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all cursor-pointer appearance-none"
+              >
+                <option value="National">🇮🇳 National (All-India Central Schemes)</option>
+                <optgroup label="── States & Union Territories ──">
+                  {INDIAN_STATES_AND_UTS.filter(s => s !== 'National').map(state => (
+                    <option key={state} value={state}>
+                      📍 {state}
+                    </option>
+                  ))}
+                </optgroup>
+              </select>
+              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-light">
+                ▼
               </div>
             </div>
           </div>
 
-          {/* Active Filter Pills / Summary */}
+          {/* Active Filter Summary */}
           <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border/70 text-[12.5px]">
             <div className="flex items-center gap-2 text-charcoal">
               <span className="font-medium">
@@ -641,7 +619,7 @@ export const GovernmentSchemes: React.FC = () => {
             </div>
             <h3 className="font-serif text-[18px] text-charcoal mb-1">No matching schemes found</h3>
             <p className="text-[13.5px] text-medium max-w-md mx-auto mb-4">
-              We couldn't find any schemes matching "{searchQuery}" for {selectedState}.
+              We couldn't find any schemes for {selectedState}.
             </p>
             <button
               onClick={() => { setSearchQuery(''); setSelectedState('National'); }}
