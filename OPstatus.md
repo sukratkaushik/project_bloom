@@ -195,6 +195,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Dark-Mode Harmonized Badges:** Updated all statutory badges to support both light and dark modes with proper background tints, readable text, and subtle borders.
     *   **Official Portals Dark Theme:** Styled the "Official Central Government Portals" footer card for full dark mode contrast.
 
+### **Task 24: Single Box Per Row End-to-End Layout (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Single Box Per Row:** Replaced the 2-column grid (`md:grid-cols-2`) with a full-width single-box-per-row layout (`flex flex-col gap-6`).
+    *   **Full End-to-End Expansion:** Each legal benefit card now expands across 100% of the container width (`w-full`), giving maximum breathing room for titles, complete benefit explanations, callout boxes, and legal source citations without any horizontal truncation or squishing.
+
 ---
 
 ## 📅 2026-07-05
