@@ -23,6 +23,13 @@ export type BudgetItem = {
   label: string;
 };
 
+export type CustomNoteTopic = {
+  id: string;
+  title: string;
+  placeholder?: string;
+  createdAt: number;
+};
+
 export type BirthPlan = {
   personalDetails?: {
     name?: string;
@@ -121,6 +128,7 @@ export type PlannerState = {
   customBudgetItems: BudgetItem[];
   customTasks: Record<string, Task[]>;
   notes: Record<string, string>;
+  customNoteTopics?: CustomNoteTopic[];
   critFilter: boolean;
   activeJourneyId?: string;
   isDarkModeActive: boolean;

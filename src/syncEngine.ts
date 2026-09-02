@@ -141,6 +141,7 @@ class SyncEngine {
       
       if (perms.notes !== false) {
         syncData.state.notes = state.notes;
+        syncData.state.customNoteTopics = state.customNoteTopics;
       }
       
       if (perms.babynames !== false) {
