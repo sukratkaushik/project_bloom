@@ -23,7 +23,7 @@ type PlannerContextType = {
   addCustomSupplement: (name: string, dose: string) => void;
   deleteCustomSupplement: (id: string) => void;
   setNote: (id: string, value: string) => void;
-  addCustomNoteTopic: (title: string, placeholder?: string) => void;
+  addCustomNoteTopic: (title: string, details?: string, placeholder?: string) => void;
   deleteCustomNoteTopic: (id: string) => void;
   generatePlan: (setupData: Partial<PlannerState>) => void;
   resetPlan: () => void;
@@ -101,9 +101,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       try {
         const record = await db.appState.get('global');
         if (record) {
+          const parsed = JSON.parse(record.stateJSON);
           setState(prev => ({
             ...prev,
-            ...JSON.parse(record.stateJSON),
+            ...parsed,
+            notes: { ...prev.notes, ...(parsed.notes || {}) },
+            customNoteTopics: parsed.customNoteTopics || prev.customNoteTopics || [],
             isDarkModeActive: prev.isDarkModeActive
           }));
         } else {
@@ -177,6 +180,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               setState(prev => ({
                 ...prev,
                 ...cloudData,
+                notes: { ...prev.notes, ...(cloudData.notes || {}) },
+                customNoteTopics: cloudData.customNoteTopics || prev.customNoteTopics || [],
                 isDarkModeActive: prev.isDarkModeActive,
                 isSetup: true,
                 activeJourneyId: profile.activeJourneyId,
@@ -449,10 +454,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
-  const addCustomNoteTopic = (title: string, placeholder?: string) => {
+  const addCustomNoteTopic = (title: string, details?: string, placeholder?: string) => {
     const id = `custom_topic_${Date.now()}`;
     setState((prev) => {
       if (prev.isPartnerReadOnly) return prev;
+      const noteContent = (details || '').trim();
       return {
         ...prev,
         customNoteTopics: [
@@ -464,6 +470,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             createdAt: Date.now(),
           },
         ],
+        notes: noteContent ? { ...prev.notes, [id]: noteContent } : prev.notes,
       };
     });
   };

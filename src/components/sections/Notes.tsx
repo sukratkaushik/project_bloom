@@ -15,6 +15,7 @@ export const Notes: React.FC = () => {
   const { state, setNote, addCustomNoteTopic, deleteCustomNoteTopic } = usePlanner();
   const [isAddingTopic, setIsAddingTopic] = useState(false);
   const [newTitle, setNewTitle] = useState('');
+  const [newDetails, setNewDetails] = useState('');
   const [newPlaceholder, setNewPlaceholder] = useState('');
   const [error, setError] = useState('');
 
@@ -24,8 +25,9 @@ export const Notes: React.FC = () => {
       setError('Please provide a topic title.');
       return;
     }
-    addCustomNoteTopic(newTitle.trim(), newPlaceholder.trim());
+    addCustomNoteTopic(newTitle.trim(), newDetails.trim(), newPlaceholder.trim());
     setNewTitle('');
+    setNewDetails('');
     setNewPlaceholder('');
     setError('');
     setIsAddingTopic(false);
@@ -51,36 +53,46 @@ export const Notes: React.FC = () => {
     minHeight: string;
     isCustom?: boolean;
     onDelete?: () => void;
-  }) => (
-    <div className="group relative">
-      <div className="flex items-center justify-between mb-2">
-        <label className="text-[11px] font-semibold tracking-[1px] uppercase text-medium flex items-center gap-1.5">
-          {isCustom && <span className="w-1.5 h-1.5 rounded-full bg-sage" />}
-          {label}
-        </label>
-        {isCustom && onDelete && (
-          <button
-            type="button"
-            onClick={() => {
-              if (window.confirm(`Delete topic "${label}" and its notes?`)) {
-                onDelete();
-              }
-            }}
-            className="text-light hover:text-critical p-1 rounded-md transition-colors cursor-pointer"
-            title="Delete topic"
-          >
-            <Trash2 size={15} />
-          </button>
-        )}
+  }) => {
+    const hasContent = Boolean(state.notes[id] && state.notes[id].trim());
+    return (
+      <div className="group relative">
+        <div className="flex items-center justify-between mb-2">
+          <label className="text-[11px] font-semibold tracking-[1px] uppercase text-medium flex items-center gap-1.5">
+            {isCustom && <span className="w-2 h-2 rounded-full bg-sage" />}
+            {label}
+          </label>
+          <div className="flex items-center gap-2">
+            {hasContent && (
+              <span className="text-[11px] font-medium text-sage flex items-center gap-1">
+                <Check size={12} /> Saved
+              </span>
+            )}
+            {isCustom && onDelete && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Delete topic "${label}" and its notes?`)) {
+                    onDelete();
+                  }
+                }}
+                className="text-light hover:text-critical p-1 rounded-md transition-colors cursor-pointer"
+                title="Delete topic"
+              >
+                <Trash2 size={15} />
+              </button>
+            )}
+          </div>
+        </div>
+        <textarea
+          value={state.notes[id] || ''}
+          onChange={(e) => setNote(id, e.target.value)}
+          className={`w-full p-3.5 border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal bg-white resize-y transition-all leading-[1.65] focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 placeholder:text-light placeholder:italic ${minHeight}`}
+          placeholder={placeholder}
+        />
       </div>
-      <textarea
-        value={state.notes[id] || ''}
-        onChange={(e) => setNote(id, e.target.value)}
-        className={`w-full p-3.5 border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal bg-white resize-y transition-all leading-[1.65] focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 placeholder:text-light placeholder:italic ${minHeight}`}
-        placeholder={placeholder}
-      />
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="animate-in fade-in duration-300">
@@ -148,6 +160,18 @@ export const Notes: React.FC = () => {
           placeholder="What do you want to remember about this time? What are your hopes for your growing family? Write freely…"
           minHeight="min-h-[140px]"
         />
+
+        {/* User-Added Custom Topics Section Header */}
+        {state.customNoteTopics && state.customNoteTopics.length > 0 && (
+          <div className="pt-3 border-t border-border/80 flex items-center justify-between">
+            <h3 className="text-[12px] font-bold uppercase tracking-[1.5px] text-medium flex items-center gap-2">
+              <span>My Custom Topics</span>
+              <span className="px-2 py-0.5 rounded-full bg-sage/15 text-sage text-[11px] font-bold">
+                {state.customNoteTopics.length}
+              </span>
+            </h3>
+          </div>
+        )}
 
         {/* User-Added Custom Topics */}
         {(state.customNoteTopics || []).map((topic) => (
@@ -244,20 +268,14 @@ export const Notes: React.FC = () => {
 
               <div>
                 <label className="text-[11px] font-bold uppercase tracking-wider text-light block mb-1">
-                  Prompt / Placeholder (Optional)
+                  Notes & Details (Optional)
                 </label>
-                <input
-                  type="text"
-                  value={newPlaceholder}
-                  onChange={(e) => setNewPlaceholder(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTopic();
-                    }
-                  }}
-                  placeholder="e.g., What recipes to freeze? Who will drop off groceries?"
-                  className="w-full p-3 bg-cream border border-border rounded-xl text-[14px] text-charcoal outline-none focus:border-sage"
+                <textarea
+                  value={newDetails}
+                  onChange={(e) => setNewDetails(e.target.value)}
+                  placeholder={newPlaceholder || "Write down your questions, thoughts, or notes here..."}
+                  rows={3}
+                  className="w-full p-3 bg-cream border border-border rounded-xl text-[14px] text-charcoal outline-none focus:border-sage resize-y leading-[1.6]"
                 />
               </div>
 
