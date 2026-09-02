@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Building, ExternalLink, HeartHandshake, MapPin, ShieldCheck, Sparkles, Filter } from 'lucide-react';
+import { Building, ExternalLink, HeartHandshake, MapPin, ShieldCheck, Sparkles, Filter, Scale, Briefcase, Baby, HeartPulse, Clock, FileText } from 'lucide-react';
 import { Paywall } from '../Paywall';
 
 export interface Scheme {
@@ -493,6 +493,115 @@ export const SCHEMES_DATABASE: Scheme[] = [
   }
 ];
 
+export interface LegalBenefit {
+  id: string;
+  title: string;
+  badge: string;
+  badgeColor: string;
+  iconName: 'briefcase' | 'shield' | 'heart' | 'baby' | 'clock' | 'scale';
+  benefit: string;
+  legalSource: {
+    actName: string;
+    section: string;
+    url: string;
+    authority: string;
+  };
+  keyProtection: string;
+}
+
+export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
+  {
+    id: 'paid-leave',
+    title: '26 Weeks Fully Paid Maternity Leave',
+    badge: '26 WEEKS PAID LEAVE',
+    badgeColor: 'bg-purple-100 text-purple-800 border-[1.5px] border-purple-200',
+    iconName: 'briefcase',
+    benefit: 'Legally guarantees 26 weeks (6.5 months) of fully paid absence from work for up to 2 surviving children (12 weeks for 3+ children). Up to 8 weeks can be availed before the expected date of delivery, and the remainder postpartum, paid at 100% average daily wages with zero deduction.',
+    legalSource: {
+      actName: 'Maternity Benefit (Amendment) Act, 2017',
+      section: 'Section 5(3)',
+      url: 'https://www.labour.gov.in',
+      authority: 'Ministry of Labour & Employment, Govt. of India'
+    },
+    keyProtection: 'Mandatory across all private companies, IT firms, factories, startups, and establishments employing 10+ persons. Only requirement is 80 days of service in the preceding 12 months.'
+  },
+  {
+    id: 'dismissal-protection',
+    title: 'Absolute Immunity from Dismissal or Termination',
+    badge: 'STRICT DISMISSAL IMMUNITY',
+    badgeColor: 'bg-rose-100 text-rose-800 border-[1.5px] border-rose-200',
+    iconName: 'shield',
+    benefit: 'Provides complete statutory job security throughout pregnancy and the leave period. Employers are strictly barred from terminating, discharging, demoting, or altering terms of employment to the disadvantage of a pregnant employee.',
+    legalSource: {
+      actName: 'Maternity Benefit Act, 1961',
+      section: 'Section 12',
+      url: 'https://www.labour.gov.in',
+      authority: 'Ministry of Labour & Employment, Govt. of India'
+    },
+    keyProtection: 'It is a cognizable, punishable criminal offense for an employer to terminate employment on grounds of pregnancy. By Supreme Court precedent, this protection applies equally to contractual, temporary, and daily-wage employees.'
+  },
+  {
+    id: 'arduous-work',
+    title: 'Exemption from Heavy, Standing, or Hazardous Duties',
+    badge: 'WORKPLACE SAFETY SAFEGUARD',
+    badgeColor: 'bg-green-100 text-green-800 border-[1.5px] border-green-200',
+    iconName: 'heart',
+    benefit: 'Expectant mothers have the statutory right to request reassignment away from strenuous tasks. Employers must legally excuse them from long hours of standing, heavy lifting, or exposure to toxic chemicals, machinery, and radiation.',
+    legalSource: {
+      actName: 'Maternity Benefit Act, 1961',
+      section: 'Section 4(3)',
+      url: 'https://www.labour.gov.in',
+      authority: 'Ministry of Labour & Employment, Govt. of India'
+    },
+    keyProtection: 'Prohibits assigning any work during the 1 month preceding 6 weeks before delivery that could cause physical strain, harm fetal development, or increase the risk of miscarriage.'
+  },
+  {
+    id: 'creche-nursing',
+    title: 'Mandatory Nursing Breaks & Crèche Access',
+    badge: 'CHILDCARE & NURSING RIGHTS',
+    badgeColor: 'bg-blue-100 text-blue-800 border-[1.5px] border-blue-200',
+    iconName: 'baby',
+    benefit: 'Working mothers are entitled to 2 paid nursing breaks during each workday until the infant attains 15 months of age. Establishments with 50+ staff must maintain an accessible crèche within 500 meters.',
+    legalSource: {
+      actName: 'Maternity Benefit (Amendment) Act, 2017',
+      section: 'Section 11 & 11A',
+      url: 'https://www.labour.gov.in',
+      authority: 'Ministry of Labour & Employment, Govt. of India'
+    },
+    keyProtection: 'Mothers are legally entitled to 4 visits per day to the crèche (including rest intervals), with zero loss of salary or work penalties.'
+  },
+  {
+    id: 'miscarriage-leave',
+    title: 'Paid Recovery Leave for Miscarriage or Complications',
+    badge: '6 WEEKS PAID RECOVERY',
+    badgeColor: 'bg-orange-100 text-orange-800 border-[1.5px] border-orange-200',
+    iconName: 'clock',
+    benefit: 'Provides 6 weeks of fully paid leave immediately following a miscarriage or Medical Termination of Pregnancy (MTP). For pregnancy-induced illness or premature birth complications, an additional 1 month of paid leave can be claimed.',
+    legalSource: {
+      actName: 'Maternity Benefit Act, 1961',
+      section: 'Section 9 & Section 10',
+      url: 'https://www.labour.gov.in',
+      authority: 'Ministry of Labour & Employment, Govt. of India'
+    },
+    keyProtection: 'Granted immediately upon submission of a registered doctor’s certificate. Protects women from wage loss and physical exploitation during medical bereavement.'
+  },
+  {
+    id: 'universal-nutrition',
+    title: 'Universal Free Nutrition & Cash Grants',
+    badge: 'UNIVERSAL STATUTORY RIGHT',
+    badgeColor: 'bg-emerald-100 text-emerald-800 border-[1.5px] border-emerald-200',
+    iconName: 'scale',
+    benefit: 'Statutory guarantee for all pregnant and lactating women (non-govt employees) to receive free daily hot cooked meals and Take-Home Rations via Anganwadi centres throughout pregnancy and 6 months postpartum, plus minimum ₹6,000 direct cash benefit (PMMVY/JSY).',
+    legalSource: {
+      actName: 'National Food Security Act (NFSA), 2013',
+      section: 'Section 4',
+      url: 'https://nfsa.gov.in',
+      authority: 'Department of Food & Public Distribution, Govt. of India'
+    },
+    keyProtection: 'Enforceable under Article 21 (Right to Life) and Article 42 (Maternity Relief) of the Constitution of India; independent of employment sector.'
+  }
+];
+
 export interface GovernmentSchemesProps {
   initialSearchQuery?: string;
   initialState?: string;
@@ -749,6 +858,108 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                 <span className="text-[11.5px] text-medium">{link.domain}</span>
               </a>
             ))}
+          </div>
+        </div>
+
+        {/* Statutory Legal Rights & Workplace Protections */}
+        <div className="bg-white border-[1.5px] border-border rounded-[20px] shadow-sm p-6 sm:p-8 mt-8 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/70 pb-5">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
+                <Scale className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal leading-tight">
+                  Legal Rights &amp; Workplace Protections for Pregnant Women
+                </h3>
+                <p className="text-[13.5px] text-medium">
+                  Statutory rights, mandatory paid leave, dismissal immunity, and healthcare protections enacted under Indian law.
+                </p>
+              </div>
+            </div>
+            <span className="self-start sm:self-auto px-3.5 py-1 bg-sage-pale/60 text-sage-dark text-[11.5px] font-bold rounded-full border border-sage/20 uppercase tracking-wider">
+              Statutory Rights
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            {LEGAL_MATERNITY_BENEFITS.map((item) => {
+              const IconComp = {
+                briefcase: Briefcase,
+                shield: ShieldCheck,
+                heart: HeartPulse,
+                baby: Baby,
+                clock: Clock,
+                scale: Scale
+              }[item.iconName];
+
+              return (
+                <div
+                  key={item.id}
+                  className="bg-cream/40 border-[1.5px] border-border rounded-[16px] p-5 flex flex-col justify-between hover:border-sage hover:shadow-sm transition-all group"
+                >
+                  <div className="space-y-3.5">
+                    {/* Header */}
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-9 h-9 rounded-xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
+                          <IconComp className="w-4.5 h-4.5" />
+                        </div>
+                        <h4 className="font-serif text-[16.5px] font-semibold text-charcoal group-hover:text-sage-dark transition-colors leading-snug">
+                          {item.title}
+                        </h4>
+                      </div>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    {/* Benefit Provided by Government */}
+                    <div>
+                      <dt className="text-[10.5px] font-bold text-light uppercase tracking-wider mb-0.5">
+                        Benefit Provided by Government
+                      </dt>
+                      <dd className="text-[13px] text-charcoal leading-relaxed">
+                        {item.benefit}
+                      </dd>
+                    </div>
+
+                    {/* Key Protection */}
+                    <div className="bg-sage-pale/25 p-3 rounded-[10px] border border-sage-pale">
+                      <dt className="text-[10.5px] font-bold text-sage uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-sage" /> Key Protection
+                      </dt>
+                      <dd className="text-[12px] text-charcoal/90 leading-relaxed font-medium">
+                        {item.keyProtection}
+                      </dd>
+                    </div>
+                  </div>
+
+                  {/* Legal Source Hyperlink */}
+                  <div className="pt-3 mt-3.5 border-t border-border/70 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[12px]">
+                    <span className="text-light text-[11px]">
+                      Legal Source:
+                    </span>
+                    <a
+                      href={item.legalSource.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 font-semibold text-sage-dark hover:underline"
+                    >
+                      {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={11} />
+                    </a>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Legal Enforcement Note */}
+          <div className="p-4 bg-cream/70 border border-border rounded-[12px] flex items-start gap-3 text-[12.5px] text-medium">
+            <FileText className="w-4 h-4 text-sage shrink-0 mt-0.5" />
+            <p className="leading-relaxed">
+              <strong className="text-charcoal">Enforcement &amp; Redressal:</strong> These statutory entitlements are enacted by the Parliament of India and are non-negotiable. If an employer denies paid maternity leave, terminates employment during pregnancy, or refuses required health adjustments, formal complaints can be filed with the <strong>Office of the State Labour Commissioner</strong>, the <strong>Chief Labour Commissioner (Central)</strong>, or the <strong>National Commission for Women (NCW)</strong>.
+            </p>
           </div>
         </div>
       </div>

@@ -176,6 +176,18 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   Poshan Tracker: Updated redirect to `https://www.poshantracker.in`.
         *   Added verified official portals for West Bengal (`wbhealth.gov.in`), UP BOCW (`website.upbocw.in`), Rajasthan Jan Aadhaar (`janaadhaar.rajasthan.gov.in`), AP WDCW (`wdcw.ap.gov.in`), Karnataka DWCD (`dwcd.karnataka.gov.in`), MP Sambal (`sambal.mp.gov.in`), Gujarat Health (`gujhealth.gujarat.gov.in`), Assam NHM (`nhm.assam.gov.in`), Punjab NHM (`nhm.punjab.gov.in`), and Jharkhand JRHMS (`jrhms.jharkhand.gov.in`).
 
+### **Task 22: Legal Rights & Workplace Protections for Pregnant Women (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Placement & UI Integration:** Added a comprehensive legal benefits section directly below the "Official Central Government Portals" footer with matching brand typography (`font-serif` Playfair headers, `font-sans` Nunito body), brand color palette (`text-charcoal`, `bg-cream/40`, `border-border`, `text-sage`, `bg-sage-pale/25`), and responsive cards.
+    *   **Core Statutory Benefits Covered:**
+        1. 26 Weeks Fully Paid Maternity Leave (`Section 5(3)`, Maternity Benefit (Amendment) Act, 2017).
+        2. Absolute Immunity from Dismissal or Termination (`Section 12`, Maternity Benefit Act, 1961) including Supreme Court precedent covering contract and temporary staff.
+        3. Exemption from Heavy, Standing, or Hazardous Duties (`Section 4(3)`, Maternity Benefit Act, 1961).
+        4. Mandatory Nursing Breaks & Crèche Access (`Section 11 & 11A`, Maternity Benefit Act, 2017).
+        5. Paid Recovery Leave for Miscarriage or Complications (`Section 9 & 10`, Maternity Benefit Act, 1961).
+        6. Universal Free Nutrition & Cash Grants (`Section 4`, National Food Security Act, 2013).
+    *   **Structured Format:** For each benefit, clearly delineated: (a) *Benefit Provided by Government*, (b) *Key Protection* (highlighted in callout with shield icon), and (c) *Legal Source (hyperlinked)* linking directly to official government portals (`labour.gov.in`, `nfsa.gov.in`).
+
 ---
 
 ## 📅 2026-07-05
