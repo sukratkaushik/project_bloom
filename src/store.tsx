@@ -187,6 +187,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 activeJourneyId: profile.activeJourneyId,
                 role: isUserAdmin ? 'admin' : (profile.role || 'user'),
                 isAdmin: isUserAdmin,
+                isPartnerReadOnly: isUserAdmin ? false : Boolean(cloudData.isPartnerReadOnly),
                 planTier,
                 isPremium,
                 planExpiry: profile.planExpiry || null,
@@ -199,11 +200,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                   stateJSON: JSON.stringify({
                     ...state,
                     ...cloudData,
+                    notes: { ...state.notes, ...(cloudData.notes || {}) },
+                    customNoteTopics: cloudData.customNoteTopics || state.customNoteTopics || [],
                     isDarkModeActive: state.isDarkModeActive,
                     isSetup: true,
                     activeJourneyId: profile.activeJourneyId,
                     role: isUserAdmin ? 'admin' : (profile.role || 'user'),
                     isAdmin: isUserAdmin,
+                    isPartnerReadOnly: isUserAdmin ? false : Boolean(cloudData.isPartnerReadOnly),
                     planTier,
                     isPremium,
                     planExpiry: profile.planExpiry || null,
@@ -218,6 +222,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...prev,
               role: isUserAdmin ? 'admin' : (profile?.role || 'user'),
               isAdmin: isUserAdmin,
+              isPartnerReadOnly: isUserAdmin ? false : Boolean(prev.isPartnerReadOnly),
               planTier,
               isPremium,
               planExpiry: profile?.planExpiry || null,
@@ -316,9 +321,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     setState((prev) => ({ ...prev, ...updates }));
   };
 
+  const isReadOnly = (prev: PlannerState) => {
+    if (prev.isAdmin || prev.role === 'admin') return false;
+    return Boolean(prev.isPartnerReadOnly);
+  };
+
   const toggleTask = (id: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         checked: { ...prev.checked, [id]: !prev.checked[id] },
@@ -328,7 +338,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const toggleAssign = (id: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         assigned: { ...prev.assigned, [id]: !prev.assigned[id] },
@@ -338,7 +348,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteTask = (id: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         deletedTasks: { ...prev.deletedTasks, [id]: true },
@@ -348,7 +358,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setAssigneeNote = (id: string, note: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         assigneeNotes: { ...prev.assigneeNotes, [id]: note },
@@ -358,7 +368,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setDecision = (id: string, value: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         decisions: { ...prev.decisions, [id]: value },
@@ -368,7 +378,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setDecisionNote = (id: string, value: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         decisionNotes: { ...prev.decisionNotes, [id]: value },
@@ -378,7 +388,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setBudgetEst = (id: string, value: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         budgetEst: { ...prev.budgetEst, [id]: value },
@@ -388,7 +398,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setBudgetAct = (id: string, value: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         budgetAct: { ...prev.budgetAct, [id]: value },
@@ -399,7 +409,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addCustomBudgetItem = (label: string) => {
     const id = 'custom_' + Date.now();
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         customBudgetItems: [...prev.customBudgetItems, { id, label }],
@@ -411,7 +421,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const id = `custom_task_${Date.now()}`;
     const newTask = { id, text, crit: false };
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       const sectionTasks = prev.customTasks[section] || [];
       return {
         ...prev,
@@ -426,7 +436,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addCustomSupplement = (name: string, dose: string) => {
     const id = `custom_supp_${Date.now()}`;
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         customSupplements: [...(prev.customSupplements || []), { id, name, dose }],
@@ -436,7 +446,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteCustomSupplement = (id: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         customSupplements: (prev.customSupplements || []).filter(s => s.id !== id),
@@ -446,7 +456,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const setNote = (id: string, value: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       return {
         ...prev,
         notes: { ...prev.notes, [id]: value },
@@ -457,7 +467,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const addCustomNoteTopic = (title: string, details?: string, placeholder?: string) => {
     const id = `custom_topic_${Date.now()}`;
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       const noteContent = (details || '').trim();
       return {
         ...prev,
@@ -477,7 +487,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
   const deleteCustomNoteTopic = (id: string) => {
     setState((prev) => {
-      if (prev.isPartnerReadOnly) return prev;
+      if (isReadOnly(prev)) return prev;
       const updatedNotes = { ...prev.notes };
       delete updatedNotes[id];
       return {
