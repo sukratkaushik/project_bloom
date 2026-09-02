@@ -163,7 +163,9 @@ export const exportToPDF = async (state: PlannerState) => {
     { id: 'notesNames', label: 'Baby names we love' },
     { id: 'notesSupport', label: 'Support people & roles' },
     { id: 'notesCultural', label: 'Cultural, spiritual & personal wishes' },
+    { id: 'notesWishes', label: 'Wishes & hopes — a note to yourself' },
     { id: 'notesJournal', label: 'Journal / Free space' },
+    ...(state.customNoteTopics || []).map(t => ({ id: t.id, label: t.title })),
   ];
 
   notesSections.forEach((section) => {

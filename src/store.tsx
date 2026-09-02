@@ -23,6 +23,8 @@ type PlannerContextType = {
   addCustomSupplement: (name: string, dose: string) => void;
   deleteCustomSupplement: (id: string) => void;
   setNote: (id: string, value: string) => void;
+  addCustomNoteTopic: (title: string, placeholder?: string) => void;
+  deleteCustomNoteTopic: (id: string) => void;
   generatePlan: (setupData: Partial<PlannerState>) => void;
   resetPlan: () => void;
   restoreJourney: (uid: string) => Promise<boolean>;
@@ -54,6 +56,7 @@ const defaultState: PlannerState = {
   customBudgetItems: [],
   customTasks: {},
   notes: {},
+  customNoteTopics: [],
   critFilter: false,
   isDarkModeActive: false,
   isPremium: false,
@@ -446,6 +449,38 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     });
   };
 
+  const addCustomNoteTopic = (title: string, placeholder?: string) => {
+    const id = `custom_topic_${Date.now()}`;
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      return {
+        ...prev,
+        customNoteTopics: [
+          ...(prev.customNoteTopics || []),
+          {
+            id,
+            title: title.trim(),
+            placeholder: placeholder?.trim() || 'Write your thoughts, questions, or notes here...',
+            createdAt: Date.now(),
+          },
+        ],
+      };
+    });
+  };
+
+  const deleteCustomNoteTopic = (id: string) => {
+    setState((prev) => {
+      if (prev.isPartnerReadOnly) return prev;
+      const updatedNotes = { ...prev.notes };
+      delete updatedNotes[id];
+      return {
+        ...prev,
+        customNoteTopics: (prev.customNoteTopics || []).filter((t) => t.id !== id),
+        notes: updatedNotes,
+      };
+    });
+  };
+
   const generatePlan = async (setupData: Partial<PlannerState>) => {
     if (!setupData.dueDate) return;
 
@@ -613,6 +648,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         addCustomSupplement,
         deleteCustomSupplement,
         setNote,
+        addCustomNoteTopic,
+        deleteCustomNoteTopic,
         generatePlan,
         resetPlan,
         restoreJourney,

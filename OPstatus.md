@@ -220,6 +220,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Full-Width Single Box Per Row:** Replaced the uneven 2-column grid with a stacked single-box-per-row layout (`flex flex-col gap-5`), giving each food safety tier (`AVOID`, `CAUTION`, `SAFE`) an end-to-end full-width box (`w-full`).
     *   **Responsive Multi-Column Food Grid:** Formatted food items inside each tier into a clean responsive multi-column grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5`) with polished item cards and full dark mode support, eliminating awkward whitespace.
 
+### **Task 29: Dynamic Custom Topics & Details in Notes & Journal (`Notes.tsx`, `store.tsx`, `types.ts`, `pdfExport.ts`, `syncEngine.ts`)**
+*   **Details:**
+    *   **Add Custom Topics:** Users can now add custom journal topics with personalized titles and helper prompts directly within the Notes & Journal section.
+    *   **Quick Inspiration Suggestions:** Provided one-click prefill chips for common pregnancy topics (e.g. Postpartum Meal Prep, Doula Queries, Pediatrician Checklist, Baby Registry Must-Haves, Sibling/Pet Prep, Work Leave).
+    *   **Delete & Confirmation:** Allowed users to remove any custom topic with confirmation, safely cleaning up the stored notes.
+    *   **State, PDF & Sync Integration:** Wired `customNoteTopics` into `PlannerState`, live peer-to-peer WebRTC Partner Sync, and PDF document generation.
+
 ---
 
 ## 📅 2026-07-05
