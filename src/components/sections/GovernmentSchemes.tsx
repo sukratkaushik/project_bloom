@@ -123,7 +123,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'All pregnant women and lactating mothers.',
     how: 'Register at your local village/ward Anganwadi Centre.',
     icon: '🥗',
-    link: { label: 'Poshan Tracker', url: 'https://poshantracker.in', domain: 'poshantracker.in' }
+    link: { label: 'Poshan Tracker', url: 'https://www.poshantracker.in', domain: 'poshantracker.in' }
   },
 
   // ================= TAMIL NADU =================
@@ -162,7 +162,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'Pregnant women delivering in government hospitals in Telangana (up to 2 live births).',
     how: 'Register with ANM/ASHA worker or PHC during early pregnancy with Aadhaar.',
     icon: '🎁',
-    link: { label: 'KCR Kit Portal', url: 'https://kcrkit.telangana.gov.in', domain: 'kcrkit.telangana.gov.in' }
+    link: { label: 'Telangana MCH Portal', url: 'https://mchkit.telangana.gov.in', domain: 'mchkit.telangana.gov.in' }
   },
   {
     id: 'tg-arogya',
@@ -186,7 +186,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Monthly nutritious food basket with eggs, milk, peanut-jaggery chikki, ragi flour, dried dates, plus daily hot cooked meals at Anganwadi centers.',
     who: 'All pregnant and lactating mothers across rural, urban, and tribal AP.',
     how: 'Register at nearest Anganwadi centre with Aadhaar and pregnancy card.',
-    icon: '🥛'
+    icon: '🥛',
+    link: { label: 'AP WDCW Portal', url: 'https://wdcw.ap.gov.in', domain: 'wdcw.ap.gov.in' }
   },
 
   // ================= KARNATAKA =================
@@ -199,7 +200,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Provides one full cooked nutritious meal every day (rice, dal/sambar, green leafy vegetables, 1 boiled egg or sprouted gram, 200ml milk, and chikki) for 15 months (pregnancy through 6 months postpartum).',
     who: 'All pregnant women and lactating mothers in Karnataka.',
     how: 'Register at local Anganwadi Centre.',
-    icon: '🍱'
+    icon: '🍱',
+    link: { label: 'Karnataka DWCD Portal', url: 'https://dwcd.karnataka.gov.in', domain: 'dwcd.karnataka.gov.in' }
   },
   {
     id: 'ka-prasuti-araike',
@@ -248,7 +250,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'Residents of Delhi (3+ years residency) with annual family income up to ₹1,00,000 on birth of girl child.',
     how: 'Apply through Women and Child Development Department (WCD) Delhi or nearby SB-eDistrict portal.',
     icon: '👧',
-    link: { label: 'Delhi e-District', url: 'https://edistrict.delhigovt.nic.in', domain: 'edistrict.delhigovt.nic.in' }
+    link: { label: 'Delhi WCD Portal', url: 'https://wcd.delhi.gov.in', domain: 'wcd.delhi.gov.in' }
   },
 
   // ================= UTTAR PRADESH =================
@@ -262,7 +264,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'Families resident of UP with annual income up to ₹3 Lakh (max 2 daughters per family).',
     how: 'Apply online at mksy.up.gov.in or via CSC center.',
     icon: '✨',
-    link: { label: 'UP Sumangala Portal', url: 'https://mksy.up.gov.in', domain: 'mksy.up.gov.in' }
+    link: { label: 'UP Sumangala Portal', url: 'https://mksy.up.gov.in/women_welfare/', domain: 'mksy.up.gov.in' }
   },
   {
     id: 'up-matritva',
@@ -273,7 +275,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Financial aid of ₹20,000 for birth of boy child or ₹25,000 for birth of girl child, plus 3 months minimum wage equivalent to mothers.',
     who: 'Registered construction workers under the UP Building & Other Construction Workers Board (BOCW).',
     how: 'Apply on the UP BOCW portal or nearest Labor Office with worker registration card.',
-    icon: '🏗️'
+    icon: '🏗️',
+    link: { label: 'UP BOCW Portal', url: 'https://website.upbocw.in/', domain: 'upbocw.in' }
   },
 
   // ================= RAJASTHAN =================
@@ -286,7 +289,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: '₹6,000 cash assistance paid in 5 stages upon the birth of the 2nd child (pregnant registration, ANC, institutional birth, immunizations, and family planning adoption) to reduce child malnutrition.',
     who: 'All pregnant women expecting their second child in Rajasthan.',
     how: 'Register at nearest Anganwadi centre or via Jan Aadhaar portal.',
-    icon: '🤱'
+    icon: '🤱',
+    link: { label: 'Jan Aadhaar Portal', url: 'https://janaadhaar.rajasthan.gov.in', domain: 'janaadhaar.rajasthan.gov.in' }
   },
   {
     id: 'rj-rajshree',
@@ -324,7 +328,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Dedicated 102 Matri Yaan ambulance transport service for pregnant women to and from hospital, completely free institutional delivery, and comprehensive postnatal kits.',
     who: 'All pregnant women across West Bengal.',
     how: 'Dial 102 toll-free ambulance during labor or coordinate through ASHA/ANM worker.',
-    icon: '🚑'
+    icon: '🚑',
+    link: { label: 'WB Health Portal', url: 'https://www.wbhealth.gov.in', domain: 'wbhealth.gov.in' }
   },
   {
     id: 'wb-kanyashree',
@@ -336,7 +341,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'Unmarried girl children in West Bengal.',
     how: 'Apply through local educational institutions and WCD portal.',
     icon: '👧',
-    link: { label: 'Kanyashree Portal', url: 'https://wbkanyashree.gov.in', domain: 'wbkanyashree.gov.in' }
+    link: { label: 'Kanyashree Official Portal', url: 'https://kanyashree.wb.gov.in', domain: 'kanyashree.wb.gov.in' }
   },
 
   // ================= BIHAR =================
@@ -350,7 +355,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'All girl children born in Bihar (up to 2 girls per household).',
     how: 'Register on the e-Kalyan Bihar portal or through Anganwadi Sevika.',
     icon: '🎀',
-    link: { label: 'e-Kalyan Bihar', url: 'https://ekalyan.bih.nic.in', domain: 'ekalyan.bih.nic.in' }
+    link: { label: 'Medhasoft Bihar Portal', url: 'https://medhasoft.bihar.gov.in/', domain: 'medhasoft.bihar.gov.in' }
   },
 
   // ================= MADHYA PRADESH =================
@@ -363,7 +368,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Total cash benefit of ₹16,000: ₹4,000 during the last trimester for nutritious diet + ₹12,000 post institutional delivery for infant care.',
     who: 'Pregnant women registered under Sambal Yojana / Unorganized Workers Board.',
     how: 'Submit pregnancy registration and Sambal Card at nearest government hospital or PHC.',
-    icon: '🌾'
+    icon: '🌾',
+    link: { label: 'MP Sambal Portal', url: 'https://sambal.mp.gov.in', domain: 'sambal.mp.gov.in' }
   },
   {
     id: 'mp-ladli-laxmi',
@@ -388,7 +394,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Financial aid of ₹6,000 in 3 instalments (₹2,000 at 1st trimester ANC registration, ₹2,000 after institutional delivery, ₹2,000 after primary child vaccination).',
     who: 'BPL pregnant women in Gujarat for first two live deliveries.',
     how: 'Register at nearest Sub-Centre / PHC using BPL ration card and Techo portal.',
-    icon: '🌻'
+    icon: '🌻',
+    link: { label: 'Gujarat Health Portal', url: 'https://gujhealth.gujarat.gov.in', domain: 'gujhealth.gujarat.gov.in' }
   },
   {
     id: 'gj-chiranjeevi',
@@ -413,7 +420,7 @@ export const SCHEMES_DATABASE: Scheme[] = [
     who: 'Children under 18 and mothers in Kerala requiring specialized medical support.',
     how: 'Apply through Social Security Mission Kerala at government medical college hospitals.',
     icon: '🌿',
-    link: { label: 'Kerala Social Security', url: 'http://www.socialsecuritymission.gov.in', domain: 'socialsecuritymission.gov.in' }
+    link: { label: 'Kerala Social Security', url: 'https://socialsecuritymission.gov.in', domain: 'socialsecuritymission.gov.in' }
   },
 
   // ================= ASSAM =================
@@ -426,7 +433,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: '₹5,000 in two instalments for pregnant women who complete mandatory periodic ANC check-ups to encourage nutrition and institutional care.',
     who: 'All pregnant women in Assam undergoing ANC at public health centers.',
     how: 'Register with ASHA / ANM worker at local PHC.',
-    icon: '🍃'
+    icon: '🍃',
+    link: { label: 'NHM Assam Portal', url: 'https://nhm.assam.gov.in', domain: 'nhm.assam.gov.in' }
   },
 
   // ================= HARYANA =================
@@ -466,7 +474,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Cash incentive of ₹1,000 for every pregnant woman who chooses institutional delivery in government hospitals in Punjab.',
     who: 'All pregnant women delivering in government health facilities in Punjab.',
     how: 'Entitlement processed directly at hospital discharge.',
-    icon: '🌻'
+    icon: '🌻',
+    link: { label: 'NHM Punjab Portal', url: 'https://nhm.punjab.gov.in', domain: 'nhm.punjab.gov.in' }
   },
 
   // ================= JHARKHAND =================
@@ -479,7 +488,8 @@ export const SCHEMES_DATABASE: Scheme[] = [
     benefit: 'Free ambulance transport, free hospital stay, medicines, diagnostic tests, and supplementary nutrition kits for mother and newborn.',
     who: 'All pregnant mothers in Jharkhand.',
     how: 'Call 108 for free transport or register at PHC/CHC.',
-    icon: '🌲'
+    icon: '🌲',
+    link: { label: 'JRHMS Jharkhand Portal', url: 'https://jrhms.jharkhand.gov.in', domain: 'jrhms.jharkhand.gov.in' }
   }
 ];
 

@@ -165,10 +165,16 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
 *   **Details:**
     *   **Instant Activation on Apply:** When a user applies a 100% free pass coupon (`OPIN30`, `VIPCARE90`, `BLOOM30`), it immediately sets duration to the free period, updates Firestore subscription directly, and updates the local planner store without requiring manual navigation through the checkout flow.
     *   **Celebratory Success Pop-Up Modal:** Rendered a modern modal popup displaying celebration badges, promo code confirmation, unlocked features summary (Bloom AI, Food Scanner, EHR Exports), and an explicit **[ Go to Dashboard ]** button (`navigate('/dashboard')`).
-### **Task 20: Streamline Government Schemes Filtering (`GovernmentSchemes.tsx`)**
+### **Task 21: Audit & Correction of Government Scheme Weblinks (`GovernmentSchemes.tsx`)**
 *   **Details:**
-    *   **Removed 'Search by Keyword' Input:** Cleaned up the filter control section by removing the keyword search text box and redundant icons, simplifying navigation for users to focus directly on State / Central government scheme filters.
-    *   **Full Backward Compatibility:** Maintained the component interface with `GovernmentSchemesProps` supporting optional `initialSearchQuery` and `initialState`, preserving `localStorage` state retention and fallback filter logic.
+    *   **Fixed Kanyashree Prakalpa URL:** Corrected invalid URL (`wbkanyashree.gov.in`) to the live official portal `https://kanyashree.wb.gov.in`.
+    *   **Audited & Updated State Scheme Links:**
+        *   Telangana: Replaced deprecated `kcrkit.telangana.gov.in` with live `https://mchkit.telangana.gov.in`.
+        *   Delhi: Replaced `edistrict.delhigovt.nic.in` with official `https://wcd.delhi.gov.in`.
+        *   Bihar: Replaced timing-out `ekalyan.bih.nic.in` with live `https://medhasoft.bihar.gov.in/`.
+        *   Kerala: Upgraded `socialsecuritymission.gov.in` from HTTP to HTTPS (`https://socialsecuritymission.gov.in`).
+        *   Poshan Tracker: Updated redirect to `https://www.poshantracker.in`.
+        *   Added verified official portals for West Bengal (`wbhealth.gov.in`), UP BOCW (`website.upbocw.in`), Rajasthan Jan Aadhaar (`janaadhaar.rajasthan.gov.in`), AP WDCW (`wdcw.ap.gov.in`), Karnataka DWCD (`dwcd.karnataka.gov.in`), MP Sambal (`sambal.mp.gov.in`), Gujarat Health (`gujhealth.gujarat.gov.in`), Assam NHM (`nhm.assam.gov.in`), Punjab NHM (`nhm.punjab.gov.in`), and Jharkhand JRHMS (`jrhms.jharkhand.gov.in`).
 
 ---
 
