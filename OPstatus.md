@@ -205,6 +205,11 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Removed Header Badge:** Removed the green `STATUTORY RIGHTS` badge from the top-right of the Legal Rights section header.
     *   **Eliminated Repetitive Words:** Removed the redundant `Statutory Entitlement` eyebrow from each card and adjusted the section subtitle to avoid word repetition, creating a cleaner, more streamlined header and card layout.
 
+### **Task 26: Remove All Badge Pills from Legal Protection Cards (`GovernmentSchemes.tsx`)**
+*   **Details:**
+    *   **Removed Card Badges:** Removed all individual badge pills (`26 WEEKS PAID LEAVE`, `DISMISSAL IMMUNITY`, `SAFETY SAFEGUARD`, `CHILDCARE & NURSING`, `6 WEEKS RECOVERY`, `Universal Right`) from the legal protection card headers.
+    *   **Clean Headline Alignment:** With the badge pills removed, the card headers now feature a minimalist, balanced layout consisting of the category icon paired directly with the full-width serif title.
+
 ---
 
 ## 📅 2026-07-05

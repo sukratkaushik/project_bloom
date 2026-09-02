@@ -496,8 +496,6 @@ export const SCHEMES_DATABASE: Scheme[] = [
 export interface LegalBenefit {
   id: string;
   title: string;
-  badge: string;
-  badgeColor: string;
   iconName: 'briefcase' | 'shield' | 'heart' | 'baby' | 'clock' | 'scale';
   benefit: string;
   legalSource: {
@@ -513,8 +511,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'paid-leave',
     title: '26 Weeks Fully Paid Maternity Leave',
-    badge: '26 Weeks Paid Leave',
-    badgeColor: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800/60',
     iconName: 'briefcase',
     benefit: 'Legally guarantees 26 weeks (6.5 months) of fully paid absence from work for up to 2 surviving children (12 weeks for 3+ children). Up to 8 weeks can be availed before the expected date of delivery, and the remainder postpartum, paid at 100% average daily wages with zero deduction.',
     legalSource: {
@@ -528,8 +524,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'dismissal-protection',
     title: 'Absolute Immunity from Dismissal or Termination',
-    badge: 'Dismissal Immunity',
-    badgeColor: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/60',
     iconName: 'shield',
     benefit: 'Provides complete statutory job security throughout pregnancy and the leave period. Employers are strictly barred from terminating, discharging, demoting, or altering terms of employment to the disadvantage of a pregnant employee.',
     legalSource: {
@@ -543,8 +537,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'arduous-work',
     title: 'Exemption from Heavy, Standing, or Hazardous Duties',
-    badge: 'Safety Safeguard',
-    badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/60',
     iconName: 'heart',
     benefit: 'Expectant mothers have the statutory right to request reassignment away from strenuous tasks. Employers must legally excuse them from long hours of standing, heavy lifting, or exposure to toxic chemicals, machinery, and radiation.',
     legalSource: {
@@ -558,8 +550,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'creche-nursing',
     title: 'Mandatory Nursing Breaks & Crèche Access',
-    badge: 'Childcare & Nursing',
-    badgeColor: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-800/60',
     iconName: 'baby',
     benefit: 'Working mothers are entitled to 2 paid nursing breaks during each workday until the infant attains 15 months of age. Establishments with 50+ staff must maintain an accessible crèche within 500 meters.',
     legalSource: {
@@ -573,8 +563,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'miscarriage-leave',
     title: 'Paid Recovery Leave for Miscarriage or Complications',
-    badge: '6 Weeks Recovery',
-    badgeColor: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800/60',
     iconName: 'clock',
     benefit: 'Provides 6 weeks of fully paid leave immediately following a miscarriage or Medical Termination of Pregnancy (MTP). For pregnancy-induced illness or premature birth complications, an additional 1 month of paid leave can be claimed.',
     legalSource: {
@@ -588,8 +576,6 @@ export const LEGAL_MATERNITY_BENEFITS: LegalBenefit[] = [
   {
     id: 'universal-nutrition',
     title: 'Universal Free Nutrition & Cash Grants',
-    badge: 'Universal Right',
-    badgeColor: 'bg-teal-50 text-teal-800 border-teal-200 dark:bg-teal-950/60 dark:text-teal-300 dark:border-teal-800/60',
     iconName: 'scale',
     benefit: 'Statutory guarantee for all pregnant and lactating women (non-govt employees) to receive free daily hot cooked meals and Take-Home Rations via Anganwadi centres throughout pregnancy and 6 months postpartum, plus minimum ₹6,000 direct cash benefit (PMMVY/JSY).',
     legalSource: {
@@ -894,19 +880,14 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                   className="bg-cream/40 dark:bg-white/[0.03] border-[1.5px] border-border dark:border-white/10 rounded-[18px] p-6 sm:p-7 flex flex-col justify-between hover:border-sage dark:hover:border-sage/50 hover:shadow-sm transition-all group w-full"
                 >
                   <div className="space-y-4">
-                    {/* Header: Full width layout with Icon & Title on left, Badge on right */}
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60 dark:border-white/10">
-                      <div className="flex items-center gap-3.5">
-                        <div className="w-11 h-11 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
-                          <IconComp className="w-5 h-5" />
-                        </div>
-                        <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
-                          {item.title}
-                        </h4>
+                    {/* Header: Icon & Full-width Title */}
+                    <div className="flex items-center gap-3.5 pb-3 border-b border-border/60 dark:border-white/10">
+                      <div className="w-11 h-11 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+                        <IconComp className="w-5 h-5" />
                       </div>
-                      <span className={`self-start sm:self-auto text-[11px] font-bold px-3 py-1 rounded-full border uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
-                        {item.badge}
-                      </span>
+                      <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
+                        {item.title}
+                      </h4>
                     </div>
 
                     {/* Benefit Provided by Government */}
