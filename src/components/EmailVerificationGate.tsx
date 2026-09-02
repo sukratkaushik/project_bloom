@@ -140,7 +140,7 @@ export const EmailVerificationGate: React.FC<Props> = ({ user, onVerified }) => 
           <button
             type="submit"
             disabled={verifying || otpInput.length !== 6}
-            className="w-full bg-charcoal hover:bg-black text-cream rounded-[12px] font-bold py-3 text-[14px] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+            className="w-full bg-charcoal hover:bg-black text-cream dark:hover:bg-slate-200 dark:hover:text-slate-900 rounded-[12px] font-bold py-3 text-[14px] transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
             {verifying ? (
               <>

@@ -282,7 +282,7 @@ export const ContractionTimer: React.FC = () => {
             className={`py-4 px-2 rounded-[12px] font-semibold text-[16px] transition-all flex items-center justify-center gap-2
               ${activeStartedAt 
                 ? 'bg-red-200 text-red-800 shadow-md hover:bg-red-300 active:scale-95' 
-                : 'bg-red-50 text-red-300 cursor-not-allowed border-[1.5px] border-transparent'}`}
+                : 'bg-red-50 dark:bg-slate-800/40 text-red-300 dark:text-slate-500 cursor-not-allowed border-[1.5px] border-transparent'}`}
           >
             END
           </button>
@@ -321,7 +321,7 @@ export const ContractionTimer: React.FC = () => {
           </div>
 
           {analysis.allMet ? (
-            <div className="bg-white border border-red-200 rounded-xl p-4 flex gap-3 text-red-800">
+            <div className="bg-white dark:bg-red-950/30 border border-red-200 dark:border-red-800/40 rounded-xl p-4 flex gap-3 text-red-800">
               <Phone className="w-6 h-6 shrink-0 mt-0.5" />
               <p className="text-[14px] font-semibold leading-snug">
                 Based on the 5-1-1 rule, it may be time to go to the hospital. Call your doctor or dial 108 now.

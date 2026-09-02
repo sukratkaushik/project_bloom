@@ -62,7 +62,7 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
                   e.stopPropagation();
                   deleteTask(t.id);
                 }}
-                className="text-gray-300 hover:text-red-400 transition-colors mt-1.5 ml-2"
+                className="text-light hover:text-critical transition-colors mt-1.5 ml-2"
                 title="Delete task"
               >
                 <Trash2 size={16} />

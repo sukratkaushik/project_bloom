@@ -547,13 +547,13 @@ export const AdminPanel: React.FC = () => {
                       }`}>
                         {item.type}
                       </span>
-                      <span className="text-[13px] font-semibold text-charcoal dark:text-white">{item.userEmail}</span>
+                      <span className="text-[13px] font-semibold text-charcoal">{item.userEmail}</span>
                     </div>
                     <span className="text-[11.5px] text-light">
                       {new Date(item.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
                     </span>
                   </div>
-                  <div className="text-[13.5px] text-charcoal/90 dark:text-white/90 leading-relaxed whitespace-pre-wrap">
+                  <div className="text-[13.5px] text-charcoal leading-relaxed whitespace-pre-wrap">
                     {item.message}
                   </div>
                 </div>
@@ -700,12 +700,12 @@ export const AdminPanel: React.FC = () => {
                 <AlertTriangle size={22} className="text-red-600" />
               </div>
               <div>
-                <h3 className="font-serif font-bold text-[18px] text-charcoal dark:text-white">Delete User Account</h3>
+                <h3 className="font-serif font-bold text-[18px] text-charcoal">Delete User Account</h3>
                 <p className="text-[12px] text-light">This action is permanent and cannot be undone.</p>
               </div>
             </div>
 
-            <div className="p-3.5 bg-red-50/70 dark:bg-red-950/20 border border-red-200/80 dark:border-red-900/40 rounded-xl space-y-2 text-[12.5px] text-charcoal/90 dark:text-white/90">
+            <div className="p-3.5 bg-red-50/70 dark:bg-red-950/20 border border-red-200/80 dark:border-red-900/40 rounded-xl space-y-2 text-[12.5px] text-charcoal">
               <p>
                 Are you sure you want to permanently delete <strong className="text-red-700 dark:text-red-400">{userToDelete.displayName || userToDelete.email}</strong>?
               </p>
