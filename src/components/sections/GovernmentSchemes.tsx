@@ -882,7 +882,7 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="flex flex-col gap-6">
             {LEGAL_MATERNITY_BENEFITS.map((item) => {
               const IconComp = {
                 briefcase: Briefcase,
@@ -896,64 +896,71 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
               return (
                 <div
                   key={item.id}
-                  className="bg-cream/40 dark:bg-white/[0.03] border-[1.5px] border-border dark:border-white/10 rounded-[16px] p-5 sm:p-6 flex flex-col justify-between hover:border-sage dark:hover:border-sage/50 hover:shadow-sm transition-all group"
+                  className="bg-cream/40 dark:bg-white/[0.03] border-[1.5px] border-border dark:border-white/10 rounded-[18px] p-6 sm:p-7 flex flex-col justify-between hover:border-sage dark:hover:border-sage/50 hover:shadow-sm transition-all group w-full"
                 >
                   <div className="space-y-4">
-                    {/* Header: Meta bar (Icon + Category + Badge) on top, Title below with 100% width */}
-                    <div className="space-y-2">
-                      <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-lg bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
-                            <IconComp className="w-4 h-4" />
-                          </div>
-                          <span className="text-[11px] font-bold tracking-wider uppercase text-sage dark:text-sage-pale">
-                            Statutory Entitlement
-                          </span>
+                    {/* Header: Full width layout with Icon & Title on left, Badge on right */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-border/60 dark:border-white/10">
+                      <div className="flex items-center gap-3.5">
+                        <div className="w-11 h-11 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+                          <IconComp className="w-5 h-5" />
                         </div>
-                        <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
-                          {item.badge}
-                        </span>
+                        <div>
+                          <div className="text-[11px] font-bold tracking-wider uppercase text-sage dark:text-sage-pale mb-0.5">
+                            Statutory Entitlement
+                          </div>
+                          <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
+                            {item.title}
+                          </h4>
+                        </div>
                       </div>
-
-                      <h4 className="font-serif text-[17.5px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
-                        {item.title}
-                      </h4>
+                      <span className={`self-start sm:self-auto text-[11px] font-bold px-3 py-1 rounded-full border uppercase tracking-wider shrink-0 ${item.badgeColor}`}>
+                        {item.badge}
+                      </span>
                     </div>
 
                     {/* Benefit Provided by Government */}
-                    <div>
-                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">
+                    <div className="pt-1">
+                      <dt className="text-[11px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">
                         Benefit Provided by Government
                       </dt>
-                      <dd className="text-[13.5px] text-charcoal dark:text-gray-200 leading-relaxed">
+                      <dd className="text-[14px] text-charcoal dark:text-gray-200 leading-relaxed">
                         {item.benefit}
                       </dd>
                     </div>
 
-                    {/* Key Protection */}
-                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-3.5 rounded-[12px] border border-sage-pale dark:border-sage/25">
-                      <dt className="text-[10.5px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                        <ShieldCheck size={13} className="text-sage dark:text-sage-pale" /> Key Protection
-                      </dt>
-                      <dd className="text-[12.5px] text-charcoal/90 dark:text-gray-200 leading-relaxed font-medium">
-                        {item.keyProtection}
-                      </dd>
+                    {/* Key Protection Callout */}
+                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-4 rounded-[14px] border border-sage-pale dark:border-sage/25 flex items-start gap-3.5">
+                      <ShieldCheck className="w-5 h-5 text-sage dark:text-sage-pale shrink-0 mt-0.5" />
+                      <div>
+                        <dt className="text-[11px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5">
+                          Key Legal Protection
+                        </dt>
+                        <dd className="text-[13px] text-charcoal/90 dark:text-gray-200 leading-relaxed font-medium">
+                          {item.keyProtection}
+                        </dd>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Legal Source Hyperlink */}
-                  <div className="pt-3.5 mt-3.5 border-t border-border/70 dark:border-white/10 flex flex-wrap items-center justify-between gap-1.5 text-[12px]">
-                    <span className="text-light dark:text-gray-400 text-[11px]">
-                      Legal Source:
+                  {/* Legal Source Hyperlink Bar */}
+                  <div className="pt-4 mt-4 border-t border-border/70 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[12.5px]">
+                    <div className="flex items-center gap-2">
+                      <span className="text-light dark:text-gray-400 text-[11.5px] font-medium">
+                        Legal Source:
+                      </span>
+                      <a
+                        href={item.legalSource.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 font-bold text-sage-dark dark:text-sage-pale hover:underline"
+                      >
+                        {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={12} />
+                      </a>
+                    </div>
+                    <span className="text-[11.5px] text-light dark:text-gray-400 italic">
+                      {item.legalSource.authority}
                     </span>
-                    <a
-                      href={item.legalSource.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 font-semibold text-sage-dark dark:text-sage-pale hover:underline"
-                    >
-                      {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={11} />
-                    </a>
                   </div>
                 </div>
               );
