@@ -219,7 +219,7 @@ export const PartnerSync: React.FC = () => {
                     {(item.tasks as any[]).map(t => {
                       const isExcluded = (state.syncPermissions?.excludedTaskIds || []).includes(t.id);
                       return (
-                        <label key={t.id} className="flex items-start gap-2 cursor-pointer hover:bg-black/5 p-1.5 rounded-lg">
+                        <label key={t.id} className="flex items-start gap-2 cursor-pointer hover:bg-charcoal/5 dark:hover:bg-white/5 p-1.5 rounded-lg">
                           <input
                             type="checkbox"
                             checked={!isExcluded}
@@ -262,7 +262,7 @@ export const PartnerSync: React.FC = () => {
               <p className="text-[13px] text-medium mt-1">{status}</p>
             </div>
             <div className={`px-3 py-1.5 rounded-full text-[12px] font-semibold tracking-wide uppercase ${status.includes('Connected') ? 'bg-sage text-white' :
-              status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'bg-amber-400 text-amber-900' : 'bg-gray-100 text-medium'
+              status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'bg-amber-400 text-amber-950 dark:bg-amber-950/40 dark:text-amber-300 dark:border dark:border-amber-800/40' : 'bg-gray-100 text-medium'
               }`}>
               {status.includes('Connected') ? 'Active' : status.includes('Waiting') || status.includes('Connecting') || status.includes('Initializing') ? 'Pending' : 'Disconnected'}
             </div>
@@ -273,7 +273,7 @@ export const PartnerSync: React.FC = () => {
               <ShieldCheck className="w-16 h-16 text-sage mx-auto mb-4 opacity-50" />
               <h4 className="font-semibold text-charcoal text-[18px]">You are securely connected.</h4>
               <p className="text-[14px] text-medium mt-2 max-w-sm mx-auto mb-6">Your selected data will now sync automatically between both devices.</p>
-              <button onClick={handleDisconnect} className="px-6 py-2.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 rounded-xl font-medium text-[14px] transition-colors">
+              <button onClick={handleDisconnect} className="px-6 py-2.5 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 dark:hover:bg-red-900/40 rounded-xl font-medium text-[14px] transition-colors">
                 Disconnect Session
               </button>
 
@@ -303,7 +303,7 @@ export const PartnerSync: React.FC = () => {
                           {copied ? <Check size={18} /> : <Copy size={18} />}
                         </button>
                       </div>
-                      <button onClick={handleDisconnect} className="w-full py-3 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 font-medium text-[14px] rounded-xl transition-colors">
+                      <button onClick={handleDisconnect} className="w-full py-3 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 dark:hover:bg-red-900/40 font-medium text-[14px] rounded-xl transition-colors">
                         Stop Hosting
                       </button>
                     </div>

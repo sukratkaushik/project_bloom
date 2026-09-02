@@ -79,7 +79,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
             e.stopPropagation();
             deleteTask(task.id);
           }}
-          className="text-gray-300 hover:text-red-400 transition-colors mt-1"
+          className="text-light hover:text-critical transition-colors mt-1"
           title="Delete task"
         >
           <Trash2 size={16} />

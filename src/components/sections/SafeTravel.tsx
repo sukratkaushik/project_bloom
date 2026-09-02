@@ -292,7 +292,7 @@ export const SafeTravel: React.FC = () => {
 
               {/* Destination Input (Helper info) */}
               <div className="space-y-2">
-                <label className="text-[12px] font-bold uppercase tracking-[1px] text-charcoal/60 dark:text-white/60">Destination (Optional)</label>
+                <label className="text-[12px] font-bold uppercase tracking-[1px] text-medium dark:text-slate-400">Destination (Optional)</label>
                 <div className="relative flex items-center">
                   <MapPin className="absolute left-3.5 w-4 h-4 text-charcoal/50" />
                   <input
@@ -300,7 +300,7 @@ export const SafeTravel: React.FC = () => {
                     value={destinationInfo}
                     onChange={(e) => setDestinationInfo(e.target.value)}
                     placeholder="e.g. Hawaii, Rome, Local Roadtrip"
-                    className="w-full pl-10 pr-4 py-2.5 text-[14px] rounded-[12px] border border-border/80 dark:border-border/20 bg-white dark:bg-charcoal/15 text-charcoal placeholder:text-charcoal/45 focus:outline-none focus:border-sage"
+                    className="w-full pl-10 pr-4 py-2.5 text-[14px] rounded-[12px] border border-border/80 dark:border-border/20 bg-white dark:bg-charcoal/15 text-charcoal placeholder:text-light focus:outline-none focus:border-sage"
                   />
                 </div>
               </div>
@@ -310,7 +310,7 @@ export const SafeTravel: React.FC = () => {
           <div className="lg:col-span-7 space-y-6">
             <div className="premium-card p-6 space-y-6">
               <div className="flex justify-between items-start">
-                <h2 className="font-serif text-[20px] text-charcoal dark:text-white font-semibold">Safety Assessment</h2>
+                <h2 className="font-serif text-[20px] text-charcoal font-semibold">Safety Assessment</h2>
                 
                 {/* Risk Badge */}
                 <div className={`px-4 py-1.5 rounded-full text-[12px] font-bold uppercase tracking-[1px]
@@ -322,7 +322,7 @@ export const SafeTravel: React.FC = () => {
               </div>
 
               <div className="p-4 rounded-[16px] bg-charcoal/5 dark:bg-charcoal/10 border border-border/50 dark:border-border/10 space-y-3">
-                <div className="flex gap-2 items-start text-charcoal dark:text-white font-medium text-[14px] leading-relaxed">
+                <div className="flex gap-2 items-start text-charcoal font-medium text-[14px] leading-relaxed">
                   <Info className="w-5 h-5 text-sage shrink-0 mt-0.5" />
                   <div>
                     <span className="font-bold">Overview: </span>
@@ -335,8 +335,8 @@ export const SafeTravel: React.FC = () => {
                 <div className="flex gap-3 items-start">
                   <Stethoscope className="w-5 h-5 text-sage shrink-0 mt-1" />
                   <div>
-                    <h4 className="text-[14px] font-bold text-charcoal dark:text-white">OB/Midwife Advice:</h4>
-                    <p className="text-[13.5px] text-charcoal/80 dark:text-white/80 leading-relaxed font-medium mt-0.5">{analysis.ObAdvice}</p>
+                    <h4 className="text-[14px] font-bold text-charcoal">OB/Midwife Advice:</h4>
+                    <p className="text-[13.5px] text-medium leading-relaxed font-medium mt-0.5">{analysis.ObAdvice}</p>
                   </div>
                 </div>
 
@@ -345,7 +345,7 @@ export const SafeTravel: React.FC = () => {
                     <AlertCircle className="w-5 h-5 text-critical shrink-0 mt-1" />
                     <div>
                       <h4 className="text-[14px] font-bold text-critical">Travel/Airline Restrictions:</h4>
-                      <p className="text-[13.5px] text-charcoal/80 dark:text-white/80 leading-relaxed font-medium mt-0.5">{analysis.airlineWarning}</p>
+                      <p className="text-[13.5px] text-medium leading-relaxed font-medium mt-0.5">{analysis.airlineWarning}</p>
                     </div>
                   </div>
                 )}
@@ -355,8 +355,8 @@ export const SafeTravel: React.FC = () => {
               {destinationInfo && (
                 <div className="p-4 border border-sage/20 bg-sage-pale/20 rounded-[16px] flex gap-2.5 items-start">
                   <ShieldCheck className="w-5 h-5 text-sage shrink-0 mt-0.5" />
-                  <div className="text-[13px] text-charcoal/80 dark:text-white/80 leading-normal font-medium">
-                    Planning for <span className="font-bold text-charcoal dark:text-white">{destinationInfo}</span>: Ensure your pregnancy health insurance includes international/out-of-state emergency delivery and medical repatriation. Locate the nearest Level III neonatal care ward (NICU) at your destination before packing!
+                  <div className="text-[13px] text-medium leading-normal font-medium">
+                    Planning for <span className="font-bold text-charcoal">{destinationInfo}</span>: Ensure your pregnancy health insurance includes international/out-of-state emergency delivery and medical repatriation. Locate the nearest Level III neonatal care ward (NICU) at your destination before packing!
                   </div>
                 </div>
               )}

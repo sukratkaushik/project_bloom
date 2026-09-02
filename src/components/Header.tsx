@@ -68,7 +68,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             onClick={toggleDarkMode}
             className={`md:hidden p-2 rounded-full border-[1.5px] transition-all text-[15px] cursor-pointer flex items-center justify-center w-9 h-9
-              ${state.isDarkModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10' : 'border-border text-charcoal/70 dark:text-white/70 bg-transparent hover:border-charcoal'}`}
+              ${state.isDarkModeActive ? 'border-sage text-sage-dark dark:text-sage bg-sage-pale dark:bg-sage/10' : 'border-border text-charcoal/70 dark:text-slate-300 bg-transparent hover:border-charcoal'}`}
             title="Toggle Dark Mode"
           >
             {state.isDarkModeActive ? '🌙' : '☀️'}
