@@ -14,10 +14,12 @@ export const AdminFeedbacks: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const isMasterAdmin = auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
+
   useEffect(() => {
     const fetchFeedbacks = async () => {
       // Security check in UI
-      if (auth.currentUser?.email !== 'sukrat.kaushik@gmail.com') {
+      if (!isMasterAdmin) {
         setLoading(false);
         return;
       }
@@ -38,13 +40,13 @@ export const AdminFeedbacks: React.FC = () => {
     };
 
     fetchFeedbacks();
-  }, []);
+  }, [isMasterAdmin]);
 
   if (loading) {
     return <div className="text-medium p-4">Loading feedbacks...</div>;
   }
 
-  if (auth.currentUser?.email !== 'sukrat.kaushik@gmail.com') {
+  if (!isMasterAdmin) {
     return <div className="text-critical p-4">Unauthorized access.</div>;
   }
 

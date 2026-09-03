@@ -236,6 +236,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Promo Banner & Checkout (`PromoBanner.tsx`, `CheckoutPage.tsx`):** Added a sliding announcement banner for the `BLOOM30` promotion and enabled promo code support in the checkout flow.
     *   **Product Vision (`PRODUCT_VISION.md`):** Added a comprehensive product vision document detailing the executive summary, feature scope, and business potential of the app.
 
+### **Task 30: Google Workspace Email & Live SMTP Dispatch Migration (`ourpregnancy.in`)**
+*   **Details:**
+    *   **Domain Email Security (SPF, DKIM, DMARC):** Configured and verified 1024-bit DKIM DNS record (`google._domainkey`), SPF (`include:_spf.google.com`), and DMARC (`p=quarantine`) in GoDaddy for `ourpregnancy.in`, achieving 100% authenticated sender reputation to prevent emails landing in Spam.
+    *   **Google Workspace SMTP Secrets:** Stored `SMTP_USER` (`sukrat.kaushik@ourpregnancy.in`) and 16-character App Password (`SMTP_PASS`) into Firebase Cloud Secrets.
+    *   **Backend Mailer Integration (`functions/src/index.ts`):** Migrated all transactional emails (Welcome email, verification OTP, plan changes, celebratory promo codes) to dispatch natively from `sukrat.kaushik@ourpregnancy.in` with reply-to `hello@ourpregnancy.in`.
+    *   **Dual Admin & Owner Support (`firestore.rules`, `functions`, `App.tsx`, `Sidebar.tsx`, `AdminPanel.tsx`, `AdminFeedbacks.tsx`):** Added root administrator privileges to `sukrat.kaushik@ourpregnancy.in` alongside `sukrat.kaushik@gmail.com`.
+
 ---
 
 ## 📅 2026-06-28

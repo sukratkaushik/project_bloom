@@ -170,7 +170,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'notes', icon: '📝', label: 'Notes & Journal' },
     { id: 'profile', icon: '⚙️', label: 'Settings & Profile', hideFavorite: true },
     { id: 'feedback', icon: '💬', label: 'Feedback & Support', hideFavorite: true },
-    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', hideFavorite: true }] : []),
+    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', hideFavorite: true }] : []),
   ];
 
   const isSearching = searchQuery.trim().length > 0;
