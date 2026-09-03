@@ -671,7 +671,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
                 Our Pregnancy Team &middot; Made with &#x1F90D; for expectant mothers
               </p>
               <p style="margin: 0; font-size: 12px; color: #8F9E99;">
-                Questions? Reach out to <a href="mailto:hello@ourpregnancy.in" style="color: #8AB6A3; text-decoration: underline;">hello@ourpregnancy.in</a>
+                Questions? Reach out to <a href="mailto:support@ourpregnancy.in" style="color: #8AB6A3; text-decoration: underline;">support@ourpregnancy.in</a>
               </p>
             </td>
           </tr>
@@ -692,8 +692,8 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
         },
     });
     const mailOptions = {
-        from: `"Our Pregnancy Team" <${userVal}>`,
-        replyTo: "hello@ourpregnancy.in",
+        from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
+        replyTo: "support@ourpregnancy.in",
         to: targetEmail,
         subject: `You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
         html: emailHtml,
@@ -856,8 +856,8 @@ exports.sendPromoActivationEmail = (0, https_1.onCall)({ region: "asia-south1", 
         auth: { user: userVal, pass: passVal },
     });
     const mailOptions = {
-        from: `"Our Pregnancy Team" <${userVal}>`,
-        replyTo: "hello@ourpregnancy.in",
+        from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
+        replyTo: "support@ourpregnancy.in",
         to: email,
         subject: `🎁 You've unlocked ${durationText} of Our Pregnancy Premium!`,
         html: emailHtml,
@@ -1146,8 +1146,8 @@ exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1", secre
         },
     });
     const mailOptions = {
-        from: `"Our Pregnancy Team" <${userVal}>`,
-        replyTo: "hello@ourpregnancy.in",
+        from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
+        replyTo: "support@ourpregnancy.in",
         to: cleanEmail,
         subject: `Your verification code: ${otpCode} — Our Pregnancy`,
         html: emailHtml,
@@ -1267,7 +1267,7 @@ async function sendWelcomeFounderEmail(targetEmail, targetName) {
         },
     });
     const mailOptions = {
-        from: `"${welcomeEmail_1.WELCOME_EMAIL_SENDER_NAME}" <${userVal}>`,
+        from: `"${welcomeEmail_1.WELCOME_EMAIL_SENDER_NAME}" <${welcomeEmail_1.WELCOME_EMAIL_FROM}>`,
         replyTo: welcomeEmail_1.WELCOME_EMAIL_REPLY_TO,
         to: targetEmail,
         subject: welcomeEmail_1.WELCOME_EMAIL_SUBJECT,

@@ -131,8 +131,8 @@ export const Footer: React.FC<FooterProps> = ({ onToast, className = '' }) => {
             </a>
             <span className="text-border">•</span>
             <a
-              href="mailto:hello@ourpregnancy.in"
-              onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)}
+              href="mailto:support@ourpregnancy.in"
+              onClick={(e) => handleEmailClick("support@ourpregnancy.in", e)}
               className="hover:text-sage-dark transition-colors cursor-pointer"
               title="Email Support"
             >

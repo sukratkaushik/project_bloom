@@ -315,7 +315,7 @@ export const TeamPage: React.FC = () => {
             <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="hover:text-white transition-colors">Home</a>
             <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-white transition-colors">Terms of Service</a>
-            <a href="mailto:hello@ourpregnancy.in" onClick={(e) => handleEmailClick("hello@ourpregnancy.in", e)} className="hover:text-white transition-colors">hello@ourpregnancy.in</a>
+            <a href="mailto:support@ourpregnancy.in" onClick={(e) => handleEmailClick("support@ourpregnancy.in", e)} className="hover:text-white transition-colors">support@ourpregnancy.in</a>
           </div>
         </div>
 
