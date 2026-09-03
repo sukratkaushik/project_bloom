@@ -243,6 +243,14 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Backend Mailer Integration (`functions/src/index.ts`):** Migrated all transactional emails (Welcome email, verification OTP, plan changes, celebratory promo codes) to dispatch natively from `sukrat.kaushik@ourpregnancy.in` with reply-to `hello@ourpregnancy.in`.
     *   **Dual Admin & Owner Support (`firestore.rules`, `functions`, `App.tsx`, `Sidebar.tsx`, `AdminPanel.tsx`, `AdminFeedbacks.tsx`):** Added root administrator privileges to `sukrat.kaushik@ourpregnancy.in` alongside `sukrat.kaushik@gmail.com`.
 
+### **Task 31: Specialized Email Sender Identities (`info@`, `founder@`, `support@ourpregnancy.in`)**
+*   **Details:**
+    *   **Configured Workspace Aliases:** Set up 3 core sender aliases (`info@ourpregnancy.in`, `founder@ourpregnancy.in`, `support@ourpregnancy.in`) mapped directly to `sukrat.kaushik@ourpregnancy.in`.
+    *   **Backend Mailer Identity Routing (`functions/src/index.ts`, `welcomeEmail.ts`):**
+        *   **`info@ourpregnancy.in`**: Dispatches transactional notices, plan upgrades, OTP verification codes, and promo/coupon code activations.
+        *   **`founder@ourpregnancy.in`**: Dispatches the personal founder welcome email (`"Sukrat | Founder, Our Pregnancy"`).
+        *   **`support@ourpregnancy.in`**: Configured as the universal `replyTo` destination for all system communications, landing page footer support link, and app feedback.
+
 ---
 
 ## 📅 2026-06-28
