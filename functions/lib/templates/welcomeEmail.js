@@ -9,9 +9,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.WELCOME_EMAIL_REPLY_TO = exports.WELCOME_EMAIL_FROM = exports.WELCOME_EMAIL_SENDER_NAME = exports.WELCOME_EMAIL_SUBJECT = void 0;
 exports.renderWelcomeEmailHtml = renderWelcomeEmailHtml;
 exports.WELCOME_EMAIL_SUBJECT = "Welcome to Our Pregnancy — A note from the founder";
-exports.WELCOME_EMAIL_SENDER_NAME = "Sukrat | Founder, Our Pregnancy";
+exports.WELCOME_EMAIL_SENDER_NAME = "Founder, Our Pregnancy";
 exports.WELCOME_EMAIL_FROM = "founder@ourpregnancy.in";
-exports.WELCOME_EMAIL_REPLY_TO = "founder@ourpregnancy.in";
+exports.WELCOME_EMAIL_REPLY_TO = "support@ourpregnancy.in";
 function renderWelcomeEmailHtml(recipientFirstName) {
     const cleanName = recipientFirstName && recipientFirstName.trim().length > 0 && recipientFirstName.toLowerCase() !== "there"
         ? recipientFirstName.trim()

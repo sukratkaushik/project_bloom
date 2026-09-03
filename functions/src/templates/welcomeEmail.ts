@@ -6,9 +6,9 @@
  */
 
 export const WELCOME_EMAIL_SUBJECT = "Welcome to Our Pregnancy — A note from the founder";
-export const WELCOME_EMAIL_SENDER_NAME = "Sukrat | Founder, Our Pregnancy";
+export const WELCOME_EMAIL_SENDER_NAME = "Founder, Our Pregnancy";
 export const WELCOME_EMAIL_FROM = "founder@ourpregnancy.in";
-export const WELCOME_EMAIL_REPLY_TO = "founder@ourpregnancy.in";
+export const WELCOME_EMAIL_REPLY_TO = "support@ourpregnancy.in";
 
 export function renderWelcomeEmailHtml(recipientFirstName: string): string {
   const cleanName = recipientFirstName && recipientFirstName.trim().length > 0 && recipientFirstName.toLowerCase() !== "there"
