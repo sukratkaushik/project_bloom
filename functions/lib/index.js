@@ -540,7 +540,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
     const callerEmail = request.auth.token.email;
     const db = admin.firestore();
     const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
     if (!isCallerAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can send plan notifications.");
     }
@@ -548,13 +548,13 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
     if (!targetEmail || !planTier) {
         throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
-    let userVal = "sukrat.kaushik@gmail.com";
+    let userVal = "sukrat.kaushik@ourpregnancy.in";
     let passVal = "";
     try {
-        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     catch {
-        userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     try {
         passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
@@ -725,13 +725,13 @@ exports.sendPromoActivationEmail = (0, https_1.onCall)({ region: "asia-south1", 
     const cleanPromo = promoCode ? String(promoCode).trim().toUpperCase() : "OPIN30";
     const months = Number(durationMonths) || 1;
     const durationText = `${months * 30} days`;
-    let userVal = "sukrat.kaushik@gmail.com";
+    let userVal = "sukrat.kaushik@ourpregnancy.in";
     let passVal = "";
     try {
-        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     catch {
-        userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     try {
         passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
@@ -883,7 +883,7 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
     const callerEmail = request.auth.token.email;
     const db = admin.firestore();
     const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
     if (!isCallerAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can view the user directory.");
     }
@@ -907,7 +907,7 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
                     uid: authUser.uid,
                     email: authUser.email || null,
                     displayName: authUser.displayName || null,
-                    role: authUser.email === "sukrat.kaushik@gmail.com" ? "admin" : "user",
+                    role: (authUser.email === "sukrat.kaushik@gmail.com" || authUser.email === "sukrat.kaushik@ourpregnancy.in") ? "admin" : "user",
                     planTier: "free",
                     planExpiry: null,
                     isSetup: false,
@@ -922,7 +922,7 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
                 uid: authUser.uid,
                 email: authUser.email || existingDoc.email || null,
                 displayName: authUser.displayName || existingDoc.displayName || null,
-                role: existingDoc.role || (authUser.email === "sukrat.kaushik@gmail.com" ? "admin" : "user"),
+                role: existingDoc.role || ((authUser.email === "sukrat.kaushik@gmail.com" || authUser.email === "sukrat.kaushik@ourpregnancy.in") ? "admin" : "user"),
                 planTier: existingDoc.planTier || "free",
                 planExpiry: existingDoc.planExpiry || null,
                 isSetup: existingDoc.isSetup ?? false,
@@ -962,7 +962,7 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
     const callerEmail = request.auth.token.email;
     const db = admin.firestore();
     const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
     if (!isCallerAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can delete users.");
     }
@@ -971,7 +971,7 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
         throw new https_1.HttpsError("invalid-argument", "targetUid is required.");
     }
     // Safety: Protect the primary owner account from deletion
-    if (targetUid === request.auth.uid || targetUid === "sukrat.kaushik@gmail.com") {
+    if (targetUid === request.auth.uid || targetUid === "sukrat.kaushik@gmail.com" || targetUid === "sukrat.kaushik@ourpregnancy.in") {
         throw new https_1.HttpsError("failed-precondition", "Primary administrator account cannot be deleted.");
     }
     try {
@@ -1040,13 +1040,13 @@ exports.sendVerificationOtp = (0, https_1.onCall)({ region: "asia-south1", secre
         createdAt: Date.now(),
         expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
     });
-    let userVal = "sukrat.kaushik@gmail.com";
+    let userVal = "sukrat.kaushik@ourpregnancy.in";
     let passVal = "";
     try {
-        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     catch {
-        userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     try {
         passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
@@ -1235,13 +1235,13 @@ exports.verifyOtp = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpU
  * Dispatches the Concept 3 Founder Welcome Email to a newly verified expectant mother.
  */
 async function sendWelcomeFounderEmail(targetEmail, targetName) {
-    let userVal = "sukrat.kaushik@gmail.com";
+    let userVal = "sukrat.kaushik@ourpregnancy.in";
     let passVal = "";
     try {
-        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     catch {
-        userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
+        userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
     }
     try {
         passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";

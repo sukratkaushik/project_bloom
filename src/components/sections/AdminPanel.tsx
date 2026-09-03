@@ -56,7 +56,7 @@ export const AdminPanel: React.FC = () => {
   const [durationMonths, setDurationMonths] = useState<number | null>(null); // null = lifetime
   const [sendEmailNotification, setSendEmailNotification] = useState<boolean>(true);
 
-  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com';
+  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -163,7 +163,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   const handleToggleAdminRole = async (targetUser: UserProfile) => {
-    const isOwner = targetUser.email === 'sukrat.kaushik@gmail.com';
+    const isOwner = targetUser.email === 'sukrat.kaushik@gmail.com' || targetUser.email === 'sukrat.kaushik@ourpregnancy.in';
     if (isOwner) return;
 
     const newRole = targetUser.role === 'admin' ? 'user' : 'admin';
@@ -182,6 +182,8 @@ export const AdminPanel: React.FC = () => {
       setUpdatingUid(null);
     }
   };
+
+  const isSelectedUserOwner = selectedUser?.email === 'sukrat.kaushik@gmail.com' || selectedUser?.email === 'sukrat.kaushik@ourpregnancy.in';
 
   const getInitials = (name?: string | null, email?: string | null) => {
     if (name && name.trim()) {
@@ -218,13 +220,13 @@ export const AdminPanel: React.FC = () => {
   }
 
   // Metric counts
-  const premiumCount = users.filter(u => u.planTier === 'premium' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com').length;
-  const standardCount = users.filter(u => u.planTier === 'standard' && u.email !== 'sukrat.kaushik@gmail.com' && u.role !== 'admin').length;
+  const premiumCount = users.filter(u => u.planTier === 'premium' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
+  const standardCount = users.filter(u => u.planTier === 'standard' && u.email !== 'sukrat.kaushik@gmail.com' && u.email !== 'sukrat.kaushik@ourpregnancy.in' && u.role !== 'admin').length;
   const freeCount = users.length - premiumCount - standardCount;
-  const adminCount = users.filter(u => u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com').length;
+  const adminCount = users.filter(u => u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
 
   const filteredUsers = users.filter(u => {
-    const isOwner = u.email === 'sukrat.kaushik@gmail.com';
+    const isOwner = u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in';
     const effectivePlan = isOwner ? 'premium' : (u.planTier || 'free');
 
     // Filter by tier chips

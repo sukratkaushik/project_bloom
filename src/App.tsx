@@ -91,6 +91,7 @@ const AppContent: React.FC = () => {
     user && (
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
+      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
       user.providerData.some((p) => p.providerId === 'google.com')
     )
   );

@@ -32,7 +32,7 @@ export const Footer: React.FC<FooterProps> = ({ onToast, className = '' }) => {
     }
   };
 
-  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com';
+  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
 
   return (
     <footer className={`bg-white border md:border-border/90 z-40 shadow-xs no-print md:rounded-[16px] md:mb-5 w-full shrink-0 ${className}`}>
