@@ -251,6 +251,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
         *   **`founder@ourpregnancy.in`**: Dispatches the personal founder welcome email (`"Sukrat | Founder, Our Pregnancy"`).
         *   **`support@ourpregnancy.in`**: Configured as the universal `replyTo` destination for all system communications, landing page footer support link, and app feedback.
 
+### **Task 32: Strict Legal Compliance with Indian Law (PCPNDT Act, 1994) — Total Prohibition of Fetal Sex/Gender Determination**
+*   **Details:**
+    *   **Legal Mandate:** Implemented strict compliance with the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994 of India, which criminalizes fetal sex determination and gender disclosure.
+    *   **Backend Medical Report Analyzer (`analyzeMedicalReport` in `functions/src/index.ts`):** Added explicit clinical prompt directives and output sanitization filters (`sanitizePCPNDTContent`) ensuring that uploaded ultrasound scans or medical reports NEVER analyze, guess, deduce, or disclose fetal gender.
+    *   **Bloom AI Prenatal Assistant Interceptor (`chatWithAI` in `functions/src/index.ts` & `AskOurPregnancy.tsx`):** Added a hardcoded keyword interceptor (`isPCPNDTGenderQuery`) that automatically blocks any attempt to determine baby sex/gender (in English, Hindi, Hinglish, or via unscientific myths like nub/ramzi theory) and issues a legally compliant refusal.
+    *   **UI Compliance Banner (`MedicalReports.tsx`):** Added a prominent legal compliance banner informing users that the tool is strictly for organizing prescription records and test summaries, with zero fetal gender detection capabilities.
+
 ---
 
 ## 📅 2026-06-28
