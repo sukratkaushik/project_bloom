@@ -20,7 +20,8 @@ import {
   AlertTriangle,
   RotateCcw,
   ShieldCheck,
-  Loader2
+  Loader2,
+  Scale
 } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
@@ -280,13 +281,24 @@ export const MedicalReports: React.FC = () => {
         </div>
 
         {/* Privacy Notice Banner */}
-        <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
+        <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-3 flex gap-3 items-start">
           <Lock className="w-5 h-5 text-sage shrink-0 mt-0.5" />
           <div>
             <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Secure Cloud Storage & Privacy</h4>
             <p className="text-[12px] text-medium leading-relaxed">
               All medical reports are stored securely in the cloud with strict industry-standard encryption and privacy controls.
               Your health records are confidential, secure, and accessible across all your linked devices.
+            </p>
+          </div>
+        </div>
+
+        {/* Indian Law Compliance: PCPNDT Act Banner */}
+        <div className="bg-amber-500/10 border border-amber-500/25 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
+          <Scale className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-[13px] font-bold text-amber-900 dark:text-amber-300 mb-0.5">⚖️ Strict Compliance with Indian Law (PCPNDT Act, 1994)</h4>
+            <p className="text-[12px] text-charcoal/85 dark:text-gray-300 leading-relaxed">
+              In accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994</strong>, determination or disclosure of the sex/gender of a fetus is strictly prohibited in India. This application and its AI tools <strong>do not identify, predict, or reveal fetal gender</strong> under any circumstances. This feature is intended solely for organizing your prescriptions, tracking diagnostic test records, and preparing medical summaries for your OB-GYN consultations.
             </p>
           </div>
         </div>

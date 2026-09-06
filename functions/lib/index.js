@@ -124,10 +124,35 @@ function isQueryDueDateInvalid(message) {
     }
     return false;
 }
+/**
+ * Compliance with Indian Law: The Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994.
+ * Fetal sex determination and disclosure of fetal sex/gender are strictly prohibited in India.
+ */
+function isPCPNDTGenderQuery(message) {
+    const clean = message.toLowerCase();
+    const genderQueryPatterns = [
+        'boy or girl', 'girl or boy', 'boy or a girl', 'girl or a boy',
+        'baby boy or baby girl', 'baby girl or baby boy', 'male or female', 'female or male',
+        'baby gender', 'fetal gender', 'gender of baby', 'gender of the baby', 'gender of my baby',
+        'sex of baby', 'sex of the baby', 'sex of my baby', 'fetal sex', 'determine sex', 'determine gender',
+        'predict gender', 'predict sex', 'tell me gender', 'tell me the gender', 'tell me sex',
+        'ultrasound gender', 'gender from ultrasound', 'sex from ultrasound', 'ultrasound sex',
+        'nub theory', 'ramzi theory', 'skull theory', 'heart rate gender',
+        'ladka ya ladki', 'ladka hai ya ladki', 'ladki hai ya ladka', 'beta hoga ya beti',
+        'beta hai ya beti', 'beti hogi ya beta', 'beta ya beti', 'ling janch', 'ling parikshan'
+    ];
+    return genderQueryPatterns.some(pattern => clean.includes(pattern));
+}
 exports.chatWithAI = (0, https_1.onCall)({ secrets: [hfApiKey], region: "asia-south1" }, async (request) => {
     const { message, systemPrompt, maxTokens, dueDate } = request.data;
     if (!message) {
         throw new https_1.HttpsError("invalid-argument", "Message is required.");
+    }
+    // Strict PCPNDT Act Legal Interceptor
+    if (isPCPNDTGenderQuery(message)) {
+        return {
+            reply: "In strict accordance with Indian law (The Pre-Conception and Pre-Natal Diagnostic Techniques - PCPNDT Act, 1994), prenatal sex determination or disclosure of the gender/sex of a fetus is strictly illegal. Our Pregnancy complies fully with Indian regulations and cannot predict, determine, or reveal the gender of your baby. Our tools are dedicated exclusively to maternal health, fetal wellness, and safe prenatal care."
+        };
     }
     const apiKey = hfApiKey.value();
     if (!apiKey) {
@@ -346,6 +371,11 @@ exports.analyzeMedicalReport = (0, https_1.onCall)({ secrets: [hfApiKey], region
     const systemPrompt = `You are a clinical AI assistant helping a pregnant mother understand her medical reports, ultrasound records, or doctor's prescriptions.
 A major task is deciphering doctor handwriting or complex medical terms, presenting them in a clear, supportive, and easy-to-understand patient-friendly manner.
 
+CRITICAL LEGAL REQUIREMENT (PCPNDT ACT, 1994 - INDIA):
+Under Indian Law (The Pre-Conception and Pre-Natal Diagnostic Techniques - Prohibition of Sex Selection Act, 1994), prenatal sex determination and disclosure of fetal sex or gender are strictly illegal and prohibited.
+Under NO circumstances are you allowed to identify, predict, deduce, or disclose the sex or gender of the fetus (e.g. boy, girl, male, female fetus, fetal genitalia, nub theory).
+If the report or ultrasound contains any reference to fetal sex or gender, you MUST completely omit, ignore, and redact it. Never mention fetal sex or gender anywhere in your output.
+
 Extract the information and return ONLY a valid JSON object with the following structure (do NOT wrap it in HTML/markdown, do not add any additional text, just the raw JSON object itself):
 {
   "summary": "A 2-3 sentence patient-friendly summary of the report contents, findings, or doctor's general advice. Keep the tone warm and supportive.",
@@ -361,7 +391,8 @@ Rules:
 1. Under 'prescriptions', decipher all handwritten or printed medications, dosages, frequency, and instructions. If there are no prescriptions, return an empty array.
 2. Under 'warnings', highlight any warnings, precautions, or key indicators mentioned. If none, return an empty array.
 3. If handwriting is illegible, do your best and append '(please verify with pharmacist)' to the specific item.
-4. Keep all responses supportive, and tailored for a mother's understanding.`;
+4. Keep all responses supportive, and tailored for a mother's understanding.
+5. Strictly comply with the PCPNDT Act: NEVER reveal or analyze fetal sex or gender.`;
     try {
         let extractedText = "";
         if (fileType === "application/pdf") {
@@ -441,12 +472,32 @@ Rules:
         throw new https_1.HttpsError("internal", error.message || "Failed to analyze medical report.");
     }
 });
+function sanitizePCPNDTContent(data) {
+    if (!data)
+        return data;
+    const pcpndtRegex = /\b(male fetus|female fetus|boy fetus|girl fetus|fetus is a boy|fetus is a girl|baby is a boy|baby is a girl|it is a boy|it's a boy|it is a girl|it's a girl|gender:\s*(male|female|boy|girl)|sex:\s*(male|female)|fetal sex:\s*(male|female)|fetal gender:\s*(male|female))\b/gi;
+    if (typeof data === "string") {
+        return data.replace(pcpndtRegex, "[REDACTED - PCPNDT ACT COMPLIANCE]");
+    }
+    if (Array.isArray(data)) {
+        return data.map(item => sanitizePCPNDTContent(item));
+    }
+    if (typeof data === "object") {
+        const cleaned = {};
+        for (const key of Object.keys(data)) {
+            cleaned[key] = sanitizePCPNDTContent(data[key]);
+        }
+        return cleaned;
+    }
+    return data;
+}
 function parseResponseContent(result) {
     if (result.choices && result.choices.length > 0 && result.choices[0].message) {
         let content = result.choices[0].message.content.trim();
         content = content.replace(/^```json\s*/i, "").replace(/```\s*$/, "").trim();
         try {
-            return JSON.parse(content);
+            const parsed = JSON.parse(content);
+            return sanitizePCPNDTContent(parsed);
         }
         catch (parseErr) {
             console.error("JSON parse error from model output:", content);
