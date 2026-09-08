@@ -9,6 +9,8 @@ coverage/
 
 # Claude Code
 .claude/
+Claude outputs/
 
 # Firebase
 .firebase/
+firestore.rules.backup-*

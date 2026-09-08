@@ -12,7 +12,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "clean": "rm -rf dist",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:rules": "tsx --test test/firestore.rules.test.ts"
   },
   "dependencies": {
     "@sentry/browser": "^10.49.0",
@@ -35,6 +36,7 @@
     "vite": "^6.2.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@types/express": "^4.17.21",
     "@types/node": "^22.14.0",
     "@types/peerjs": "^0.0.30",

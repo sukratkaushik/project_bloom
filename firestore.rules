@@ -38,7 +38,10 @@ service cloud.firestore {
       
       // Rules for Tracking Data (Kicks, Vitals, etc.)
       match /trackingData/{docId} {
-        allow read, write: if isAuthenticated();
+        allow read, write: if isAuthenticated() && (
+          get(/databases/$(database)/documents/journeys/$(journeyId)).data.uid == request.auth.uid ||
+          isAdmin()
+        );
       }
     }
 
