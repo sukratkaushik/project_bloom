@@ -258,6 +258,13 @@ This file tracks the ongoing development, bug fixes, and deployment tasks for th
     *   **Bloom AI Prenatal Assistant Interceptor (`chatWithAI` in `functions/src/index.ts` & `AskOurPregnancy.tsx`):** Added a hardcoded keyword interceptor (`isPCPNDTGenderQuery`) that automatically blocks any attempt to determine baby sex/gender (in English, Hindi, Hinglish, or via unscientific myths like nub/ramzi theory) and issues a legally compliant refusal.
     *   **UI Compliance Banner (`MedicalReports.tsx`):** Added a prominent legal compliance banner informing users that the tool is strictly for organizing prescription records and test summaries, with zero fetal gender detection capabilities.
 
+### **Task 33: Fix Firestore Subcollection Data-Isolation Vulnerability on `trackingData`**
+*   **Details:**
+    *   **Vulnerability Remediation:** Resolved a critical cross-user data isolation vulnerability where `journeys/{journeyId}/trackingData` only checked authentication rather than parent journey ownership.
+    *   **Parent-Based Access Enforcement (`firestore.rules`):** Updated `trackingData/{docId}` rules to check `get(/databases/$(database)/documents/journeys/$(journeyId)).data.uid == request.auth.uid || isAdmin()`, ensuring users can strictly read and write only their own fetal movements, contractions, vitals, mood, symptoms, and hydration.
+    *   **Automated Emulator Security Test Suite (`test/firestore.rules.test.ts`):** Implemented an automated test suite verifying all 5 security test cases (owner access, cross-user denial, admin access, unauthenticated denial, and all 7 tracker data types) against the local Firestore emulator.
+    *   **Zero Migration & Demo-Safe:** No client data model or schema migrations required; 100% backward compatible with existing cloud sync flows.
+
 ---
 
 ## 📅 2026-06-28
