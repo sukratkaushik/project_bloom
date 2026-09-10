@@ -283,7 +283,7 @@ export const Profile: React.FC = () => {
             <div className="p-4 bg-gray-50 rounded-[16px] border border-border">
               <h4 className="text-[12px] font-semibold tracking-wide uppercase text-light mb-2">Retention Policy</h4>
               <p className="text-medium text-sm leading-relaxed">
-                To protect your privacy, we follow a strict **2-year retention policy**. Tracking logs are automatically deleted from our cloud servers after 2 years of inactivity. We recommend exporting your data as a PDF before this period if you wish to keep a permanent record.
+                Your pregnancy journey and health logs are safely preserved in your private cloud profile for as long as your account remains active. You can export a complete summary of your records as a PDF at any time, or permanently delete your account and erase all associated data whenever you wish using the Delete My Account option below.
               </p>
             </div>
 
