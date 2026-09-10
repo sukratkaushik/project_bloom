@@ -85,6 +85,14 @@ export const deleteUserByAdminCallable = async (targetUid: string): Promise<{ su
   return res.data;
 };
 
+export const deleteMyOwnAccountCallable = async (): Promise<{ success: boolean; message?: string }> => {
+  const { httpsCallable } = await import('firebase/functions');
+  const fn = httpsCallable(functions, 'deleteMyOwnAccount');
+  const res = await fn() as { data: { success: boolean; message?: string } };
+  return res.data;
+};
+
+
 export const updateUserSubscription = async (
   targetUid: string,
   planTier: 'free' | 'standard' | 'premium',

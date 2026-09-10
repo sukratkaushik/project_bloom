@@ -12,6 +12,7 @@ export const TaskItem: React.FC<TaskItemProps> = ({ task }) => {
   
   const isDone = !!state.checked[task.id];
   const isAssigned = !!state.assigned[task.id];
+  const assigneeNote = state.assigneeNotes?.[task.id] || '';
   // Hide partner tag if solo
   const isPartnerTask = task.partner && state.partnerSit !== 'solo';
   const canAssign = state.partnerSit !== 'solo';
