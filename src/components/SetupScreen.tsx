@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePlanner } from '../store';
-import { auth } from '../firebase';
+import { auth, db, doc, setDoc, serverTimestamp } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { CustomSelect } from './CustomSelect';
 import { navigate } from '../utils/navigation';
+
+export const CURRENT_POLICY_VERSION = '2026-04';
+
 
 // Custom Apple-style Wheel Picker Component
 const WheelPicker = ({ options, value, onChange, label }: { options: string[], value: string, onChange: (v: string) => void, label: string }) => {
@@ -142,11 +145,26 @@ export const SetupScreen: React.FC = () => {
     setFlags((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const handleGenerate = () => {
+  const handleGenerate = async () => {
     if (!dueDate) {
       alert('Please enter your due date.');
       return;
     }
+
+    if (auth.currentUser && hasConsented) {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        await setDoc(userRef, {
+          uid: auth.currentUser.uid,
+          consentGiven: true,
+          consentedAt: serverTimestamp(),
+          policyVersion: CURRENT_POLICY_VERSION,
+        }, { merge: true });
+      } catch (err) {
+        console.error('Failed to record user consent:', err);
+      }
+    }
+
     generatePlan({
       dueDate,
       pregnancyNum,
