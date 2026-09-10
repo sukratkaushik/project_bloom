@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification, connectAuthEmulator } from 'firebase/auth';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, connectFirestoreEmulator } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, connectFirestoreEmulator, serverTimestamp } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import firebaseConfig from '../firebase-applet-config.json';
@@ -21,7 +21,7 @@ if (
   connectFunctionsEmulator(functions, '127.0.0.1', 5001);
 }
 
-export { createUserWithEmailAndPassword, signInWithEmailAndPassword, doc, setDoc, getDoc };
+export { createUserWithEmailAndPassword, signInWithEmailAndPassword, doc, setDoc, getDoc, serverTimestamp };
 
 
 
@@ -35,6 +35,9 @@ export interface UserProfile {
   planTier?: 'free' | 'standard' | 'premium';
   planExpiry?: number | null; // timestamp in ms, or null for lifetime
   emailVerified?: boolean;
+  consentGiven?: boolean;
+  consentedAt?: any;
+  policyVersion?: string;
   createdAt: number;
   updatedAt: number;
 }
