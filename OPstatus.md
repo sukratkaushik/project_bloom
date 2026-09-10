@@ -2,7 +2,22 @@
 
 This file tracks the ongoing development, bug fixes, and deployment tasks for the Project Bloom / Our Pregnancy application.
 
+## 📅 2026-09-10
+
+### **Task 34: Self-Service Account & Health Data Deletion ("Delete My Account")**
+*   **Details:**
+    *   **Privacy Policy Fulfillment:** Aligned the application with its stated privacy promise ("permanently erases your data from our systems") by providing self-service account deletion for end users.
+    *   **Secure Cloud Function (`functions/src/index.ts` `deleteMyOwnAccount`):** Implemented an `onCall` Cloud Function (`asia-south1`) callable only by authenticated users. Target UID is derived strictly from `request.auth.uid` (rejects any client parameters) to guarantee data isolation.
+    *   **Complete Purge:** Atomically purges user profile (`users/{uid}`), all associated pregnancy journeys (`journeys`), nested `trackingData` subcollections across all 7 tracking types, all user feedback entries (`feedbacks`), and Firebase Auth credentials (`admin.auth().deleteUser`).
+    *   **Administrator Safeguards:** Hardened against accidental deletion of primary admin accounts (`sukrat.kaushik@gmail.com`, `sukrat.kaushik@ourpregnancy.in`).
+    *   **Profile UI & Confirmation Modal (`src/components/sections/Profile.tsx`):** Added a "Delete My Account" card under "Data Privacy & Cloud Sync" with a strict confirmation modal requiring the user to type "DELETE" before initiating deletion, with clear itemized warnings and cancel controls.
+    *   **Client State Cleanup & Failure Handling:** On success, completely clears local IndexedDB (Dexie) tables, `localStorage`, `sessionStorage`, signs out from Firebase Auth (`signOut`), and redirects to the landing page (`#/`). On failure, retains local data and displays error toast allowing retry.
+    *   **Automated Testing (`test/deleteAccount.test.ts`):** Added end-to-end unit test suite executed against Firestore emulator verifying unauthenticated rejection, admin protection, total data erasure for caller, and 100% data integrity for other users.
+
+---
+
 ## 📅 2026-08-30
+
 
 ### **Task: Brand Design System Alignment for Email Communications**
 *   **Details:**

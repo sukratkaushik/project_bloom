@@ -13,7 +13,8 @@
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit",
-    "test:rules": "tsx --test test/firestore.rules.test.ts"
+    "test:rules": "tsx --test test/firestore.rules.test.ts",
+    "test:delete": "tsx --test test/deleteAccount.test.ts"
   },
   "dependencies": {
     "@sentry/browser": "^10.49.0",

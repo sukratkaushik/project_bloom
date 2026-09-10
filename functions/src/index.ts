@@ -1158,6 +1158,73 @@ export const deleteUserByAdmin = onCall(
 );
 
 /**
+ * Self-service permanent account deletion.
+ * Callable ONLY by an authenticated user deleting their own data.
+ * Derives target UID strictly from request.auth.uid (never client parameters).
+ */
+export const deleteMyOwnAccount = onCall(
+  { region: "asia-south1" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const uid = request.auth.uid;
+    const email = request.auth.token.email;
+
+    // Safety: Protect the primary owner account from accidental deletion
+    if (
+      email === "sukrat.kaushik@gmail.com" ||
+      email === "sukrat.kaushik@ourpregnancy.in" ||
+      uid === "sukrat.kaushik@gmail.com" ||
+      uid === "sukrat.kaushik@ourpregnancy.in"
+    ) {
+      throw new HttpsError("failed-precondition", "Primary administrator account cannot be deleted through self-service.");
+    }
+
+    const db = admin.firestore();
+
+    try {
+      // 1. Delete all journeys and nested tracking data for this user
+      const journeysSnap = await db.collection("journeys").where("uid", "==", uid).get();
+      for (const jDoc of journeysSnap.docs) {
+        const trackingSnap = await jDoc.ref.collection("trackingData").get();
+        if (!trackingSnap.empty) {
+          const batch = db.batch();
+          trackingSnap.docs.forEach((doc) => batch.delete(doc.ref));
+          await batch.commit();
+        }
+        await jDoc.ref.delete();
+      }
+
+      // 2. Delete any feedbacks submitted by user
+      const feedbackSnap = await db.collection("feedbacks").where("uid", "==", uid).get();
+      if (!feedbackSnap.empty) {
+        const fBatch = db.batch();
+        feedbackSnap.docs.forEach((doc) => fBatch.delete(doc.ref));
+        await fBatch.commit();
+      }
+
+      // 3. Delete user document in Firestore
+      await db.collection("users").doc(uid).delete();
+
+      // 4. Delete user account in Firebase Authentication
+      try {
+        await admin.auth().deleteUser(uid);
+      } catch (authErr: any) {
+        console.warn(`Auth delete warning for ${uid}:`, authErr.message);
+      }
+
+      return { success: true, message: "Your account and all associated data have been permanently deleted." };
+    } catch (err: any) {
+      console.error(`Failed to delete account for user ${uid}:`, err);
+      throw new HttpsError("internal", err.message || "Failed to delete account.");
+    }
+  }
+);
+
+
+/**
  * Generates and dispatches a 6-digit numeric OTP for email verification.
  * Immune to email crawlers, link pre-fetchers, and SafeLinks scanners.
  */

@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
-import { auth } from '../../firebase';
-import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck } from 'lucide-react';
+import { auth, deleteMyOwnAccountCallable } from '../../firebase';
+import { signOut } from 'firebase/auth';
+import { db as dexieDb } from '../../db';
+import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 
 export const Profile: React.FC = () => {
@@ -10,6 +12,53 @@ export const Profile: React.FC = () => {
   const [userName, setUserName] = useState(state.userName || '');
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Self-service account deletion state
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmText !== 'DELETE') return;
+    setIsDeleting(true);
+    setDeleteError(null);
+
+    try {
+      // 1. Invoke server-side account deletion
+      await deleteMyOwnAccountCallable();
+
+      // 2. Clear local Dexie IndexedDB
+      try {
+        await Promise.all(dexieDb.tables.map(table => table.clear()));
+      } catch (dbErr) {
+        console.warn("Could not clear local database:", dbErr);
+      }
+
+      // 3. Clear local & session storage
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+      } catch (storageErr) {
+        console.warn("Could not clear storage:", storageErr);
+      }
+
+      // 4. Sign out from Firebase Auth
+      await signOut(auth);
+
+      // 5. Redirect to Landing Page
+      window.location.hash = '#/';
+      window.location.reload();
+    } catch (err: any) {
+      console.error("Failed to delete account:", err);
+      const msg = err?.message || "Failed to delete account. Please try again.";
+      setDeleteError(msg);
+      setToastMessage(msg);
+      setTimeout(() => setToastMessage(null), 5000);
+      setIsDeleting(false);
+    }
+  };
+
 
   const handleEmailClick = (email: string, e: React.MouseEvent) => {
     e.preventDefault();
@@ -237,6 +286,32 @@ export const Profile: React.FC = () => {
                 To protect your privacy, we follow a strict **2-year retention policy**. Tracking logs are automatically deleted from our cloud servers after 2 years of inactivity. We recommend exporting your data as a PDF before this period if you wish to keep a permanent record.
               </p>
             </div>
+
+            {/* Self-Service Account Deletion */}
+            <div className="p-4 bg-red-50/40 rounded-[16px] border border-red-200">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h4 className="font-semibold text-red-950 mb-1 flex items-center gap-2">
+                    <Trash2 className="w-4 h-4 text-red-600 shrink-0" />
+                    Delete My Account
+                  </h4>
+                  <p className="text-red-800/80 text-sm leading-relaxed">
+                    Permanently delete your account, journeys, tracking logs, and cloud backups. This cannot be undone.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteConfirmText('');
+                    setDeleteError(null);
+                    setShowDeleteModal(true);
+                  }}
+                  className="px-4 py-2 bg-white text-red-600 border border-red-300 hover:bg-red-50 hover:border-red-400 font-medium text-sm rounded-xl transition-colors cursor-pointer shrink-0 self-start sm:self-center"
+                >
+                  Delete My Account
+                </button>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -290,6 +365,88 @@ export const Profile: React.FC = () => {
           </div>
         </div>
       )}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[24px] max-w-[480px] w-full p-6 sm:p-8 shadow-2xl border border-red-100 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3 text-red-600">
+              <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                <AlertTriangle className="w-6 h-6 text-red-600" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl font-bold text-charcoal">Delete Account Permanently?</h3>
+                <p className="text-xs text-red-600 font-medium">This action cannot be undone.</p>
+              </div>
+            </div>
+
+            <div className="text-sm text-medium space-y-2 bg-red-50/50 p-4 rounded-xl border border-red-100">
+              <p className="font-medium text-charcoal text-xs sm:text-sm">The following will be permanently erased from our servers:</p>
+              <ul className="list-disc list-inside space-y-1 text-xs text-red-900">
+                <li>Your profile and login credentials</li>
+                <li>All pregnancy journeys and due date calculations</li>
+                <li>All kick counts, contraction logs, and vitals</li>
+                <li>All symptom, mood, hydration, and supplement records</li>
+                <li>All local device logs and synced cloud storage</li>
+              </ul>
+            </div>
+
+            {deleteError && (
+              <div className="p-3 bg-red-100 text-red-800 text-xs rounded-xl font-medium border border-red-200">
+                {deleteError}
+              </div>
+            )}
+
+            <div>
+              <label className="block text-xs font-semibold text-charcoal mb-1.5">
+                Type <span className="text-red-600 font-bold">DELETE</span> to confirm:
+              </label>
+              <input
+                type="text"
+                value={deleteConfirmText}
+                onChange={(e) => setDeleteConfirmText(e.target.value)}
+                placeholder="DELETE"
+                disabled={isDeleting}
+                className="w-full px-3.5 py-2.5 rounded-xl border border-border focus:border-red-500 focus:outline-hidden text-sm font-medium tracking-wider"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => {
+                  if (!isDeleting) {
+                    setShowDeleteModal(false);
+                    setDeleteConfirmText('');
+                    setDeleteError(null);
+                  }
+                }}
+                disabled={isDeleting}
+                className="px-4 py-2.5 rounded-xl border border-border text-charcoal text-sm font-medium hover:bg-gray-50 transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleteConfirmText !== 'DELETE' || isDeleting}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold shadow-xs disabled:opacity-40 disabled:cursor-not-allowed transition-all cursor-pointer"
+              >
+                {isDeleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>Permanently Delete</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
           <span>📋</span> {toastMessage}
