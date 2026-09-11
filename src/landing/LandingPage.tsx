@@ -787,9 +787,9 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Flowchart Section */}
-      <section id="how-it-works" className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
+      <section id="how-it-works" className="bg-sage-pale/20 pt-14 md:pt-16 pb-12 md:pb-14 px-6 overflow-hidden">
         <div className="max-w-[1140px] mx-auto">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12 md:mb-14">
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-pale text-[12px] font-bold text-sage uppercase tracking-wider mb-4 border border-sage/20">
               <Sparkles size={14} /> Step-by-Step Experience
             </div>
@@ -855,44 +855,44 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Premium Value Callout / Conversion Card */}
-          <div className="mt-16 bg-white border-2 border-sage/30 rounded-[28px] p-8 md:p-10 shadow-[0_12px_40px_rgba(107,146,120,0.12)] relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-sage-pale/40 via-gold/5 to-transparent rounded-full filter blur-3xl pointer-events-none" />
-            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+          <div className="mt-12 md:mt-14 bg-white border border-sage/30 rounded-[24px] p-6 md:p-8 shadow-md relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-sage-pale/30 via-gold/5 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
               <div className="max-w-2xl">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold text-[12px] font-bold uppercase tracking-wider mb-3 border border-gold/25">
-                  <Sparkles size={14} className="text-gold" /> Why Upgrade to Premium?
+                <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-gold/15 text-gold text-[11px] font-bold uppercase tracking-wider mb-2.5 border border-gold/25">
+                  <Sparkles size={13} className="text-gold" /> Why Upgrade to Premium?
                 </div>
-                <h3 className="font-serif text-2xl md:text-3xl font-bold text-charcoal mb-3">
+                <h3 className="font-serif text-2xl md:text-[26px] font-bold text-charcoal mb-2.5 leading-snug">
                   Essential care is free. Clinical AI intelligence is your superpower.
                 </h3>
-                <p className="text-medium text-[15px] leading-relaxed mb-5">
+                <p className="text-medium text-[14px] leading-relaxed mb-4">
                   While daily kick tracking and government scheme navigators are free forever, Premium gives you an on-demand medical-grade support system whenever concerns arise — day or night.
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[13px] font-semibold text-charcoal">
-                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
-                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[12.5px] font-semibold text-charcoal">
+                  <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={15} className="text-sage shrink-0" />
                     <span>24/7 Bloom AI Chat</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
-                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                  <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={15} className="text-sage shrink-0" />
                     <span>AI Food & Report Scanner</span>
                   </div>
-                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
-                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                  <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={15} className="text-sage shrink-0" />
                     <span>FHIR R4 Doctor EHR Export</span>
                   </div>
                 </div>
               </div>
 
-              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-2.5 w-full lg:w-auto shrink-0">
                 <a
                   href="#pricing"
-                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-sage text-white font-bold text-[15px] hover:bg-sage-dark shadow-md hover:shadow-lg transition-all active:scale-98 text-center"
+                  className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark shadow-sm hover:shadow-md transition-all active:scale-98 text-center"
                 >
                   <span>Explore Premium Plans</span>
-                  <ArrowRight size={16} />
+                  <ArrowRight size={15} />
                 </a>
-                <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-sage-pale/60 text-sage-dark text-[12px] font-bold border border-sage/25 text-center">
+                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-sage-pale/60 text-sage-dark text-[11.5px] font-bold border border-sage/25 text-center">
                   <span>Use code <span className="font-extrabold text-charcoal bg-white/70 px-1.5 py-0.5 rounded">OPIN30</span> for 30 days free</span>
                 </div>
               </div>
@@ -902,14 +902,14 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Section Divider */}
-      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
+      <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-4">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
         <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Toolkit</span>
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
       {/* Features Bento Grid */}
-      <section id="features" className="max-w-[1140px] mx-auto px-6 py-12 md:py-16">
+      <section id="features" className="max-w-[1140px] mx-auto px-6 pt-6 md:pt-8 pb-12 md:pb-16">
         <div className="text-center mb-10 md:mb-12">
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-pale text-[11px] font-bold text-sage uppercase tracking-wider mb-3 border border-sage/20">
             <Sparkles size={13} /> Comprehensive Toolkit
