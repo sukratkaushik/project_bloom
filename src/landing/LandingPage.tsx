@@ -26,7 +26,10 @@ import {
   MailCheck,
   X,
   Moon,
-  Linkedin
+  Linkedin,
+  Baby,
+  ClipboardList,
+  FileText
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -912,6 +915,9 @@ export const LandingPage: React.FC = () => {
             <Sparkles size={14} /> Comprehensive Toolkit
           </div>
           <h2 className="font-serif text-[clamp(32px,5vw,48px)] text-charcoal mb-4 leading-tight">Everything you need,<br />beautifully organized.</h2>
+          <p className="text-medium text-[16px] max-w-2xl mx-auto">
+            From essential free daily trackers to medical-grade AI intelligence and legal maternity protections — explore the full spectrum of Project Bloom.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -919,16 +925,20 @@ export const LandingPage: React.FC = () => {
           {/* Feature 1: AI Food Scanner (Large) */}
           <div className="md:col-span-2 bg-gradient-to-br from-cream to-white border border-border rounded-[32px] overflow-hidden flex flex-col md:flex-row group hover:shadow-xl transition-all duration-500">
             <div className="p-8 md:p-10 flex-1 flex flex-col justify-center">
-              <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-6 text-sage">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold border border-gold/30 text-[11px] font-bold uppercase tracking-wider mb-5 w-fit">
+                <Sparkles size={12} /> Premium AI
+              </span>
+              <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-5 text-sage">
                 <Camera size={24} />
               </div>
-              <h3 className="font-serif text-[28px] font-bold text-charcoal mb-3">AI Food Safety Scanner</h3>
-              <p className="text-[16px] text-medium leading-relaxed mb-6">
-                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our AI verify it against food safety guidelines instantly.
+              <h3 className="font-serif text-[26px] md:text-[28px] font-bold text-charcoal mb-3">AI Food Safety Scanner</h3>
+              <p className="text-[15px] md:text-[16px] text-medium leading-relaxed mb-6">
+                Not sure if that street food, raw papaya, or unfamiliar herb is safe during pregnancy? Snap a picture and let our AI verify it against clinical food safety guidelines instantly.
               </p>
-              <ul className="space-y-2">
-                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Detects harmful ingredients</li>
-                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Tailored for local cuisines</li>
+              <ul className="space-y-2.5">
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage shrink-0" /> Detects harmful ingredients & unsafe spices</li>
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage shrink-0" /> Tailored for Indian street foods & regional cuisines</li>
+                <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage shrink-0" /> Trimester-specific safety flags & healthy swaps</li>
               </ul>
             </div>
             <div className="flex-1 min-h-[300px] relative overflow-hidden bg-sage-pale/30">
@@ -939,88 +949,234 @@ export const LandingPage: React.FC = () => {
           {/* Feature 2: Partner Sync (Tall) */}
           <div className="bg-white border border-border rounded-[32px] p-8 md:p-10 flex flex-col relative overflow-hidden group hover:shadow-xl transition-all duration-500">
             <div className="absolute top-0 right-0 w-64 h-64 bg-sage/10 rounded-full filter blur-[60px] -z-0"></div>
-            <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-6 text-sage relative z-10">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-pale text-sage border border-sage/30 text-[11px] font-bold uppercase tracking-wider mb-5 w-fit relative z-10">
+              🌿 Standard Plan
+            </span>
+            <div className="w-12 h-12 rounded-[14px] bg-sage-pale flex items-center justify-center mb-5 text-sage relative z-10">
               <Cloud size={24} />
             </div>
             <h3 className="font-serif text-[24px] font-bold text-charcoal mb-3 relative z-10">Real-Time Partner Sync</h3>
             <p className="text-[15px] text-medium leading-relaxed mb-8 relative z-10">
-              Enjoy secure storage in the cloud. Securely link devices via WebRTC to share the journey with your partner while maintaining granular privacy controls.
+              Keep your partner connected to every milestone, fetal kick, and labor contraction in real time via private WebRTC encrypted sync, with granular privacy controls.
             </p>
             <div className="mt-auto relative z-10 space-y-3">
               <div className="bg-cream rounded-xl p-4 border border-border flex items-center justify-between">
                 <span className="text-[13px] font-bold text-charcoal">Sync Mode</span>
-                <span className="text-[12px] bg-sage text-white px-2 py-1 rounded font-bold">Encrypted</span>
+                <span className="text-[12px] bg-sage text-white px-2.5 py-1 rounded-md font-bold">Encrypted</span>
               </div>
               <div className="bg-cream rounded-xl p-4 border border-border flex items-center justify-between">
                 <span className="text-[13px] font-bold text-charcoal">Cloud Storage</span>
-                <span className="text-[12px] bg-charcoal text-cream px-2 py-1 rounded font-bold">Secure</span>
+                <span className="text-[12px] bg-charcoal text-cream px-2.5 py-1 rounded-md font-bold">Secure</span>
               </div>
             </div>
           </div>
 
-          {/* Feature 3: Biometrics (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Activity size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Labor Readiness Score</h4>
-            <p className="text-[14px] text-medium">Predictive biometrics analyzing your HRV, RHR, and Braxton Hicks frequency.</p>
+          {/* Feature 3: AI Medical Report Analyzer (Large 2-col) */}
+          <div className="md:col-span-2 bg-gradient-to-br from-white to-gold-pale/20 border border-gold/30 rounded-[32px] p-8 md:p-10 flex flex-col justify-between hover:shadow-xl transition-all duration-500 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-72 h-72 bg-gold/10 rounded-full filter blur-[70px] pointer-events-none" />
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold border border-gold/30 text-[11px] font-bold uppercase tracking-wider mb-5 w-fit">
+                <Sparkles size={12} /> Premium AI
+              </span>
+              <div className="w-12 h-12 rounded-[14px] bg-gold-pale flex items-center justify-center mb-5 text-gold">
+                <FileText size={24} />
+              </div>
+              <h3 className="font-serif text-[26px] md:text-[28px] font-bold text-charcoal mb-3">AI Medical Report & Ultrasound Analyzer</h3>
+              <p className="text-[15px] md:text-[16px] text-medium leading-relaxed mb-6">
+                Don't spend days panicking over confusing lab numbers or doctor handwriting. Upload CBC blood panels, anomaly scans, thyroid profiles, or glucose tests for immediate, reassuring clinical explanations in plain language.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+                <div className="bg-white/80 border border-border rounded-xl p-3.5">
+                  <span className="text-[13px] font-bold text-charcoal block mb-1">Ultrasound Biometry</span>
+                  <span className="text-[12px] text-medium leading-snug block">Translates BPD, FL, AC, and estimated fetal weight.</span>
+                </div>
+                <div className="bg-white/80 border border-border rounded-xl p-3.5">
+                  <span className="text-[13px] font-bold text-charcoal block mb-1">Lab Range Context</span>
+                  <span className="text-[12px] text-medium leading-snug block">Explains abnormal flags with reassuring pregnancy norms.</span>
+                </div>
+                <div className="bg-white/80 border border-border rounded-xl p-3.5">
+                  <span className="text-[13px] font-bold text-charcoal block mb-1">Doctor Questions</span>
+                  <span className="text-[12px] text-medium leading-snug block">Prepares tailored questions for your next OB-GYN visit.</span>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Feature 4: EHR Export (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-gold-pale text-gold flex items-center justify-center mb-4"><Stethoscope size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">FHIR R4 EHR Export</h4>
-            <p className="text-[14px] text-medium">Instantly export your entire care plan and vitals to major hospital systems like Epic.</p>
+          {/* Feature 4: Postpartum & Early Parenthood (1-col) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 text-[10px] font-bold uppercase tracking-wider mb-4">
+                🌿 Standard Plan
+              </span>
+              <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4">
+                <Baby size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Postpartum & 4th Trimester</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Care doesn't end at delivery. Complete recovery guides covering lochia, pelvic floor rehabilitation, EPDS baby blues screening, and newborn feeding milestones.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 5: AI Chatbot (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Bot size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Ask Bloom 24/7</h4>
-            <p className="text-[14px] text-medium">Get immediate answers to your pregnancy questions with our fine-tuned AI companion.</p>
+          {/* Feature 5: Ask Bloom 24/7 AI Companion */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 text-[10px] font-bold uppercase tracking-wider mb-4">
+                <Sparkles size={11} /> Premium AI
+              </span>
+              <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4">
+                <Bot size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Ask Bloom 24/7 AI</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Empathetic, instant answers for late-night worries and sudden symptoms. Clinically grounded in ACOG, RCOG, and WHO obstetric guidelines.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 6: Vitals Tracker (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Heart size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Vitals Tracker</h4>
-            <p className="text-[14px] text-medium">Log blood pressure with preeclampsia threshold alerts.</p>
+          {/* Feature 6: FHIR R4 EHR & Doctor PDF Export */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 text-[10px] font-bold uppercase tracking-wider mb-4">
+                <Sparkles size={11} /> Premium AI
+              </span>
+              <div className="w-10 h-10 rounded-full bg-gold-pale text-gold flex items-center justify-center mb-4">
+                <Stethoscope size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Doctor Clinical PDF & EHR</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Turn months of vitals, kick logs, and symptoms into a structured, doctor-ready PDF or interoperable FHIR R4 medical export for your OB-GYN consultations.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 7: Kick Counter (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Activity size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Kick Counter</h4>
-            <p className="text-[14px] text-medium">Count fetal movements daily from 28 weeks with auto-alerts if count is low.</p>
+          {/* Feature 7: Govt Schemes & Maternity Legal Rights */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 text-[10px] font-bold uppercase tracking-wider mb-4">
+                🌿 Standard Plan
+              </span>
+              <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4">
+                <Landmark size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Govt Schemes & Legal Rights</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Claim ₹5,000–₹11,000+ through PMMVY, JSY & state kits. Understand your 26-week paid leave, crèche access, and job protections under the Maternity Benefit Act.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 8: Checklists (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-gold-pale text-gold flex items-center justify-center mb-4"><CheckCircle2 size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Multiple Checklists</h4>
-            <p className="text-[14px] text-medium">Prepare essentials for delivery day with our curated hospital bag lists.</p>
+          {/* Feature 8: Interactive Birth Plan Builder */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border text-[10px] font-bold uppercase tracking-wider mb-4">
+                Free Forever
+              </span>
+              <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4">
+                <ClipboardList size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">WHO Birth Plan Builder</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Structured 5-step preferences builder: pain relief, golden hour skin-to-skin, delayed cord clamping, and C-section contingencies with a 1-click printable hospital PDF.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 9: Contraction Timer (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4"><Timer size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Contraction Timer</h4>
-            <p className="text-[14px] text-medium">Time contractions and get the 5-1-1 hospital rule calculated automatically.</p>
+          {/* Feature 9: Labor Readiness Score */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border text-[10px] font-bold uppercase tracking-wider mb-4">
+                Free Forever
+              </span>
+              <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4">
+                <Activity size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Labor Readiness Score</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Predictive biometrics tracking HRV trends, resting heart rate, and Braxton Hicks frequency to monitor your body's natural preparation for birth.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 10: Pregnancy Timeline (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4"><Calendar size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Pregnancy Timeline</h4>
-            <p className="text-[14px] text-medium">Track weekly changes, milestones, and what to expect along your journey.</p>
+          {/* Feature 10: Contraction Timer (5-1-1) */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border text-[10px] font-bold uppercase tracking-wider mb-4">
+                Free Forever
+              </span>
+              <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4">
+                <Timer size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Contraction Timer (5-1-1)</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Time contractions with automatic calculation of the clinical 5-1-1 rule so you know the exact right moment to leave for labor.
+              </p>
+            </div>
           </div>
 
-          {/* Feature 11: Dark Mode (Small) */}
-          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300">
-            <div className="w-10 h-10 rounded-full bg-charcoal text-white flex items-center justify-center mb-4"><Moon size={20} /></div>
-            <h4 className="font-bold text-[18px] text-charcoal mb-2">Calm/Dark Mode</h4>
-            <p className="text-[14px] text-medium">Soothing dark mode for tracking during those 3 AM wake-ups.</p>
+          {/* Feature 11: Kick Counter & BP Alerts */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border text-[10px] font-bold uppercase tracking-wider mb-4">
+                Free Forever
+              </span>
+              <div className="w-10 h-10 rounded-full bg-sage-pale text-sage flex items-center justify-center mb-4">
+                <Heart size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Kick Counter & Vitals Alerts</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Count daily fetal movements with low-count alert triggers, plus log blood pressure with preeclampsia warning thresholds.
+              </p>
+            </div>
           </div>
 
+          {/* Feature 12: Weekly Timeline & Hospital Bag */}
+          <div className="bg-white border border-border rounded-[32px] p-8 hover:shadow-lg transition-all duration-300 flex flex-col justify-between">
+            <div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border text-[10px] font-bold uppercase tracking-wider mb-4">
+                Free Forever
+              </span>
+              <div className="w-10 h-10 rounded-full bg-blush-pale text-blush flex items-center justify-center mb-4">
+                <Calendar size={20} />
+              </div>
+              <h4 className="font-bold text-[18px] text-charcoal mb-2">Timeline & Hospital Bag</h4>
+              <p className="text-[14px] text-medium leading-relaxed">
+                Track 40-week baby growth milestones, weekly body changes, and pack delivery essentials with curated checklists for mom, baby, and partner.
+              </p>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Section Conversion Banner */}
+        <div className="mt-14 bg-gradient-to-r from-cream via-white to-cream border-2 border-sage/30 rounded-[28px] p-8 md:p-10 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+          <div className="max-w-xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-pale text-sage text-[12px] font-bold uppercase tracking-wider mb-2 border border-sage/20">
+              <Sparkles size={14} /> Clear, Honest Tiers
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl font-bold text-charcoal mb-2">
+              Start free today. Upgrade when you need clinical AI.
+            </h3>
+            <p className="text-medium text-[15px] leading-relaxed">
+              Every mother deserves safe core tracking for free. When you want 24/7 AI peace of mind, report analysis, and postpartum guidance, our paid plans start at just ₹199.
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto shrink-0">
+            <a
+              href="#pricing"
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark shadow-sm transition-all active:scale-98"
+            >
+              <span>Compare Plans & Pricing</span>
+              <ArrowRight size={16} />
+            </a>
+            <button
+              type="button"
+              onClick={handleStart}
+              className="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl border border-border bg-white text-charcoal font-bold text-[14px] hover:bg-cream transition-all active:scale-98 shadow-sm"
+            >
+              <span>Start Free Now</span>
+            </button>
+          </div>
         </div>
       </section>
 
