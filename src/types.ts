@@ -157,4 +157,5 @@ export type PlannerState = {
   isRestoring?: boolean;
   connectedWearables?: string[];
   lastWearableSyncTime?: number;
+  aiProcessingConsent?: boolean;
 };

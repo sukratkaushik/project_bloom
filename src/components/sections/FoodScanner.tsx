@@ -4,6 +4,7 @@ import { Upload, AlertTriangle, CheckCircle, Loader2, Bot, Sparkles } from 'luci
 import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
+import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 
 interface ScanResult {
   isFood?: boolean;
@@ -50,6 +51,11 @@ export const FoodScanner: React.FC = () => {
   const analyzeImage = async () => {
     if (!imagePreview || !imageFile) return;
 
+    if (isAiConsentBlocked(state.aiProcessingConsent)) {
+      setError("Turn on AI features in your Profile to use this.");
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
 
@@ -91,6 +97,9 @@ export const FoodScanner: React.FC = () => {
         </div>
 
       <div className="bg-white p-6 rounded-[16px] border-[1.5px] border-border shadow-sm mb-8">
+        {isAiConsentBlocked(state.aiProcessingConsent) && (
+          <AiConsentPrompt className="mb-5" message="Turn on AI features in your Profile to use the Food Guide scanner" />
+        )}
         {!imagePreview ? (
           <div 
             onClick={() => fileInputRef.current?.click()}
@@ -117,21 +126,25 @@ export const FoodScanner: React.FC = () => {
             </div>
             
             {!result && (
-              <button
-                onClick={analyzeImage}
-                disabled={isAnalyzing}
-                className="w-full p-[14px] bg-sage text-white rounded-[10px] font-sans text-[14px] font-semibold tracking-[0.4px] cursor-pointer transition-all hover:bg-sage-dark disabled:opacity-70 flex items-center justify-center gap-2"
-              >
-                {isAnalyzing ? (
-                  <>
-                    <Loader2 size={18} className="animate-spin" /> Analyzing Nutrition & Safety...
-                  </>
-                ) : (
-                  <>
-                    <Bot size={18} /> Analyze Food with Our Pregnancy AI
-                  </>
-                )}
-              </button>
+              isAiConsentBlocked(state.aiProcessingConsent) ? (
+                <AiConsentPrompt message="Turn on AI features in your Profile to analyze this food image" />
+              ) : (
+                <button
+                  onClick={analyzeImage}
+                  disabled={isAnalyzing}
+                  className="w-full p-[14px] bg-sage text-white rounded-[10px] font-sans text-[14px] font-semibold tracking-[0.4px] cursor-pointer transition-all hover:bg-sage-dark disabled:opacity-70 flex items-center justify-center gap-2"
+                >
+                  {isAnalyzing ? (
+                    <>
+                      <Loader2 size={18} className="animate-spin" /> Analyzing Nutrition & Safety...
+                    </>
+                  ) : (
+                    <>
+                      <Bot size={18} /> Analyze Food with Our Pregnancy AI
+                    </>
+                  )}
+                </button>
+              )
             )}
           </div>
         )}

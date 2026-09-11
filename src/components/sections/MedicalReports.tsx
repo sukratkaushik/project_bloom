@@ -26,6 +26,7 @@ import {
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { Paywall } from '../Paywall';
+import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -195,6 +196,14 @@ export const MedicalReports: React.FC = () => {
   };
 
   const runAIAnalysis = async (report: MedicalReport) => {
+    if (isAiConsentBlocked(state.aiProcessingConsent)) {
+      setAnalysisErrorMap(prev => ({
+        ...prev,
+        [report.id]: "Turn on AI features in your Profile to use this."
+      }));
+      return;
+    }
+
     setAnalyzingMap(prev => ({ ...prev, [report.id]: true }));
     setAnalysisErrorMap(prev => ({ ...prev, [report.id]: null }));
 
@@ -431,23 +440,27 @@ export const MedicalReports: React.FC = () => {
                     {/* AI Assistant Section */}
                     <div className="mt-2 border-t border-border/40 pt-4">
                       {!report.aiAnalysedAt && !analyzingMap[report.id] && (
-                        <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                          <div className="flex gap-2.5 items-start">
-                            <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
-                            <div className="text-left">
-                              <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
-                              <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
-                                Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
-                              </p>
+                        isAiConsentBlocked(state.aiProcessingConsent) ? (
+                          <AiConsentPrompt compact message="Turn on AI features in your Profile to analyze medical reports" />
+                        ) : (
+                          <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                            <div className="flex gap-2.5 items-start">
+                              <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
+                              <div className="text-left">
+                                <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
+                                <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
+                                  Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
+                                </p>
+                              </div>
                             </div>
+                            <button
+                              onClick={() => runAIAnalysis(report)}
+                              className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
+                            >
+                              <Sparkles size={13} /> Analyze Report
+                            </button>
                           </div>
-                          <button
-                            onClick={() => runAIAnalysis(report)}
-                            className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
-                          >
-                            <Sparkles size={13} /> Analyze Report
-                          </button>
-                        </div>
+                        )
                       )}
 
                       {analyzingMap[report.id] && (
