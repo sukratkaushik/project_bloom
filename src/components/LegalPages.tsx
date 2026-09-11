@@ -43,7 +43,7 @@ export const PrivacyPolicy: React.FC = () => {
         </a>
         <h1 className="font-serif text-4xl text-charcoal mb-6">Privacy Policy</h1>
         <div className="prose prose-sage max-w-none text-medium space-y-4">
-          <p><strong>Last Updated:</strong> April 2026</p>
+          <p><strong>Last Updated:</strong> September 2026</p>
           <p>Welcome to Our Pregnancy. Your privacy is critically important to us, especially given the sensitive nature of pregnancy and health data. This Privacy Policy explains how we collect, use, and protect your information.</p>
 
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">1. Information We Collect</h2>
@@ -66,7 +66,16 @@ export const PrivacyPolicy: React.FC = () => {
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">3. How We Use Your Information</h2>
           <p>We use your information to provide, maintain, and improve the Our Pregnancy app. Your data is strictly used to provide the personalized tracking experience. We do not sell your personal data to third parties, and your health data is never used to train public AI models.</p>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. Your Data Rights</h2>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. How We Share Your Data</h2>
+          <p>We do not sell, rent, or trade your personal or health data. To deliver our services, we route necessary data through trusted third-party service providers solely to perform essential application functions:</p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><strong>Cloud hosting and database storage:</strong> Your account information and encrypted tracking logs are stored with a cloud infrastructure provider, not on our own physical servers.</li>
+            <li><strong>AI processing:</strong> When you use AI-powered features (Bloom AI chat assistant, food safety scanner, and medical report analysis), the photos, documents, or health text you submit are sent to a third-party AI service to generate a response. This data is not used to train public AI models.</li>
+            <li><strong>Payment processing:</strong> If you subscribe to a paid plan, your payment transaction is handled by a third-party payment processor. We do not collect or store your payment card details or banking credentials ourselves.</li>
+            <li><strong>Email delivery:</strong> Transactional communications (such as welcome emails, account notifications, plan updates, and payment receipts) are transmitted through a cloud email delivery service.</li>
+          </ul>
+
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Your Data Rights</h2>
           <p>You have the following rights regarding your personal data:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Right to access and update:</strong> You may review and correct your data directly within the app.</li>
@@ -74,7 +83,7 @@ export const PrivacyPolicy: React.FC = () => {
             <li><strong>Right to nominee:</strong> You have the right to nominate someone to exercise these rights on your behalf.</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Grievance Representative</h2>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Grievance Representative</h2>
           <p>If you have any complaints or concerns regarding your data, please contact our support and grievance representative:</p>
           <div className="bg-sage-pale p-4 rounded-[12px] mt-4">
             <p className="font-semibold text-charcoal">Representative: Sukrat Kaushik</p>
