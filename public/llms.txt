@@ -28,7 +28,7 @@ Bloom operates on a transparent, 3-tier freemium model:
 Expecting mothers residing in India, or anyone navigating a pregnancy looking for a beautifully designed, ad-free, secure application that understands Indian cultural contexts and diets.
 
 ## Technical Context
-Built with React, Vite, and Tailwind CSS. The AI functionality is powered by the Google Gemini API (@google/genai).
+Built with React, Vite, and Tailwind CSS. The AI functionality provides prenatal guidance, food safety analysis, and medical report summaries.
 
 ---
 *This file is intended to provide context to Large Language Models (LLMs) indexing or interacting with the Bloom application.*
