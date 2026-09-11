@@ -14,6 +14,7 @@ import {
   Bot,
   Camera,
   Landmark,
+  Scale,
   ArrowRight,
   CheckCircle2,
   Lock,
@@ -784,35 +785,114 @@ export const LandingPage: React.FC = () => {
 
       {/* Flowchart Section */}
       <section id="how-it-works" className="bg-sage-pale/20 py-16 md:py-24 px-6 overflow-hidden">
-        <div className="max-w-[1000px] mx-auto">
+        <div className="max-w-[1140px] mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-serif text-4xl text-charcoal mb-4">How <span className="notranslate">Our Pregnancy</span> Works</h2>
-            <p className="text-medium text-[16px] max-w-2xl mx-auto">A seamless, private journey from your first trimester to delivery day.</p>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-sage-pale text-[12px] font-bold text-sage uppercase tracking-wider mb-4 border border-sage/20">
+              <Sparkles size={14} /> Step-by-Step Experience
+            </div>
+            <h2 className="font-serif text-3xl md:text-4xl text-charcoal mb-4">How <span className="notranslate">Our Pregnancy</span> Works</h2>
+            <p className="text-medium text-[16px] max-w-2xl mx-auto">From zero-setup privacy and government financial entitlements to 24/7 AI prenatal care — here is how your journey unfolds.</p>
           </div>
 
           <div className="relative mt-8">
             {/* Connecting Line (Desktop) */}
-            <div className="hidden md:block absolute top-[48px] left-[12%] right-[12%] h-[2px] bg-gradient-to-r from-sage-pale via-sage-light to-sage-pale" />
+            <div className="hidden md:block absolute top-[48px] left-[10%] right-[10%] h-[2px] bg-gradient-to-r from-sage-pale via-sage-light to-gold/40" />
 
             <div className="grid grid-cols-1 md:grid-cols-4 gap-12 md:gap-6 relative z-10">
               {[
-                { step: "1", title: "Quick Setup", desc: "Enter your due date. No account required to start tracking.", icon: <Calendar className="w-6 h-6 text-sage" /> },
-                { step: "2", title: "Track Daily", desc: "Log vitals, kick counts, and contractions right on your phone.", icon: <Activity className="w-6 h-6 text-sage" /> },
-                { step: "3", title: "Prepare", desc: "Build your hospital bag checklist and track symptoms.", icon: <Heart className="w-6 h-6 text-sage" /> },
-                { step: "4", title: "Sync & Share", desc: "Securely sync to the cloud or share progress with your partner.", icon: <Cloud className="w-6 h-6 text-sage" /> }
+                {
+                  step: "1",
+                  tag: "Free Forever",
+                  tagClass: "bg-sage-pale text-sage border-sage/20",
+                  title: "Private Onboarding",
+                  desc: "Enter your due date or LMP to calculate your personalized weekly timeline immediately. No account required, 100% offline-first.",
+                  icon: <Calendar className="w-6 h-6 text-sage" />
+                },
+                {
+                  step: "2",
+                  tag: "Free Forever",
+                  tagClass: "bg-sage-pale text-sage border-sage/20",
+                  title: "Track Vitals & Safety",
+                  desc: "Log fetal kick counts, timed contractions, and blood pressure with preeclampsia warning alerts stored securely on your phone.",
+                  icon: <Activity className="w-6 h-6 text-sage" />
+                },
+                {
+                  step: "3",
+                  tag: "Govt. & Legal Aid",
+                  tagClass: "bg-sage-pale text-sage border-sage/20",
+                  title: "Schemes & Rights",
+                  desc: "Unlock ₹5,000–₹11,000+ through PMMVY, JSY & state maternity kits. Understand statutory 26-week paid leave & job protections under the Maternity Benefit Act.",
+                  icon: <Landmark className="w-6 h-6 text-sage" />
+                },
+                {
+                  step: "4",
+                  tag: "⭐ Premium AI",
+                  tagClass: "bg-gold/15 text-gold border-gold/30 font-extrabold",
+                  title: "AI Prenatal Care",
+                  desc: "Put a 24/7 Bloom AI clinical companion in your pocket. Scan Indian food safety, decipher medical reports, and export FHIR R4 EHRs for your OB-GYN.",
+                  icon: <Sparkles className="w-6 h-6 text-gold" />
+                }
               ].map((item, i) => (
                 <div key={i} className="flex flex-col items-center text-center relative group">
                   {/* Connecting Line (Mobile) */}
                   {i !== 3 && <div className="md:hidden absolute top-[100px] bottom-[-48px] left-1/2 w-[2px] -translate-x-1/2 bg-sage-pale z-[-1]" />}
 
-                  <div className="w-24 h-24 rounded-full bg-white border-[4px] border-cream shadow-[0_8px_30px_rgba(107,146,120,0.12)] flex flex-col items-center justify-center mb-6 relative group-hover:-translate-y-2 group-hover:shadow-[0_15px_40px_rgba(107,146,120,0.2)] transition-all duration-400">
+                  <div className="w-24 h-24 rounded-full bg-white border-[4px] border-cream shadow-[0_8px_30px_rgba(107,146,120,0.12)] flex flex-col items-center justify-center mb-5 relative group-hover:-translate-y-2 group-hover:shadow-[0_15px_40px_rgba(107,146,120,0.2)] transition-all duration-400">
                     <span className="text-[10px] font-bold text-sage/70 uppercase tracking-widest absolute top-3">Step {item.step}</span>
                     <div className="mt-4 group-hover:scale-110 transition-transform duration-400">{item.icon}</div>
                   </div>
-                  <h3 className="font-bold text-[18px] text-charcoal mb-2">{item.title}</h3>
-                  <p className="text-[14px] text-medium leading-relaxed max-w-[200px]">{item.desc}</p>
+                  <span className={`inline-block text-[11px] font-bold px-2.5 py-0.5 rounded-full border mb-2 ${item.tagClass}`}>
+                    {item.tag}
+                  </span>
+                  <h3 className="font-bold text-[17px] text-charcoal mb-2">{item.title}</h3>
+                  <p className="text-[13.5px] text-medium leading-relaxed max-w-[240px]">{item.desc}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Premium Value Callout / Conversion Card */}
+          <div className="mt-16 bg-white border-2 border-sage/30 rounded-[28px] p-8 md:p-10 shadow-[0_12px_40px_rgba(107,146,120,0.12)] relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-sage-pale/40 via-gold/5 to-transparent rounded-full filter blur-3xl pointer-events-none" />
+            <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
+              <div className="max-w-2xl">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gold/15 text-gold text-[12px] font-bold uppercase tracking-wider mb-3 border border-gold/25">
+                  <Sparkles size={14} className="text-gold" /> Why Upgrade to Premium?
+                </div>
+                <h3 className="font-serif text-2xl md:text-3xl font-bold text-charcoal mb-3">
+                  Essential care is free. Clinical AI intelligence is your superpower.
+                </h3>
+                <p className="text-medium text-[15px] leading-relaxed mb-5">
+                  While daily kick tracking and government scheme navigators are free forever, Premium gives you an on-demand medical-grade support system whenever concerns arise — day or night.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-[13px] font-semibold text-charcoal">
+                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                    <span>24/7 Bloom AI Chat</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                    <span>AI Food & Report Scanner</span>
+                  </div>
+                  <div className="flex items-center gap-2 bg-cream/80 p-2.5 rounded-xl border border-border">
+                    <CheckCircle2 size={16} className="text-sage shrink-0" />
+                    <span>FHIR R4 Doctor EHR Export</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto shrink-0">
+                <a
+                  href="#pricing"
+                  className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-sage text-white font-bold text-[15px] hover:bg-sage-dark shadow-md hover:shadow-lg transition-all active:scale-98 text-center"
+                >
+                  <span>Explore Premium Plans</span>
+                  <ArrowRight size={16} />
+                </a>
+                <div className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg bg-sage-pale/60 text-sage-dark text-[12px] font-bold border border-sage/25 text-center">
+                  <span>Use code <span className="font-extrabold text-charcoal bg-white/70 px-1.5 py-0.5 rounded">OPIN30</span> for 30 days free</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
