@@ -1188,47 +1188,123 @@ export const LandingPage: React.FC = () => {
           <div className="absolute -bottom-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-charcoal/10 blur-[120px]"></div>
         </div>
 
-        <div className="max-w-[1200px] mx-auto relative z-10">
+        <div className="max-w-[1240px] mx-auto relative z-10">
           <div className="text-center mb-16 md:mb-20">
             <span className="bg-white/20 text-white border border-white/30 px-4 py-1.5 rounded-full text-[13px] font-bold tracking-[2px] uppercase mb-6 inline-block shadow-sm backdrop-blur-md">
-              Localized Care
+              Localized For India
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl mb-6">Made for expectant mothers</h2>
-            <p className="text-white/90 text-[16px] md:text-[18px] max-w-2xl mx-auto font-medium">
-              Because pregnancy means navigating local foods, government schemes, and unique cultural contexts. We've got you covered.
+            <h2 className="font-serif text-3xl md:text-5xl mb-6">
+              Engineered for Indian Pregnancies,<br className="hidden md:inline" /> Not Western Algorithms
+            </h2>
+            <p className="text-white/90 text-[16px] md:text-[18px] max-w-3xl mx-auto font-medium leading-relaxed">
+              Western apps don't know what ghee, hing, or raw papaya do to your body — or how to claim ₹18,000+ from Indian maternity schemes. We bridge modern obstetric science with Indian cultural realities.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-            {/* Card 1 */}
-            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
-              <div className="w-16 h-16 bg-sage-pale text-sage rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
-                🥗
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-left">
+            {/* Card 1: AI Indian Food Scanner */}
+            <div className="bg-white p-7 md:p-8 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 bg-sage-pale text-sage rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
+                  🥗
+                </div>
+                <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-gold/15 text-gold border border-gold/30 uppercase tracking-wider mb-3">
+                  ⭐ Premium AI
+                </span>
+                <h3 className="font-bold text-[18px] md:text-[19px] mb-2.5 text-charcoal">AI Food Safety Scanner</h3>
+                <p className="text-medium text-[13.5px] leading-relaxed">
+                  Snap any street food, wedding dish, or unfamiliar curry for instant AI safety checks. Trimester-safe guidance on Indian staples like ragi, paneer, kesar, raw papaya, and gestational diabetes diets.
+                </p>
               </div>
-              <h3 className="font-bold text-[20px] mb-3">Foods Database</h3>
-              <p className="text-medium text-[15px] leading-relaxed">
-                Know exactly what's safe. Comprehensive coverage for dal, ragi, paneer, amla, and accurate risk flags for items like raw papaya or street food.
-              </p>
+              <div className="mt-5 pt-3.5 border-t border-border/60 text-[12px] font-semibold text-sage flex items-center gap-1.5">
+                <CheckCircle2 size={15} className="shrink-0 text-sage" />
+                <span>Instant photo analysis for local dishes</span>
+              </div>
             </div>
-            {/* Card 2 */}
-            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
-              <div className="w-16 h-16 bg-blush-pale text-blush rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm -rotate-3 group-hover:rotate-0">
-                🏥
+
+            {/* Card 2: Govt Schemes & Legal Rights */}
+            <div className="bg-white p-7 md:p-8 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 bg-blush-pale text-blush rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm -rotate-3 group-hover:rotate-0">
+                  🏛️
+                </div>
+                <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider mb-3">
+                  🌿 Standard Plan
+                </span>
+                <h3 className="font-bold text-[18px] md:text-[19px] mb-2.5 text-charcoal">₹5,000–₹18,000+ Schemes & Rights</h3>
+                <p className="text-medium text-[13.5px] leading-relaxed">
+                  Unlock central & 36 State/UT cash transfers (PMMVY, JSY, KCR Kit, Muthulakshmi Reddy). Generate legal leave notices to protect your 26 weeks of paid salary under the Maternity Benefit Act.
+                </p>
               </div>
-              <h3 className="font-bold text-[20px] mb-3">Govt Scheme Guide</h3>
-              <p className="text-medium text-[15px] leading-relaxed">
-                Don't miss out on important benefits. Clear, actionable guides for JSY, PMMVY (₹5,000 cash assistance), and JSSK (hospital delivery).
-              </p>
+              <div className="mt-5 pt-3.5 border-t border-border/60 text-[12px] font-semibold text-blush flex items-center gap-1.5">
+                <CheckCircle2 size={15} className="shrink-0 text-blush" />
+                <span>Full 26-week salary legal protection</span>
+              </div>
             </div>
-            {/* Card 3 */}
-            <div className="bg-white p-8 md:p-10 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50">
-              <div className="w-16 h-16 bg-gold-pale text-gold rounded-2xl flex items-center justify-center text-3xl mb-8 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
-                📞
+
+            {/* Card 3: 11 Regional Languages & Cultural Care */}
+            <div className="bg-white p-7 md:p-8 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm rotate-3 group-hover:rotate-0">
+                  🌐
+                </div>
+                <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border uppercase tracking-wider mb-3">
+                  Free & Standard
+                </span>
+                <h3 className="font-bold text-[18px] md:text-[19px] mb-2.5 text-charcoal">11 Regional Indian Languages</h3>
+                <p className="text-medium text-[13.5px] leading-relaxed">
+                  Read clinical milestones and medical guides in your mother tongue (Hindi, Tamil, Telugu, Marathi, Bengali, Gujarati & more). Includes safe travel guidance for maternal home (mayka) trips and fasting.
+                </p>
               </div>
-              <h3 className="font-bold text-[20px] mb-3">Emergency Ready</h3>
-              <p className="text-medium text-[15px] leading-relaxed">
-                Critical helplines at your fingertips. 108 Ambulance, 112 National Emergency, and iCall psychosocial support — always one tap away.
-              </p>
+              <div className="mt-5 pt-3.5 border-t border-border/60 text-[12px] font-semibold text-amber-700 flex items-center gap-1.5">
+                <CheckCircle2 size={15} className="shrink-0 text-amber-600" />
+                <span>Hindi, Tamil, Telugu, Bengali & more</span>
+              </div>
+            </div>
+
+            {/* Card 4: Clinical SOS & Partner Emergency */}
+            <div className="bg-white p-7 md:p-8 rounded-[24px] shadow-xl hover:-translate-y-2 transition-all duration-300 group text-charcoal border border-white/50 flex flex-col justify-between">
+              <div>
+                <div className="w-14 h-14 bg-gold-pale text-gold rounded-2xl flex items-center justify-center text-2xl mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm -rotate-3 group-hover:rotate-0">
+                  🚨
+                </div>
+                <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider mb-3">
+                  🌿 Standard Plan
+                </span>
+                <h3 className="font-bold text-[18px] md:text-[19px] mb-2.5 text-charcoal">1-Tap SOS & Partner Alert</h3>
+                <p className="text-medium text-[13.5px] leading-relaxed">
+                  Instant one-tap dispatch for 108 Ambulance / 112 National Emergency, while alerting your partner with real-time GPS location and contraction frequency. Includes iCall 24/7 maternal mental health support.
+                </p>
+              </div>
+              <div className="mt-5 pt-3.5 border-t border-border/60 text-[12px] font-semibold text-gold-dark flex items-center gap-1.5">
+                <CheckCircle2 size={15} className="shrink-0 text-gold" />
+                <span>Real-time partner GPS & SOS alert</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Pre-Pricing Transition Bridge */}
+          <div className="mt-14 max-w-3xl mx-auto bg-white/10 backdrop-blur-md border border-white/30 rounded-[24px] p-6 md:p-8 text-center text-white shadow-lg">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-[11px] font-bold uppercase tracking-wider mb-3 border border-white/25">
+              <Sparkles size={13} /> The Only India-Centric Pregnancy Platform
+            </div>
+            <h3 className="font-serif text-2xl md:text-3xl font-bold mb-2">
+              Ready to experience care built for your world?
+            </h3>
+            <p className="text-white/85 text-[15px] max-w-xl mx-auto mb-6 leading-relaxed">
+              Start with free core tracking, or unlock full 36-state government guides, 26-week legal notice generators, and 24/7 AI food scanning from just ₹199/month.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              <a
+                href="#pricing"
+                className="inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-xl bg-white text-charcoal font-bold text-[14px] hover:bg-cream shadow-md transition-all active:scale-98"
+              >
+                <span>View Plans & Pricing Below</span>
+                <ArrowRight size={16} />
+              </a>
+              <span className="text-[12px] font-semibold text-white/90 bg-white/15 px-3.5 py-2.5 rounded-lg border border-white/20">
+                🎁 Use code <strong className="text-white underline font-extrabold">OPIN30</strong> for 30 days free Premium
+              </span>
             </div>
           </div>
         </div>
