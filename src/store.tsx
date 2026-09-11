@@ -191,6 +191,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 planTier,
                 isPremium,
                 planExpiry: profile.planExpiry || null,
+                aiProcessingConsent: profile.aiProcessingConsent,
               }));
 
               // Immediately persist state to Dexie
@@ -211,6 +212,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                     planTier,
                     isPremium,
                     planExpiry: profile.planExpiry || null,
+                    aiProcessingConsent: profile.aiProcessingConsent,
                   }),
                   updatedAt: Date.now(),
                 }).catch(console.error);
@@ -226,6 +228,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               planTier,
               isPremium,
               planExpiry: profile?.planExpiry || null,
+              aiProcessingConsent: profile?.aiProcessingConsent,
             }));
           }
         } catch (error) {
@@ -587,7 +590,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...cloudData,
               isDarkModeActive: prev.isDarkModeActive,
               isSetup: true,
-              activeJourneyId: profile.activeJourneyId
+              activeJourneyId: profile.activeJourneyId,
+              aiProcessingConsent: profile.aiProcessingConsent,
             };
             if (isDbLoaded) {
               db.appState.put({

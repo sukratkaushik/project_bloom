@@ -130,6 +130,7 @@ export const SetupScreen: React.FC = () => {
   const [dietPref, setDietPref] = useState(state.dietPref || 'vegetarian');
   const [flags, setFlags] = useState<Record<string, boolean>>(state.flags || {});
   const [hasConsented, setHasConsented] = useState(false);
+  const [hasAiConsented, setHasAiConsented] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(true);
 
   const selectedDate = dueDate ? new Date(dueDate) : null;
@@ -159,6 +160,8 @@ export const SetupScreen: React.FC = () => {
           consentGiven: true,
           consentedAt: serverTimestamp(),
           policyVersion: CURRENT_POLICY_VERSION,
+          aiProcessingConsent: hasAiConsented,
+          aiProcessingConsentedAt: hasAiConsented ? serverTimestamp() : null,
         }, { merge: true });
       } catch (err) {
         console.error('Failed to record user consent:', err);
@@ -172,6 +175,7 @@ export const SetupScreen: React.FC = () => {
       partnerSit,
       dietPref,
       flags,
+      aiProcessingConsent: hasAiConsented,
     });
     navigate('/dashboard');
   };
@@ -311,6 +315,24 @@ export const SetupScreen: React.FC = () => {
             </div>
             <span className="text-[13px] text-charcoal leading-snug">
               I agree to the <a href="/privacy" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Privacy Policy</a> and <a href="/terms" target="_blank" className="text-sage hover:underline hover:text-sage-dark font-medium" rel="noreferrer">Terms of Service</a>. I understand that my data will be securely processed to personalise my plan.
+            </span>
+          </label>
+        </div>
+
+        {/* Optional AI Features Processing Consent */}
+        <div className="mt-3 p-4 rounded-[12px] bg-white border border-border/80 hover:border-sage/40 transition-colors">
+          <label className="flex items-start gap-3 cursor-pointer select-none">
+            <div className="pt-0.5">
+              <input 
+                type="checkbox" 
+                checked={hasAiConsented}
+                onChange={(e) => setHasAiConsented(e.target.checked)}
+                className="w-4 h-4 text-sage rounded border-border focus:ring-sage focus:ring-2 cursor-pointer"
+              />
+            </div>
+            <span className="text-[13px] text-charcoal/90 leading-snug">
+              <span className="inline-block px-1.5 py-0.5 mr-1.5 text-[10px] font-semibold tracking-wide uppercase bg-sage-pale text-sage rounded">Optional</span>
+              I'd also like to use AI-powered features (Bloom AI chat, food safety scanner, medical report analysis). I understand photos and health details I submit to these features are processed by a third-party AI provider.
             </span>
           </label>
         </div>

@@ -5,6 +5,7 @@ import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../firebase';
 import { isPregnancyRelated } from '../utils/pregnancyClassifier';
+import { AiConsentPrompt, isAiConsentBlocked } from './AiConsentPrompt';
 
 interface FloatingChatbotProps {
   activePage?: string;
@@ -56,6 +57,14 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     if (typeof e !== 'string') e.preventDefault();
     const textToSend = typeof e === 'string' ? e : input;
     if (!textToSend.trim()) return;
+
+    if (isAiConsentBlocked(state.aiProcessingConsent)) {
+      setMessages(prev => [...prev, {
+        role: 'ai',
+        text: "AI features are turned off in your settings. Turn on AI features in your Profile to use Bloom AI."
+      }]);
+      return;
+    }
 
     // Add the user's message to the chat
     setMessages(prev => [...prev, { role: 'user', text: textToSend }]);
@@ -156,22 +165,28 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
           </div>
 
           {/* Input Area */}
-          <form onSubmit={handleSend} className="p-3 bg-white border-t border-border flex items-center gap-2">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder={`Ask about ${activePage || 'your pregnancy'}...`}
-              className="flex-1 bg-cream border border-border rounded-full px-5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all"
-            />
-            <button
-              type="submit"
-              disabled={!input.trim()}
-              className="w-10 h-10 rounded-full bg-sage text-white flex items-center justify-center disabled:opacity-30 hover:bg-sage-dark transition-all shadow-md shrink-0 active:scale-90"
-            >
-              <Send size={16} className="-ml-0.5" />
-            </button>
-          </form>
+          {isAiConsentBlocked(state.aiProcessingConsent) ? (
+            <div className="p-3 bg-white border-t border-border">
+              <AiConsentPrompt compact message="Turn on AI features in Profile to chat" />
+            </div>
+          ) : (
+            <form onSubmit={handleSend} className="p-3 bg-white border-t border-border flex items-center gap-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={`Ask about ${activePage || 'your pregnancy'}...`}
+                className="flex-1 bg-cream border border-border rounded-full px-5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all"
+              />
+              <button
+                type="submit"
+                disabled={!input.trim()}
+                className="w-10 h-10 rounded-full bg-sage text-white flex items-center justify-center disabled:opacity-30 hover:bg-sage-dark transition-all shadow-md shrink-0 active:scale-90"
+              >
+                <Send size={16} className="-ml-0.5" />
+              </button>
+            </form>
+          )}
         </div>
       )}
 

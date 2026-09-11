@@ -16,6 +16,7 @@
     "test:rules": "tsx --test test/firestore.rules.test.ts",
     "test:delete": "tsx --test test/deleteAccount.test.ts",
     "test:consent": "tsx --test test/consentPersistence.test.ts",
+    "test:ai-consent": "tsx --test test/aiConsent.test.ts",
     "test:e2e": "node test/e2e-ui-delete.mjs"
   },
   "dependencies": {

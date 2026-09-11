@@ -38,6 +38,8 @@ export interface UserProfile {
   consentGiven?: boolean;
   consentedAt?: any;
   policyVersion?: string;
+  aiProcessingConsent?: boolean;
+  aiProcessingConsentedAt?: any;
   createdAt: number;
   updatedAt: number;
 }

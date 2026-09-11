@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
-import { auth, deleteMyOwnAccountCallable } from '../../firebase';
+import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
-import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, Trash2, AlertTriangle, Loader2 } from 'lucide-react';
+import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, Trash2, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 
 export const Profile: React.FC = () => {
@@ -91,6 +91,27 @@ export const Profile: React.FC = () => {
   
   const handleNameSave = () => {
     updateState({ userName });
+  };
+
+  const isAiEnabled = state.aiProcessingConsent !== false;
+
+  const handleToggleAiConsent = async (enabled: boolean) => {
+    updateState({ aiProcessingConsent: enabled });
+    if (auth.currentUser) {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        await setDoc(userRef, {
+          aiProcessingConsent: enabled,
+          aiProcessingConsentedAt: enabled ? serverTimestamp() : null,
+        }, { merge: true });
+        setToastMessage(enabled ? "AI-powered features enabled" : "AI-powered features disabled");
+        setTimeout(() => setToastMessage(null), 3000);
+      } catch (err) {
+        console.error("Failed to update AI processing consent:", err);
+        setToastMessage("Failed to update AI settings. Please try again.");
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    }
   };
 
   return (
@@ -277,6 +298,30 @@ export const Profile: React.FC = () => {
                 <p className="text-medium text-sm leading-relaxed">
                   Tracking data (kicks, vitals, mood) is encrypted and synced to your private cloud profile. This allows you to access your journey from any device.
                 </p>
+              </div>
+            </div>
+
+            {/* AI Processing Consent Setting */}
+            <div id="ai-consent-setting" className="p-4 bg-sage-pale/30 rounded-[16px] border border-sage/20">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="w-4 h-4 text-sage shrink-0" />
+                    <h4 className="font-semibold text-charcoal text-sm">AI Features & Processing</h4>
+                  </div>
+                  <p className="text-medium text-xs sm:text-sm leading-relaxed">
+                    Allow Bloom AI chat, the food safety scanner, and medical report analysis to process photos and health details using secure third-party AI models.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5" aria-label="Toggle AI processing consent">
+                  <input
+                    type="checkbox"
+                    checked={isAiEnabled}
+                    onChange={(e) => handleToggleAiConsent(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+                </label>
               </div>
             </div>
 

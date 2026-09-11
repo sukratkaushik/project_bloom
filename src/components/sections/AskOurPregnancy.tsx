@@ -7,6 +7,7 @@ import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { isPregnancyRelated } from '../../utils/pregnancyClassifier';
+import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 
 export const AskOurPregnancy: React.FC = () => {
   const { state } = usePlanner();
@@ -129,6 +130,14 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
   const handleSend = async () => {
     if ((!input.trim() && !attachedFile) || isLoading) return;
 
+    if (isAiConsentBlocked(state.aiProcessingConsent)) {
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: "AI processing is currently turned off in your settings. Turn on AI features in your Profile to use this."
+      }]);
+      return;
+    }
+
     let userMsg = input.trim() || "Please analyze this document.";
 
     // Optimistically show user message (without huge text dump)
@@ -243,47 +252,53 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
               </div>
             )}
 
-            <div className="relative flex items-center">
-              {/* Hidden File Input */}
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handleFileSelect}
-                accept=".pdf,.txt"
-                className="hidden"
-              />
+            {isAiConsentBlocked(state.aiProcessingConsent) ? (
+              <div className="py-2">
+                <AiConsentPrompt />
+              </div>
+            ) : (
+              <div className="relative flex items-center">
+                {/* Hidden File Input */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleFileSelect}
+                  accept=".pdf,.txt"
+                  className="hidden"
+                />
 
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isLoading}
-                className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
-                title="Attach Document (PDF or Text)"
-              >
-                <Paperclip size={18} />
-              </button>
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isLoading}
+                  className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
+                  title="Attach Document (PDF or Text)"
+                >
+                  <Paperclip size={18} />
+                </button>
 
-              <textarea
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                  }
-                }}
-                placeholder="Ask about symptoms, or attach a document..."
-                className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
-                rows={1}
-              />
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSend();
+                    }
+                  }}
+                  placeholder="Ask about symptoms, or attach a document..."
+                  className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
+                  rows={1}
+                />
 
-              <button
-                onClick={handleSend}
-                disabled={(!input.trim() && !attachedFile) || isLoading}
-                className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
-              >
-                <Send size={18} />
-              </button>
-            </div>
+                <button
+                  onClick={handleSend}
+                  disabled={(!input.trim() && !attachedFile) || isLoading}
+                  className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
+                >
+                  <Send size={18} />
+                </button>
+              </div>
+            )}
             <div className="text-center mt-2 text-[10px] text-light">
               Bloom AI uses AI and may make mistakes. Always verify medical information with your healthcare provider.
             </div>
