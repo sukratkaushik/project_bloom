@@ -704,7 +704,7 @@ export const LandingPage: React.FC = () => {
 
           <p className="text-[17px] md:text-[20px] text-medium mb-10 leading-relaxed">
             Track symptoms, count kicks, pack your hospital bag, and monitor blood pressure.
-            <strong className="text-charcoal font-semibold"> Core features free. AI tools coming soon.</strong>
+            <strong className="text-charcoal font-semibold"> Core features free. AI-powered tools included.</strong>
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
@@ -844,7 +844,7 @@ export const LandingPage: React.FC = () => {
               </div>
               <h3 className="font-serif text-[28px] font-bold text-charcoal mb-3">AI Food Safety Scanner</h3>
               <p className="text-[16px] text-medium leading-relaxed mb-6">
-                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our Gemini-powered AI verify it against food safety guidelines instantly.
+                Not sure if that street food or local fruit is safe during pregnancy? Snap a picture and let our AI verify it against food safety guidelines instantly.
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center gap-2 text-[14px] font-medium text-charcoal"><CheckCircle2 size={16} className="text-sage" /> Detects harmful ingredients</li>
@@ -1217,7 +1217,7 @@ export const LandingPage: React.FC = () => {
                   {[
                     "Everything in Standard plan",
                     "Bloom AI prenatal chatbot support 24/7",
-                    "Gemini-powered AI Food Safety Scanner",
+                    "AI-powered Food Safety Scanner",
                     "FHIR R4 EHR Doctor Report Exports",
                     "Priority feature request channel"
                   ].map((feat, i) => (
