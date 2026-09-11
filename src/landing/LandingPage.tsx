@@ -1239,13 +1239,13 @@ export const LandingPage: React.FC = () => {
           </div>
 
           {/* Pre-Pricing Transition Bridge */}
-          <div className="mt-10 max-w-2xl mx-auto bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-5 md:p-6 text-center text-white shadow-md">
+          <div className="mt-8 md:mt-10 w-full bg-white/10 backdrop-blur-md border border-white/30 rounded-2xl p-5 md:p-6 lg:px-8 text-white shadow-md">
             <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
               <div>
                 <h4 className="font-serif text-[18px] md:text-[20px] font-bold mb-1">
                   Care built for your world
                 </h4>
-                <p className="text-white/85 text-[13px]">
+                <p className="text-white/85 text-[13px] md:text-[14px]">
                   Explore plans starting at just ₹199/month below.
                 </p>
               </div>
