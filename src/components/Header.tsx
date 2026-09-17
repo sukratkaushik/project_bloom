@@ -2,7 +2,7 @@ import React from 'react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { LanguageSelector } from './LanguageSelector';
-import { PromoBanner } from './PromoBanner';
+import { navigate } from '../utils/navigation';
 
 interface HeaderProps {
   isMobileMenuOpen?: boolean;
@@ -20,9 +20,8 @@ export const Header: React.FC<HeaderProps> = ({
   const { state, updateState, toggleDarkMode } = usePlanner();
 
   return (
-    <header className="bg-white border-b border-border sticky top-0 md:top-[14px] z-50 shadow-sm no-print md:rounded-[14px]">
-      <PromoBanner />
-      <div className="max-w-[1400px] mx-auto flex items-center justify-between min-h-[70px] px-4 md:px-10 lg:px-12">
+    <header className="bg-white border-b border-border sticky top-0 z-50 shadow-sm no-print w-full">
+      <div className="w-full mx-auto flex items-center justify-between min-h-[70px] px-4 md:px-10 lg:px-12">
 
         <div className="flex items-center shrink-0">
           {!hideMenuIcon && setIsMobileMenuOpen && (
@@ -62,6 +61,17 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
+          {/* Company Dropdown */}
+          <div className="relative group hidden md:block">
+            <button className="text-[14px] font-semibold text-charcoal hover:text-sage transition-colors flex items-center gap-1 cursor-pointer py-2">
+              Company <span className="text-[9px] opacity-70 transition-transform group-hover:rotate-180">▼</span>
+            </button>
+            <div className="absolute top-[100%] right-0 mt-1 w-44 bg-white border border-border/80 rounded-xl shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 flex flex-col py-2 z-50">
+              <a href="/team" onClick={(e) => { e.preventDefault(); navigate('/team'); }} className="px-4 py-2.5 text-[13px] font-semibold text-charcoal/80 hover:text-sage hover:bg-sage-pale/40 transition-colors text-left">Our Team</a>
+              <a href="/blogs" onClick={(e) => { e.preventDefault(); navigate('/blogs'); }} className="px-4 py-2.5 text-[13px] font-semibold text-charcoal/80 hover:text-sage hover:bg-sage-pale/40 transition-colors text-left">Blogs</a>
+              <a href="/careers" onClick={(e) => { e.preventDefault(); navigate('/careers'); }} className="px-4 py-2.5 text-[13px] font-semibold text-charcoal/80 hover:text-sage hover:bg-sage-pale/40 transition-colors text-left">Careers</a>
+            </div>
+          </div>
           <LanguageSelector />
           
           {/* Mobile Dark Mode Toggle */}

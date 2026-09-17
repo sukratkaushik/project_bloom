@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import { navigate } from '../utils/navigation';
+import { PublicHeader } from './PublicHeader';
 
 export const PrivacyPolicy: React.FC = () => {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
@@ -36,13 +37,17 @@ export const PrivacyPolicy: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cream py-12 px-6 sm:px-12">
-      <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
-        <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </a>
-        <h1 className="font-serif text-4xl text-charcoal mb-6">Privacy Policy</h1>
-        <div className="prose prose-sage max-w-none text-medium space-y-4">
+    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+      <PublicHeader />
+      <div className="pt-32 pb-16 px-4 sm:px-6 md:px-12 relative z-10">
+        {toastMessage && (
+          <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[60] bg-charcoal text-white px-4 py-2 rounded-lg shadow-lg text-[13px] font-medium animate-in fade-in slide-in-from-top-4">
+            {toastMessage}
+          </div>
+        )}
+        <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
+          <h1 className="font-serif text-4xl text-charcoal mb-6">Privacy Policy</h1>
+          <div className="prose prose-sage max-w-none text-medium space-y-4">
           <p><strong>Last Updated:</strong> September 2026</p>
           <p>Welcome to Our Pregnancy. Your privacy is critically important to us, especially given the sensitive nature of pregnancy and health data. This Privacy Policy explains how we collect, use, and protect your information.</p>
 
@@ -92,11 +97,7 @@ export const PrivacyPolicy: React.FC = () => {
           </div>
         </div>
       </div>
-      {toastMessage && (
-        <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">
-          <span>📋</span> {toastMessage}
-        </div>
-      )}
+      </div>
     </div>
   );
 };
@@ -107,12 +108,11 @@ export const TermsOfService: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-cream py-12 px-6 sm:px-12">
-      <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
-        <a href="/" onClick={(e) => { e.preventDefault(); navigate('/'); }} className="inline-flex items-center gap-2 text-sage hover:text-sage-dark font-semibold mb-8 transition-colors">
-          <ArrowLeft className="w-4 h-4" /> Back to Home
-        </a>
-        <h1 className="font-serif text-4xl text-charcoal mb-6">Terms of Service</h1>
+    <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+      <PublicHeader />
+      <div className="pt-32 pb-16 px-4 sm:px-6 md:px-12 relative z-10">
+        <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">
+          <h1 className="font-serif text-4xl text-charcoal mb-6">Terms of Service</h1>
         <div className="prose prose-sage max-w-none text-medium space-y-4">
           <p><strong>Last Updated:</strong> April 2026</p>
           <p>Please read these Terms of Service carefully before using the Our Pregnancy app.</p>
@@ -137,6 +137,7 @@ export const TermsOfService: React.FC = () => {
           <p>We reserve the right to modify or replace these Terms at any time. We will provide notice of any significant changes.</p>
         </div>
       </div>
+    </div>
     </div>
   );
 };

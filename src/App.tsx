@@ -9,6 +9,8 @@ import { SetupScreen } from './components/SetupScreen';
 import { Dashboard } from './components/Dashboard';
 import { LandingPage } from './landing/LandingPage';
 import { TeamPage } from './landing/TeamPage';
+import { BlogsPage } from './landing/BlogsPage';
+import { CareersPage } from './landing/CareersPage';
 import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
 import { CheckoutPage } from './components/CheckoutPage';
@@ -100,6 +102,10 @@ const AppContent: React.FC = () => {
 
   if (currentPath === '/team') {
     content = <TeamPage />;
+  } else if (currentPath === '/blogs') {
+    content = <BlogsPage />;
+  } else if (currentPath === '/careers') {
+    content = <CareersPage />;
   } else if (currentPath === '/privacy') {
     content = <PrivacyPolicy />;
   } else if (currentPath === '/terms') {
