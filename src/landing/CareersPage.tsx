@@ -14,7 +14,7 @@ export const CareersPage: React.FC = () => {
 
   const recipientEmail = 'founder@ourpregnancy.in';
   const subject = 'Unsolicited Application - Careers';
-  const body = 'Hi Sukrat,\n\nI would love to join the Our Pregnancy team. Please find my background and resume attached.\n\nBest regards,';
+  const body = 'Hello Our Pregnancy Team,\n\nI would love to join the Our Pregnancy team. Please find my background and resume attached.\n\nBest regards,';
 
   const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
