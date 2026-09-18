@@ -1531,6 +1531,8 @@ export const LandingPage: React.FC = () => {
 
           <div className="flex flex-col md:flex-row md:justify-end gap-4 md:gap-8 text-[14px] text-light">
             <a href="/team" onClick={(e) => { e.preventDefault(); navigate('/team'); }} className="hover:text-white transition-colors">Meet the Team</a>
+            <a href="/blogs" onClick={(e) => { e.preventDefault(); navigate('/blogs'); }} className="hover:text-white transition-colors">Blogs</a>
+            <a href="/careers" onClick={(e) => { e.preventDefault(); navigate('/careers'); }} className="hover:text-white transition-colors">Careers</a>
             <a href="/privacy" onClick={(e) => { e.preventDefault(); navigate('/privacy'); }} className="hover:text-white transition-colors">Privacy Policy</a>
             <a href="/terms" onClick={(e) => { e.preventDefault(); navigate('/terms'); }} className="hover:text-white transition-colors">Terms of Service</a>
             <a href="mailto:support@ourpregnancy.in" onClick={(e) => handleEmailClick("support@ourpregnancy.in", e)} className="hover:text-white transition-colors">support@ourpregnancy.in</a>
