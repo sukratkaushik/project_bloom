@@ -1,16 +1,41 @@
-import React, { useEffect } from 'react';
-import { ArrowLeft, Sparkles, MailPlus, Briefcase } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { Sparkles, MailPlus, Briefcase, Copy, Check, ExternalLink } from 'lucide-react';
 import { usePlanner } from '../store';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { PublicHeader } from '../components/PublicHeader';
-import { navigate } from '../utils/navigation';
 
 export const CareersPage: React.FC = () => {
-  const { state, toggleDarkMode } = usePlanner();
+  const { state } = usePlanner();
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  const recipientEmail = 'founder@ourpregnancy.in';
+  const subject = 'Unsolicited Application - Careers';
+  const body = 'Hi Sukrat,\n\nI would love to join the Our Pregnancy team. Please find my background and resume attached.\n\nBest regards,';
+
+  const mailtoUrl = `mailto:${recipientEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${recipientEmail}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+  const copyToClipboard = () => {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(recipientEmail).catch(() => {});
+    }
+    setCopied(true);
+    setToastMessage(`Copied ${recipientEmail} to clipboard!`);
+    setTimeout(() => {
+      setToastMessage(null);
+      setCopied(false);
+    }, 4000);
+  };
+
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    copyToClipboard();
+    window.location.href = mailtoUrl;
+  };
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
@@ -55,21 +80,55 @@ export const CareersPage: React.FC = () => {
               Don't see a role that fits you perfectly? We're always open to hearing from talented designers, engineers, medical professionals, and innovators. Drop us an email with your resume and a brief note on how you can contribute!
             </p>
 
-            <a
-              href="mailto:sukrat.kaushik@ourpregnancy.in?subject=Unsolicited%20Application%20-%20Careers"
-              className="inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[16px] transition-all hover:bg-sage-dark hover:-translate-y-1 hover:shadow-md"
-            >
-              <MailPlus size={20} />
-              Apply Now
-            </a>
-            
-            <p className="text-light text-[13px] mt-6">
-              Send your application to <span className="font-semibold text-charcoal">sukrat.kaushik@ourpregnancy.in</span>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+              <a
+                href={mailtoUrl}
+                onClick={handleApplyClick}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[15px] sm:text-[16px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-md cursor-pointer active:scale-98"
+              >
+                <MailPlus size={19} />
+                Apply Now
+              </a>
+
+              <a
+                href={gmailUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => {
+                  setToastMessage('Opening Gmail composer...');
+                  setTimeout(() => setToastMessage(null), 3000);
+                }}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white text-charcoal border border-border rounded-full font-semibold px-6 py-4 text-[15px] transition-all hover:bg-cream hover:-translate-y-0.5 hover:shadow-sm"
+              >
+                <ExternalLink size={17} className="text-sage" />
+                Open in Gmail
+              </a>
+            </div>
+
+            <p className="text-light text-[13px] mt-6 flex items-center justify-center gap-1.5 flex-wrap">
+              <span>Send your application to</span>
+              <button
+                type="button"
+                onClick={copyToClipboard}
+                className="inline-flex items-center gap-1 font-semibold text-charcoal hover:text-sage underline cursor-pointer transition-colors"
+                title="Click to copy email address"
+              >
+                <span>{recipientEmail}</span>
+                {copied ? <Check size={14} className="text-sage" /> : <Copy size={13} className="opacity-70" />}
+              </button>
             </p>
           </div>
         </div>
 
       </main>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-xl flex items-center gap-2.5 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-white/20 whitespace-nowrap">
+          <span>📋</span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
     </div>
   );
 };
