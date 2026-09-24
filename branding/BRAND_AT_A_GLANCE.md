@@ -30,8 +30,7 @@ Critical          #d97777   Destructive actions only
 
 ```
 Headings    Playfair Display     sentence case, never Title Case
-Body / UI   Nunito → Inter       16px preferred, 1.6 line-height
-Calm Mode   Lexend everywhere    dyslexia-friendly, 1.85 line-height
+Body / UI   Plus Jakarta Sans / Inter   16px preferred, 1.6 line-height (clean, high legibility)
 ```
 
 ## The voice
@@ -45,7 +44,7 @@ Calm Mode   Lexend everywhere    dyslexia-friendly, 1.85 line-height
 - Sentence case everywhere except ≤3-word overlines.
 - Sparing emoji: 🌸 ✨ 🤍 🌿 🇮🇳 🤰🏻.
 - **Core features free** — never "everything free", "pay nothing", or "free forever".
-- **Private & secure** — never "privacy-first" or "stays on your device" (we use Firebase cloud sync).
+- **Private & secure** — local-first on device (Dexie.js / IndexedDB) with optional encrypted cloud backup.
 
 ## The logo
 
@@ -55,13 +54,13 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 
 - **Radius:** 16px standard, 24px cards/modals, 32px feature bento cards, pill buttons.
 - **Shadows:** soft and warm — `0 4px 20px -4px rgba(44, 62, 80, 0.05)`.
-- **Motion:** fade + 4–16px translate. 160 / 240 / 480 ms. Calm Mode 2.5× slower.
+- **Motion:** subtle fade + 4–16px translate (160 / 240 / 480 ms). Sensory-friendly and distraction-free by default.
 
-## The three modes
+## Visual presentation
 
-- **Light** — default, day, marketing
-- **Dark** — late-night tracking
-- **Calm** — anxiety, accessibility, 3am wake-ups (Lexend + 2.5× motion)
+- **Sensory-friendly default** — clean, distraction-free interface without flashing ads, aggressive tickers, or panic-inducing countdowns.
+- **High-legibility typography** — optimized for nighttime viewing without eye strain.
+
 
 ## The features (what we sell)
 
@@ -90,7 +89,7 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 - Priority feature request channel
 
 ### Also in-app (across tiers)
-- Foods Database, Emergency Ready (108/112/iCall), Language Selector (12 languages — 11 Indian + German), Daily Knowledge Drop with streak, Wearable Integrations (Apple Health, Oura, Google Fit, Garmin, Fitbit — Labor Readiness only), Vaccination Reminders, Safe Travel Guide, Notes & Journal, Medical Reports, Calm Mode, Dark Mode
+- Foods Database, Emergency Ready (108/112/iCall), Language Selector (12 languages — 11 Indian + German), Daily Knowledge Drop with streak, Wearable Integrations (Apple Health, Oura, Google Fit, Garmin, Fitbit — Labor Readiness only), Vaccination Reminders, Safe Travel Guide, Notes & Journal, Medical Reports, Dark Mode
 
 ## The non-negotiables
 
@@ -103,6 +102,7 @@ A soft minimalist lotus whose lower petals form the curve of a pregnant belly. P
 7. **Never claim "free forever / no hidden costs / privacy-first"** as absolute pitches — Free is a tier, not the whole product. Use "3-tier pricing", "core tracking is free", "encrypted and only accessible by you".
 8. **Never call AI features "coming soon"** — Standard + Premium ship today with real pricing. That phrasing was retired in June 2026 (v1.5).
 9. **Labor Readiness Score is always framed as "Conceptual / Simulated"** — no ACOG/WHO guideline validates it. Always paired with the "Do not use for medical decisions" disclaimer.
+10. **Product Accuracy Guardrail (Retired "Calm Mode" & Font Spec):** Never claim a "Calm Mode" toggle (the entire app is calm & sensory-friendly by default), never mention "Lexend" or "dyslexia-friendly font" (bundle standardizes on Plus Jakarta Sans, Inter, Playfair Display), and never claim "2.5× slower animations" (standard clean micro-interactions). Emphasize zero clickbait/ads, ACOG/FOGSI clinical baselines, local-first IndexedDB privacy, and 24/7 Bloom AI.
 
 ## The asset surfaces
 
