@@ -226,6 +226,13 @@ export const MobileShell: React.FC = () => {
               <TodayTab
                 onOpenTool={handleOpenTool}
                 onOpenAddRituals={() => setShowAddRitualsModal(true)}
+                onOpenSchedule={() => setShowScheduleModal(true)}
+                onSelectTab={(tab) => {
+                  setActiveToolId(null);
+                  setActiveTab(tab as 'today' | 'explore' | 'care' | 'smart' | 'vault');
+                  scrollToTop();
+                }}
+                onShowToast={showToast}
               />
             )}
             {activeTab === 'explore' && (

@@ -1,16 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../../../db';
 import { usePlanner } from '../../../store';
-import { Footprints, Droplets, Activity, Sparkles, ChevronRight, Plus, Calendar, ShieldCheck, Wind, Music } from 'lucide-react';
+import { WEEKLY_DATA } from '../../../weeklyData';
+import { v4 as uuidv4 } from 'uuid';
+import {
+  Footprints,
+  Droplets,
+  Activity,
+  Sparkles,
+  ChevronRight,
+  Plus,
+  Calendar,
+  ShieldCheck,
+  Wind,
+  Clock,
+  Check,
+  Stethoscope,
+  Phone,
+  Heart,
+  Pill,
+  CheckCircle2,
+  RotateCcw,
+} from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 
 interface TodayTabProps {
   onOpenTool: (toolId: string) => void;
   onOpenAddRituals: () => void;
+  onOpenSchedule?: () => void;
+  onSelectTab?: (tab: string) => void;
+  onShowToast?: (message: string) => void;
 }
 
-export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals }) => {
+export const TodayTab: React.FC<TodayTabProps> = ({
+  onOpenTool,
+  onOpenAddRituals,
+  onOpenSchedule,
+  onSelectTab,
+  onShowToast,
+}) => {
   const { state } = usePlanner();
 
   // Gestational calculations
@@ -21,34 +50,81 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
   const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
   const progressPercent = Math.min(100, Math.max(1, Math.round((completedDays / 280) * 100)));
 
-  // Trimester calculation
-  let trimester = 1;
-  let trimesterName = 'Trimester 1';
-  if (currentWeek > 27) {
-    trimester = 3;
+  // Interactive selected week for timeline preview
+  const [selectedWeek, setSelectedWeek] = useState<number>(currentWeek);
+
+  // Sync selected week when currentWeek changes
+  useEffect(() => {
+    setSelectedWeek(currentWeek);
+  }, [currentWeek]);
+
+  // Scroller ref for week timeline
+  const weekTimelineRef = useRef<HTMLDivElement>(null);
+  const currentWeekPillRef = useRef<HTMLButtonElement>(null);
+
+  // Auto-scroll timeline to current week on mount
+  useEffect(() => {
+    if (currentWeekPillRef.current && weekTimelineRef.current) {
+      currentWeekPillRef.current.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
+    }
+  }, [currentWeek]);
+
+  // Selected week developmental data from weeklyData.ts
+  const weekInfo = WEEKLY_DATA[selectedWeek - 1] || WEEKLY_DATA[0];
+
+  // Trimester calculation based on selected week
+  let trimesterName = 'Trimester 1 • Early Formation';
+  if (selectedWeek > 27) {
     trimesterName = 'Trimester 3 • The Final Stretch';
-  } else if (currentWeek > 13) {
-    trimester = 2;
+  } else if (selectedWeek > 13) {
     trimesterName = 'Trimester 2 • Golden Period';
   }
 
-  // Fruit/veggie baby sizes for weeks
-  const babySizes: Record<number, { name: string; icon: string; length: string; weight: string }> = {
-    8: { name: 'Raspberry', icon: '🫐', length: '1.6 cm', weight: '1 g' },
-    12: { name: 'Lime', icon: '🍋', length: '5.4 cm', weight: '14 g' },
-    16: { name: 'Avocado', icon: '🥑', length: '11.6 cm', weight: '100 g' },
-    20: { name: 'Banana', icon: '🍌', length: '25.6 cm', weight: '300 g' },
-    24: { name: 'Ear of Corn', icon: '🌽', length: '30.0 cm', weight: '600 g' },
-    28: { name: 'Eggplant', icon: '🍆', length: '37.6 cm', weight: '1.0 kg' },
-    32: { name: 'Coconut', icon: '🥥', length: '42.4 cm', weight: '1.7 kg' },
-    36: { name: 'Papaya', icon: '🍈', length: '47.4 cm', weight: '2.6 kg' },
-    40: { name: 'Watermelon', icon: '🍉', length: '51.2 cm', weight: '3.4 kg' },
+  // Clinical milestone guidance derived from gestational week
+  const getClinicalCheckup = (week: number) => {
+    if (week <= 13) {
+      return {
+        title: 'NT Scan & Dual Marker Blood Screen',
+        desc: 'Nuchal translucency ultrasound & genetic risk assessment.',
+        badge: 'Recommended Week 11-13',
+        daysAway: 'In 4 Days',
+      };
+    } else if (week <= 22) {
+      return {
+        title: 'Level II TIFFA Anomaly Ultrasound',
+        desc: 'Detailed anatomical scan assessing fetal organs & spine.',
+        badge: 'Recommended Week 18-20',
+        daysAway: 'In 5 Days',
+      };
+    } else if (week <= 28) {
+      return {
+        title: 'OGTT Glucose Screen & Growth Check',
+        desc: 'Gestational diabetes evaluation & maternal hemoglobin test.',
+        badge: 'Recommended Week 24-28',
+        daysAway: 'In 6 Days',
+      };
+    } else if (week <= 34) {
+      return {
+        title: 'Growth Scan & Placental Doppler',
+        desc: 'Amniotic fluid index (AFI) check & fetal presentation check.',
+        badge: 'Recommended Week 32-34',
+        daysAway: 'In 3 Days',
+      };
+    } else {
+      return {
+        title: 'Non-Stress Test (NST) & Group B Strep',
+        desc: 'Bi-weekly cardiotocography check & labor readiness review.',
+        badge: 'Recommended Week 36-40',
+        daysAway: 'In 2 Days',
+      };
+    }
   };
 
-  const closestWeekKey = Object.keys(babySizes)
-    .map(Number)
-    .reduce((prev, curr) => (Math.abs(curr - currentWeek) < Math.abs(prev - currentWeek) ? curr : prev), 24);
-  const babySize = babySizes[closestWeekKey];
+  const checkup = getClinicalCheckup(currentWeek);
 
   // Dexie live queries for today's logs
   const todayStr = new Date().toISOString().split('T')[0];
@@ -59,6 +135,8 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
     [activeJourneyId, todayStr]
   );
   const totalWaterMl = (todayWaterLogs || []).reduce((acc, log) => acc + log.amountMl, 0);
+  const waterGoalMl = 2500;
+  const waterPercent = Math.min(100, Math.round((totalWaterMl / waterGoalMl) * 100));
 
   const todayKickSessions = useLiveQuery(
     () => db.kickSessions.where('journeyId').equals(activeJourneyId).reverse().limit(1).toArray(),
@@ -73,46 +151,233 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
   const latestBp = todayVitals?.[0]
     ? `${todayVitals[0].systolic}/${todayVitals[0].diastolic}`
     : '118/76';
+  const latestPulse = todayVitals?.[0]?.pulse || 74;
+
+  const todaySupplements = useLiveQuery(
+    () => db.supplementLogs.where('[journeyId+date]').equals([activeJourneyId, todayStr]).toArray(),
+    [activeJourneyId, todayStr]
+  );
+  const todaySuppLog = todaySupplements?.[0];
+  const takenSupps = todaySuppLog?.supplementsTaken || [];
+  const essentialSupps = ['folic', 'iron', 'calcium'];
+  const allSuppsTaken = essentialSupps.every((s) => takenSupps.includes(s));
+
+  // 1-Tap Quick Actions
+  const handleQuickWater = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+    await db.hydrationLogs.put({
+      id: uuidv4(),
+      journeyId: activeJourneyId,
+      date: todayStr,
+      timestamp: Date.now(),
+      amountMl: 250,
+    });
+    if (onShowToast) {
+      onShowToast('💧 Added 250ml water (1 glass)');
+    }
+  };
+
+  const handleQuickKick = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+    const existing = todayKickSessions?.[0];
+    const nowTs = Date.now();
+
+    if (existing && !existing.completed && (nowTs - existing.updatedAt < 3600000)) {
+      const updatedCount = (existing.kickCount || 0) + 1;
+      await db.kickSessions.update(existing.id, {
+        kickCount: updatedCount,
+        completed: updatedCount >= 10,
+        endTime: nowTs,
+        updatedAt: nowTs,
+      });
+      if (onShowToast) {
+        onShowToast(`👣 Kick recorded! (${updatedCount}/10)`);
+      }
+    } else {
+      const newCount = (existing?.kickCount && existing.kickCount < 10) ? existing.kickCount + 1 : 1;
+      await db.kickSessions.put({
+        id: uuidv4(),
+        journeyId: activeJourneyId,
+        startTime: nowTs,
+        endTime: nowTs,
+        kickCount: newCount,
+        completed: newCount >= 10,
+        createdAt: nowTs,
+        updatedAt: nowTs,
+      });
+      if (onShowToast) {
+        onShowToast(`👣 Kick recorded! (${newCount}/10)`);
+      }
+    }
+  };
+
+  const handleQuickSupplements = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    triggerHaptic('medium');
+    const newSupps = allSuppsTaken
+      ? takenSupps.filter((s) => !essentialSupps.includes(s))
+      : Array.from(new Set([...takenSupps, ...essentialSupps]));
+
+    if (todaySuppLog) {
+      await db.supplementLogs.update(todaySuppLog.id, { supplementsTaken: newSupps });
+    } else {
+      await db.supplementLogs.put({
+        id: uuidv4(),
+        journeyId: activeJourneyId,
+        date: todayStr,
+        supplementsTaken: newSupps,
+      });
+    }
+    if (onShowToast) {
+      onShowToast(allSuppsTaken ? '💊 Daily vitamins unmarked' : '💊 Daily prenatal vitamins logged!');
+    }
+  };
 
   return (
     <div className="space-y-4 pb-24 animate-in fade-in duration-200">
-      {/* 1. Gestational Hero Card */}
+      {/* 1. Interactive Horizontal Week Timeline Scroller (Week 1–40) */}
+      <div className="bg-white/90 backdrop-blur-xs border border-border/80 rounded-2xl p-2.5 shadow-2xs">
+        <div className="flex items-center justify-between px-1.5 mb-1.5 text-[11px] font-semibold text-medium">
+          <span className="uppercase tracking-wider">Gestational Timeline</span>
+          {selectedWeek !== currentWeek ? (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setSelectedWeek(currentWeek);
+                if (currentWeekPillRef.current) {
+                  currentWeekPillRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    inline: 'center',
+                    block: 'nearest',
+                  });
+                }
+              }}
+              className="text-sage-dark hover:underline flex items-center gap-1 font-bold cursor-pointer"
+            >
+              <RotateCcw size={11} />
+              <span>Back to Week {currentWeek}</span>
+            </button>
+          ) : (
+            <span className="text-sage-dark font-bold">Week {currentWeek} (Today)</span>
+          )}
+        </div>
+
+        <div
+          ref={weekTimelineRef}
+          className="flex items-center gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 px-0.5"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {Array.from({ length: 40 }, (_, i) => i + 1).map((w) => {
+            const isCurrent = w === currentWeek;
+            const isSelected = w === selectedWeek;
+            const wEmoji = WEEKLY_DATA[w - 1]?.babyEmoji || '🌱';
+
+            return (
+              <button
+                key={w}
+                ref={isCurrent ? currentWeekPillRef : null}
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setSelectedWeek(w);
+                }}
+                className={`flex flex-col items-center justify-center min-w-[54px] py-1.5 px-1 rounded-xl transition-all shrink-0 cursor-pointer ${
+                  isSelected
+                    ? 'bg-sage-dark text-white font-bold shadow-xs scale-102'
+                    : isCurrent
+                    ? 'bg-sage-pale text-sage-dark font-bold border border-sage/40'
+                    : 'bg-cream/70 hover:bg-cream text-charcoal/80 border border-border/70'
+                }`}
+              >
+                <span className="text-[10.5px] tracking-tight">Wk {w}</span>
+                <span className="text-[16px] my-0.5 leading-none">{wEmoji}</span>
+                {isCurrent ? (
+                  <span
+                    className={`text-[8.5px] uppercase font-bold tracking-tight px-1 rounded-full ${
+                      isSelected ? 'bg-white text-sage-dark' : 'bg-sage-dark text-white'
+                    }`}
+                  >
+                    Now
+                  </span>
+                ) : (
+                  <span className="text-[8.5px] text-light">
+                    {w <= 13 ? 'T1' : w <= 27 ? 'T2' : 'T3'}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 2. Gestational Hero Card (Live or Preview) */}
       <div className="bg-gradient-to-br from-white via-cream to-sage-pale/40 border border-border/80 rounded-3xl p-5 shadow-xs relative overflow-hidden">
         <div className="flex items-start justify-between">
           <div>
-            <span className="inline-block bg-sage/15 text-sage-dark text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider mb-1.5 border border-sage/20">
-              {trimesterName}
-            </span>
-            <h1 className="font-serif text-[26px] font-bold text-charcoal tracking-tight leading-tight">
-              Week {currentWeek}
+            <div className="flex items-center gap-1.5 mb-1.5">
+              <span className="inline-block bg-sage/15 text-sage-dark text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-sage/20">
+                {trimesterName}
+              </span>
+              {selectedWeek !== currentWeek && (
+                <span className="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-200">
+                  Preview
+                </span>
+              )}
+            </div>
+            <h1 className="font-serif text-[28px] font-bold text-charcoal tracking-tight leading-tight">
+              Week {selectedWeek}
             </h1>
             <p className="text-[13px] text-medium font-medium mt-0.5">
-              {diffDays} Days Remaining until Due Date
+              {selectedWeek === currentWeek
+                ? `${diffDays} Days Remaining until Due Date`
+                : `Developmental preview for gestational week ${selectedWeek}`}
             </p>
           </div>
 
-          <div className="w-16 h-16 rounded-2xl bg-white/90 border border-border/70 shadow-xs flex flex-col items-center justify-center shrink-0">
-            <span className="text-3xl leading-none">{babySize.icon}</span>
-            <span className="text-[9.5px] font-bold text-medium mt-1 uppercase tracking-wide">
-              {babySize.name.split(' ')[0]}
+          <div className="w-18 h-18 rounded-2xl bg-white/95 border border-border/80 shadow-xs flex flex-col items-center justify-center shrink-0 p-1">
+            <span className="text-3xl leading-none">{weekInfo.babyEmoji}</span>
+            <span className="text-[10px] font-bold text-charcoal mt-1 text-center truncate max-w-[62px]">
+              {weekInfo.babySizeAnalogy.split(' ')[0]}
             </span>
           </div>
         </div>
 
         {/* Baby Metrology Row */}
-        <div className="mt-4 pt-3 border-t border-border/60 flex items-center justify-between text-[12px]">
+        <div className="mt-4 pt-3 border-t border-border/60 grid grid-cols-3 gap-2 text-[12px]">
           <div>
-            <span className="text-medium text-[11px]">Size of baby:</span>
-            <p className="font-bold text-charcoal">{babySize.name}</p>
+            <span className="text-medium text-[11px] block">Size Analogy:</span>
+            <p className="font-bold text-charcoal truncate">{weekInfo.babySizeAnalogy}</p>
           </div>
           <div className="text-center">
-            <span className="text-medium text-[11px]">Est. Length:</span>
-            <p className="font-bold text-charcoal">{babySize.length}</p>
+            <span className="text-medium text-[11px] block">Est. Length:</span>
+            <p className="font-bold text-charcoal">{weekInfo.length}</p>
           </div>
           <div className="text-right">
-            <span className="text-medium text-[11px]">Est. Weight:</span>
-            <p className="font-bold text-charcoal">{babySize.weight}</p>
+            <span className="text-medium text-[11px] block">Est. Weight:</span>
+            <p className="font-bold text-charcoal">{weekInfo.weight}</p>
           </div>
+        </div>
+
+        {/* Weekly Fetal Highlight Snippet */}
+        <div className="mt-3 p-3 bg-white/75 rounded-2xl border border-sage/20 text-[12.5px] leading-relaxed text-charcoal/90">
+          <p className="line-clamp-2">
+            <span className="font-bold text-sage-dark">Baby's Growth: </span>
+            {weekInfo.babyDev}
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('dev');
+            }}
+            className="mt-1.5 inline-flex items-center gap-1 text-[11.5px] font-bold text-sage-dark hover:underline cursor-pointer"
+          >
+            <span>Full 40-week organogenesis timeline</span>
+            <ChevronRight size={13} />
+          </button>
         </div>
 
         {/* Gestational Progress Bar */}
@@ -130,11 +395,158 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
         </div>
       </div>
 
-      {/* 2. Your Daily Rituals (Customizable 4-Grid) */}
+      {/* 3. Hero Upcoming Checkup Card */}
+      <div className="bg-gradient-to-br from-sage-pale/60 via-white to-cream border border-sage/35 rounded-3xl p-4.5 shadow-xs">
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2.5">
+            <div className="w-10 h-10 rounded-2xl bg-sage-dark text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <Stethoscope size={20} />
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold text-sage-dark uppercase tracking-wider">
+                  Upcoming Checkup
+                </span>
+                <span className="text-[9.5px] font-bold bg-sage/15 text-sage-dark px-2 py-0.2 rounded-full">
+                  {checkup.daysAway}
+                </span>
+              </div>
+              <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight mt-0.5">
+                {checkup.title}
+              </h3>
+            </div>
+          </div>
+
+          <a
+            href="tel:+919876543210"
+            onClick={() => triggerHaptic('light')}
+            className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0"
+            title="Call Clinic"
+            aria-label="Call Clinic"
+          >
+            <Phone size={15} />
+          </a>
+        </div>
+
+        <p className="text-[12px] text-medium mt-2 leading-relaxed">
+          {checkup.desc}
+        </p>
+
+        <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-[11.5px]">
+          <div className="flex items-center gap-1.5 text-medium">
+            <Clock size={13} className="text-sage-dark" />
+            <span className="font-medium truncate max-w-[150px]">Dr. Priya Sharma • Cloudnine</span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {onOpenSchedule && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  onOpenSchedule();
+                }}
+                className="text-[11.5px] font-bold text-medium hover:text-charcoal px-2 py-1 rounded-lg hover:bg-black/5 transition-colors cursor-pointer"
+              >
+                Reschedule
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onSelectTab) {
+                  onSelectTab('care');
+                } else {
+                  onOpenTool('medical');
+                }
+              }}
+              className="px-3 py-1.5 bg-sage-dark text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <span>Scan Checklist</span>
+              <ChevronRight size={13} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. Side-by-Side Bento Vitals Grid (Blood Pressure & Kicks) */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Left Bento: Blood Pressure & Heart Rate */}
+        <div
+          onClick={() => {
+            triggerHaptic('light');
+            onOpenTool('vitals');
+          }}
+          className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
+                <Heart size={17} />
+              </div>
+              <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                NORMAL
+              </span>
+            </div>
+            <p className="text-[11.5px] font-semibold text-medium">Blood Pressure</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="font-serif font-bold text-charcoal text-[20px] leading-tight">
+                {latestBp}
+              </span>
+              <span className="text-[10px] text-light font-bold">mmHg</span>
+            </div>
+          </div>
+
+          <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-medium">
+            <span>Pulse</span>
+            <span className="font-bold text-charcoal">{latestPulse} bpm</span>
+          </div>
+        </div>
+
+        {/* Right Bento: Fetal Kick Counter with 1-Tap Micro Action */}
+        <div
+          onClick={() => {
+            triggerHaptic('light');
+            onOpenTool('kickcounter');
+          }}
+          className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center">
+                <Footprints size={17} />
+              </div>
+              <span className="text-[9.5px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-2 py-0.5 rounded-full">
+                {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
+              </span>
+            </div>
+            <p className="text-[11.5px] font-semibold text-medium">Fetal Kicks</p>
+            <div className="flex items-baseline gap-1 mt-0.5">
+              <span className="font-serif font-bold text-charcoal text-[20px] leading-tight">
+                {latestKicks}
+              </span>
+              <span className="text-[11px] text-medium font-medium">/ 10 today</span>
+            </div>
+          </div>
+
+          {/* Micro 1-Tap Quick Log Button */}
+          <button
+            type="button"
+            onClick={handleQuickKick}
+            className="mt-2.5 w-full py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <Plus size={13} strokeWidth={2.5} />
+            <span>+1 Kick</span>
+          </button>
+        </div>
+      </div>
+
+      {/* 5. Daily Health Rituals with 1-Tap Micro-Actions (Hydration & Supplements) */}
       <div>
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-1.5">
-            <Calendar size={16} className="text-sage-dark" />
+            <Calendar size={15} className="text-sage-dark" />
             <h2 className="font-serif text-[16px] font-bold text-charcoal">
               Daily Health Rituals
             </h2>
@@ -147,107 +559,116 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
             }}
             className="text-[11.5px] text-sage-dark font-bold hover:underline flex items-center gap-0.5 cursor-pointer"
           >
-            <span>Edit</span>
+            <span>Customize</span>
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-2.5">
-          {/* Ritual Card 1: Kicks */}
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('kickcounter');
-            }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 text-left shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center">
-                <Footprints size={17} />
-              </div>
-              <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-1.5 py-0.5 rounded-full">
-                ACTIVE
-              </span>
-            </div>
-            <p className="font-bold text-charcoal text-[14px]">Kick Counter</p>
-            <p className="text-[12px] text-medium mt-0.5">
-              {latestKicks > 0 ? `${latestKicks} kicks logged` : 'Count 10 kicks'}
-            </p>
-          </button>
-
-          {/* Ritual Card 2: Hydration */}
-          <button
-            type="button"
+        <div className="grid grid-cols-2 gap-3">
+          {/* Card 1: Hydration Tracker with 1-Tap +250ml */}
+          <div
             onClick={() => {
               triggerHaptic('light');
               onOpenTool('hydration');
             }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 text-left shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer"
+            className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                <Droplets size={17} />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
+                  <Droplets size={17} />
+                </div>
+                <span className="text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
+                  {totalWaterMl >= waterGoalMl ? 'GOAL MET' : `${waterPercent}%`}
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded-full">
-                {totalWaterMl >= 2500 ? 'GOAL MET' : 'HYDRATE'}
-              </span>
-            </div>
-            <p className="font-bold text-charcoal text-[14px]">Water Tracker</p>
-            <p className="text-[12px] text-medium mt-0.5">
-              {(totalWaterMl / 1000).toFixed(2)}L of 2.5L
-            </p>
-          </button>
+              <p className="text-[11.5px] font-semibold text-medium">Hydration</p>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  {(totalWaterMl / 1000).toFixed(2)}L
+                </span>
+                <span className="text-[10.5px] text-light font-medium">/ 2.5L</span>
+              </div>
 
-          {/* Ritual Card 3: Vitals */}
-          <button
-            type="button"
+              {/* Mini progress bar */}
+              <div className="w-full bg-border/60 rounded-full h-1.5 mt-2 overflow-hidden">
+                <div
+                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${waterPercent}%` }}
+                />
+              </div>
+            </div>
+
+            {/* 1-Tap +250ml Action */}
+            <button
+              type="button"
+              onClick={handleQuickWater}
+              className="mt-2.5 w-full py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            >
+              <Plus size={12} strokeWidth={2.5} />
+              <span>+250ml Glass</span>
+            </button>
+          </div>
+
+          {/* Card 2: Daily Prenatal Supplements with 1-Tap Toggle */}
+          <div
             onClick={() => {
               triggerHaptic('light');
-              onOpenTool('vitals');
+              onOpenTool('nutrition');
             }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 text-left shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer"
+            className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
           >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-red-50 text-red-600 flex items-center justify-center">
-                <Activity size={17} />
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+                  <Pill size={17} />
+                </div>
+                <span
+                  className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${
+                    allSuppsTaken
+                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : 'text-amber-700 bg-amber-50 border-amber-200'
+                  }`}
+                >
+                  {allSuppsTaken ? 'TAKEN ✓' : `${takenSupps.length}/3 TAKEN`}
+                </span>
               </div>
-              <span className="text-[10px] font-bold text-green-700 bg-green-50 px-1.5 py-0.5 rounded-full">
-                NORMAL
-              </span>
+              <p className="text-[11.5px] font-semibold text-medium">Prenatal Vitamins</p>
+              <p className="text-[11px] text-charcoal font-bold mt-0.5 truncate">
+                Folic, Iron, Calcium
+              </p>
+              <p className="text-[10px] text-light mt-1">
+                {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
+              </p>
             </div>
-            <p className="font-bold text-charcoal text-[14px]">Blood Pressure</p>
-            <p className="text-[12px] text-medium mt-0.5">
-              {latestBp} mmHg
-            </p>
-          </button>
 
-          {/* Ritual Card 4: Ask Bloom AI */}
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('askourpregnancy');
-            }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 text-left shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer"
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
-                <Sparkles size={17} />
-              </div>
-              <span className="text-[10px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded-full">
-                AI OB-GYN
-              </span>
-            </div>
-            <p className="font-bold text-charcoal text-[14px]">Ask Bloom AI</p>
-            <p className="text-[12px] text-medium mt-0.5">
-              Questions & guidance
-            </p>
-          </button>
+            {/* 1-Tap Mark Taken Action */}
+            <button
+              type="button"
+              onClick={handleQuickSupplements}
+              className={`mt-2.5 w-full py-1.5 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer ${
+                allSuppsTaken
+                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  : 'bg-cream border border-border hover:border-sage text-charcoal'
+              }`}
+            >
+              {allSuppsTaken ? (
+                <>
+                  <CheckCircle2 size={12} className="text-emerald-600" />
+                  <span>Taken Today ✓</span>
+                </>
+              ) : (
+                <>
+                  <Plus size={12} strokeWidth={2.5} />
+                  <span>Mark Taken</span>
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 3. Mindful Breathing & Garbh Sanskar Card */}
-      <div 
+      {/* 6. Mindful Breathing & Garbh Sanskar Card */}
+      <div
         onClick={() => {
           triggerHaptic('light');
           onOpenTool('breathing');
@@ -256,15 +677,15 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-sage-dark text-white flex items-center justify-center shrink-0">
-              <Wind size={18} />
+            <div className="w-10 h-10 rounded-xl bg-sage-dark text-white flex items-center justify-center shrink-0 shadow-2xs">
+              <Wind size={19} />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-bold text-sage-dark uppercase tracking-wider">
+                <span className="text-[10.5px] font-bold text-sage-dark uppercase tracking-wider">
                   Maternal Peace & Bonding
                 </span>
-                <span className="text-[10px] font-medium bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full">
+                <span className="text-[9.5px] font-medium bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full">
                   100% Offline
                 </span>
               </div>
@@ -280,7 +701,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({ onOpenTool, onOpenAddRituals
         </div>
       </div>
 
-      {/* 4. Stage-Adaptive Milestone Action Card */}
+      {/* 7. Government Maternity Aid Milestone Card */}
       <div className="bg-gradient-to-r from-soft-saffron/10 via-white to-gold/10 border border-soft-saffron/30 rounded-2xl p-4 shadow-2xs">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-xl bg-soft-saffron/20 text-soft-saffron-dark flex items-center justify-center shrink-0 mt-0.5">
