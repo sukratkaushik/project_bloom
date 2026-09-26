@@ -1,16 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../store';
 import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
-import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, Trash2, AlertTriangle, Loader2, Sparkles } from 'lucide-react';
+import { User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
+import { ComplianceConsentModal } from '../ComplianceConsentModal';
+import { 
+  isBiometricLockEnabled, 
+  setBiometricLockEnabled, 
+  checkBiometricSupport, 
+  authenticateWithBiometrics, 
+  BiometricStatus 
+} from '../../utils/biometricService';
 
 export const Profile: React.FC = () => {
   const { state, updateState } = usePlanner();
   
   const [userName, setUserName] = useState(state.userName || '');
   const [showDisclaimer, setShowDisclaimer] = useState(false);
+  const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Self-service account deletion state
@@ -25,12 +34,13 @@ export const Profile: React.FC = () => {
     setDeleteError(null);
 
     try {
-      // 1. Invoke server-side account deletion
+      // 1. Invoke server-side account deletion (Cloud Firestore, Storage, Auth)
       await deleteMyOwnAccountCallable();
 
-      // 2. Clear local Dexie IndexedDB
+      // 2. Complete Local Erasure under DPDP Act 2023 Sec 12
       try {
         await Promise.all(dexieDb.tables.map(table => table.clear()));
+        await dexieDb.delete();
       } catch (dbErr) {
         console.warn("Could not clear local database:", dbErr);
       }
@@ -46,9 +56,8 @@ export const Profile: React.FC = () => {
       // 4. Sign out from Firebase Auth
       await signOut(auth);
 
-      // 5. Redirect to Landing Page
-      window.location.hash = '#/';
-      window.location.reload();
+      // 5. Redirect cleanly to root
+      window.location.href = '/';
     } catch (err: any) {
       console.error("Failed to delete account:", err);
       const msg = err?.message || "Failed to delete account. Please try again.";
@@ -109,6 +118,39 @@ export const Profile: React.FC = () => {
       } catch (err) {
         console.error("Failed to update AI processing consent:", err);
         setToastMessage("Failed to update AI settings. Please try again.");
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    }
+  };
+
+  const [isBiometricEnabled, setIsBiometricEnabled] = useState(isBiometricLockEnabled());
+  const [biometricInfo, setBiometricInfo] = useState<BiometricStatus | null>(null);
+
+  useEffect(() => {
+    checkBiometricSupport().then(setBiometricInfo);
+  }, []);
+
+  const handleToggleBiometric = async (enable: boolean) => {
+    if (enable) {
+      const res = await authenticateWithBiometrics('Verify your identity to enable Biometric Privacy Shield');
+      if (res.success) {
+        setBiometricLockEnabled(true);
+        setIsBiometricEnabled(true);
+        setToastMessage('Biometric Privacy Shield enabled');
+        setTimeout(() => setToastMessage(null), 3000);
+      } else {
+        setToastMessage('Biometric verification cancelled');
+        setTimeout(() => setToastMessage(null), 3000);
+      }
+    } else {
+      const res = await authenticateWithBiometrics('Verify your identity to disable Biometric Privacy Shield');
+      if (res.success) {
+        setBiometricLockEnabled(false);
+        setIsBiometricEnabled(false);
+        setToastMessage('Biometric Privacy Shield turned off');
+        setTimeout(() => setToastMessage(null), 3000);
+      } else {
+        setToastMessage('Biometric verification cancelled');
         setTimeout(() => setToastMessage(null), 3000);
       }
     }
@@ -325,6 +367,35 @@ export const Profile: React.FC = () => {
               </div>
             </div>
 
+            {/* Biometric Maternal Privacy Shield */}
+            <div id="biometric-lock-setting" className="p-4 bg-sage-pale/40 rounded-[16px] border border-sage/30">
+              <div className="flex items-start justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <Fingerprint className="w-5 h-5 text-sage shrink-0" />
+                    <h4 className="font-semibold text-charcoal text-sm">Biometric Privacy Shield (App Lock)</h4>
+                    {biometricInfo?.isSupported && (
+                      <span className="text-[10px] font-bold uppercase tracking-wider bg-sage/20 text-sage-dark px-2 py-0.5 rounded-full">
+                        {biometricInfo.label}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-medium text-xs sm:text-sm leading-relaxed">
+                    Lock maternal vitals and medical logs behind hardware-backed {biometricInfo?.label || 'Fingerprint / Face Unlock'}. Requires authentication on launch and after 1 minute of inactivity.
+                  </p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer shrink-0 mt-0.5" aria-label="Toggle Biometric Lock">
+                  <input
+                    type="checkbox"
+                    checked={isBiometricEnabled}
+                    onChange={(e) => handleToggleBiometric(e.target.checked)}
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
+                </label>
+              </div>
+            </div>
+
             <div className="p-4 bg-gray-50 rounded-[16px] border border-border">
               <h4 className="text-[12px] font-semibold tracking-wide uppercase text-light mb-2">Retention Policy</h4>
               <p className="text-medium text-sm leading-relaxed">
@@ -370,6 +441,21 @@ export const Profile: React.FC = () => {
           </div>
           
           <div className="space-y-3">
+            <button
+              type="button"
+              onClick={() => setShowComplianceModal(true)}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group text-left"
+            >
+              <div className="flex items-center gap-2.5">
+                <ShieldCheck className="w-4 h-4 text-terracotta" />
+                <span className="font-medium text-charcoal group-hover:text-terracotta">
+                  DPDP Data Rights & Medical Disclaimer (Bilingual)
+                </span>
+              </div>
+              <span className="text-terracotta font-semibold text-xs bg-terracotta/10 px-2.5 py-1 rounded-full">
+                Review
+              </span>
+            </button>
             <button onClick={() => setShowDisclaimer(true)} className="w-full flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group text-left">
               <span className="font-medium text-charcoal group-hover:text-sage">Medical Disclaimer</span>
               <span className="text-sage">→</span>
@@ -382,6 +468,14 @@ export const Profile: React.FC = () => {
               <span className="font-medium text-charcoal group-hover:text-sage">Terms of Service</span>
               <span className="text-sage">→</span>
             </a>
+            <a href="/blogs" onClick={(e) => { e.preventDefault(); navigate('/blogs'); }} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+              <span className="font-medium text-charcoal group-hover:text-sage">Pregnancy Blogs & Guides</span>
+              <span className="text-sage">→</span>
+            </a>
+            <a href="/careers" onClick={(e) => { e.preventDefault(); navigate('/careers'); }} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
+              <span className="font-medium text-charcoal group-hover:text-sage">Careers at Our Pregnancy</span>
+              <span className="text-sage">→</span>
+            </a>
             <a href="mailto:grievance@ourpregnancy.in" onClick={(e) => handleEmailClick("grievance@ourpregnancy.in", e)} className="flex items-center justify-between p-4 bg-gray-50 rounded-[16px] border border-border hover:bg-sage-pale/50 transition-colors cursor-pointer group">
               <span className="font-medium text-charcoal group-hover:text-sage">Contact Support / Grievance Officer</span>
               <span className="text-sage">→</span>
@@ -390,6 +484,13 @@ export const Profile: React.FC = () => {
         </section>
 
       </div>
+
+      {showComplianceModal && (
+        <ComplianceConsentModal
+          forceOpen={true}
+          onAccept={() => setShowComplianceModal(false)}
+        />
+      )}
 
       {showDisclaimer && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">

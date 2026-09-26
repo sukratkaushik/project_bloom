@@ -18,6 +18,11 @@ import { EmailVerificationGate } from './components/EmailVerificationGate';
 import { auth } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
 import { normalizeLegacyHash } from './utils/navigation';
+import { initStatusBar, registerBackButtonHandler, isNativeApp } from './utils/nativeBridge';
+import { ComplianceConsentModal } from './components/ComplianceConsentModal';
+import { App as CapApp } from '@capacitor/app';
+import { isBiometricLockEnabled, BIOMETRIC_GRACE_PERIOD_MS } from './utils/biometricService';
+import { BiometricSecurityOverlay } from './components/BiometricSecurityOverlay';
 
 const AppContent: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -29,6 +34,31 @@ const AppContent: React.FC = () => {
   normalizeLegacyHash();
 
   const [currentPath, setCurrentPath] = useState(() => window.location.pathname);
+
+  // Maternal Privacy Shield (Biometric Lock)
+  const [isBiometricLocked, setIsBiometricLocked] = useState(() => {
+    return isNativeApp() && isBiometricLockEnabled();
+  });
+
+  useEffect(() => {
+    if (!isNativeApp()) return;
+    let lastActive = Date.now();
+
+    const listenerPromise = CapApp.addListener('appStateChange', (state) => {
+      if (!state.isActive) {
+        lastActive = Date.now();
+      } else {
+        const inactiveDuration = Date.now() - lastActive;
+        if (inactiveDuration >= BIOMETRIC_GRACE_PERIOD_MS && isBiometricLockEnabled()) {
+          setIsBiometricLocked(true);
+        }
+      }
+    });
+
+    return () => {
+      listenerPromise.then(handle => handle.remove()).catch(() => {});
+    };
+  }, []);
 
   // Handle in-app email verification action codes if redirected to our domain
   useEffect(() => {
@@ -77,6 +107,18 @@ const AppContent: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    initStatusBar();
+    const unregisterBack = registerBackButtonHandler(() => {
+      if (window.location.pathname !== '/' && window.location.pathname !== '') {
+        window.history.back();
+        return true; // handled
+      }
+      return false; // let native system exit app
+    });
+    return () => unregisterBack();
+  }, []);
+
+  useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
       setIsAuthReady(true);
@@ -116,10 +158,10 @@ const AppContent: React.FC = () => {
     content = <SplashScreen />;
   } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {
     // Protected Routes Security Guard: Zero-Trust Verification Check
-    if (!user) {
+    if (!user && !isNativeApp() && !state.isSetup) {
       // Unauthenticated visitor -> Landing Page
       content = <LandingPage />;
-    } else if (!isVerifiedUser) {
+    } else if (user && !isVerifiedUser) {
       // Logged in but email unverified -> Render Airtight Verification Gate
       content = (
         <EmailVerificationGate
@@ -130,8 +172,8 @@ const AppContent: React.FC = () => {
           }}
         />
       );
-    } else if (currentPath.startsWith('/dashboard') && state.isSetup) {
-      // Authenticated + Verified + Setup Done -> Dashboard
+    } else if (currentPath.startsWith('/dashboard') && (state.isSetup || isNativeApp())) {
+      // Setup Done or Native Mobile App -> Dashboard
       content = <Dashboard />;
     } else {
       // Authenticated + Verified + Needs Setup -> Setup Screen
@@ -139,9 +181,23 @@ const AppContent: React.FC = () => {
     }
   }
 
+  const isPublicInfoPage = 
+    currentPath === '/privacy' || 
+    currentPath === '/terms' || 
+    currentPath === '/blogs' || 
+    currentPath === '/careers' || 
+    currentPath === '/team';
+
   return (
     <div key={currentPath} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
       {content}
+      {splashFinished && !isPublicInfoPage && (
+        <ComplianceConsentModal />
+      )}
+      <BiometricSecurityOverlay
+        isLocked={isBiometricLocked}
+        onUnlocked={() => setIsBiometricLocked(false)}
+      />
       <div id="google_translate_element" className="hidden"></div>
     </div>
   );

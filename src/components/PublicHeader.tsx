@@ -4,6 +4,7 @@ import { navigate } from '../utils/navigation';
 import { LanguageSelector } from './LanguageSelector';
 import { auth } from '../firebase';
 import { Loader2 } from 'lucide-react';
+import { isNativeApp } from '../utils/nativeBridge';
 
 interface PublicHeaderProps {
   onLoginClick?: () => void;
@@ -31,6 +32,8 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     return () => unsubscribe();
   }, []);
 
+  const isNative = isNativeApp();
+
   const isVerified = Boolean(
     user && (
       user.emailVerified ||
@@ -38,7 +41,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       user.providerData.some((p) => p.providerId === 'google.com')
     )
   );
-  const isSetupComplete = state.isSetup && isVerified;
+  const isSetupComplete = (state.isSetup && isVerified) || (isNative && state.isSetup);
 
   const handleLogin = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -64,7 +67,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   };
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 bg-white/90 backdrop-blur-md transition-all duration-300 border-b border-border/80 ${isScrolled ? 'shadow-[0_12px_32px_rgba(0,0,0,0.08)]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]'}`}>
+    <header className={`fixed top-0 left-0 w-full z-50 bg-[#FDFBF7]/95 backdrop-blur-md transition-all duration-300 border-b border-border/80 ${isScrolled ? 'shadow-[0_12px_32px_rgba(0,0,0,0.08)]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]'} ${
+      isNative ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[env(safe-area-inset-top,0px)]'
+    }`}>
       {/* w-full to push logo to the far left edge instead of max-w constraints */}
       <div className={`transition-all duration-300 w-full px-4 sm:px-6 md:px-8 ${isScrolled ? 'py-1.5 sm:py-2' : 'py-2 sm:py-3.5'}`}>
         <nav className="w-full flex items-center justify-between">

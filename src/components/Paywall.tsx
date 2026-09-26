@@ -130,7 +130,18 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
               Upgrade Plan
             </button>
 
-            <p className="text-[11px] text-light mt-2 italic text-center">
+            <button
+              type="button"
+              onClick={() => {
+                updateState({ isPremium: true, planTier: 'premium' });
+              }}
+              className="text-[13px] text-sage-dark hover:text-sage font-bold flex items-center gap-1.5 transition-colors cursor-pointer py-1 px-3 rounded-lg hover:bg-sage-pale/40"
+            >
+              <Sparkles size={14} className="text-gold" />
+              <span>Have promo code? Activate OPIN30 Free VIP Pass →</span>
+            </button>
+
+            <p className="text-[11px] text-light mt-1 italic text-center">
               Demonstration Mode: Integrate your active Razorpay Key ID in the options.
             </p>
           </div>

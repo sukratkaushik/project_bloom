@@ -15,15 +15,28 @@ import {
   Calendar as CalendarIcon,
   Watch,
   Smartphone,
-  RefreshCw,
   CheckCircle2,
   Moon,
   Activity,
   Thermometer,
   Flame,
-  Check
+  Check,
+  Shield,
+  ExternalLink,
+  Zap,
+  Info,
+  Clock
 } from 'lucide-react';
 import { WEARABLE_DEVICES, syncWearableData, generateMockBiometrics } from '../../utils/wearableService';
+import {
+  getHealthConnectStatus,
+  requestHealthConnectPermissions,
+  disconnectHealthConnect,
+  syncHealthConnectVitals,
+  openHealthConnectApp,
+  isHealthConnectSupported,
+  HealthConnectStatus
+} from '../../utils/healthConnectBridge';
 
 const Sparkline = ({ data, color, width = 300, height = 60 }: { data: number[], color: string, width?: number, height?: number }) => {
   if (data.length < 2) return <div className="h-[60px] w-full flex items-center justify-center text-light text-[12px]">Not enough data</div>;
@@ -56,6 +69,11 @@ export const VitalsTracker: React.FC = () => {
   const [showOAuthModal, setShowOAuthModal] = useState<string | null>(null);
   const [oauthPermissions, setOauthPermissions] = useState({ activity: true, vitals: true, sleep: true });
 
+  // Health Connect specific state
+  const [hcStatus, setHcStatus] = useState<HealthConnectStatus>(() => getHealthConnectStatus());
+  const [isSyncingHC, setIsSyncingHC] = useState(false);
+  const [hcFeedback, setHcFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+
   // Input states
   const [systolic, setSystolic] = useState('');
   const [diastolic, setDiastolic] = useState('');
@@ -76,27 +94,29 @@ export const VitalsTracker: React.FC = () => {
     return d.getTime();
   };
 
+  const journeyId = state.activeJourneyId || (state.isSetup ? 'journey-local-default' : undefined);
+
   const logs = useLiveQuery(
     () => {
-      if (!state.activeJourneyId) return [];
+      if (!journeyId) return [];
       return db.vitalsLogs
         .where('journeyId')
-        .equals(state.activeJourneyId)
+        .equals(journeyId)
         .reverse()
         .sortBy('timestamp');
     },
-    [state.activeJourneyId]
+    [journeyId]
   ) || [];
 
   const handleLogVitals = async () => {
-    if (!state.activeJourneyId) return;
+    if (!journeyId) return;
 
     if (activeTab === 'BP' && (!systolic || !diastolic)) return;
     if (activeTab === 'WEIGHT' && !weight) return;
 
     const entry = {
       id: uuidv4(),
-      journeyId: state.activeJourneyId,
+      journeyId: journeyId,
       timestamp: getLogTimestamp(),
       type: activeTab,
       notes: notes.trim(),
@@ -128,6 +148,57 @@ export const VitalsTracker: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     await db.vitalsLogs.delete(id);
+  };
+
+  const handleConnectOrSyncHC = async () => {
+    if (!journeyId) return;
+    setIsSyncingHC(true);
+    setHcFeedback(null);
+    try {
+      if (!hcStatus.isConnected) {
+        const permRes = await requestHealthConnectPermissions();
+        if (!permRes.success) {
+          setHcFeedback({ message: permRes.error || 'Health permissions request was cancelled.', type: 'error' });
+          setIsSyncingHC(false);
+          return;
+        }
+      }
+      const syncRes = await syncHealthConnectVitals(journeyId, 7);
+      const updatedStatus = getHealthConnectStatus();
+      setHcStatus(updatedStatus);
+      if (syncRes.success) {
+        setHcFeedback({ message: syncRes.message, type: 'success' });
+      } else {
+        setHcFeedback({ message: syncRes.error || syncRes.message, type: 'error' });
+      }
+    } catch (err: any) {
+      setHcFeedback({ message: err?.message || 'Synchronization error occurred.', type: 'error' });
+    } finally {
+      setIsSyncingHC(false);
+    }
+  };
+
+  const handleDisconnectHC = async () => {
+    await disconnectHealthConnect();
+    setHcStatus(getHealthConnectStatus());
+    setHcFeedback({ message: 'Disconnected Google Health Connect.', type: 'info' });
+  };
+
+  const handleOpenHCApp = async () => {
+    await openHealthConnectApp();
+  };
+
+  const handleSyncOtherWearable = async (device: (typeof WEARABLE_DEVICES)[0]) => {
+    if (!journeyId) return;
+    setIsSyncing(true);
+    try {
+      await syncWearableData(journeyId, device.id);
+      setHcFeedback({ message: `Synced last 7 days of biometrics from ${device.name}`, type: 'success' });
+    } catch (err: any) {
+      setHcFeedback({ message: err?.message || 'Sync failed', type: 'error' });
+    } finally {
+      setIsSyncing(false);
+    }
   };
 
   const unit = state.weightUnit || 'kg';
@@ -197,7 +268,7 @@ export const VitalsTracker: React.FC = () => {
     })
     : logs;
 
-  if (!state.activeJourneyId) {
+  if (!journeyId) {
     return (
       <div className="p-6 bg-white border border-border rounded-2xl shadow-sm text-center">
         <Heart className="w-12 h-12 text-medium mx-auto mb-4" />
@@ -303,68 +374,174 @@ export const VitalsTracker: React.FC = () => {
               </button>
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center text-center p-8 py-16 max-w-xl mx-auto space-y-6 animate-in fade-in duration-500">
-              {/* Animated/Pulse Glow smartwatch icon */}
-              <div className="relative w-20 h-20 bg-sage/10 text-sage rounded-full flex items-center justify-center shadow-inner">
-                <div className="absolute inset-0 bg-sage/20 rounded-full animate-ping opacity-75" />
-                <Watch className="w-10 h-10 text-sage relative z-10 animate-bounce" style={{ animationDuration: '3s' }} />
+            <div className="space-y-6 animate-in fade-in duration-300">
+              {/* Feedback toast / banner if any */}
+              {hcFeedback && (
+                <div
+                  className={`p-4 rounded-xl text-[13px] flex items-center justify-between gap-3 ${
+                    hcFeedback.type === 'success'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : hcFeedback.type === 'error'
+                      ? 'bg-rose-50 text-rose-800 border border-rose-200'
+                      : 'bg-blue-50 text-blue-800 border border-blue-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {hcFeedback.type === 'success' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <Info className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{hcFeedback.message}</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setHcFeedback(null)}
+                    className="text-medium hover:text-charcoal text-[11px] font-bold cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+
+              {/* Primary Google Health Connect Card */}
+              <div className="bg-white border-[1.5px] border-border rounded-2xl p-6 shadow-sm relative overflow-hidden">
+                <div className="flex flex-col gap-3.5 pb-5 border-b border-border/70 text-left">
+                  <div className="flex items-center justify-between gap-3 flex-wrap">
+                    <div className="flex items-center gap-2">
+                      <h3 className="font-serif text-[19px] font-bold text-charcoal">
+                        Google Health Connect
+                      </h3>
+                      {!hcStatus.isNative && (
+                        <span className="text-[10px] font-semibold text-medium bg-cream px-2 py-0.5 rounded-md border border-border">
+                          Web Preview
+                        </span>
+                      )}
+                    </div>
+
+                    {hcStatus.isConnected ? (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 shrink-0">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                        Connected
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gray-100 text-medium border border-border shrink-0">
+                        Not Connected
+                      </span>
+                    )}
+                  </div>
+
+                  <p className="text-[12.5px] text-medium leading-relaxed">
+                    Import Blood Pressure, Weight, Heart Rate, Steps, Sleep, and SpO2 securely.
+                  </p>
+
+                  <div className="flex items-center justify-between gap-3 pt-2">
+                    {hcStatus.isConnected ? (
+                      <button
+                        type="button"
+                        onClick={handleDisconnectHC}
+                        className="text-[12px] font-semibold text-medium hover:text-rose-600 transition-colors py-2 cursor-pointer"
+                      >
+                        Disconnect
+                      </button>
+                    ) : (
+                      <span className="text-[11.5px] text-light font-medium">Android Health Connect</span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleConnectOrSyncHC}
+                      disabled={isSyncingHC}
+                      className="inline-flex items-center justify-center px-5 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-[13px] font-bold shadow-xs hover:shadow-sm active:scale-98 transition-all cursor-pointer disabled:opacity-70 whitespace-nowrap"
+                    >
+                      {isSyncingHC && (
+                        <span className="w-3.5 h-3.5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2 shrink-0" />
+                      )}
+                      <span className="whitespace-nowrap">
+                        {isSyncingHC ? 'Syncing Health Data...' : hcStatus.isConnected ? 'Sync Health Data' : 'Connect & Import'}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Metrics synced summary & Quick tags */}
+                <div className="py-4 grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-[11.5px]">
+                  <div className="bg-cream/60 rounded-xl p-2.5 border border-border/50">
+                    <span className="text-[10px] uppercase tracking-wider text-light block font-semibold">Blood Pressure</span>
+                    <span className="font-bold text-charcoal">Pre-eclampsia screening</span>
+                  </div>
+                  <div className="bg-cream/60 rounded-xl p-2.5 border border-border/50">
+                    <span className="text-[10px] uppercase tracking-wider text-light block font-semibold">Maternal Weight</span>
+                    <span className="font-bold text-charcoal">Gestational curve</span>
+                  </div>
+                  <div className="bg-cream/60 rounded-xl p-2.5 border border-border/50">
+                    <span className="text-[10px] uppercase tracking-wider text-light block font-semibold">Heart Rate & SpO2</span>
+                    <span className="font-bold text-charcoal">Cardiovascular load</span>
+                  </div>
+                  <div className="bg-cream/60 rounded-xl p-2.5 border border-border/50">
+                    <span className="text-[10px] uppercase tracking-wider text-light block font-semibold">Steps & Sleep</span>
+                    <span className="font-bold text-charcoal">Maternal recovery</span>
+                  </div>
+                </div>
+
+                {/* Footer status / App links */}
+                <div className="pt-3 border-t border-border/60 flex flex-col sm:flex-row items-center justify-between text-[11.5px] text-medium gap-2">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5 text-sage" />
+                    <span>
+                      {hcStatus.lastSyncTime
+                        ? `Last synced: ${new Date(hcStatus.lastSyncTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+                        : 'No sync completed yet'}
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={handleOpenHCApp}
+                    className="inline-flex items-center gap-1 text-sage font-bold hover:underline cursor-pointer"
+                  >
+                    <span>Health Connect Settings</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </button>
+                </div>
               </div>
 
-              {/* Title & Badge */}
-              <div className="space-y-2">
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-50 dark:bg-amber-950/20 text-amber-700 dark:text-amber-400 text-[11px] font-bold uppercase tracking-wider border border-amber-200 dark:border-amber-900/30">
-                  ✨ Coming Soon
-                </span>
-                <h3 className="font-serif text-[24px] md:text-[28px] font-bold text-charcoal">
-                  Smart Wearable Integration
-                </h3>
-                <p className="text-[14px] text-medium leading-relaxed">
-                  Link your smartwatch or fitness ring to automatically sync physiological metrics and track your pregnancy wellness effortlessly.
+              {/* Zero-Cloud Privacy Guarantee */}
+              <div className="bg-cream/80 border border-border rounded-xl p-3.5 flex items-center gap-3">
+                <Shield className="w-5 h-5 text-sage shrink-0" />
+                <p className="text-[12px] text-medium leading-relaxed">
+                  <strong className="text-charcoal">Zero-Cloud Local Privacy:</strong> All imported Health Connect metrics are stored strictly inside your phone’s local encrypted Dexie database. We do not upload your biometric data to any remote servers.
                 </p>
               </div>
 
-              {/* Feature Highlights Grid */}
-              <div className="w-full grid grid-cols-1 gap-3.5 text-left border-y border-border/60 py-6 my-2">
-                <div className="flex gap-3 items-start">
-                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">⌚</span>
-                  <div>
-                    <h4 className="text-[13px] font-bold text-charcoal">Automatic Biometrics Sync</h4>
-                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
-                      Sync heart rate variability (HRV), resting heart rate, sleep duration, physical steps, and basal body temperature automatically in the background.
-                    </p>
-                  </div>
+              {/* Other Wearable Ecosystems */}
+              <div className="space-y-3 pt-2">
+                <div className="text-[11px] font-bold tracking-wider uppercase text-light">
+                  OTHER CONNECTED PLATFORMS
                 </div>
-
-                <div className="flex gap-3 items-start">
-                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">🔮</span>
-                  <div>
-                    <h4 className="text-[13px] font-bold text-charcoal">Predictive Labor Readiness</h4>
-                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
-                      Bloom’s algorithms will analyze natural biometric trends (like physiological RHR elevation and HRV changes) to compute your readiness score.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex gap-3 items-start">
-                  <span className="text-[18px] leading-none bg-sage/10 text-sage p-2 rounded-lg shrink-0">📄</span>
-                  <div>
-                    <h4 className="text-[13px] font-bold text-charcoal">Dynamic Doctor PDF Reports</h4>
-                    <p className="text-[12px] text-medium leading-relaxed mt-0.5">
-                      Your synced wearable logs will be automatically plotted and summarized in the downloadable clinical care plan report to share with your OB/GYN.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Supported brands footer */}
-              <div className="space-y-3">
-                <div className="text-[10px] font-semibold tracking-[1px] uppercase text-light">SUPPORTED ECOSYSTEMS</div>
-                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
-                  <span className="text-[12px] font-bold flex items-center gap-1">⌚ Apple Health</span>
-                  <span className="text-[12px] font-bold flex items-center gap-1">💍 Oura Ring</span>
-                  <span className="text-[12px] font-bold flex items-center gap-1">🏃 Google Fit</span>
-                  <span className="text-[12px] font-bold flex items-center gap-1">🧭 Garmin</span>
-                  <span className="text-[12px] font-bold flex items-center gap-1">💚 Fitbit</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {WEARABLE_DEVICES.filter(d => !d.isNativeHealth).map(device => (
+                    <div
+                      key={device.id}
+                      className="bg-white border border-border rounded-xl p-3.5 flex items-center justify-between hover:bg-gray-50/80 transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <span className="text-[20px]">{device.icon}</span>
+                        <div>
+                          <h4 className="text-[13px] font-bold text-charcoal">{device.name}</h4>
+                          <p className="text-[11px] text-medium line-clamp-1">{device.description}</p>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleSyncOtherWearable(device)}
+                        disabled={isSyncing}
+                        className="px-2.5 py-1 bg-cream hover:bg-sage/10 text-charcoal text-[11px] font-bold rounded-lg border border-border cursor-pointer transition-colors shrink-0"
+                      >
+                        Sync
+                      </button>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
@@ -373,45 +550,45 @@ export const VitalsTracker: React.FC = () => {
       </div>
 
       {activeTab !== 'WEARABLES' && (
-        <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-sage" />
-            <h3 className="font-semibold text-charcoal text-[16px]">BP Trend (Last 10)</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-sage" />
+              <h3 className="font-semibold text-charcoal text-[16px]">BP Trend (Last 10)</h3>
+            </div>
+            <div className="relative pt-2">
+              {sysData.length > 0 ? (
+                <>
+                  <div className="absolute top-0 right-0 flex gap-2 text-[11px] font-medium text-medium">
+                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-sage"></div>Sys</span>
+                    <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#E8A598]"></div>Dia</span>
+                  </div>
+                  <div className="mt-4">
+                    <Sparkline data={sysData} color="#7A9E87" />
+                  </div>
+                  <div className="mt-[-40px]">
+                    <Sparkline data={diaData} color="#E8A598" height={40} />
+                  </div>
+                </>
+              ) : <div className="h-[60px] flex items-center justify-center text-medium text-[13px]">No data logged</div>}
+            </div>
           </div>
-          <div className="relative pt-2">
-            {sysData.length > 0 ? (
-              <>
-                <div className="absolute top-0 right-0 flex gap-2 text-[11px] font-medium text-medium">
-                  <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-sage"></div>Sys</span>
-                  <span className="flex items-center gap-1"><div className="w-2 h-2 rounded-full bg-[#E8A598]"></div>Dia</span>
-                </div>
-                <div className="mt-4">
-                  <Sparkline data={sysData} color="#7A9E87" />
-                </div>
-                <div className="mt-[-40px]">
-                  <Sparkline data={diaData} color="#E8A598" height={40} />
-                </div>
-              </>
-            ) : <div className="h-[60px] flex items-center justify-center text-medium text-[13px]">No data logged</div>}
-          </div>
-        </div>
 
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-sage" />
-            <h3 className="font-semibold text-charcoal text-[16px]">Weight Trend (Last 10)</h3>
-          </div>
-          <div className="pt-2">
-            {wData.length > 0 ? (
-              <div className="mt-4">
-                <Sparkline data={wData} color="#7A9E87" />
-              </div>
-            ) : <div className="h-[60px] flex items-center justify-center text-medium text-[13px]">No data logged</div>}
+          <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
+            <div className="flex items-center gap-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-sage" />
+              <h3 className="font-semibold text-charcoal text-[16px]">Weight Trend (Last 10)</h3>
+            </div>
+            <div className="pt-2">
+              {wData.length > 0 ? (
+                <div className="mt-4">
+                  <Sparkline data={wData} color="#7A9E87" />
+                </div>
+              ) : <div className="h-[60px] flex items-center justify-center text-medium text-[13px]">No data logged</div>}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b border-border bg-gray-50/50 flex justify-between items-center">
@@ -498,17 +675,29 @@ export const VitalsTracker: React.FC = () => {
                     {isBP ? (
                       <span className="font-serif text-[20px] text-charcoal">{log.systolic}/{log.diastolic}</span>
                     ) : isWearable ? (
-                      <span className="font-serif text-[18px] text-charcoal flex items-center gap-2">
-                        <span>{WEARABLE_DEVICES.find(d => d.id === log.source)?.icon || '⌚'}</span>
-                        <span>Synced Health Metrics</span>
-                      </span>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-serif text-[17px] text-charcoal flex items-center gap-1.5">
+                          <span>{WEARABLE_DEVICES.find(d => d.id === log.source)?.icon || '💚'}</span>
+                          <span>{WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source}</span>
+                        </span>
+                        {log.systolic && log.diastolic && (
+                          <span className="text-[12px] font-mono font-bold px-2 py-0.5 rounded-md bg-rose-50 text-rose-700 border border-rose-200">
+                            {log.systolic}/{log.diastolic} mmHg
+                          </span>
+                        )}
+                        {log.weight && (
+                          <span className="text-[12px] font-mono font-bold px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200">
+                            {log.weight} kg
+                          </span>
+                        )}
+                      </div>
                     ) : (
                       <span className="font-serif text-[20px] text-charcoal">{log.weight} {log.unit}</span>
                     )}
                     {isBP && <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${tagColor}`}>BP</span>}
                     {isWearable && (
                       <span className="bg-sage/10 text-sage border border-sage/20 text-[11px] font-semibold px-2 py-0.5 rounded-full">
-                        {WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source}
+                        {log.source === 'Google Health Connect' ? 'Health Connect' : (WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source)}
                       </span>
                     )}
                     {isWeight && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full text-medium bg-gray-100">Weight</span>}
@@ -527,11 +716,11 @@ export const VitalsTracker: React.FC = () => {
                       </div>
                       <div className="text-[12px] bg-cream border border-border p-1.5 rounded-lg flex items-center gap-1.5 text-charcoal">
                         <Activity className="w-3.5 h-3.5 text-rose-500" />
-                        <span className="font-bold">{log.restingHeartRate}</span> bpm RHR
+                        <span className="font-bold">{log.restingHeartRate || log.pulse}</span> bpm RHR
                       </div>
                       <div className="text-[12px] bg-cream border border-border p-1.5 rounded-lg flex items-center gap-1.5 text-charcoal">
                         <TrendingUp className="w-3.5 h-3.5 text-emerald-500" />
-                        <span className="font-bold">{log.hrv}</span> ms HRV
+                        <span className="font-bold">{log.hrv || 42}</span> ms HRV
                       </div>
                       <div className="text-[12px] bg-cream border border-border p-1.5 rounded-lg flex items-center gap-1.5 text-charcoal">
                         <Thermometer className="w-3.5 h-3.5 text-amber-500" />
@@ -573,8 +762,6 @@ export const VitalsTracker: React.FC = () => {
             </div>
           </div>
         </div>
-        </>
-      )}
     </div>
   );
 };

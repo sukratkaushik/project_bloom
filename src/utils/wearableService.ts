@@ -1,5 +1,6 @@
 import { db, VitalsLog } from '../db';
 import { v4 as uuidv4 } from 'uuid';
+import { syncHealthConnectVitals } from './healthConnectBridge';
 
 export interface WearableDevice {
   id: string;
@@ -7,9 +8,18 @@ export interface WearableDevice {
   description: string;
   color: string;
   icon: string;
+  isNativeHealth?: boolean;
 }
 
 export const WEARABLE_DEVICES: WearableDevice[] = [
+  {
+    id: 'google_health',
+    name: 'Google Health Connect',
+    description: 'Sync blood pressure, weight, heart rate, steps, sleep, and SpO2 via Android Health Connect.',
+    color: '#4285F4',
+    icon: '🩺',
+    isNativeHealth: true
+  },
   {
     id: 'apple_health',
     name: 'Apple Health',
@@ -23,13 +33,6 @@ export const WEARABLE_DEVICES: WearableDevice[] = [
     description: 'Import sleep stages, resting heart rate, HRV, and basal body temperature.',
     color: '#0052FF',
     icon: '💍'
-  },
-  {
-    id: 'google_fit',
-    name: 'Google Fit',
-    description: 'Import Android physical activity, heart rate, and steps biometrics.',
-    color: '#34A853',
-    icon: '🏃'
   },
   {
     id: 'garmin',
@@ -86,9 +89,14 @@ export function generateMockBiometrics(source: string, daysAgo: number): {
 }
 
 /**
- * Syncs mock data for the last 7 days for a given wearable source into Dexie DB.
+ * Syncs data for the last 7 days for a given wearable source into Dexie DB.
  */
 export async function syncWearableData(journeyId: string, source: string): Promise<VitalsLog[]> {
+  if (source === 'google_health' || source === 'google_fit' || source === 'Google Health Connect') {
+    const res = await syncHealthConnectVitals(journeyId, 7);
+    return res.syncedLogs;
+  }
+
   const syncedRecords: VitalsLog[] = [];
 
   for (let i = 0; i < 7; i++) {

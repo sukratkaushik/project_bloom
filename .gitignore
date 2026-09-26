@@ -16,3 +16,14 @@ Claude outputs/
 firestore.rules.backup-*
 *.backup-*
 
+# Android Keystore & Signing Secrets
+*.keystore
+*.jks
+keystore.properties
+
+# Android Binaries
+*.apk
+*.aab
+
+
+

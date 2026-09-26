@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "HEART_RATE": "Read",
+    "STEPS": "Read",
+    "WEIGHT": "ReadWrite",
+    "SLEEP": "Read",
+    "BLOOD_PRESSURE": "Read",
+    "OXYGEN_SATURATION": "Read",
+    "BODY_TEMPERATURE": "Read",
+    "BLOOD_GLUCOSE": "Read"
+  },
+  "disableBackgroundJobs": true,
+  "disableReadHealthDataHistory": true,
+  "privacyPolicyUrl": "https://ourpregnancy.in/privacy"
+}

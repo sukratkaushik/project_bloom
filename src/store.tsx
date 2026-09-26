@@ -102,9 +102,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         const record = await db.appState.get('global');
         if (record) {
           const parsed = JSON.parse(record.stateJSON);
+          const activeJourneyId = parsed.activeJourneyId || (parsed.isSetup ? 'journey-local-default' : undefined);
           setState(prev => ({
             ...prev,
             ...parsed,
+            activeJourneyId,
             notes: { ...prev.notes, ...(parsed.notes || {}) },
             customNoteTopics: parsed.customNoteTopics || prev.customNoteTopics || [],
             isDarkModeActive: prev.isDarkModeActive
@@ -113,9 +115,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           // Fallback to localStorage just in case of migration
           const saved = localStorage.getItem('bloom_planner');
           if (saved) {
+            const parsed = JSON.parse(saved);
+            const activeJourneyId = parsed.activeJourneyId || (parsed.isSetup ? 'journey-local-default' : undefined);
             setState(prev => ({
               ...prev,
-              ...JSON.parse(saved),
+              ...parsed,
+              activeJourneyId,
               isDarkModeActive: prev.isDarkModeActive
             }));
           }
@@ -321,7 +326,13 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const updateState = (updates: Partial<PlannerState>) => {
-    setState((prev) => ({ ...prev, ...updates }));
+    setState((prev) => {
+      const next = { ...prev, ...updates };
+      if (next.isSetup && !next.activeJourneyId) {
+        next.activeJourneyId = 'journey-local-default';
+      }
+      return next;
+    });
   };
 
   const isReadOnly = (prev: PlannerState) => {
