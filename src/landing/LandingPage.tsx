@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
 import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
@@ -314,6 +315,11 @@ export const LandingPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
+      <Helmet>
+        <title>Our Pregnancy — Secure & Private Indian Pregnancy Companion</title>
+        <meta name="description" content="A privacy-first, free pregnancy companion tailored for Indian mothers. Track milestones, blood pressure, kick counts, contraction timing, and scan food safety offline." />
+        <link rel="canonical" href="https://ourpregnancy.in/" />
+      </Helmet>
       {/* Auth Modal */}
       {showEmailModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">

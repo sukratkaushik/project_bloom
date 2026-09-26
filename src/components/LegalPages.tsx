@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 import { PublicHeader } from './PublicHeader';
@@ -38,6 +39,11 @@ export const PrivacyPolicy: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+      <Helmet>
+        <title>Privacy Policy | Our Pregnancy</title>
+        <meta name="description" content="Read our Privacy Policy to understand how we protect your data at Our Pregnancy." />
+        <link rel="canonical" href="https://ourpregnancy.in/privacy" />
+      </Helmet>
       <PublicHeader />
       <div className="pt-32 pb-16 px-4 sm:px-6 md:px-12 relative z-10">
         {toastMessage && (
@@ -109,6 +115,11 @@ export const TermsOfService: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+      <Helmet>
+        <title>Terms of Service | Our Pregnancy</title>
+        <meta name="description" content="Read our Terms of Service at Our Pregnancy." />
+        <link rel="canonical" href="https://ourpregnancy.in/terms" />
+      </Helmet>
       <PublicHeader />
       <div className="pt-32 pb-16 px-4 sm:px-6 md:px-12 relative z-10">
         <div className="max-w-3xl mx-auto bg-white p-8 sm:p-12 rounded-[24px] shadow-sm border border-border">

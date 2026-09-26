@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { Sparkles, MailPlus, PenTool, Copy, Check, ExternalLink, X, Mail } from 'lucide-react';
 import { usePlanner } from '../store';
 import { PublicHeader } from '../components/PublicHeader';
@@ -54,6 +55,11 @@ export const BlogsPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
+      <Helmet>
+        <title>Pregnancy Blogs | Our Pregnancy</title>
+        <meta name="description" content="Read our latest articles on pregnancy, nutrition, fitness, and mental health tailored for Indian mothers." />
+        <link rel="canonical" href="https://ourpregnancy.in/blogs" />
+      </Helmet>
       {/* Mesh Glow Background Blobs */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob -z-10" />
       <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-blush-light/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000 -z-10" />
