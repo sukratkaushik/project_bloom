@@ -920,7 +920,7 @@ export const LandingPage: React.FC = () => {
                 </div>
               </div>
               <div className="w-full md:w-[210px] lg:w-[240px] min-h-[170px] md:min-h-full rounded-xl overflow-hidden relative bg-sage-pale/30 shrink-0">
-                <img src="/food_scanner_updated_1779026987896.png" alt="Food Scanner UI" className="w-full h-full object-cover" />
+                <img src="/food_scanner_updated_1779026987896.webp" alt="Food Scanner UI" className="w-full h-full object-cover" />
               </div>
             </div>
 

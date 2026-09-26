@@ -17,7 +17,8 @@
     "test:delete": "tsx --test test/deleteAccount.test.ts",
     "test:consent": "tsx --test test/consentPersistence.test.ts",
     "test:ai-consent": "tsx --test test/aiConsent.test.ts",
-    "test:e2e": "node test/e2e-ui-delete.mjs"
+    "test:e2e": "node test/e2e-ui-delete.mjs",
+    "postbuild": "react-snap"
   },
   "dependencies": {
     "@sentry/browser": "^10.49.0",
@@ -46,6 +47,8 @@
     "@types/node": "^22.14.0",
     "@types/peerjs": "^0.0.30",
     "autoprefixer": "^10.4.21",
+    "react-snap": "^1.23.0",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.1.14",
     "tsx": "^4.21.0",
     "typescript": "~5.8.2",

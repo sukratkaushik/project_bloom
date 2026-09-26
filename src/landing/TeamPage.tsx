@@ -136,7 +136,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-sage-light to-sage",
                 bio: "Visionary founder passionate about scaling health solutions and building secure, mother-centric technologies.",
                 linkedin: "https://www.linkedin.com/in/sukratkaushik/",
-                image: "/sukrat.jpg"
+                image: "/sukrat.webp"
               },
               {
                 name: "Lakshay Trehan",
@@ -146,7 +146,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-blush-light to-blush",
                 bio: "Engineering lead focused on offline-first architectures, privacy, and seamless user experiences.",
                 linkedin: "https://www.linkedin.com/in/lakshaytrehan",
-                image: "/lakshay.jpg"
+                image: "/lakshay.webp"
               },
               {
                 name: "Vaishali Kaushik",
@@ -156,7 +156,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-gold-pale to-gold",
                 bio: "Growth and marketing specialist dedicated to building supportive maternal communities.",
                 linkedin: null,
-                image: "/vaishali.png"
+                image: "/vaishali.webp"
               }
             ].map((member, i) => (
               <div key={i} className="premium-card p-8 flex flex-col items-center text-center relative group">
