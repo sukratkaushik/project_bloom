@@ -1,0 +1,1712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Full Stack Of Agentic AI at OPIN | Our Pregnancy Architecture</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-warm: #fbfdfc;
+      --brand-green: #0ea254;
+      --brand-dark: #0f172a;
+      --brand-sage: #228b57;
+      --card-bg: #ffffff;
+      --border-color: #e2e8f0;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      background: #f1f6f3;
+      color: var(--brand-dark);
+      line-height: 1.5;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .app-header {
+      max-width: 1200px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .logo-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge h1 {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-badge span {
+      color: var(--brand-green);
+    }
+
+    .logo-tag {
+      background: #e6f6ec;
+      color: #15803d;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      letter-spacing: 0.5px;
+      border: 1px solid #bbf7d0;
+    }
+
+    .action-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      border: none;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: #0ea254;
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(14, 162, 84, 0.25);
+    }
+
+    .btn-primary:hover {
+      background: #0c8a47;
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: #ffffff;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+    }
+
+    .btn-secondary:hover {
+      background: #f8fafc;
+      color: #0f172a;
+      border-color: #94a3b8;
+    }
+
+    .main-container {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+
+    .graphic-card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 24px;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 0 0 1px rgba(0, 0, 0, 0.04);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .svg-wrapper {
+      width: 100%;
+      max-width: 1100px;
+      filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.02));
+      transition: transform 0.2s ease;
+    }
+
+    .details-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+      margin-top: 10px;
+    }
+
+    .detail-card {
+      background: #ffffff;
+      border-radius: 14px;
+      padding: 18px 20px;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .detail-card h3 {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .detail-card p {
+      font-size: 13px;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .tag {
+      background: #f1f5f9;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+
+    .tag.green {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .tag.blue {
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    .tag.purple {
+      background: #f3e8ff;
+      color: #6b21a8;
+    }
+  </style>
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="logo-badge">
+      <h1>🌸 Our Pregnancy <span>(OPIN)</span></h1>
+      <span class="logo-tag">Maternal Agentic AI</span>
+    </div>
+    <div class="action-bar">
+      <button class="btn btn-secondary" onclick="downloadSVG()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download SVG
+      </button>
+      <button class="btn btn-primary" onclick="downloadPNG()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download PNG (High-Res)
+      </button>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <div class="graphic-card">
+      <div class="svg-wrapper" id="svg-container">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 1600" width="100%" height="100%" style="background: linear-gradient(145deg, #fbfdfc 0%, #f4faf6 50%, #edf7f1 100%); font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+  <defs>
+    <!-- Soft Drop Shadows -->
+    <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="14" flood-color="#0f2b18" flood-opacity="0.12"/>
+    </filter>
+    <filter id="slab-3d-shadow" x="-30%" y="-30%" width="160%" height="170%">
+      <feDropShadow dx="0" dy="16" stdDeviation="14" flood-color="#092012" flood-opacity="0.25"/>
+    </filter>
+    <filter id="node-shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="6" stdDeviation="6" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="badge-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#16a34a" flood-opacity="0.15"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Decorative Background Gradients -->
+  <g opacity="0.4" pointer-events="none">
+    <circle cx="160" cy="180" r="160" fill="#a7e3bf" filter="blur(70px)"/>
+    <circle cx="1020" cy="380" r="200" fill="#9de0ca" filter="blur(80px)"/>
+    <circle cx="180" cy="1320" r="200" fill="#a5ecd7" filter="blur(90px)"/>
+    <circle cx="950" cy="1200" r="180" fill="#a1e2b6" filter="blur(80px)"/>
+  </g>
+
+  <!-- Infographic Header Banner -->
+  <g transform="translate(590.0, 78)" text-anchor="middle">
+    <!-- Brand Pill -->
+    <rect x="-175" y="-45" width="350" height="30" rx="15" fill="#e8f6ed" stroke="#b4e4c4" stroke-width="1.4" filter="url(#node-shadow)"/>
+    <text x="0" y="-25" font-size="11.5" font-weight="800" fill="#14663b" letter-spacing="1.5">🌸 OUR PREGNANCY (OPIN) • MATERNAL AI</text>
+    
+    <!-- Title -->
+    <text x="0" y="30" font-size="46" font-weight="900" fill="#0f172a" letter-spacing="-1">
+      <tspan fill="#0ea254">Full Stack</tspan> Of Agentic AI
+    </text>
+    <text x="0" y="58" font-size="14.5" font-weight="600" fill="#475569" letter-spacing="0.1">
+      India's 1st Local-First Maternal Clinical Intelligence Platform Architecture
+    </text>
+  </g>
+
+  <!-- ==================== LAYER 1: Frontend & Clients ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#549646"/>
+      <stop offset="100%" stop-color="#3f7734"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-1">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="660.0,220 830,285.0 830,313.0 660.0,248" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="830,285.0 1000.0,220 1000.0,248 830,313.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="830,155.0 1000.0,220 830,285.0 660.0,220" fill="url(#grad-slab-1)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="830" y="225" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Frontend & Clients
+      </text>
+    </g>
+
+    <!-- Left Branch Connector Trunk -->
+    <line x1="660.0" y1="220" x2="218.0" y2="220" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="660.0" cy="220" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: React 19 -->
+    <g transform="translate(218.0, 220)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#0284c7" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <circle cx="0" cy="0" r="3.2" fill="#0284c7"/><ellipse rx="11" ry="4.2" fill="none" stroke="#0284c7" stroke-width="1.6"/><ellipse rx="11" ry="4.2" transform="rotate(60)" fill="none" stroke="#0284c7" stroke-width="1.6"/><ellipse rx="11" ry="4.2" transform="rotate(120)" fill="none" stroke="#0284c7" stroke-width="1.6"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        React 19
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        UI & Context
+      </text>
+    </g>
+
+    <!-- Node: Tailwind 4 -->
+    <g transform="translate(336.0, 220)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#0ea5e9" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-10,-2 C-8,-8 -3,-8 0,-5 C3,-2 6,-2 9,-5 C7,1 2,1 -1,-2 C-4,-5 -7,-5 -10,-2 Z M-6,5 C-4,0 0,0 2,2 C4,4 7,4 9,2 C7,8 3,8 1,6 C-1,4 -4,4 -6,5 Z" fill="#0ea5e9"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Tailwind 4
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Design System
+      </text>
+    </g>
+
+    <!-- Node: Capacitor -->
+    <g transform="translate(454.0, 220)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#10b981" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-6,-2 A6,6 0 0,1 6,-2 L6,6 L-6,6 Z" fill="#10b981"/><line x1="-4" y1="-7" x2="-6" y2="-10" stroke="#10b981" stroke-width="1.5"/><line x1="4" y1="-7" x2="6" y2="-10" stroke="#10b981" stroke-width="1.5"/><circle cx="-2.5" cy="-1.5" r="1" fill="#ffffff"/><circle cx="2.5" cy="-1.5" r="1" fill="#ffffff"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Capacitor
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Android APK/AAB
+      </text>
+    </g>
+
+    <!-- Node: PWA Workbox -->
+    <g transform="translate(572.0, 220)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#8b5cf6" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-8,-8 L-8,8 L-4,8 L-4,0 L-1,0 A4,4 0 0,0 -1,-8 Z" fill="#8b5cf6"/><circle cx="6" cy="2" r="3" fill="#8b5cf6"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        PWA Workbox
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Offline App Shell
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 2: Document Ingestion ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b8f4c"/>
+      <stop offset="100%" stop-color="#2b6f3a"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-2">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="610.0,350 780,415.0 780,443.0 610.0,378" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="780,415.0 950.0,350 950.0,378 780,443.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="780,285.0 950.0,350 780,415.0 610.0,350" fill="url(#grad-slab-2)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="780" y="355" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Document Ingestion
+      </text>
+    </g>
+
+    <!-- Left Branch Connector Trunk -->
+    <line x1="610.0" y1="350" x2="168.0" y2="350" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="610.0" cy="350" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Tesseract OCR -->
+    <g transform="translate(168.0, 350)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#2563eb" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-8" y="-9" width="16" height="18" rx="2" fill="none" stroke="#2563eb" stroke-width="1.8"/><line x1="-5" y1="-4" x2="5" y2="-4" stroke="#2563eb" stroke-width="1.5"/><line x1="-5" y1="0" x2="5" y2="0" stroke="#2563eb" stroke-width="1.5"/><line x1="-5" y1="4" x2="2" y2="4" stroke="#2563eb" stroke-width="1.5"/><line x1="-10" y1="-1" x2="10" y2="-1" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="2,1"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Tesseract OCR
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Lab Vitals Extractor
+      </text>
+    </g>
+
+    <!-- Node: USG / PDF -->
+    <g transform="translate(286.0, 350)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#ea580c" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-6,-9 L2,-9 L7,-4 L7,9 L-6,9 Z" fill="none" stroke="#ea580c" stroke-width="1.8"/><path d="M2,-9 L2,-4 L7,-4" fill="none" stroke="#ea580c" stroke-width="1.5"/><text x="-4" y="5" font-size="6" font-weight="900" fill="#ea580c">USG</text>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        USG / PDF
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Ultrasound Parser
+      </text>
+    </g>
+
+    <!-- Node: Camera Vision -->
+    <g transform="translate(404.0, 350)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#059669" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-9" y="-6" width="18" height="14" rx="2.5" fill="none" stroke="#059669" stroke-width="1.8"/><path d="M-4,-6 L-2,-9 L2,-9 L4,-6 Z" fill="#059669"/><circle cx="0" cy="1" r="4" fill="none" stroke="#059669" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Camera Vision
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Food Plate Scanner
+      </text>
+    </g>
+
+    <!-- Node: Whisper STT -->
+    <g transform="translate(522.0, 350)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#7c3aed" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-3" y="-8" width="6" height="11" rx="3" fill="#7c3aed"/><path d="M-6,-2 A6,6 0 0,0 6,-2" fill="none" stroke="#7c3aed" stroke-width="1.8"/><line x1="0" y1="4" x2="0" y2="8" stroke="#7c3aed" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Whisper STT
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Voice Symptom Log
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 3: Chunking & Preprocessing ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#228b57"/>
+      <stop offset="100%" stop-color="#176e43"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-3">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="560.0,480 730,545.0 730,573.0 560.0,508" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="730,545.0 900.0,480 900.0,508 730,573.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="730,415.0 900.0,480 730,545.0 560.0,480" fill="url(#grad-slab-3)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="730" y="485" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Chunking & Preprocessing
+      </text>
+    </g>
+
+    <!-- Left Branch Connector Trunk -->
+    <line x1="560.0" y1="480" x2="118.0" y2="480" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="560.0" cy="480" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Trimester Slicer -->
+    <g transform="translate(118.0, 480)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#059669" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-8" y="-6" width="16" height="14" rx="2" fill="none" stroke="#059669" stroke-width="1.8"/><line x1="-4" y1="-8" x2="-4" y2="-5" stroke="#059669" stroke-width="2"/><line x1="4" y1="-8" x2="4" y2="-5" stroke="#059669" stroke-width="2"/><line x1="-8" y1="-1" x2="8" y2="-1" stroke="#059669" stroke-width="1.5"/><circle cx="-3" cy="3" r="1.2" fill="#059669"/><circle cx="3" cy="3" r="1.2" fill="#059669"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Trimester Slicer
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Week 1–42 Chunks
+      </text>
+    </g>
+
+    <!-- Node: FOGSI / ACOG -->
+    <g transform="translate(236.0, 480)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#dc2626" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-3" y="-9" width="6" height="18" rx="1.5" fill="#dc2626"/><rect x="-9" y="-3" width="18" height="6" rx="1.5" fill="#dc2626"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        FOGSI / ACOG
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Clinical Guidelines
+      </text>
+    </g>
+
+    <!-- Node: Dexie Normalizer -->
+    <g transform="translate(354.0, 480)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#d97706" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-8" y="-7" width="16" height="14" rx="2" fill="none" stroke="#d97706" stroke-width="1.8"/><line x1="-8" y1="-2" x2="8" y2="-2" stroke="#d97706" stroke-width="1.5"/><line x1="-2" y1="-7" x2="-2" y2="7" stroke="#d97706" stroke-width="1.5"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Dexie Normalizer
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        7 Typed Stores
+      </text>
+    </g>
+
+    <!-- Node: FHIR R4 Mapper -->
+    <g transform="translate(472.0, 480)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#e11d48" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M0,-9 L7,-4 L5,6 L-5,6 L-7,-4 Z" fill="none" stroke="#e11d48" stroke-width="1.8"/><text x="-5" y="4" font-size="7" font-weight="900" fill="#e11d48">HL7</text>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        FHIR R4 Mapper
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        HL7 Observation Map
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 4: Embeddings ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-4" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1d9368"/>
+      <stop offset="100%" stop-color="#147451"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-4">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="510.0,610 680,675.0 680,703.0 510.0,638" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="680,675.0 850.0,610 850.0,638 680,703.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="680,545.0 850.0,610 680,675.0 510.0,610" fill="url(#grad-slab-4)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="680" y="615" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Embeddings
+      </text>
+    </g>
+
+    <!-- Left Branch Connector Trunk -->
+    <line x1="510.0" y1="610" x2="186.0" y2="610" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="510.0" cy="610" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: BGE-Small Med -->
+    <g transform="translate(186.0, 610)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#0284c7" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <circle cx="-5" cy="5" r="2.5" fill="#0284c7"/><circle cx="5" cy="-5" r="2.5" fill="#0284c7"/><circle cx="5" cy="5" r="2.5" fill="#0284c7"/><circle cx="-5" cy="-5" r="2.5" fill="#0284c7"/><line x1="-5" y1="5" x2="5" y2="-5" stroke="#0284c7" stroke-width="1.5"/><line x1="-5" y1="-5" x2="5" y2="5" stroke="#0284c7" stroke-width="1.5"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        BGE-Small Med
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Clinical Vectors
+      </text>
+    </g>
+
+    <!-- Node: MiniLM-L6 -->
+    <g transform="translate(304.0, 610)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#7c3aed" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-6" y="-6" width="12" height="12" rx="1.5" fill="none" stroke="#7c3aed" stroke-width="1.8"/><rect x="-3" y="-3" width="6" height="6" fill="#7c3aed"/><line x1="-9" y1="-3" x2="-6" y2="-3" stroke="#7c3aed" stroke-width="1.5"/><line x1="-9" y1="3" x2="-6" y2="3" stroke="#7c3aed" stroke-width="1.5"/><line x1="6" y1="-3" x2="9" y2="-3" stroke="#7c3aed" stroke-width="1.5"/><line x1="6" y1="3" x2="9" y2="3" stroke="#7c3aed" stroke-width="1.5"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        MiniLM-L6
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Semantic Match
+      </text>
+    </g>
+
+    <!-- Node: Hugging Face -->
+    <g transform="translate(422.0, 610)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#f59e0b" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <circle cx="0" cy="0" r="8" fill="none" stroke="#f59e0b" stroke-width="1.8"/><circle cx="-3" cy="-2" r="1.2" fill="#f59e0b"/><circle cx="3" cy="-2" r="1.2" fill="#f59e0b"/><path d="M-4,2 Q0,6 4,2" fill="none" stroke="#f59e0b" stroke-width="1.6"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Hugging Face
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Model Embedding Hub
+      </text>
+    </g>
+
+    <!-- Right Pill Badge -->
+    <line x1="850.0" y1="610" x2="875.0" y2="610" stroke="#276a44" stroke-width="2"/>
+    <g transform="translate(885.0, 610)">
+      <rect x="0" y="-18" width="180" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" filter="url(#node-shadow)"/>
+      <text x="90" y="-2" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">🌸 Sukrat Kaushik • Founder</text>
+      <text x="90" y="11" font-size="9" font-weight="500" fill="#64748b" text-anchor="middle">Clinical AI Architecture</text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 5: Vector & Local Database ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1c9c77"/>
+      <stop offset="100%" stop-color="#137c5e"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-5">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="460.0,740 630,805.0 630,833.0 460.0,768" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="630,805.0 800.0,740 800.0,768 630,833.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="630,675.0 800.0,740 630,805.0 460.0,740" fill="url(#grad-slab-5)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="630" y="745" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Vector & Local Database
+      </text>
+    </g>
+
+    <!-- Left Branch Connector Trunk -->
+    <line x1="460.0" y1="740" x2="136.0" y2="740" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="460.0" cy="740" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Dexie.js -->
+    <g transform="translate(136.0, 740)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#059669" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <ellipse cx="0" cy="-4" rx="8" ry="3" fill="none" stroke="#059669" stroke-width="1.6"/><path d="M-8,-4 L-8,4 A8,3 0 0,0 8,4 L8,-4" fill="none" stroke="#059669" stroke-width="1.6"/><path d="M-8,0 A8,3 0 0,0 8,0" fill="none" stroke="#059669" stroke-width="1.6"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Dexie.js
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Local BloomDB v3
+      </text>
+    </g>
+
+    <!-- Node: Firestore -->
+    <g transform="translate(254.0, 740)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#f97316" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-6,7 C-8,3 -4,-1 -2,-7 C-1,-5 1,-3 1,-1 C2,-4 5,-6 6,-8 C8,-2 8,5 4,8 C0,10 -4,10 -6,7 Z" fill="#f97316"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Firestore
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Cloud Backup (asia)
+      </text>
+    </g>
+
+    <!-- Node: FHIR Vault -->
+    <g transform="translate(372.0, 740)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#0d9488" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-8" y="-7" width="16" height="14" rx="3" fill="none" stroke="#0d9488" stroke-width="1.8"/><circle cx="0" cy="0" r="3" fill="#0d9488"/><line x1="0" y1="3" x2="0" y2="5" stroke="#0d9488" stroke-width="2"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        FHIR Vault
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Health Record Store
+      </text>
+    </g>
+
+    <!-- Right Pill Badge -->
+    <line x1="800.0" y1="740" x2="825.0" y2="740" stroke="#276a44" stroke-width="2"/>
+    <g transform="translate(835.0, 740)">
+      <rect x="0" y="-18" width="180" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" filter="url(#node-shadow)"/>
+      <text x="90" y="-2" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">WebRTC PeerJS</text>
+      <text x="90" y="11" font-size="9" font-weight="500" fill="#64748b" text-anchor="middle">P2P Partner Sync (Zero Cloud)</text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 6: Retrieval Layer ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-6" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1fa486"/>
+      <stop offset="100%" stop-color="#15846b"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-6">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="410.0,870 580,935.0 580,963.0 410.0,898" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="580,935.0 750.0,870 750.0,898 580,963.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="580,805.0 750.0,870 580,935.0 410.0,870" fill="url(#grad-slab-6)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="580" y="875" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Retrieval Layer
+      </text>
+    </g>
+
+    <!-- Right Branch Connector Trunk -->
+    <line x1="750.0" y1="870" x2="1074.0" y2="870" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="750.0" cy="870" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Gestational Engine -->
+    <g transform="translate(805.0, 870)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#059669" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <circle cx="0" cy="0" r="8" fill="none" stroke="#059669" stroke-width="1.8"/><polyline points="0,-5 0,0 4,2" fill="none" stroke="#059669" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Gestational Engine
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Trimester Context
+      </text>
+    </g>
+
+    <!-- Node: Health Connect -->
+    <g transform="translate(923.0, 870)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#e11d48" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M0,6 C-6,1 -9,-2 -9,-5 A4.5,4.5 0 0,1 -1,-7 L0,-5 L1,-7 A4.5,4.5 0 0,1 9,-5 C9,-2 6,1 0,6 Z" fill="#e11d48"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Health Connect
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Wearables & Vitals
+      </text>
+    </g>
+
+    <!-- Node: Clinical Triage -->
+    <g transform="translate(1041.0, 870)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#dc2626" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <polygon points="0,-9 9,7 -9,7" fill="none" stroke="#dc2626" stroke-width="1.8"/><line x1="0" y1="-4" x2="0" y2="1" stroke="#dc2626" stroke-width="2"/><circle cx="0" cy="4" r="1.2" fill="#dc2626"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Clinical Triage
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        140/90 BP Alert Filter
+      </text>
+    </g>
+
+    <!-- Left Pill Badge -->
+    <line x1="410.0" y1="870" x2="385.0" y2="870" stroke="#276a44" stroke-width="2"/>
+    <g transform="translate(195.0, 870)">
+      <rect x="0" y="-18" width="180" height="36" rx="18" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.4" filter="url(#node-shadow)"/>
+      <text x="90" y="-2" font-size="11" font-weight="700" fill="#0f172a" text-anchor="middle">Dexie LiveQuery</text>
+      <text x="90" y="11" font-size="9" font-weight="500" fill="#64748b" text-anchor="middle">Instant Reactive UI</text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 7: Prompt Engineering ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-7" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#25ab95"/>
+      <stop offset="100%" stop-color="#188a77"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-7">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="360.0,1000 530,1065.0 530,1093.0 360.0,1028" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="530,1065.0 700.0,1000 700.0,1028 530,1093.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="530,935.0 700.0,1000 530,1065.0 360.0,1000" fill="url(#grad-slab-7)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="530" y="1005" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Prompt Engineering
+      </text>
+    </g>
+
+    <!-- Right Branch Connector Trunk -->
+    <line x1="700.0" y1="1000" x2="1024.0" y2="1000" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="700.0" cy="1000" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Safety Guardrails -->
+    <g transform="translate(755.0, 1000)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#16a34a" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M0,-9 L8,-5 L8,1 C8,6 4,9 0,10 C-4,9 -8,6 -8,1 L-8,-5 Z" fill="none" stroke="#16a34a" stroke-width="1.8"/><polyline points="-3,0 -1,3 4,-2" fill="none" stroke="#16a34a" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Safety Guardrails
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Non-Prescriptive Bounds
+      </text>
+    </g>
+
+    <!-- Node: Indian Myth Buster -->
+    <g transform="translate(873.0, 1000)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#d97706" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M0,-9 Q0,0 9,0 Q0,0 0,9 Q0,0 -9,0 Q0,0 0,-9 Z" fill="#d97706"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Indian Myth Buster
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Cultural Diet Safety
+      </text>
+    </g>
+
+    <!-- Node: Few-Shot Triage -->
+    <g transform="translate(991.0, 1000)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#4f46e5" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-8,-7 L8,-7 L8,4 L2,4 L-2,8 L-2,4 L-8,4 Z" fill="none" stroke="#4f46e5" stroke-width="1.8"/><text x="-5" y="1" font-size="8" font-weight="900" fill="#4f46e5">&gt;_</text>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Few-Shot Triage
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Trimester Rules
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 8: Maternal LLMs & Vision ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2db2a3"/>
+      <stop offset="100%" stop-color="#1f9185"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-8">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="310.0,1130 480,1195.0 480,1223.0 310.0,1158" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="480,1195.0 650.0,1130 650.0,1158 480,1223.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="480,1065.0 650.0,1130 480,1195.0 310.0,1130" fill="url(#grad-slab-8)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="480" y="1135" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Maternal LLMs & Vision
+      </text>
+    </g>
+
+    <!-- Right Branch Connector Trunk -->
+    <line x1="650.0" y1="1130" x2="1092.0" y2="1130" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="650.0" cy="1130" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Qwen 2.5-72B -->
+    <g transform="translate(705.0, 1130)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#6366f1" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-6,0 C-8,-3 -6,-8 -1,-8 C-1,-5 1,-5 1,-8 C6,-8 8,-3 6,0 C8,4 5,8 1,8 C1,5 -1,5 -1,8 C-5,8 -8,4 -6,0 Z" fill="none" stroke="#6366f1" stroke-width="1.8"/><line x1="0" y1="-7" x2="0" y2="7" stroke="#6366f1" stroke-width="1.4"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Qwen 2.5-72B
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Clinical AI Chat
+      </text>
+    </g>
+
+    <!-- Node: Qwen 2.5-VL -->
+    <g transform="translate(823.0, 1130)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#ec4899" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-8,0 Q0,-6 8,0 Q0,6 -8,0 Z" fill="none" stroke="#ec4899" stroke-width="1.8"/><circle cx="0" cy="0" r="2.8" fill="#ec4899"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Qwen 2.5-VL
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Food & Lab Vision
+      </text>
+    </g>
+
+    <!-- Node: Offline Engine -->
+    <g transform="translate(941.0, 1130)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#10b981" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-6" y="-6" width="12" height="12" rx="2" fill="none" stroke="#10b981" stroke-width="1.8"/><circle cx="0" cy="0" r="2.5" fill="#10b981"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Offline Engine
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Deterministic Fallback
+      </text>
+    </g>
+
+    <!-- Node: Structured JSON -->
+    <g transform="translate(1059.0, 1130)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#f59e0b" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <text x="-8" y="5" font-size="14" font-weight="800" fill="#f59e0b">{}</text>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Structured JSON
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Typed Clinical Cards
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 9: Infra / Deployment ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#37b9b1"/>
+      <stop offset="100%" stop-color="#259891"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-9">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="260.0,1260 430,1325.0 430,1353.0 260.0,1288" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="430,1325.0 600.0,1260 600.0,1288 430,1353.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="430,1195.0 600.0,1260 430,1325.0 260.0,1260" fill="url(#grad-slab-9)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="430" y="1265" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Infra / Deployment
+      </text>
+    </g>
+
+    <!-- Right Branch Connector Trunk -->
+    <line x1="600.0" y1="1260" x2="1042.0" y2="1260" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="600.0" cy="1260" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Cloud Functions -->
+    <g transform="translate(655.0, 1260)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#f97316" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <circle cx="0" cy="0" r="8" fill="none" stroke="#f97316" stroke-width="1.8"/><path d="M-4,5 L1,-5 L3,5 M-2,0 L3,0" fill="none" stroke="#f97316" stroke-width="1.6"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Cloud Functions
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Node.js (asia-south1)
+      </text>
+    </g>
+
+    <!-- Node: Firebase Hosting -->
+    <g transform="translate(773.0, 1260)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#0284c7" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-7,3 A4,4 0 0,1 -4,-4 A5,5 0 0,1 5,-3 A3.5,3.5 0 0,1 7,3 Z" fill="none" stroke="#0284c7" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Firebase Hosting
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Global Edge CDN
+      </text>
+    </g>
+
+    <!-- Node: Google Play -->
+    <g transform="translate(891.0, 1260)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#10b981" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <polygon points="-4,-7 7,0 -4,7" fill="#10b981"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Google Play
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Android Release
+      </text>
+    </g>
+
+    <!-- Node: Secret Manager -->
+    <g transform="translate(1009.0, 1260)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#6366f1" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <rect x="-6" y="-2" width="12" height="9" rx="2" fill="none" stroke="#6366f1" stroke-width="1.8"/><path d="M-4,-2 L-4,-5 A4,4 0 0,1 4,-5 L4,-2" fill="none" stroke="#6366f1" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Secret Manager
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Zero Client API Keys
+      </text>
+    </g>
+  </g>
+
+  <!-- ==================== LAYER 10: Observability & Privacy Audit ==================== -->
+  <defs>
+    <linearGradient id="grad-slab-10" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3fbdbf"/>
+      <stop offset="100%" stop-color="#2ba1a3"/>
+    </linearGradient>
+  </defs>
+
+  <g id="layer-10">
+    <!-- 3D Slab Group -->
+    <g filter="url(#slab-3d-shadow)">
+      <!-- Left 3D side bevel -->
+      <polygon points="210.0,1390 380,1455.0 380,1483.0 210.0,1418" fill="#0e3820"/>
+      
+      <!-- Right 3D side bevel -->
+      <polygon points="380,1455.0 550.0,1390 550.0,1418 380,1483.0" fill="#164d2d"/>
+
+      <!-- Top Diamond Face -->
+      <polygon points="380,1325.0 550.0,1390 380,1455.0 210.0,1390" fill="url(#grad-slab-10)" stroke="#5bd18b" stroke-width="1" stroke-opacity="0.35"/>
+      
+      <!-- Layer Label in Bold White on Slab -->
+      <text x="380" y="1395" font-size="16.5" font-weight="800" fill="#ffffff" text-anchor="middle" letter-spacing="0.2" filter="drop-shadow(0 2px 3px rgba(0,0,0,0.35))">
+        Observability & Privacy Audit
+      </text>
+    </g>
+
+    <!-- Right Branch Connector Trunk -->
+    <line x1="550.0" y1="1390" x2="874.0" y2="1390" stroke="#276a44" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="550.0" cy="1390" r="4.5" fill="#38a169" stroke="#ffffff" stroke-width="1.8"/>
+
+    <!-- Node: Privacy Auditor -->
+    <g transform="translate(605.0, 1390)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#059669" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M0,-8 L7,-4 L7,1 C7,6 3,9 0,10 C-3,9 -7,6 -7,1 L-7,-4 Z" fill="#059669"/><circle cx="0" cy="1" r="1.5" fill="#ffffff"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Privacy Auditor
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Zero Data Leak Gate
+      </text>
+    </g>
+
+    <!-- Node: Cloud Telemetry -->
+    <g transform="translate(723.0, 1390)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#2563eb" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <polyline points="-8,4 -3,-2 1,3 7,-5" fill="none" stroke="#2563eb" stroke-width="2"/><circle cx="7" cy="-5" r="2" fill="#2563eb"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Cloud Telemetry
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        Latency & Error Logs
+      </text>
+    </g>
+
+    <!-- Node: Self Purge -->
+    <g transform="translate(841.0, 1390)">
+      <!-- Line anchor point -->
+      <circle cx="0" cy="0" r="4" fill="#2d7a4d" stroke="#ffffff" stroke-width="1.5"/>
+
+      <!-- Circular Badge Card above trunk -->
+      <g transform="translate(0, -38)" filter="url(#node-shadow)">
+        <!-- Vertical connector stem -->
+        <line x1="0" y1="38" x2="0" y2="24" stroke="#276a44" stroke-width="2"/>
+
+        <!-- Outer white card -->
+        <circle cx="0" cy="0" r="23" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5"/>
+        <circle cx="0" cy="0" r="19" fill="#e11d48" fill-opacity="0.08"/>
+        
+        <!-- Tech Icon -->
+        <g transform="translate(0, 0)">
+          <path d="M-6,-4 L6,-4 M-2,-6 L2,-6 M-5,-4 L-4,6 L4,6 L5,-4" fill="none" stroke="#e11d48" stroke-width="1.8"/>
+        </g>
+      </g>
+
+      <!-- Label Below Trunk -->
+      <text x="0" y="24" font-size="12.5" font-weight="700" fill="#1e293b" text-anchor="middle">
+        Self Purge
+      </text>
+      <text x="0" y="38" font-size="9.5" font-weight="500" fill="#64748b" text-anchor="middle">
+        deleteMyOwnAccount
+      </text>
+    </g>
+  </g>
+
+  <!-- Footer Note & Brand Watermark -->
+  <g transform="translate(590.0, 1560)" text-anchor="middle">
+    <text x="0" y="0" font-size="12" font-weight="600" fill="#64748b">
+      Designed for Project Bloom / Our Pregnancy (OPIN) • Live at <tspan fill="#0ea254" font-weight="700">ourpregnancy.in</tspan> • Zero-Client-Key Architecture
+    </text>
+  </g>
+</svg>
+
+      </div>
+    </div>
+
+    <section class="details-grid">
+      <div class="detail-card">
+        <h3>🔒 1. Local-First Clinical Privacy</h3>
+        <p>Unlike standard cloud RAG setups that transmit sensitive patient telemetry to third parties, OPIN tracks kicks, contractions, vitals, and nutrition inside <strong>Dexie.js (IndexedDB)</strong> on the mother's device with zero mandatory cloud sync.</p>
+        <div class="tag-list">
+          <span class="tag green">Local First</span>
+          <span class="tag green">Zero Cloud Storage</span>
+          <span class="tag blue">WebRTC P2P Sync</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>🛡️ 2. Clinical Triage & Guardrails</h3>
+        <p>Strict FOGSI (India) and ACOG compliance. Heuristic engines immediately intercept high-risk maternal symptoms (e.g. BP $\ge$ 140/90 mmHg, 5-1-1 labor rule) before forwarding to LLM reasoning.</p>
+        <div class="tag-list">
+          <span class="tag purple">FOGSI Guidelines</span>
+          <span class="tag purple">ACOG Compliant</span>
+          <span class="tag green">Emergency Triage</span>
+        </div>
+      </div>
+
+      <div class="detail-card">
+        <h3>⚡ 3. Serverless Zero-Client-Key AI</h3>
+        <p>Hardened Node.js Cloud Functions in Mumbai (<code>asia-south1</code>) route multimodal queries to Qwen 2.5-72B and Qwen 2.5-VL-72B without exposing Hugging Face or provider tokens to client bundles.</p>
+        <div class="tag-list">
+          <span class="tag blue">asia-south1</span>
+          <span class="tag blue">Qwen 2.5-72B</span>
+          <span class="tag green">Zero Client Keys</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    function downloadSVG() {
+      const svgEl = document.querySelector('#svg-container svg');
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgEl);
+      const blob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'OPIN_Full_Stack_Agentic_AI.svg';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadPNG() {
+      const svgEl = document.querySelector('#svg-container svg');
+      const serializer = new XMLSerializer();
+      const source = serializer.serializeToString(svgEl);
+      const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+      const url = URL.createObjectURL(svgBlob);
+
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement('canvas');
+        const scale = 2; // High-res 2x
+        canvas.width = svgEl.viewBox.baseVal.width * scale;
+        canvas.height = svgEl.viewBox.baseVal.height * scale;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#fbfdfc';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        const pngUrl = canvas.toDataURL('image/png');
+        const a = document.createElement('a');
+        a.href = pngUrl;
+        a.download = 'OPIN_Full_Stack_Agentic_AI.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      };
+      img.src = url;
+    }
+  </script>
+</body>
+</html>

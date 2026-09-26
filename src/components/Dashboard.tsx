@@ -40,8 +40,11 @@ import { LanguageSelector } from './LanguageSelector';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { MedicalReports } from './sections/MedicalReports';
+import { GuidedBreathingAudio } from './sections/GuidedBreathingAudio';
 
 import { navigate } from '../utils/navigation';
+import { isNativeApp } from '../utils/nativeBridge';
+import { MobileShell } from './mobile/MobileShell';
 
 const VALID_PAGES = [
   'tracker', 'dev', 'medical', 'medical-reports', 'prep', 'finance', 
@@ -49,7 +52,7 @@ const VALID_PAGES = [
   'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
   'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
   'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
-  'admin-panel', 'notes', 'profile'
+  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar'
 ];
 
 const getPageFromPath = (): string => {
@@ -67,6 +70,23 @@ export const Dashboard: React.FC = () => {
   const [activePage, setActivePageState] = useState<string>(getPageFromPath);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [isMobileViewport, setIsMobileViewport] = useState<boolean>(() => {
+    if (isNativeApp()) return true;
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    if (isNativeApp()) return;
+    const handleResize = () => {
+      setIsMobileViewport(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Sync state -> URL when user clicks any tab or feature
   const setActivePage = (page: string) => {
@@ -145,6 +165,10 @@ export const Dashboard: React.FC = () => {
   const filteredTasks = filterTasks(allTasks);
   const doneCount = filteredTasks.filter(t => state.checked[t.id]).length;
   const progressPct = filteredTasks.length ? Math.round((doneCount / filteredTasks.length) * 100) : 0;
+
+  if (isMobileViewport) {
+    return <MobileShell />;
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-cream">
@@ -230,6 +254,7 @@ export const Dashboard: React.FC = () => {
                 {activePage === 'admin-panel' && <AdminPanel />}
                 {activePage === 'notes' && <Notes />}
                 {activePage === 'profile' && <Profile />}
+                {(activePage === 'breathing' || activePage === 'garbhsanskar') && <GuidedBreathingAudio />}
               </motion.div>
             </AnimatePresence>
           </div>

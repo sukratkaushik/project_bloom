@@ -303,36 +303,64 @@ Rules:
 
 Return ONLY the JSON object.`;
     try {
-        const response = await fetch("https://router.huggingface.co/v1/chat/completions", {
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                "Content-Type": "application/json",
-            },
-            method: "POST",
-            body: JSON.stringify({
-                model: "Qwen/Qwen2.5-VL-72B-Instruct",
-                messages: [
-                    {
-                        role: "user",
-                        content: [
-                            {
-                                type: "image_url",
-                                image_url: {
-                                    url: `data:${mimeType};base64,${base64Data}`,
+        const formatErrorMessage = (err) => {
+            if (!err)
+                return "Unknown error";
+            if (typeof err === "string")
+                return err;
+            if (typeof err.message === "string")
+                return err.message;
+            if (Array.isArray(err))
+                return err.map(e => typeof e === "string" ? e : (e?.message || JSON.stringify(e))).join(", ");
+            return JSON.stringify(err);
+        };
+        const callVisionAPI = async (model) => {
+            return fetch("https://router.huggingface.co/v1/chat/completions", {
+                headers: {
+                    Authorization: `Bearer ${apiKey}`,
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    model,
+                    messages: [
+                        {
+                            role: "user",
+                            content: [
+                                {
+                                    type: "image_url",
+                                    image_url: {
+                                        url: `data:${mimeType};base64,${base64Data}`,
+                                    },
                                 },
-                            },
-                            {
-                                type: "text",
-                                text: systemPrompt,
-                            },
-                        ],
-                    },
-                ],
-                max_tokens: 700,
-                temperature: 0.1,
-            }),
-        });
-        const result = await response.json();
+                                {
+                                    type: "text",
+                                    text: systemPrompt,
+                                },
+                            ],
+                        },
+                    ],
+                    max_tokens: 700,
+                    temperature: 0.1,
+                }),
+            });
+        };
+        let response = await callVisionAPI("Qwen/Qwen2.5-VL-72B-Instruct");
+        let result = await response.json();
+        // If primary 72B vision model is busy, loading, or returns an error, fallback to warm 7B vision model
+        if (result.error && !result.choices) {
+            console.warn("Primary 72B vision model returned error, trying fallback model:", result.error);
+            try {
+                const fallbackRes = await callVisionAPI("Qwen/Qwen2.5-VL-7B-Instruct");
+                const fallbackResult = await fallbackRes.json();
+                if (fallbackResult.choices && fallbackResult.choices.length > 0) {
+                    result = fallbackResult;
+                }
+            }
+            catch (fallbackErr) {
+                console.error("Fallback vision model error:", fallbackErr);
+            }
+        }
         if (result.choices && result.choices.length > 0 && result.choices[0].message) {
             let content = result.choices[0].message.content.trim();
             // Strip any markdown code fences if the model adds them
@@ -347,8 +375,9 @@ Return ONLY the JSON object.`;
             }
         }
         else if (result.error) {
-            console.error("HF VL Error:", result.error);
-            throw new https_1.HttpsError("internal", `AI model error: ${result.error.message || "Unknown error"}`);
+            const errorDetail = formatErrorMessage(result.error);
+            console.error("HF VL Error:", errorDetail);
+            throw new https_1.HttpsError("unavailable", `AI model error: ${errorDetail}`);
         }
         throw new https_1.HttpsError("internal", "No response from AI model.");
     }
@@ -505,8 +534,11 @@ function parseResponseContent(result) {
         }
     }
     else if (result.error) {
-        console.error("HF API Error:", result.error);
-        throw new https_1.HttpsError("internal", `AI model error: ${result.error.message || "Unknown error"}`);
+        const errorDetail = typeof result.error === "string"
+            ? result.error
+            : (result.error.message || JSON.stringify(result.error));
+        console.error("HF API Error:", errorDetail);
+        throw new https_1.HttpsError("unavailable", `AI model error: ${errorDetail}`);
     }
     throw new https_1.HttpsError("internal", "No response received from AI model.");
 }

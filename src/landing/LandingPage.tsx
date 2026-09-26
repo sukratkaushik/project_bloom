@@ -34,9 +34,10 @@ import {
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { LanguageSelector } from '../components/LanguageSelector';
 import { PublicHeader } from '../components/PublicHeader';
-
+import { isNativeApp } from '../utils/nativeBridge';
 
 export const LandingPage: React.FC = () => {
+  const isNative = isNativeApp();
   const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
@@ -60,6 +61,7 @@ export const LandingPage: React.FC = () => {
 
   // Handle redirect result from Google sign-in (when popup was blocked)
   React.useEffect(() => {
+    if (isNative) return;
     handleRedirectResult().then(async (redirectUser) => {
       if (redirectUser) {
         const restored = await restoreJourney(redirectUser.uid);
@@ -71,7 +73,7 @@ export const LandingPage: React.FC = () => {
         }
       }
     });
-  }, []);
+  }, [isNative]);
 
   const isVerified = Boolean(
     user && (
@@ -80,12 +82,19 @@ export const LandingPage: React.FC = () => {
       user.providerData.some((p) => p.providerId === 'google.com')
     )
   );
-  const isSetupComplete = state.isSetup && isVerified;
+  const isSetupComplete = (state.isSetup && isVerified) || (isNative && state.isSetup);
 
   const handleStart = async () => {
     try {
-      if (isSetupComplete) {
+      if (isSetupComplete || (isNative && state.isSetup)) {
         navigate('/dashboard');
+        return;
+      }
+
+      // In Native Android App: Start tracking journey directly via Setup screen
+      if (isNative) {
+        updateState({ hasStartedOnboarding: true, isSetup: false });
+        navigate('/setup');
         return;
       }
 
@@ -616,21 +625,25 @@ export const LandingPage: React.FC = () => {
                     </button>
                   </div>
 
-                  <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-border"></div>
-                    <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
-                    <div className="flex-grow border-t border-border"></div>
-                  </div>
+                  {!isNative && (
+                    <>
+                      <div className="relative flex py-1 items-center">
+                        <div className="flex-grow border-t border-border"></div>
+                        <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
+                        <div className="flex-grow border-t border-border"></div>
+                      </div>
 
-                  <button
-                    type="button"
-                    onClick={handleStart}
-                    disabled={isLoggingIn}
-                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
-                  >
-                    {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                    Continue with Google
-                  </button>
+                      <button
+                        type="button"
+                        onClick={handleStart}
+                        disabled={isLoggingIn}
+                        className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                      >
+                        {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
+                        Continue with Google
+                      </button>
+                    </>
+                  )}
                 </form>
               </>
             )}
@@ -645,7 +658,7 @@ export const LandingPage: React.FC = () => {
 
 
       {/* Hero Section */}
-      <section className="relative px-6 pt-28 pb-16 md:pt-36 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible">
+      <section className={`relative px-6 ${isNative ? 'pt-36 sm:pt-40' : 'pt-28 md:pt-36'} pb-16 md:pb-24 max-w-[1200px] mx-auto z-10 flex flex-col md:flex-row items-center justify-between gap-12 overflow-visible`}>
 
         {/* Animated Background Blobs */}
         <div className="absolute top-0 -left-12 md:-left-24 w-72 h-72 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-2xl animate-blob -z-10"></div>

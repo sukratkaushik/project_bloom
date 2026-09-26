@@ -27,6 +27,7 @@ import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { Paywall } from '../Paywall';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
+import { compressImage } from '../../utils/imageCompression';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -106,36 +107,46 @@ export const MedicalReports: React.FC = () => {
     setIsUploading(true);
 
     try {
-      const reader = new FileReader();
-      reader.onload = async (event) => {
-        const base64 = event.target?.result as string;
+      let finalFile = file;
+      let base64 = '';
 
-        const reportId = 'report_' + Date.now();
-        const newReport: MedicalReport = {
-          id: reportId,
-          journeyId: state.activeJourneyId || 'local-journey',
-          title: file.name.substring(0, file.name.lastIndexOf('.')) || file.name,
-          date: new Date().toISOString().split('T')[0],
-          timestamp: Date.now(),
-          fileName: file.name,
-          fileType: file.type,
-          fileSize: file.size,
-          fileData: base64,
-          notes: '',
-          createdAt: Date.now()
-        };
+      if (file.type.startsWith('image/')) {
+        try {
+          const compressed = await compressImage(file, 1600, 0.85);
+          finalFile = compressed.file;
+          base64 = compressed.dataUrl;
+        } catch (compErr) {
+          console.warn("Medical report image compression fallback:", compErr);
+        }
+      }
 
-        await db.medicalReports.put(newReport);
-        await loadReports();
-        setIsUploading(false);
+      if (!base64) {
+        const reader = new FileReader();
+        base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = (e) => resolve(e.target?.result as string);
+          reader.onerror = () => reject(new Error("Failed to read file"));
+          reader.readAsDataURL(file);
+        });
+      }
+
+      const reportId = 'report_' + Date.now();
+      const newReport: MedicalReport = {
+        id: reportId,
+        journeyId: state.activeJourneyId || 'local-journey',
+        title: finalFile.name.substring(0, finalFile.name.lastIndexOf('.')) || finalFile.name,
+        date: new Date().toISOString().split('T')[0],
+        timestamp: Date.now(),
+        fileName: finalFile.name,
+        fileType: finalFile.type,
+        fileSize: finalFile.size,
+        fileData: base64,
+        notes: '',
+        createdAt: Date.now()
       };
 
-      reader.onerror = () => {
-        setUploadError("Failed to read the file. Please try again.");
-        setIsUploading(false);
-      };
-
-      reader.readAsDataURL(file);
+      await db.medicalReports.put(newReport);
+      await loadReports();
+      setIsUploading(false);
     } catch (err) {
       console.error("Error uploading report:", err);
       setUploadError("An error occurred during file upload. Please try again.");

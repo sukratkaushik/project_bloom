@@ -4,6 +4,7 @@ import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy,
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
 import firebaseConfig from '../firebase-applet-config.json';
+const isNativeApp = () => typeof window !== 'undefined' && Boolean((window as any).Capacitor?.isNativePlatform?.());
 
 const app = initializeApp(firebaseConfig);
 
@@ -174,6 +175,9 @@ export const analyticsPromise = isSupported().then(yes => yes ? getAnalytics(app
 export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
+  if (isNativeApp()) {
+    throw new Error('Google Sign-In is not supported in the mobile app. Please sign in or register with Email.');
+  }
   try {
     // Try popup first (works on most browsers)
     const result = await signInWithPopup(auth, googleProvider);
@@ -193,6 +197,9 @@ export const signInWithGoogle = async () => {
 
 // Handle redirect result when the page loads after a Google sign-in redirect
 export const handleRedirectResult = async () => {
+  if (isNativeApp()) {
+    return null;
+  }
   try {
     const result = await getRedirectResult(auth);
     if (result) {
