@@ -147,10 +147,14 @@ const AppContent: React.FC = () => {
   );
 };
 
+import { HelmetProvider } from 'react-helmet-async';
+
 export default function App() {
   return (
-    <PlannerProvider>
-      <AppContent />
-    </PlannerProvider>
+    <HelmetProvider>
+      <PlannerProvider>
+        <AppContent />
+      </PlannerProvider>
+    </HelmetProvider>
   );
 }
