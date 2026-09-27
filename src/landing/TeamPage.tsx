@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Linkedin, Sparkles, Shield, Heart, Wifi, Lock } from 'lucide-react';
 import { usePlanner } from '../store';
 import { LanguageSelector } from '../components/LanguageSelector';
@@ -41,6 +42,11 @@ export const TeamPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
+      <Helmet>
+        <title>Our Team | Our Pregnancy</title>
+        <meta name="description" content="Meet the team behind Our Pregnancy, dedicated to building a secure, private, and localized pregnancy companion for Indian mothers." />
+        <link rel="canonical" href="https://ourpregnancy.in/team" />
+      </Helmet>
       {/* Mesh Glow Background Blobs */}
       <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob -z-10" />
       <div className="absolute top-1/3 right-10 w-[500px] h-[500px] bg-blush-light/20 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000 -z-10" />
@@ -130,7 +136,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-sage-light to-sage",
                 bio: "Visionary founder passionate about scaling health solutions and building secure, mother-centric technologies.",
                 linkedin: "https://www.linkedin.com/in/sukratkaushik/",
-                image: "/sukrat.jpg"
+                image: "/sukrat.webp"
               },
               {
                 name: "Lakshay Trehan",
@@ -140,7 +146,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-blush-light to-blush",
                 bio: "Engineering lead focused on offline-first architectures, privacy, and seamless user experiences.",
                 linkedin: "https://www.linkedin.com/in/lakshaytrehan",
-                image: "/lakshay.jpg"
+                image: "/lakshay.webp"
               },
               {
                 name: "Vaishali Kaushik",
@@ -150,7 +156,7 @@ export const TeamPage: React.FC = () => {
                 gradient: "from-gold-pale to-gold",
                 bio: "Growth and marketing specialist dedicated to building supportive maternal communities.",
                 linkedin: null,
-                image: "/vaishali.png"
+                image: "/vaishali.webp"
               }
             ].map((member, i) => (
               <div key={i} className="premium-card p-8 flex flex-col items-center text-center relative group">
