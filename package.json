@@ -20,7 +20,7 @@
     "cap:sync": "npm run build && cap sync android",
     "cap:open:android": "cap open android",
     "cap:build:android": "npm run build && cap sync android && cd android && ./gradlew assembleDebug",
-    "postbuild": "react-snap"
+    "postbuild": "react-snap || exit 0"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",
@@ -65,5 +65,9 @@
     "typescript": "~5.8.2",
     "vite": "^6.2.0",
     "vite-plugin-pwa": "^0.21.2"
+  },
+  "reactSnap": {
+    "source": "dist",
+    "skipThirdPartyRequests": true
   }
 }
