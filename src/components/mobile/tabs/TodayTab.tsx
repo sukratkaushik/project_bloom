@@ -22,8 +22,10 @@ import {
   Pill,
   CheckCircle2,
   RotateCcw,
+  Star,
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
+import { ALL_PREGNANCY_TOOLS, getToolById, ToolDefinition } from '../toolsData';
 
 interface TodayTabProps {
   onOpenTool: (toolId: string) => void;
@@ -31,6 +33,8 @@ interface TodayTabProps {
   onOpenSchedule?: () => void;
   onSelectTab?: (tab: string) => void;
   onShowToast?: (message: string) => void;
+  pinnedIds?: string[];
+  onTogglePin?: (toolId: string) => void;
 }
 
 export const TodayTab: React.FC<TodayTabProps> = ({
@@ -39,6 +43,8 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   onOpenSchedule,
   onSelectTab,
   onShowToast,
+  pinnedIds = ['hydration', 'nutrition', 'askourpregnancy'],
+  onTogglePin,
 }) => {
   const { state } = usePlanner();
 
@@ -233,6 +239,217 @@ export const TodayTab: React.FC<TodayTabProps> = ({
     if (onShowToast) {
       onShowToast(allSuppsTaken ? '💊 Daily vitamins unmarked' : '💊 Daily prenatal vitamins logged!');
     }
+  };
+
+  // Pinned rituals resolved from toolsData
+  const defaultPinned = ['hydration', 'nutrition', 'askourpregnancy'];
+  const activePinnedIds = pinnedIds && pinnedIds.length > 0 ? pinnedIds : defaultPinned;
+  const pinnedTools = activePinnedIds
+    .map((id) => getToolById(id))
+    .filter((t): t is ToolDefinition => !!t);
+
+  const renderRitualCard = (tool: ToolDefinition) => {
+    const IconComp = tool.icon;
+    const isInteractiveWater = tool.id === 'hydration';
+    const isInteractiveSupps = tool.id === 'nutrition';
+    const isInteractiveKicks = tool.id === 'kickcounter';
+    const isInteractiveVitals = tool.id === 'vitals';
+
+    return (
+      <div
+        key={tool.id}
+        onClick={() => {
+          triggerHaptic('light');
+          onOpenTool(tool.id);
+        }}
+        className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[152px] h-full"
+      >
+        <div>
+          {/* Card Top: Icon + Badge + Unpin Star */}
+          <div className="flex items-center justify-between mb-2">
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tool.color}`}>
+              <IconComp size={17} />
+            </div>
+
+            <div className="flex items-center gap-1">
+              {isInteractiveWater ? (
+                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.2 rounded-full">
+                  {totalWaterMl >= waterGoalMl ? 'GOAL MET' : `${waterPercent}%`}
+                </span>
+              ) : isInteractiveSupps ? (
+                <span
+                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${
+                    allSuppsTaken
+                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
+                      : 'text-amber-700 bg-amber-50 border-amber-200'
+                  }`}
+                >
+                  {allSuppsTaken ? 'TAKEN ✓' : `${takenSupps.length}/3`}
+                </span>
+              ) : isInteractiveKicks ? (
+                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full">
+                  {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
+                </span>
+              ) : isInteractiveVitals ? (
+                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-full">
+                  NORMAL
+                </span>
+              ) : tool.badge ? (
+                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full">
+                  {tool.badge}
+                </span>
+              ) : null}
+
+              {onTogglePin && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    triggerHaptic('light');
+                    onTogglePin(tool.id);
+                  }}
+                  className="p-1 text-amber-500 hover:text-amber-600 rounded-full hover:bg-amber-50/80 transition-colors cursor-pointer"
+                  title="Unpin from Daily Rituals"
+                  aria-label={`Unpin ${tool.title}`}
+                >
+                  <Star size={13} className="fill-amber-400 text-amber-500" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Card Middle: Title & Metrics / Subtitle */}
+          <p className="text-[11.5px] font-semibold text-medium truncate">{tool.title}</p>
+
+          {isInteractiveWater ? (
+            <>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  {(totalWaterMl / 1000).toFixed(2)}L
+                </span>
+                <span className="text-[10px] text-light font-medium">/ 2.5L</span>
+              </div>
+              <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                <div
+                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                  style={{ width: `${waterPercent}%` }}
+                />
+              </div>
+            </>
+          ) : isInteractiveSupps ? (
+            <>
+              <p className="text-[11.5px] text-charcoal font-bold mt-0.5 truncate">
+                Folic, Iron, Calcium
+              </p>
+              <p className="text-[10px] text-light mt-0.5 truncate">
+                {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
+              </p>
+            </>
+          ) : isInteractiveKicks ? (
+            <>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  {latestKicks}
+                </span>
+                <span className="text-[10.5px] text-medium font-medium">/ 10 kicks</span>
+              </div>
+              <p className="text-[10px] text-light mt-0.5 truncate">
+                {latestKicks >= 10 ? 'Goal met today! ✨' : 'Target: 10 kicks'}
+              </p>
+            </>
+          ) : isInteractiveVitals ? (
+            <>
+              <div className="flex items-baseline gap-1 mt-0.5">
+                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  {latestBp}
+                </span>
+                <span className="text-[9.5px] text-light font-bold">mmHg</span>
+              </div>
+              <p className="text-[10px] text-light mt-0.5 truncate">
+                Pulse: {latestPulse} bpm
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-[12px] font-bold text-charcoal mt-0.5 truncate">
+                {tool.ritualSubtitle || tool.title}
+              </p>
+              <p className="text-[10.5px] text-medium mt-0.5 truncate">
+                {tool.desc}
+              </p>
+            </>
+          )}
+        </div>
+
+        {/* Card Bottom: 1-Tap Action Button */}
+        {isInteractiveWater ? (
+          <button
+            type="button"
+            onClick={handleQuickWater}
+            className="mt-2.5 w-full h-8 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <Plus size={12} strokeWidth={2.5} />
+            <span>+250ml Glass</span>
+          </button>
+        ) : isInteractiveSupps ? (
+          <button
+            type="button"
+            onClick={handleQuickSupplements}
+            className={`mt-2.5 w-full h-8 py-1.5 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer ${
+              allSuppsTaken
+                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                : 'bg-sage text-white hover:bg-sage-dark shadow-2xs'
+            }`}
+          >
+            {allSuppsTaken ? (
+              <>
+                <CheckCircle2 size={12} className="text-emerald-600" />
+                <span>Taken Today ✓</span>
+              </>
+            ) : (
+              <>
+                <Plus size={12} strokeWidth={2.5} />
+                <span>Mark Taken</span>
+              </>
+            )}
+          </button>
+        ) : isInteractiveKicks ? (
+          <button
+            type="button"
+            onClick={handleQuickKick}
+            className="mt-2.5 w-full h-8 py-1.5 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <Plus size={12} strokeWidth={2.5} />
+            <span>+1 Kick</span>
+          </button>
+        ) : isInteractiveVitals ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="mt-2.5 w-full h-8 py-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <Activity size={12} />
+            <span>+ Log Vitals</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              triggerHaptic('light');
+              onOpenTool(tool.id);
+            }}
+            className="mt-2.5 w-full h-8 py-1.5 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+          >
+            <span>{tool.actionLabel || 'Open Tool →'}</span>
+          </button>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -544,7 +761,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </div>
       </div>
 
-      {/* 5. Daily Health Rituals with 1-Tap Micro-Actions (Hydration & Supplements) */}
+      {/* 5. Dynamic Daily Health Rituals from Explore & Customization */}
       <div>
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-1.5">
@@ -552,6 +769,9 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             <h2 className="font-serif text-[16px] font-bold text-charcoal">
               Daily Health Rituals
             </h2>
+            <span className="text-[10px] font-sans font-bold text-sage-dark bg-sage-pale px-2 py-0.2 rounded-full">
+              {pinnedTools.length}
+            </span>
           </div>
           <button
             type="button"
@@ -565,108 +785,47 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          {/* Card 1: Hydration Tracker with 1-Tap +250ml */}
-          <div
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('hydration');
-            }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
-                  <Droplets size={17} />
-                </div>
-                <span className="text-[9.5px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full">
-                  {totalWaterMl >= waterGoalMl ? 'GOAL MET' : `${waterPercent}%`}
-                </span>
-              </div>
-              <p className="text-[11.5px] font-semibold text-medium">Hydration</p>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
-                  {(totalWaterMl / 1000).toFixed(2)}L
-                </span>
-                <span className="text-[10.5px] text-light font-medium">/ 2.5L</span>
-              </div>
-
-              {/* Mini progress bar */}
-              <div className="w-full bg-border/60 rounded-full h-1.5 mt-2 overflow-hidden">
-                <div
-                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${waterPercent}%` }}
-                />
-              </div>
-            </div>
-
-            {/* 1-Tap +250ml Action */}
+        {pinnedTools.length === 0 ? (
+          <div className="bg-white border border-dashed border-border/80 rounded-2xl p-6 text-center shadow-2xs">
+            <Calendar size={28} className="mx-auto text-light mb-1.5" />
+            <p className="text-[13px] font-bold text-charcoal">No daily rituals pinned yet</p>
+            <p className="text-[11.5px] text-medium mt-0.5 max-w-xs mx-auto">
+              Star (⭐) any feature from the Explore tab to quickly log and access it here.
+            </p>
             <button
               type="button"
-              onClick={handleQuickWater}
-              className="mt-2.5 w-full py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onSelectTab) onSelectTab('explore');
+              }}
+              className="mt-3 px-4 py-1.5 bg-sage text-white text-[12px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark transition-colors cursor-pointer"
             >
-              <Plus size={12} strokeWidth={2.5} />
-              <span>+250ml Glass</span>
+              Explore Features
             </button>
           </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3">
+            {pinnedTools.map((tool) => renderRitualCard(tool))}
 
-          {/* Card 2: Daily Prenatal Supplements with 1-Tap Toggle */}
-          <div
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('nutrition');
-            }}
-            className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
-          >
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
-                  <Pill size={17} />
+            {/* If odd count of items, render a subtle dashed "+ Add Ritual" slot so the 2-column grid is always balanced */}
+            {pinnedTools.length % 2 === 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  onOpenAddRituals();
+                }}
+                className="border-2 border-dashed border-border/80 hover:border-sage/60 rounded-2xl p-3.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[148px]"
+              >
+                <div className="w-8 h-8 rounded-full bg-cream group-hover:bg-sage-pale text-medium group-hover:text-sage-dark flex items-center justify-center mb-1.5 transition-colors">
+                  <Plus size={16} />
                 </div>
-                <span
-                  className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${
-                    allSuppsTaken
-                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                      : 'text-amber-700 bg-amber-50 border-amber-200'
-                  }`}
-                >
-                  {allSuppsTaken ? 'TAKEN ✓' : `${takenSupps.length}/3 TAKEN`}
-                </span>
-              </div>
-              <p className="text-[11.5px] font-semibold text-medium">Prenatal Vitamins</p>
-              <p className="text-[11px] text-charcoal font-bold mt-0.5 truncate">
-                Folic, Iron, Calcium
-              </p>
-              <p className="text-[10px] text-light mt-1">
-                {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
-              </p>
-            </div>
-
-            {/* 1-Tap Mark Taken Action */}
-            <button
-              type="button"
-              onClick={handleQuickSupplements}
-              className={`mt-2.5 w-full py-1.5 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer ${
-                allSuppsTaken
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                  : 'bg-cream border border-border hover:border-sage text-charcoal'
-              }`}
-            >
-              {allSuppsTaken ? (
-                <>
-                  <CheckCircle2 size={12} className="text-emerald-600" />
-                  <span>Taken Today ✓</span>
-                </>
-              ) : (
-                <>
-                  <Plus size={12} strokeWidth={2.5} />
-                  <span>Mark Taken</span>
-                </>
-              )}
-            </button>
+                <span className="text-[12px] font-bold text-charcoal group-hover:text-sage-dark">Add Ritual</span>
+                <span className="text-[10px] text-light mt-0.5">Explore 26 tools</span>
+              </button>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* 6. Mindful Breathing & Garbh Sanskar Card */}

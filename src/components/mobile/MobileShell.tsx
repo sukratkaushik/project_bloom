@@ -13,6 +13,7 @@ import { triggerHaptic, initNotificationChannels, registerNotificationActionList
 import { usePlanner } from '../../store';
 import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
+import { ALL_PREGNANCY_TOOLS } from './toolsData';
 
 // Import existing Section tools
 import { KickCounter } from '../sections/KickCounter';
@@ -225,6 +226,8 @@ export const MobileShell: React.FC = () => {
             {activeTab === 'today' && (
               <TodayTab
                 onOpenTool={handleOpenTool}
+                pinnedIds={pinnedIds}
+                onTogglePin={handleTogglePin}
                 onOpenAddRituals={() => setShowAddRitualsModal(true)}
                 onOpenSchedule={() => setShowScheduleModal(true)}
                 onSelectTab={(tab) => {
@@ -458,50 +461,91 @@ export const MobileShell: React.FC = () => {
       {/* Add Rituals Sheet */}
       {showAddRitualsModal && (
         <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-end justify-center animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl p-5 w-full max-w-lg shadow-2xl relative max-h-[70vh] overflow-y-auto">
-            <div className="w-12 h-1 bg-border rounded-full mx-auto mb-3" />
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-serif font-bold text-charcoal text-[16px]">
-                Customize Daily Rituals
-              </h3>
+          <div className="bg-white rounded-t-3xl p-5 w-full max-w-lg shadow-2xl relative max-h-[75vh] flex flex-col">
+            <div className="w-12 h-1 bg-border rounded-full mx-auto mb-3 shrink-0" />
+            <div className="flex items-center justify-between mb-2 shrink-0">
+              <div className="flex items-center gap-2">
+                <h3 className="font-serif font-bold text-charcoal text-[17px]">
+                  Customize Daily Rituals
+                </h3>
+                <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
+                  {pinnedIds.length} Pinned
+                </span>
+              </div>
               <button
                 onClick={() => setShowAddRitualsModal(false)}
-                className="p-1.5 text-medium hover:text-charcoal rounded-full"
+                className="p-1.5 text-medium hover:text-charcoal rounded-full cursor-pointer"
               >
                 <X size={18} />
               </button>
             </div>
-            <p className="text-[12px] text-medium mb-3">
-              Select which health tools appear on your Today screen for quick 1-tap logging.
+            <p className="text-[12px] text-medium mb-3 shrink-0">
+              Star (⭐) any tool from below to make it available on your Today tab under Daily Health Rituals.
             </p>
-            <div className="space-y-2">
-              {[
-                { id: 'kickcounter', name: 'Kick Counter' },
-                { id: 'hydration', name: 'Hydration Tracker' },
-                { id: 'vitals', name: 'Blood Pressure & Vitals' },
-                { id: 'askourpregnancy', name: 'Ask Bloom AI' },
-                { id: 'symptoms', name: 'Symptom Logger' },
-                { id: 'mood', name: 'Mood & Energy' },
-                { id: 'nutrition', name: 'Supplements Tracker' },
-                { id: 'contractions', name: 'Contraction Timer' },
-              ].map((tool) => (
-                <div
-                  key={tool.id}
-                  onClick={() => handleTogglePin(tool.id)}
-                  className="flex items-center justify-between p-3 bg-cream/60 border border-border/80 rounded-xl hover:border-sage transition-all cursor-pointer"
-                >
-                  <span className="font-semibold text-charcoal text-[13px]">{tool.name}</span>
-                  <Star
-                    size={18}
-                    className={pinnedIds.includes(tool.id) ? 'text-amber-500 fill-amber-500' : 'text-light'}
-                  />
-                </div>
-              ))}
+
+            <div className="space-y-2 overflow-y-auto flex-1 pr-1 custom-scrollbar">
+              {ALL_PREGNANCY_TOOLS.map((tool) => {
+                const isPinned = pinnedIds.includes(tool.id);
+                const IconComp = tool.icon;
+                return (
+                  <div
+                    key={tool.id}
+                    onClick={() => {
+                      triggerHaptic('light');
+                      handleTogglePin(tool.id);
+                    }}
+                    className={`flex items-center justify-between p-2.5 rounded-2xl border transition-all cursor-pointer ${
+                      isPinned
+                        ? 'bg-amber-50/50 border-amber-200'
+                        : 'bg-cream/40 border-border/70 hover:border-sage/60'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                      <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tool.color}`}>
+                        <IconComp size={16} />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-bold text-charcoal text-[12.5px] truncate">
+                            {tool.title}
+                          </span>
+                          {tool.badge && (
+                            <span className="text-[8.5px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border text-medium shrink-0">
+                              {tool.badge}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10.5px] text-medium truncate">
+                          {tool.desc}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        triggerHaptic('light');
+                        handleTogglePin(tool.id);
+                      }}
+                      className={`p-1.5 rounded-full shrink-0 ml-2 transition-colors cursor-pointer ${
+                        isPinned
+                          ? 'text-amber-500 bg-amber-100/70 hover:bg-amber-200'
+                          : 'text-light hover:text-medium hover:bg-cream'
+                      }`}
+                      aria-label={isPinned ? 'Unpin' : 'Pin'}
+                    >
+                      <Star size={16} fill={isPinned ? 'currentColor' : 'none'} />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
+
             <button
               type="button"
               onClick={() => setShowAddRitualsModal(false)}
-              className="mt-4 w-full py-2.5 bg-sage-dark text-white font-bold text-[13px] rounded-xl shadow-xs hover:bg-sage transition-colors cursor-pointer"
+              className="mt-3.5 w-full py-2.5 bg-sage-dark text-white font-bold text-[13px] rounded-xl shadow-xs hover:bg-sage transition-colors cursor-pointer shrink-0"
             >
               Done
             </button>
