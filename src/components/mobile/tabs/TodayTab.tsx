@@ -236,7 +236,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   };
 
   return (
-    <div className="space-y-4 pb-24 animate-in fade-in duration-200">
+    <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* 1. Interactive Horizontal Week Timeline Scroller (Week 1–40) */}
       <div className="bg-white/90 backdrop-blur-xs border border-border/80 rounded-2xl p-2.5 shadow-2xs">
         <div className="flex items-center justify-between px-1.5 mb-1.5 text-[11px] font-semibold text-medium">
@@ -346,18 +346,20 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </div>
 
         {/* Baby Metrology Row */}
-        <div className="mt-4 pt-3 border-t border-border/60 grid grid-cols-3 gap-2 text-[12px]">
-          <div>
-            <span className="text-medium text-[11px] block">Size Analogy:</span>
-            <p className="font-bold text-charcoal truncate">{weekInfo.babySizeAnalogy}</p>
+        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-3 gap-2 text-center">
+          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Size</span>
+            <p className="font-bold text-charcoal text-[13px] truncate mt-0.5" title={weekInfo.babySizeAnalogy}>
+              {weekInfo.babySizeAnalogy}
+            </p>
           </div>
-          <div className="text-center">
-            <span className="text-medium text-[11px] block">Est. Length:</span>
-            <p className="font-bold text-charcoal">{weekInfo.length}</p>
+          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Length</span>
+            <p className="font-bold text-charcoal text-[13px] mt-0.5">{weekInfo.length}</p>
           </div>
-          <div className="text-right">
-            <span className="text-medium text-[11px] block">Est. Weight:</span>
-            <p className="font-bold text-charcoal">{weekInfo.weight}</p>
+          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Weight</span>
+            <p className="font-bold text-charcoal text-[13px] mt-0.5">{weekInfo.weight}</p>
           </div>
         </div>
 
