@@ -29,63 +29,57 @@ export const CareTab: React.FC<CareTabProps> = ({
 }) => {
   const [selectedQuestionCategory, setSelectedQuestionCategory] = useState<string>('All');
   const [prepQuestions, setPrepQuestions] = useState<QuestionItem[]>([
-    { id: 1, text: 'Is occasional lower back tightness normal at Week 24?', category: 'Symptoms', done: false },
-    { id: 2, text: 'When should I take the Oral Glucose Tolerance Test (OGTT)?', category: 'Scans', done: true },
-    { id: 3, text: 'Safe sleeping positions and pregnancy pillow recommendations?', category: 'General', done: false },
-    { id: 4, text: 'Are daily iron and calcium supplements best taken together or apart?', category: 'Nutrition', done: true },
-    { id: 5, text: 'Recommended target fetal kick frequency for my 3rd trimester baseline?', category: 'Symptoms', done: false },
+    { id: 1, text: 'Lower back tightness at Week 24 normal?', category: 'Symptoms', done: false },
+    { id: 2, text: 'Schedule for Oral Glucose Test (OGTT)?', category: 'Scans', done: true },
+    { id: 3, text: 'Safe sleep positions & pillow advice?', category: 'General', done: false },
+    { id: 4, text: 'Best timing for iron & calcium tablets?', category: 'Nutrition', done: true },
+    { id: 5, text: 'Target fetal kick frequency baseline?', category: 'Symptoms', done: false },
   ]);
   const [newQuestionText, setNewQuestionText] = useState('');
 
-  // Clinical Prenatal Scan Roadmap
+  // Clinical Prenatal Scan Roadmap with clean, non-wrapping badges
   const scanMilestones = [
     {
       id: 'dating',
       title: 'Dating & Viability Scan',
-      period: 'Week 7–9',
+      period: 'Wk 7–9',
       status: 'completed',
-      date: 'Completed 12 Jun',
-      hospital: 'Cloudnine Whitefield',
+      date: '12 Jun • Cloudnine',
     },
     {
       id: 'nt',
       title: 'NT Scan & Dual Marker',
-      period: 'Week 11–13',
+      period: 'Wk 11–13',
       status: 'completed',
-      date: 'Completed 18 Jul',
-      hospital: 'Cloudnine Whitefield',
+      date: '18 Jul • Cloudnine',
     },
     {
       id: 'tiffa',
-      title: 'Level II TIFFA Anomaly Scan',
-      period: 'Week 18–20',
+      title: 'Level II TIFFA Anomaly',
+      period: 'Wk 18–20',
       status: 'completed',
-      date: 'Completed 28 Aug',
-      hospital: 'Cloudnine Whitefield',
+      date: '28 Aug • Cloudnine',
     },
     {
       id: 'ogtt',
-      title: 'OGTT & Routine Growth Scan',
-      period: 'Week 24–28',
+      title: 'OGTT & Growth Scan',
+      period: 'Wk 24–28',
       status: 'upcoming',
-      date: 'Wednesday, 23 Sep • 10:30 AM',
-      hospital: 'OPD Room 204 • Dr. Priya',
+      date: 'Wed, 23 Sep • 10:30 AM',
     },
     {
       id: 'doppler',
       title: 'Fetal Growth & Doppler',
-      period: 'Week 32',
+      period: 'Wk 32',
       status: 'scheduled',
       date: 'Planned for Week 32',
-      hospital: 'Cloudnine Whitefield',
     },
     {
       id: 'nst',
-      title: 'Non-Stress Test (NST) & GBS',
-      period: 'Week 36–37',
+      title: 'Non-Stress Test (NST)',
+      period: 'Wk 36–37',
       status: 'scheduled',
       date: 'Planned for Week 36',
-      hospital: 'Cloudnine Whitefield',
     },
   ];
 
@@ -122,88 +116,86 @@ export const CareTab: React.FC<CareTabProps> = ({
   );
 
   return (
-    <div className="space-y-4 pb-28 animate-in fade-in duration-200">
+    <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* 1. OB-GYN Clinical Care Team Hero Card */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-start justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-13 h-13 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
-              <Stethoscope size={26} />
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
+              <Stethoscope size={24} />
             </div>
-            <div>
-              <span className="text-[10px] font-bold text-sage-dark uppercase tracking-wider block">
-                Primary Obstetrician & Gynecologist
+            <div className="min-w-0">
+              <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
+                Primary Obstetrician
               </span>
-              <h3 className="font-serif font-bold text-charcoal text-[17px] leading-tight">
+              <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight truncate">
                 Dr. Priya Sharma, MS
               </h3>
-              <p className="text-[12px] text-medium mt-0.5 flex items-center gap-1">
-                <MapPin size={12} className="text-sage" />
-                <span>Cloudnine Hospital • Whitefield</span>
+              <p className="text-[11.5px] text-medium mt-0.5 flex items-center gap-1 truncate">
+                <MapPin size={11} className="text-sage shrink-0" />
+                <span className="truncate">Cloudnine Hospital • Whitefield</span>
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-1.5 shrink-0">
-            {/* Call Clinic Button */}
+          <div className="flex items-center gap-1.5 shrink-0 ml-2">
             <a
               href="tel:+919876543210"
               onClick={() => triggerHaptic('light')}
-              className="w-9 h-9 rounded-full bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all"
+              className="w-8 h-8 rounded-full bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all"
               aria-label="Call Clinic"
-              title="Call Clinic OPD"
+              title="Call Clinic"
             >
-              <Phone size={16} />
+              <Phone size={14} />
             </a>
-            {/* WhatsApp Nurse Button */}
             <a
               href="https://wa.me/919876543210?text=Namaste%20Cloudnine%20Care%20Team,%20query%20from%20Bloom%20App"
               target="_blank"
               rel="noreferrer"
               onClick={() => triggerHaptic('light')}
-              className="w-9 h-9 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs hover:bg-emerald-700 active:scale-95 transition-all"
+              className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs hover:bg-emerald-700 active:scale-95 transition-all"
               aria-label="WhatsApp Clinic"
-              title="Chat with OPD Care Team"
+              title="WhatsApp OPD"
             >
-              <MessageCircle size={16} />
+              <MessageCircle size={14} />
             </a>
           </div>
         </div>
 
-        {/* Patient Clinical Info Bar */}
-        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-4 gap-2 text-center text-[11.5px]">
-          <div className="bg-cream/70 rounded-xl py-1.5 px-1 border border-border/40">
-            <span className="text-medium text-[9.5px] font-bold uppercase block">UHID</span>
-            <span className="font-mono font-bold text-charcoal text-[11px]">#BLM-98421</span>
+        {/* Patient Clinical Info Bar with Symmetric Equal-Height Boxes */}
+        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-4 gap-2 text-center">
+          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">UHID</span>
+            <span className="font-mono font-bold text-charcoal text-[11px] truncate mt-0.5">#98421</span>
           </div>
-          <div className="bg-cream/70 rounded-xl py-1.5 px-1 border border-border/40">
-            <span className="text-medium text-[9.5px] font-bold uppercase block">Blood</span>
-            <span className="font-bold text-charcoal text-[11px]">B+ (Rh+)</span>
+          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Blood</span>
+            <span className="font-bold text-charcoal text-[11px] truncate mt-0.5">B+ (Rh+)</span>
           </div>
-          <div className="bg-cream/70 rounded-xl py-1.5 px-1 border border-border/40">
-            <span className="text-medium text-[9.5px] font-bold uppercase block">Gestation</span>
-            <span className="font-bold text-sage-dark text-[11px]">Wk 24 + 0d</span>
+          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Gestation</span>
+            <span className="font-bold text-sage-dark text-[11px] truncate mt-0.5">Wk 24+0d</span>
           </div>
-          <div className="bg-cream/70 rounded-xl py-1.5 px-1 border border-border/40">
-            <span className="text-medium text-[9.5px] font-bold uppercase block">Allergies</span>
-            <span className="font-bold text-emerald-700 text-[11px]">NKDA</span>
+          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Allergy</span>
+            <span className="font-bold text-emerald-700 text-[11px] truncate mt-0.5">NKDA</span>
           </div>
         </div>
       </div>
 
       {/* 2. Next Prenatal Visit Bento Card */}
       <div className="bg-gradient-to-r from-sage-pale/70 via-white to-cream border border-sage/35 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-start justify-between gap-2">
-          <div>
-            <div className="flex items-center gap-1.5 text-[11px] font-bold text-sage-dark uppercase tracking-wide">
-              <Clock size={13} />
+        <div className="flex items-center justify-between gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 text-[10.5px] font-bold text-sage-dark uppercase tracking-wide">
+              <Clock size={12} />
               <span>Next Checkup • In 6 Days</span>
             </div>
-            <h4 className="font-serif font-bold text-charcoal text-[15px] mt-1">
-              Routine Growth Scan & OGTT Glucose Screen
+            <h4 className="font-serif font-bold text-charcoal text-[15px] leading-tight mt-0.5 truncate">
+              Routine Growth Scan & OGTT
             </h4>
-            <p className="text-[12px] text-medium mt-0.5">
-              Wednesday, 23 Sep • 10:30 AM • OPD Room 204
+            <p className="text-[11.5px] text-medium mt-0.5 truncate">
+              Wed, 23 Sep • 10:30 AM • OPD Room 204
             </p>
           </div>
           <button
@@ -212,15 +204,15 @@ export const CareTab: React.FC<CareTabProps> = ({
               triggerHaptic('light');
               onOpenSchedule();
             }}
-            className="px-3 py-1.5 bg-sage text-white text-[12px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all shrink-0 cursor-pointer"
+            className="px-3 py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all shrink-0 cursor-pointer"
           >
             Reschedule
           </button>
         </div>
 
-        <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11.5px]">
-          <span className="text-medium">
-            Pre-test: Fast for 8 hours prior to the fasting glucose blood draw.
+        <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11px]">
+          <span className="text-medium truncate">
+            Fast 8 hours prior to the glucose test.
           </span>
           <button
             type="button"
@@ -228,28 +220,28 @@ export const CareTab: React.FC<CareTabProps> = ({
               triggerHaptic('light');
               onOpenTool('medical');
             }}
-            className="text-sage-dark font-bold hover:underline shrink-0 ml-2 cursor-pointer"
+            className="text-sage-dark font-bold hover:underline shrink-0 ml-2 whitespace-nowrap cursor-pointer"
           >
-            View Checklist →
+            Checklist →
           </button>
         </div>
       </div>
 
-      {/* 3. Interactive Clinical Scan Roadmap */}
+      {/* 3. Interactive Clinical Scan Roadmap with Single-Line Rows */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 px-0.5">
           <div className="flex items-center gap-1.5">
-            <CalendarCheck size={17} className="text-sage-dark" />
-            <h3 className="font-serif font-bold text-charcoal text-[15px]">
-              Prenatal Scan & Milestone Roadmap
+            <CalendarCheck size={16} className="text-sage-dark" />
+            <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
+              Prenatal Scan Roadmap
             </h3>
           </div>
-          <span className="text-[11px] font-bold text-medium">
-            ACOG & FOGSI Standard
+          <span className="text-[10.5px] font-bold text-medium">
+            FOGSI Standard
           </span>
         </div>
 
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {scanMilestones.map((item) => {
             const isCompleted = item.status === 'completed';
             const isUpcoming = item.status === 'upcoming';
@@ -257,80 +249,78 @@ export const CareTab: React.FC<CareTabProps> = ({
             return (
               <div
                 key={item.id}
-                className={`p-3 rounded-2xl border transition-all ${
+                className={`h-14 px-3 rounded-2xl border flex items-center justify-between gap-2.5 transition-all ${
                   isUpcoming
                     ? 'bg-sage-pale/40 border-sage/60 shadow-2xs'
                     : isCompleted
                     ? 'bg-cream/40 border-border/60'
-                    : 'bg-white border-border/50 opacity-70'
+                    : 'bg-white border-border/40 opacity-70'
                 }`}
               >
-                <div className="flex items-start justify-between gap-2">
-                  <div className="flex items-start gap-2.5">
-                    <div className="mt-0.5 shrink-0">
-                      {isCompleted ? (
-                        <CheckCircle2 size={16} className="text-sage-dark" />
-                      ) : isUpcoming ? (
-                        <Clock size={16} className="text-soft-saffron-dark animate-pulse" />
-                      ) : (
-                        <div className="w-4 h-4 rounded-full border border-medium/40" />
-                      )}
-                    </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold text-charcoal text-[13px] leading-tight">
-                          {item.title}
-                        </h4>
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border/70 text-medium">
-                          {item.period}
-                        </span>
-                      </div>
-                      <p className="text-[11.5px] text-medium mt-0.5">
-                        {item.date} • {item.hospital}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                  <div className="shrink-0">
+                    {isCompleted ? (
+                      <CheckCircle2 size={16} className="text-sage-dark" />
+                    ) : isUpcoming ? (
+                      <Clock size={16} className="text-soft-saffron-dark animate-pulse" />
+                    ) : (
+                      <div className="w-4 h-4 rounded-full border border-medium/40" />
+                    )}
                   </div>
-
-                  {isCompleted && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        triggerHaptic('light');
-                        onOpenTool('medical-reports');
-                      }}
-                      className="text-[11px] font-bold text-sage-dark hover:underline shrink-0 cursor-pointer"
-                    >
-                      View Report
-                    </button>
-                  )}
-                  {isUpcoming && (
-                    <span className="text-[10px] font-bold text-white bg-sage px-2 py-0.5 rounded-full shrink-0 shadow-2xs">
-                      Current
-                    </span>
-                  )}
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <h4 className="font-bold text-charcoal text-[12.5px] leading-tight truncate">
+                        {item.title}
+                      </h4>
+                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border/70 text-medium whitespace-nowrap shrink-0">
+                        {item.period}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-medium truncate mt-0.5">
+                      {item.date}
+                    </p>
+                  </div>
                 </div>
+
+                {isCompleted && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      onOpenTool('medical-reports');
+                    }}
+                    className="text-[11px] font-bold text-sage-dark hover:underline shrink-0 whitespace-nowrap cursor-pointer"
+                  >
+                    Report →
+                  </button>
+                )}
+                {isUpcoming && (
+                  <span className="text-[9px] font-bold text-white bg-sage px-2 py-0.5 rounded-full shrink-0 shadow-2xs whitespace-nowrap">
+                    Current
+                  </span>
+                )}
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* 4. Prenatal Reminders & Notifications Card */}
-      <div className="bg-white border border-border/80 rounded-2xl p-4 shadow-xs flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
-            <Bell size={20} />
+      {/* 4. Prenatal Reminders Strip */}
+      <div className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-xs flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
+            <Bell size={18} />
           </div>
-          <div>
+          <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              <h4 className="font-serif font-bold text-charcoal text-[14px]">
-                Smart Maternal Reminders
+              <h4 className="font-serif font-bold text-charcoal text-[13.5px] truncate">
+                Prenatal Reminders
               </h4>
-              <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
+              <span className="text-[9px] font-bold text-sage-dark bg-sage-pale px-1.5 py-0.2 rounded-full whitespace-nowrap shrink-0">
                 Active
               </span>
             </div>
-            <p className="text-[11.5px] text-medium mt-0.5">
+            <p className="text-[11px] text-medium truncate mt-0.5">
               Hydration, kick counts & doctor alerts
             </p>
           </div>
@@ -341,7 +331,7 @@ export const CareTab: React.FC<CareTabProps> = ({
             triggerHaptic('light');
             onOpenNotifications();
           }}
-          className="px-3 py-1.5 bg-cream border border-border text-charcoal hover:bg-sage/10 text-[11.5px] font-bold rounded-xl transition-colors shrink-0 cursor-pointer"
+          className="h-8 px-3 bg-cream border border-border text-charcoal hover:bg-sage/10 text-[11px] font-bold rounded-xl transition-colors shrink-0 whitespace-nowrap cursor-pointer"
         >
           Configure
         </button>
@@ -349,15 +339,15 @@ export const CareTab: React.FC<CareTabProps> = ({
 
       {/* 5. Questions for Doctor Checklist */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-2.5 px-0.5">
           <div className="flex items-center gap-1.5">
-            <FileText size={16} className="text-sage-dark" />
-            <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
-              Questions for Dr. Priya Sharma
+            <FileText size={15} className="text-sage-dark" />
+            <h3 className="font-serif font-bold text-charcoal text-[14px]">
+              Questions for Dr. Priya
             </h3>
           </div>
-          <span className="text-[11.5px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
-            {prepQuestions.filter((q) => q.done).length}/{prepQuestions.length} Discussed
+          <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.2 rounded-full whitespace-nowrap">
+            {prepQuestions.filter((q) => q.done).length}/{prepQuestions.length} Done
           </span>
         </div>
 
@@ -371,7 +361,7 @@ export const CareTab: React.FC<CareTabProps> = ({
                 triggerHaptic('light');
                 setSelectedQuestionCategory(cat);
               }}
-              className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 cursor-pointer ${
+              className={`h-7 px-2.5 rounded-lg text-[10.5px] font-bold transition-all shrink-0 cursor-pointer flex items-center ${
                 selectedQuestionCategory === cat
                   ? 'bg-charcoal text-white shadow-2xs'
                   : 'bg-cream text-medium border border-border/60 hover:text-charcoal'
@@ -382,21 +372,21 @@ export const CareTab: React.FC<CareTabProps> = ({
           ))}
         </div>
 
-        {/* Question List */}
-        <div className="space-y-2 mt-1">
+        {/* Single-Line Question List */}
+        <div className="space-y-1.5 mt-1">
           {filteredQuestions.map((q) => (
             <div
               key={q.id}
               onClick={() => toggleQuestion(q.id)}
-              className="flex items-start gap-2.5 p-2 rounded-xl hover:bg-cream/70 transition-colors cursor-pointer"
+              className="h-10 px-2 rounded-xl hover:bg-cream/70 flex items-center gap-2.5 transition-colors cursor-pointer"
             >
               {q.done ? (
-                <CheckSquare size={18} className="text-sage-dark shrink-0 mt-0.5" />
+                <CheckSquare size={16} className="text-sage-dark shrink-0" />
               ) : (
-                <Square size={18} className="text-medium shrink-0 mt-0.5" />
+                <Square size={16} className="text-medium shrink-0" />
               )}
               <span
-                className={`text-[12.5px] leading-snug ${
+                className={`text-[12px] truncate ${
                   q.done ? 'line-through text-light' : 'text-charcoal font-medium'
                 }`}
               >
@@ -407,31 +397,31 @@ export const CareTab: React.FC<CareTabProps> = ({
         </div>
 
         {/* Add Question Input */}
-        <form onSubmit={handleAddQuestion} className="mt-3 pt-3 border-t border-border/60 flex items-center gap-2">
+        <form onSubmit={handleAddQuestion} className="mt-2.5 pt-2.5 border-t border-border/60 flex items-center gap-2">
           <input
             type="text"
             value={newQuestionText}
             onChange={(e) => setNewQuestionText(e.target.value)}
-            placeholder="Type a new question for your doctor..."
-            className="flex-1 bg-cream/70 border border-border/80 rounded-xl px-3 py-2 text-[12.5px] text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
+            placeholder="Add a question for Dr. Priya..."
+            className="flex-1 h-9 bg-cream/70 border border-border/80 rounded-xl px-3 text-[12px] text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage placeholder:text-light"
           />
           <button
             type="submit"
             className="w-9 h-9 rounded-xl bg-charcoal text-white flex items-center justify-center shrink-0 hover:opacity-90 active:scale-95 transition-transform cursor-pointer"
             aria-label="Add question"
           >
-            <Plus size={18} />
+            <Plus size={16} />
           </button>
         </form>
       </div>
 
-      {/* 6. Clinical Vitals & Lab Snapshot */}
+      {/* 6. Clinical Vitals & Lab Snapshot (Equal Height 2x2 Grid) */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center justify-between mb-3 px-0.5">
           <div className="flex items-center gap-1.5">
-            <Activity size={16} className="text-rose-500" />
-            <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
-              Clinical Vitals & Lab Snapshot
+            <Activity size={15} className="text-rose-500" />
+            <h3 className="font-serif font-bold text-charcoal text-[14px]">
+              Vitals & Lab Snapshot
             </h3>
           </div>
           <div className="flex items-center gap-2">
@@ -443,7 +433,7 @@ export const CareTab: React.FC<CareTabProps> = ({
               }}
               className="inline-flex items-center gap-1 text-[11px] font-bold text-sage-dark hover:underline cursor-pointer"
             >
-              <RefreshCw size={12} />
+              <RefreshCw size={11} />
               <span>Log Vitals</span>
             </button>
             <button
@@ -451,40 +441,40 @@ export const CareTab: React.FC<CareTabProps> = ({
               onClick={handleShareFhir}
               className="inline-flex items-center gap-1 text-[11px] font-bold text-medium hover:text-charcoal cursor-pointer"
             >
-              <Share2 size={12} />
+              <Share2 size={11} />
               <span>FHIR</span>
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-2 text-[12px]">
-          <div className="p-3 rounded-2xl bg-cream/70 border border-border/60">
-            <span className="text-medium text-[10.5px] font-medium block">Blood Pressure</span>
-            <p className="font-bold text-charcoal text-[15px] mt-0.5">118/76 <span className="text-[11px] font-normal text-medium">mmHg</span></p>
-            <span className="text-[10px] text-green-700 font-bold">● Normal Range</span>
+          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
+            <span className="text-medium text-[10px] font-medium block">Blood Pressure</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">118/76 <span className="text-[10px] font-normal text-medium">mmHg</span></p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Normal Range</span>
           </div>
-          <div className="p-3 rounded-2xl bg-cream/70 border border-border/60">
-            <span className="text-medium text-[10.5px] font-medium block">Hemoglobin (Hb)</span>
-            <p className="font-bold text-charcoal text-[15px] mt-0.5">11.4 <span className="text-[11px] font-normal text-medium">g/dL</span></p>
-            <span className="text-[10px] text-green-700 font-bold">● Adequate</span>
+          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
+            <span className="text-medium text-[10px] font-medium block">Hemoglobin (Hb)</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">11.4 <span className="text-[10px] font-normal text-medium">g/dL</span></p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Adequate</span>
           </div>
-          <div className="p-3 rounded-2xl bg-cream/70 border border-border/60">
-            <span className="text-medium text-[10.5px] font-medium block">Fasting Blood Sugar</span>
-            <p className="font-bold text-charcoal text-[15px] mt-0.5">88 <span className="text-[11px] font-normal text-medium">mg/dL</span></p>
-            <span className="text-[10px] text-green-700 font-bold">● Non-Diabetic</span>
+          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
+            <span className="text-medium text-[10px] font-medium block">Fasting Sugar</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">88 <span className="text-[10px] font-normal text-medium">mg/dL</span></p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Non-Diabetic</span>
           </div>
-          <div className="p-3 rounded-2xl bg-cream/70 border border-border/60">
-            <span className="text-medium text-[10.5px] font-medium block">Daily Kicks Logged</span>
-            <p className="font-bold text-charcoal text-[15px] mt-0.5">10 <span className="text-[11px] font-normal text-medium">kicks / 28m</span></p>
-            <span className="text-[10px] text-sage-dark font-bold">● Healthy & Active</span>
+          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
+            <span className="text-medium text-[10px] font-medium block">Daily Kicks</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">10 <span className="text-[10px] font-normal text-medium">kicks / 28m</span></p>
+            <span className="text-[9.5px] text-sage-dark font-bold">● Active Fetus</span>
           </div>
         </div>
 
         {/* Health Connect Quick Strip */}
-        <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between text-[11.5px]">
+        <div className="mt-3 pt-2 border-t border-border/60 flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-1.5">
-            <HeartPulse size={14} className="text-sage" />
-            <span className="font-semibold text-charcoal text-[11px]">Google Health Connect</span>
+            <HeartPulse size={13} className="text-sage" />
+            <span className="font-semibold text-charcoal">Google Health Connect</span>
           </div>
           <button
             type="button"
@@ -492,7 +482,7 @@ export const CareTab: React.FC<CareTabProps> = ({
               triggerHaptic('light');
               onOpenTool('vitals');
             }}
-            className="text-sage font-bold hover:underline cursor-pointer text-[11px]"
+            className="text-sage font-bold hover:underline cursor-pointer"
           >
             Import Vitals →
           </button>
@@ -502,29 +492,29 @@ export const CareTab: React.FC<CareTabProps> = ({
       {/* 7. Emergency Hospital Triage */}
       <div className="bg-critical/5 border border-critical/25 rounded-3xl p-4 shadow-xs">
         <div className="flex items-start gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-critical/15 text-critical flex items-center justify-center shrink-0">
-            <AlertTriangle size={20} />
+          <div className="w-9 h-9 rounded-2xl bg-critical/15 text-critical flex items-center justify-center shrink-0">
+            <AlertTriangle size={18} />
           </div>
-          <div className="flex-1">
-            <h4 className="font-serif font-bold text-critical text-[14.5px]">
-              When to Seek Immediate Emergency Care
+          <div className="flex-1 min-w-0">
+            <h4 className="font-serif font-bold text-critical text-[14px]">
+              24x7 Emergency Care
             </h4>
-            <p className="text-[12px] text-charcoal/80 mt-1 leading-relaxed">
-              Contact Cloudnine triage or dial 108 immediately if you experience severe headaches with vision spots, sudden facial/hand swelling, vaginal bleeding, fluid leaking, or decreased fetal movement.
+            <p className="text-[11.5px] text-charcoal/80 mt-1 leading-snug">
+              Seek immediate care if experiencing severe headaches, sudden face/hand swelling, bleeding, or no fetal kicks.
             </p>
-            <div className="mt-3 flex items-center gap-2">
+            <div className="mt-2.5 flex items-center gap-2">
               <a
                 href="tel:108"
                 onClick={() => triggerHaptic('warning')}
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-critical text-white text-[12px] font-bold rounded-xl shadow-xs hover:opacity-90 active:scale-95 transition-all"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-critical text-white text-[11.5px] font-bold rounded-xl shadow-xs hover:opacity-90 active:scale-95 transition-all"
               >
-                <Phone size={13} />
-                <span>Call 108 Ambulance</span>
+                <Phone size={12} />
+                <span>Call 108</span>
               </a>
               <a
                 href="tel:+919876543210"
                 onClick={() => triggerHaptic('light')}
-                className="inline-flex items-center gap-1.5 px-3 py-2 bg-white border border-critical/30 text-critical text-[12px] font-bold rounded-xl shadow-2xs hover:bg-critical/10 active:scale-95 transition-all"
+                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-critical/30 text-critical text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-critical/10 active:scale-95 transition-all"
               >
                 <span>Hospital Triage</span>
               </a>
