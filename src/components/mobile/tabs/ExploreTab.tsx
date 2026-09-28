@@ -8,73 +8,20 @@ import {
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 
+import { ALL_PREGNANCY_TOOLS, CATEGORY_CHIPS, ToolDefinition } from '../toolsData';
+
 interface ExploreTabProps {
   onOpenTool: (toolId: string) => void;
   pinnedIds: string[];
   onTogglePin: (toolId: string) => void;
 }
 
-interface ToolDefinition {
-  id: string;
-  title: string;
-  desc: string;
-  category: string;
-  icon: React.FC<{ size: number; className?: string }>;
-  color: string;
-  badge?: string;
-}
-
 export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, onTogglePin }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const tools: ToolDefinition[] = [
-    // Category 1: Daily Tracking (9 tools)
-    { id: 'kickcounter', title: 'Kick Counter', desc: 'Count 10 fetal kicks with active timer', category: 'Daily Tracking', icon: Footprints, color: 'text-sage-dark bg-sage-pale', badge: 'Active' },
-    { id: 'hydration', title: 'Hydration Tracker', desc: 'Log water, tender coconut water & fluids', category: 'Daily Tracking', icon: Droplets, color: 'text-blue-600 bg-blue-50', badge: 'Daily' },
-    { id: 'vitals', title: 'Vitals & BP Tracker', desc: 'Log blood pressure, pulse, weight & sugar', category: 'Daily Tracking', icon: Activity, color: 'text-rose-600 bg-rose-50' },
-    { id: 'symptoms', title: 'Symptom Logger', desc: 'Track nausea, fatigue, swelling & cramps', category: 'Daily Tracking', icon: Heart, color: 'text-pink-600 bg-pink-50' },
-    { id: 'mood', title: 'Mood & Energy', desc: 'Daily emotional wellbeing & journal check-in', category: 'Daily Tracking', icon: Sparkles, color: 'text-amber-600 bg-amber-50' },
-    { id: 'nutrition', title: 'Supplements & Diet', desc: 'Folic acid, iron, calcium & daily vitamins', category: 'Daily Tracking', icon: Apple, color: 'text-emerald-700 bg-emerald-50' },
-    { id: 'notes', title: 'Bump Journal', desc: 'Private ultrasound notes & bump diary', category: 'Daily Tracking', icon: BookOpen, color: 'text-teal-700 bg-teal-50' },
-    { id: 'partnersync', title: 'Partner Sync (P2P)', desc: 'Encrypted WebRTC live companion sync', category: 'Daily Tracking', icon: Users, color: 'text-indigo-600 bg-indigo-50' },
-    { id: 'contractions', title: 'Contraction Timer', desc: 'ACOG 5-1-1 labor contraction timer', category: 'Daily Tracking', icon: Timer, color: 'text-orange-600 bg-orange-50' },
-
-    // Category 2: Smart AI & Cultural Guidance (5 tools)
-    { id: 'foodscanner', title: 'AI Food & Calorie Guide', desc: 'Meal calories, FOGSI vitamins, barcode & safety', category: 'Smart AI & Guidance', icon: Camera, color: 'text-orange-600 bg-orange-50', badge: 'AI' },
-    { id: 'askourpregnancy', title: 'Ask Bloom AI', desc: 'Empathetic OB-GYN clinical maternal chat', category: 'Smart AI & Guidance', icon: Sparkles, color: 'text-purple-600 bg-purple-50', badge: 'Qwen 2.5' },
-    { id: 'breathing', title: 'Garbh Sanskar & Audio', desc: 'Guided breathing & offline prenatal audio', category: 'Smart AI & Guidance', icon: Wind, color: 'text-sage-dark bg-sage-pale' },
-    { id: 'babynames', title: 'Baby Names Finder', desc: 'Indian modern & Vedic name meanings with rashi', category: 'Smart AI & Guidance', icon: Baby, color: 'text-pink-600 bg-pink-50' },
-    { id: 'travel', title: 'Safe Travel Guide', desc: 'Flying, road trips & doctor NOC guidelines', category: 'Smart AI & Guidance', icon: Plane, color: 'text-teal-600 bg-teal-50' },
-
-    // Category 3: Planning & Milestones (4 tools)
-    { id: 'dev', title: 'Fetal Development', desc: 'Week-by-week organogenesis timeline & size', category: 'Milestones & Prep', icon: Calendar, color: 'text-sage-dark bg-sage-pale' },
-    { id: 'deadlines', title: 'Due Date Deadlines', desc: 'Essential prenatal scan milestones & visits', category: 'Milestones & Prep', icon: Clock, color: 'text-amber-700 bg-amber-50' },
-    { id: 'prep', title: 'Nursery & Baby Prep', desc: 'Essential checklists for baby gear & clothing', category: 'Milestones & Prep', icon: ShoppingBag, color: 'text-blue-600 bg-blue-50' },
-    { id: 'finance', title: 'Delivery Cost Planner', desc: 'Hospital delivery estimates, insurance & savings', category: 'Milestones & Prep', icon: DollarSign, color: 'text-emerald-700 bg-emerald-50' },
-
-    // Category 4: Medical & Schemes (4 tools)
-    { id: 'schemes', title: 'Govt Maternity Schemes', desc: 'PMMVY (₹5k), JSY (₹1.4k), PMSMA & state aid', category: 'Medical & Schemes', icon: Building, color: 'text-yellow-700 bg-yellow-50', badge: 'MoHFW' },
-    { id: 'medical-reports', title: 'Medical Reports Locker', desc: 'Ultrasound scans & bloodwork AES-256 vault', category: 'Medical & Schemes', icon: FileText, color: 'text-cyan-700 bg-cyan-50' },
-    { id: 'medical', title: 'Vaccines & Schedule', desc: 'Tdap, tetanus, glucose tolerance & labs', category: 'Medical & Schemes', icon: Syringe, color: 'text-rose-600 bg-rose-50' },
-    { id: 'postpartum', title: 'Postpartum Healing', desc: 'Fourth trimester recovery, pelvic floor & care', category: 'Medical & Schemes', icon: HeartHandshake, color: 'text-rose-600 bg-rose-50' },
-
-    // Category 5: Labor & Postpartum (4 tools)
-    { id: 'hospitalbag', title: 'Hospital Bag Checklist', desc: 'Organized packing for mother, baby & partner', category: 'Labor & Postpartum', icon: Briefcase, color: 'text-stone-700 bg-stone-100' },
-    { id: 'birthplan', title: 'Birth Plan Builder', desc: 'Preferences for labor, support person & pain relief', category: 'Labor & Postpartum', icon: FileCheck2, color: 'text-sage-dark bg-sage-pale' },
-    { id: 'readiness', title: 'Labor Readiness Score', desc: 'Bishop score & cervical preparation guidance', category: 'Labor & Postpartum', icon: CheckCircle2, color: 'text-indigo-700 bg-indigo-50' },
-    { id: 'feedback', title: 'Feedback & Support', desc: 'Share your pregnancy journey suggestions', category: 'Labor & Postpartum', icon: HelpCircle, color: 'text-charcoal bg-cream' },
-  ];
-
-  // Compact, single-line chip definitions
-  const categoryChips = [
-    { label: 'All', count: tools.length, key: 'All' },
-    { label: 'Daily Logs', count: 9, key: 'Daily Tracking' },
-    { label: 'Smart AI', count: 5, key: 'Smart AI & Guidance' },
-    { label: 'Milestones', count: 4, key: 'Milestones & Prep' },
-    { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
-    { label: 'Labor Prep', count: 4, key: 'Labor & Postpartum' },
-  ];
+  const tools: ToolDefinition[] = ALL_PREGNANCY_TOOLS;
+  const categoryChips = CATEGORY_CHIPS;
 
   // Filtered tools by search query and category
   const filteredTools = useMemo(() => {
@@ -318,15 +265,15 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
                       triggerHaptic('light');
                       onTogglePin(tool.id);
                     }}
-                    className={`p-1.5 rounded-full transition-colors shrink-0 cursor-pointer ${
+                    className={`w-10 h-10 flex items-center justify-center -mr-1.5 rounded-full transition-colors shrink-0 cursor-pointer ${
                       isPinned
                         ? 'text-amber-500 bg-amber-50 hover:bg-amber-100'
-                        : 'text-light hover:text-medium hover:bg-cream'
+                        : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60'
                     }`}
                     aria-label={isPinned ? 'Unpin from Rituals' : 'Pin to Rituals'}
                     title={isPinned ? 'Pinned to Today Tab' : 'Pin to Today Tab'}
                   >
-                    <Star size={16} fill={isPinned ? 'currentColor' : 'none'} />
+                    <Star size={18} fill={isPinned ? 'currentColor' : 'none'} />
                   </button>
                 </div>
               );
