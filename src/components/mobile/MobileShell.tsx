@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { MobileTopBar } from './MobileTopBar';
 import { MobileBottomNav, MobileTabId } from './MobileBottomNav';
-import { SpeedDialFab } from './SpeedDialFab';
+import { QuickLogSheet } from './QuickLogSheet';
 import { TodayTab } from './tabs/TodayTab';
 import { ExploreTab } from './tabs/ExploreTab';
 import { CareTab } from './tabs/CareTab';
@@ -69,6 +69,7 @@ export const MobileShell: React.FC = () => {
   const [showAddRitualsModal, setShowAddRitualsModal] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
+  const [showQuickLogSheet, setShowQuickLogSheet] = useState(false);
 
   useEffect(() => {
     initNotificationChannels();
@@ -178,13 +179,14 @@ export const MobileShell: React.FC = () => {
           onOpenLanguage={() => setShowLanguageModal(true)}
           onOpenSos={() => setShowSosModal(true)}
           onOpenPricing={() => setShowPricingModal(true)}
+          onOpenQuickLog={() => setShowQuickLogSheet(true)}
         />
       </div>
 
       {/* 2. Main Scrollable Container (ONLY this inner body scrolls) */}
       <main
         ref={mainScrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-4 pt-3 max-w-lg mx-auto w-full custom-scrollbar"
+        className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-3.5 sm:px-4 pt-2.5 max-w-lg mx-auto w-full custom-scrollbar"
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {activeToolId ? (
@@ -266,10 +268,13 @@ export const MobileShell: React.FC = () => {
         )}
       </main>
 
-      {/* 3. Speed Dial FAB (only visible when not inside a tool view) */}
-      {!activeToolId && (
-        <SpeedDialFab onOpenTool={handleOpenTool} onShowToast={showToast} />
-      )}
+      {/* 3. Quick Log Bottom Sheet (clean, zero bottom nav occlusion) */}
+      <QuickLogSheet
+        isOpen={showQuickLogSheet}
+        onClose={() => setShowQuickLogSheet(false)}
+        onOpenTool={handleOpenTool}
+        onShowToast={showToast}
+      />
 
       {/* 4. Mobile Bottom Navigation (Strictly Fixed at Bottom, never moves during scroll) */}
       <div className="shrink-0 z-40 w-full">

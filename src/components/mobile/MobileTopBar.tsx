@@ -9,6 +9,7 @@ interface MobileTopBarProps {
   onOpenLanguage: () => void;
   onOpenSos: () => void;
   onOpenPricing: () => void;
+  onOpenQuickLog?: () => void;
 }
 
 export const MobileTopBar: React.FC<MobileTopBarProps> = ({
@@ -16,6 +17,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   onOpenLanguage,
   onOpenSos,
   onOpenPricing,
+  onOpenQuickLog,
 }) => {
   const { state } = usePlanner();
   const isNative = isNativeApp();
@@ -32,19 +34,19 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   const userInitial = displayName.trim().charAt(0).toUpperCase() || 'A';
 
   return (
-    <header className={`bg-[#FDFBF7] border-b border-border/80 px-3.5 pb-2.5 w-full select-none ${
+    <header className={`bg-[#FDFBF7] border-b border-border/80 px-2.5 xs:px-3.5 pb-2.5 w-full select-none ${
       isNative ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[max(0.65rem,env(safe-area-inset-top))]'
     }`}>
       {/* Upper Brand & Action Row */}
-      <div className="flex items-center justify-between gap-2 w-full">
+      <div className="flex items-center justify-between gap-1.5 xs:gap-2 w-full">
         {/* Brand Identity */}
-        <div className="flex items-center gap-2 min-w-0 shrink-0">
+        <div className="flex items-center gap-1.5 xs:gap-2 shrink-0">
           <img
             src="/logo.png"
             alt="Our Pregnancy Logo"
-            className="w-7 h-7 object-contain rounded-full bg-white shadow-2xs border border-border/70 shrink-0"
+            className="w-6.5 h-6.5 xs:w-7 xs:h-7 object-contain rounded-full bg-white shadow-2xs border border-border/70 shrink-0"
           />
-          <span className="font-serif font-bold text-charcoal text-[16px] tracking-tight leading-none whitespace-nowrap">
+          <span className="font-serif font-bold text-charcoal text-[14px] xs:text-[15px] sm:text-[16px] tracking-tight leading-none whitespace-nowrap">
             Our Pregnancy
           </span>
           <button
@@ -53,16 +55,33 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
               triggerHaptic('light');
               onOpenPricing();
             }}
-            className="bg-amber-50 hover:bg-amber-100/80 text-amber-800 text-[9.5px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 flex items-center gap-0.5 border border-amber-300/80 transition-colors cursor-pointer shadow-3xs active:scale-95"
+            className="bg-amber-50 hover:bg-amber-100/80 text-amber-800 text-[8.5px] xs:text-[9px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wider shrink-0 flex items-center gap-0.5 border border-amber-300/80 transition-colors cursor-pointer shadow-3xs active:scale-95"
             aria-label="Upgrade to Pro"
           >
-            <Sparkles size={9} className="text-amber-600" />
-            <span>PRO</span>
+            <Sparkles size={8.5} className="text-amber-600 shrink-0" />
+            <span className="hidden sm:inline">PRO</span>
           </button>
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 xs:gap-1.5 shrink-0">
+          {/* Quick Log Action Trigger */}
+          {onOpenQuickLog && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                onOpenQuickLog();
+              }}
+              className="h-7 px-1.5 xs:px-2 sm:px-2.5 flex items-center gap-0.5 sm:gap-1 bg-sage-dark text-white rounded-full text-[10.5px] sm:text-[11px] font-bold hover:bg-sage transition-all shadow-2xs shrink-0 active:scale-95 cursor-pointer"
+              aria-label="Quick Log"
+              title="Quick Health Log"
+            >
+              <span className="text-[12px] leading-none font-bold">+</span>
+              <span className="hidden sm:inline">Log</span>
+            </button>
+          )}
+
           {/* Language Selector Trigger */}
           <button
             type="button"
@@ -70,11 +89,11 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
               triggerHaptic('light');
               onOpenLanguage();
             }}
-            className="h-7 px-2 flex items-center gap-1 bg-white border border-border/90 rounded-full text-[11px] font-semibold text-charcoal hover:bg-sage-pale/40 transition-all shadow-2xs shrink-0 active:scale-95"
+            className="h-7 px-1.5 sm:px-2 flex items-center gap-0.5 bg-white border border-border/90 rounded-full text-[10px] sm:text-[11px] font-semibold text-charcoal hover:bg-sage-pale/40 transition-all shadow-2xs shrink-0 active:scale-95"
             aria-label="Select Language"
           >
-            <span className="text-[12px] leading-none">🇮🇳</span>
-            <span className="text-[10.5px] font-medium text-charcoal/80">EN</span>
+            <span className="text-[11px] leading-none">🇮🇳</span>
+            <span className="hidden sm:inline text-[9.5px] xs:text-[10.5px] font-medium text-charcoal/80">EN</span>
           </button>
 
           {/* 108 SOS Emergency Button */}
@@ -84,11 +103,11 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
               triggerHaptic('warning');
               onOpenSos();
             }}
-            className="h-7 px-2 flex items-center gap-1 bg-rose-50 border border-rose-200/90 rounded-full text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition-all shadow-2xs shrink-0 active:scale-95"
+            className="h-7 px-1.5 sm:px-2 flex items-center gap-0.5 bg-rose-50 border border-rose-200/90 rounded-full text-[10px] sm:text-[11px] font-bold text-rose-700 hover:bg-rose-100 transition-all shadow-2xs shrink-0 active:scale-95"
             aria-label="Emergency SOS"
           >
-            <ShieldAlert size={12} className="text-rose-600 shrink-0" />
-            <span className="leading-none">108</span>
+            <ShieldAlert size={11} className="text-rose-600 shrink-0" />
+            <span className="leading-none text-[9.5px] sm:text-[11px]">108</span>
           </button>
 
           {/* Profile Avatar Trigger */}
@@ -98,7 +117,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
               triggerHaptic('light');
               onOpenProfile();
             }}
-            className="w-7 h-7 rounded-full bg-sage text-white font-bold text-[12px] flex items-center justify-center shadow-2xs hover:opacity-90 active:scale-95 transition-transform shrink-0 ring-1 ring-border/50"
+            className="w-7 h-7 rounded-full bg-sage text-white font-bold text-[11.5px] flex items-center justify-center shadow-2xs hover:opacity-90 active:scale-95 transition-transform shrink-0 ring-1 ring-border/50"
             aria-label="Open Profile Settings"
           >
             {userInitial}
@@ -107,12 +126,12 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
       </div>
 
       {/* Gestational Timeline Pill Row */}
-      <div className="mt-2 flex items-center justify-between bg-white border border-border/70 rounded-full px-3 py-1 text-[11.5px] text-medium shadow-2xs font-medium">
-        <span className="font-semibold text-charcoal">Week {currentWeek} of 40</span>
-        <span className="text-border">•</span>
-        <span>Day {completedDays}</span>
-        <span className="text-border">•</span>
-        <span>Due: <strong className="text-charcoal font-semibold">{dueFormatted}</strong></span>
+      <div className="mt-2 flex items-center justify-between bg-white border border-border/70 rounded-full px-2.5 xs:px-3 py-1 text-[10.5px] xs:text-[11.5px] text-medium shadow-2xs font-medium">
+        <span className="font-semibold text-charcoal whitespace-nowrap">Wk {currentWeek} of 40</span>
+        <span className="text-border text-[9px]">•</span>
+        <span className="whitespace-nowrap">Day {completedDays}</span>
+        <span className="text-border text-[9px]">•</span>
+        <span className="truncate">Due: <strong className="text-charcoal font-semibold">{dueFormatted}</strong></span>
       </div>
     </header>
   );

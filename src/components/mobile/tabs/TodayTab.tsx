@@ -262,7 +262,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           triggerHaptic('light');
           onOpenTool(tool.id);
         }}
-        className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[152px] h-full"
+        className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[156px] h-full"
       >
         <div>
           {/* Card Top: Icon + Badge + Unpin Star */}
@@ -273,12 +273,12 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
             <div className="flex items-center gap-1">
               {isInteractiveWater ? (
-                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.2 rounded-full">
+                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.2 rounded-full whitespace-nowrap">
                   {totalWaterMl >= waterGoalMl ? 'GOAL MET' : `${waterPercent}%`}
                 </span>
               ) : isInteractiveSupps ? (
                 <span
-                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border ${
+                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border whitespace-nowrap ${
                     allSuppsTaken
                       ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
                       : 'text-amber-700 bg-amber-50 border-amber-200'
@@ -287,15 +287,15 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   {allSuppsTaken ? 'TAKEN ✓' : `${takenSupps.length}/3`}
                 </span>
               ) : isInteractiveKicks ? (
-                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full">
+                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full whitespace-nowrap">
                   {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
                 </span>
               ) : isInteractiveVitals ? (
-                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-full">
+                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-full whitespace-nowrap">
                   NORMAL
                 </span>
               ) : tool.badge ? (
-                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full">
+                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full whitespace-nowrap">
                   {tool.badge}
                 </span>
               ) : null}
@@ -319,74 +319,76 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
 
           {/* Card Middle: Title & Metrics / Subtitle */}
-          <p className="text-[11.5px] font-semibold text-medium truncate">{tool.title}</p>
+          <div className="my-auto py-0.5">
+            <p className="text-[11.5px] font-semibold text-medium truncate">{tool.title}</p>
 
-          {isInteractiveWater ? (
-            <>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
-                  {(totalWaterMl / 1000).toFixed(2)}L
-                </span>
-                <span className="text-[10px] text-light font-medium">/ 2.5L</span>
-              </div>
-              <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
-                <div
-                  className="bg-blue-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${waterPercent}%` }}
-                />
-              </div>
-            </>
-          ) : isInteractiveSupps ? (
-            <>
-              <p className="text-[11.5px] text-charcoal font-bold mt-0.5 truncate">
-                Folic, Iron, Calcium
-              </p>
-              <p className="text-[10px] text-light mt-0.5 truncate">
-                {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
-              </p>
-            </>
-          ) : isInteractiveKicks ? (
-            <>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
-                  {latestKicks}
-                </span>
-                <span className="text-[10.5px] text-medium font-medium">/ 10 kicks</span>
-              </div>
-              <p className="text-[10px] text-light mt-0.5 truncate">
-                {latestKicks >= 10 ? 'Goal met today! ✨' : 'Target: 10 kicks'}
-              </p>
-            </>
-          ) : isInteractiveVitals ? (
-            <>
-              <div className="flex items-baseline gap-1 mt-0.5">
-                <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
-                  {latestBp}
-                </span>
-                <span className="text-[9.5px] text-light font-bold">mmHg</span>
-              </div>
-              <p className="text-[10px] text-light mt-0.5 truncate">
-                Pulse: {latestPulse} bpm
-              </p>
-            </>
-          ) : (
-            <>
-              <p className="text-[12px] font-bold text-charcoal mt-0.5 truncate">
-                {tool.ritualSubtitle || tool.title}
-              </p>
-              <p className="text-[10.5px] text-medium mt-0.5 truncate">
-                {tool.desc}
-              </p>
-            </>
-          )}
+            {isInteractiveWater ? (
+              <>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                    {(totalWaterMl / 1000).toFixed(2)}L
+                  </span>
+                  <span className="text-[10px] text-light font-medium">/ 2.5L</span>
+                </div>
+                <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                  <div
+                    className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                    style={{ width: `${waterPercent}%` }}
+                  />
+                </div>
+              </>
+            ) : isInteractiveSupps ? (
+              <>
+                <p className="text-[11.5px] text-charcoal font-bold mt-0.5 truncate">
+                  Folic, Iron, Calcium
+                </p>
+                <p className="text-[10px] text-light mt-0.5 truncate">
+                  {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
+                </p>
+              </>
+            ) : isInteractiveKicks ? (
+              <>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                    {latestKicks}
+                  </span>
+                  <span className="text-[10.5px] text-medium font-medium">/ 10 kicks</span>
+                </div>
+                <p className="text-[10px] text-light mt-0.5 truncate">
+                  {latestKicks >= 10 ? 'Goal met today! ✨' : 'Target: 10 kicks'}
+                </p>
+              </>
+            ) : isInteractiveVitals ? (
+              <>
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                    {latestBp}
+                  </span>
+                  <span className="text-[9.5px] text-light font-bold">mmHg</span>
+                </div>
+                <p className="text-[10px] text-light mt-0.5 truncate">
+                  Pulse: {latestPulse} bpm
+                </p>
+              </>
+            ) : (
+              <>
+                <p className="text-[12px] font-bold text-charcoal mt-0.5 truncate">
+                  {tool.ritualSubtitle || tool.title}
+                </p>
+                <p className="text-[10.5px] text-medium mt-0.5 truncate">
+                  {tool.desc}
+                </p>
+              </>
+            )}
+          </div>
         </div>
 
-        {/* Card Bottom: 1-Tap Action Button */}
+        {/* Card Bottom: Standardized 1-Tap Action Button */}
         {isInteractiveWater ? (
           <button
             type="button"
             onClick={handleQuickWater}
-            className="mt-2.5 w-full h-8 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="mt-2 w-full h-8 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <Plus size={12} strokeWidth={2.5} />
             <span>+250ml Glass</span>
@@ -395,7 +397,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <button
             type="button"
             onClick={handleQuickSupplements}
-            className={`mt-2.5 w-full h-8 py-1.5 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer ${
+            className={`mt-2 w-full h-8 py-1 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap ${
               allSuppsTaken
                 ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
                 : 'bg-sage text-white hover:bg-sage-dark shadow-2xs'
@@ -417,7 +419,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <button
             type="button"
             onClick={handleQuickKick}
-            className="mt-2.5 w-full h-8 py-1.5 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="mt-2 w-full h-8 py-1 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <Plus size={12} strokeWidth={2.5} />
             <span>+1 Kick</span>
@@ -430,7 +432,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool('vitals');
             }}
-            className="mt-2.5 w-full h-8 py-1.5 bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="mt-2 w-full h-8 py-1 bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <Activity size={12} />
             <span>+ Log Vitals</span>
@@ -443,7 +445,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool(tool.id);
             }}
-            className="mt-2.5 w-full h-8 py-1.5 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <span>{tool.actionLabel || 'Open Tool →'}</span>
           </button>
@@ -534,49 +536,49 @@ export const TodayTab: React.FC<TodayTabProps> = ({
       <div className="bg-gradient-to-br from-white via-cream to-sage-pale/40 border border-border/80 rounded-3xl p-5 shadow-xs relative overflow-hidden">
         <div className="flex items-start justify-between">
           <div>
-            <div className="flex items-center gap-1.5 mb-1.5">
-              <span className="inline-block bg-sage/15 text-sage-dark text-[11px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-sage/20">
+            <div className="flex items-center gap-1.5 mb-1.5 flex-wrap">
+              <span className="inline-block bg-sage/15 text-sage-dark text-[10px] xs:text-[11px] font-bold px-2 xs:px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-sage/20 whitespace-nowrap">
                 {trimesterName}
               </span>
               {selectedWeek !== currentWeek && (
-                <span className="inline-block bg-amber-100 text-amber-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-200">
+                <span className="inline-block bg-amber-100 text-amber-800 text-[9.5px] xs:text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-amber-200 whitespace-nowrap">
                   Preview
                 </span>
               )}
             </div>
-            <h1 className="font-serif text-[28px] font-bold text-charcoal tracking-tight leading-tight">
+            <h1 className="font-serif text-[26px] xs:text-[28px] font-bold text-charcoal tracking-tight leading-tight">
               Week {selectedWeek}
             </h1>
-            <p className="text-[13px] text-medium font-medium mt-0.5">
+            <p className="text-[12px] xs:text-[13px] text-medium font-medium mt-0.5">
               {selectedWeek === currentWeek
                 ? `${diffDays} Days Remaining until Due Date`
                 : `Developmental preview for gestational week ${selectedWeek}`}
             </p>
           </div>
 
-          <div className="w-18 h-18 rounded-2xl bg-white/95 border border-border/80 shadow-xs flex flex-col items-center justify-center shrink-0 p-1">
-            <span className="text-3xl leading-none">{weekInfo.babyEmoji}</span>
-            <span className="text-[10px] font-bold text-charcoal mt-1 text-center truncate max-w-[62px]">
+          <div className="w-16 h-16 xs:w-18 xs:h-18 rounded-2xl bg-white/95 border border-border/80 shadow-xs flex flex-col items-center justify-center shrink-0 p-1">
+            <span className="text-2xl xs:text-3xl leading-none">{weekInfo.babyEmoji}</span>
+            <span className="text-[9.5px] xs:text-[10px] font-bold text-charcoal mt-1 text-center truncate max-w-[62px]">
               {weekInfo.babySizeAnalogy.split(' ')[0]}
             </span>
           </div>
         </div>
 
         {/* Baby Metrology Row */}
-        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-3 gap-2 text-center">
-          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Size</span>
-            <p className="font-bold text-charcoal text-[13px] truncate mt-0.5" title={weekInfo.babySizeAnalogy}>
+        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-3 gap-1.5 xs:gap-2 text-center">
+          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Size</span>
+            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] truncate mt-0.5" title={weekInfo.babySizeAnalogy}>
               {weekInfo.babySizeAnalogy}
             </p>
           </div>
-          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Length</span>
-            <p className="font-bold text-charcoal text-[13px] mt-0.5">{weekInfo.length}</p>
+          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Length</span>
+            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate">{weekInfo.length}</p>
           </div>
-          <div className="bg-white/80 rounded-xl py-2 px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[10px] uppercase font-bold tracking-wider block">Weight</span>
-            <p className="font-bold text-charcoal text-[13px] mt-0.5">{weekInfo.weight}</p>
+          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
+            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Weight</span>
+            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate">{weekInfo.weight}</p>
           </div>
         </div>
 
@@ -651,13 +653,13 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           {checkup.desc}
         </p>
 
-        <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-[11.5px]">
-          <div className="flex items-center gap-1.5 text-medium">
-            <Clock size={13} className="text-sage-dark" />
-            <span className="font-medium truncate max-w-[150px]">Dr. Priya Sharma • Cloudnine</span>
+        <div className="mt-3 pt-2.5 border-t border-border/70 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-[11.5px]">
+          <div className="flex items-center gap-1.5 text-medium min-w-0">
+            <Clock size={13} className="text-sage-dark shrink-0" />
+            <span className="font-medium truncate">Dr. Priya Sharma • Cloudnine</span>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0 self-end xs:self-auto">
             {onOpenSchedule && (
               <button
                 type="button"
@@ -665,7 +667,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   triggerHaptic('light');
                   onOpenSchedule();
                 }}
-                className="text-[11.5px] font-bold text-medium hover:text-charcoal px-2 py-1 rounded-lg hover:bg-black/5 transition-colors cursor-pointer"
+                className="text-[11px] font-bold text-medium hover:text-charcoal px-2 py-1 rounded-lg hover:bg-black/5 transition-colors cursor-pointer whitespace-nowrap"
               >
                 Reschedule
               </button>
@@ -680,7 +682,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   onOpenTool('medical');
                 }
               }}
-              className="px-3 py-1.5 bg-sage-dark text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage transition-all flex items-center gap-1 cursor-pointer"
+              className="h-8 px-3 bg-sage-dark text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
             >
               <span>Scan Checklist</span>
               <ChevronRight size={13} />
@@ -697,7 +699,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             triggerHaptic('light');
             onOpenTool('vitals');
           }}
-          className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
+          className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[148px]"
         >
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -717,7 +719,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             </div>
           </div>
 
-          <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-medium">
+          <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-medium h-8">
             <span>Pulse</span>
             <span className="font-bold text-charcoal">{latestPulse} bpm</span>
           </div>
@@ -729,7 +731,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             triggerHaptic('light');
             onOpenTool('kickcounter');
           }}
-          className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between"
+          className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[148px]"
         >
           <div>
             <div className="flex items-center justify-between mb-2">
@@ -753,7 +755,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <button
             type="button"
             onClick={handleQuickKick}
-            className="mt-2.5 w-full py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer"
+            className="mt-2.5 w-full h-8 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0"
           >
             <Plus size={13} strokeWidth={2.5} />
             <span>+1 Kick</span>
@@ -842,11 +844,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               <Wind size={19} />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5">
                 <span className="text-[10.5px] font-bold text-sage-dark uppercase tracking-wider">
                   Maternal Peace & Bonding
                 </span>
-                <span className="text-[9.5px] font-medium bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full">
+                <span className="text-[9px] font-medium bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full whitespace-nowrap">
                   100% Offline
                 </span>
               </div>
@@ -869,11 +871,13 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             <ShieldCheck size={20} />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center justify-between">
-              <span className="text-[10.5px] font-bold text-soft-saffron-dark uppercase tracking-wider">
+            <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
+              <span className="text-[10px] font-bold text-soft-saffron-dark uppercase tracking-wider">
                 Government Maternity Aid • MoHFW
               </span>
-              <span className="text-[11px] font-bold text-charcoal">₹5,000 Direct Benefit</span>
+              <span className="text-[10px] font-bold text-charcoal bg-white/80 px-2 py-0.5 rounded-md border border-soft-saffron/20 shrink-0 whitespace-nowrap">
+                ₹5,000 Direct Benefit
+              </span>
             </div>
             <h3 className="font-serif font-bold text-charcoal text-[14px] mt-0.5">
               PMMVY Form 1A Registration
