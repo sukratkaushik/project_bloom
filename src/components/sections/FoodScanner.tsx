@@ -772,7 +772,7 @@ export const FoodScanner: React.FC = () => {
         </div>
 
         {/* Multimodal Mode Selector Tabs (Sleek Material 3 Segmented Control) */}
-        <div className="w-full bg-[#F3EFE9] dark:bg-stone-800 p-1.5 rounded-2xl border border-border/80 shadow-3xs grid grid-cols-3 gap-1.5 mb-5 select-none">
+        <div className="w-full bg-[#EFECE6] dark:bg-stone-800/90 p-1.5 rounded-2xl border border-stone-200/90 dark:border-stone-700/60 shadow-inner grid grid-cols-3 gap-1.5 mb-5 select-none">
           {/* Tab 1: Camera */}
           <button
             type="button"
@@ -780,24 +780,23 @@ export const FoodScanner: React.FC = () => {
               triggerHaptic('selection');
               setActiveTab('camera');
             }}
-            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'camera'
-                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
-                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/60 font-bold'
+                : 'text-charcoal/65 dark:text-stone-400 hover:text-charcoal dark:hover:text-cream hover:bg-white/40 font-semibold'
             }`}
             aria-selected={activeTab === 'camera'}
             role="tab"
           >
-            <div
-              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+            <Camera
+              size={17}
+              className={`shrink-0 transition-colors ${
                 activeTab === 'camera'
-                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
-                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
+                  ? 'text-sage-dark dark:text-sage-light stroke-[2.3]'
+                  : 'text-charcoal/50 dark:text-stone-400 group-hover:text-charcoal stroke-[1.9]'
               }`}
-            >
-              <Camera size={16} className={activeTab === 'camera' ? 'stroke-[2.4]' : 'stroke-[2]'} />
-            </div>
-            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+            />
+            <span className="text-[12px] xs:text-[12.5px] sm:text-[13px] whitespace-nowrap tracking-tight">
               <span className="inline md:hidden">Camera</span>
               <span className="hidden md:inline">Camera & Photo</span>
             </span>
@@ -810,24 +809,23 @@ export const FoodScanner: React.FC = () => {
               triggerHaptic('selection');
               setActiveTab('barcode');
             }}
-            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'barcode'
-                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
-                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/60 font-bold'
+                : 'text-charcoal/65 dark:text-stone-400 hover:text-charcoal dark:hover:text-cream hover:bg-white/40 font-semibold'
             }`}
             aria-selected={activeTab === 'barcode'}
             role="tab"
           >
-            <div
-              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+            <Barcode
+              size={17}
+              className={`shrink-0 transition-colors ${
                 activeTab === 'barcode'
-                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
-                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
+                  ? 'text-sage-dark dark:text-sage-light stroke-[2.3]'
+                  : 'text-charcoal/50 dark:text-stone-400 group-hover:text-charcoal stroke-[1.9]'
               }`}
-            >
-              <Barcode size={16} className={activeTab === 'barcode' ? 'stroke-[2.4]' : 'stroke-[2]'} />
-            </div>
-            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+            />
+            <span className="text-[12px] xs:text-[12.5px] sm:text-[13px] whitespace-nowrap tracking-tight">
               <span className="inline md:hidden">Barcode</span>
               <span className="hidden md:inline">Barcode Database</span>
             </span>
@@ -840,24 +838,23 @@ export const FoodScanner: React.FC = () => {
               triggerHaptic('selection');
               setActiveTab('text');
             }}
-            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-2 rounded-xl transition-all duration-200 cursor-pointer ${
               activeTab === 'text'
-                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
-                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/60 font-bold'
+                : 'text-charcoal/65 dark:text-stone-400 hover:text-charcoal dark:hover:text-cream hover:bg-white/40 font-semibold'
             }`}
             aria-selected={activeTab === 'text'}
             role="tab"
           >
-            <div
-              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+            <Mic
+              size={17}
+              className={`shrink-0 transition-colors ${
                 activeTab === 'text'
-                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
-                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
+                  ? 'text-sage-dark dark:text-sage-light stroke-[2.3]'
+                  : 'text-charcoal/50 dark:text-stone-400 group-hover:text-charcoal stroke-[1.9]'
               }`}
-            >
-              <Mic size={16} className={activeTab === 'text' ? 'stroke-[2.4]' : 'stroke-[2]'} />
-            </div>
-            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+            />
+            <span className="text-[12px] xs:text-[12.5px] sm:text-[13px] whitespace-nowrap tracking-tight">
               <span className="inline md:hidden">Voice / Text</span>
               <span className="hidden md:inline">Voice & Text Log</span>
             </span>
@@ -866,7 +863,11 @@ export const FoodScanner: React.FC = () => {
 
         {/* AI Consent Guard */}
         {isAiConsentBlocked(state.aiProcessingConsent) && (
-          <AiConsentPrompt className="mb-6" message="Turn on AI features in your Profile to use the AI Food Guide scanner." />
+          <AiConsentPrompt
+            className="mb-5"
+            title="AI Nutrition Vision is Paused"
+            message="Turn on AI features to analyze meals, scan packaged barcodes, and calculate trimester micronutrients."
+          />
         )}
 
         {/* Input Methods Card */}
