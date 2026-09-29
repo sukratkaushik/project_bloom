@@ -33,10 +33,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
     });
   }, [tools, searchQuery, selectedCategory]);
 
-  // Pinned tools lookup for quick-access tray
-  const pinnedToolItems = useMemo(() => {
-    return tools.filter((t) => pinnedIds.includes(t.id));
-  }, [tools, pinnedIds]);
 
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
@@ -94,44 +90,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
         </div>
       </div>
 
-      {/* 2. Pinned Quick Access Tray (if any pinned tools exist) */}
-      {pinnedToolItems.length > 0 && selectedCategory === 'All' && !searchQuery && (
-        <div className="bg-white/80 border border-amber-200/70 rounded-2xl p-3 shadow-2xs">
-          <div className="flex items-center justify-between mb-2 px-0.5">
-            <div className="flex items-center gap-1.5">
-              <Star size={13} className="text-amber-500 fill-amber-400" />
-              <span className="text-[11px] font-bold text-charcoal uppercase tracking-wider">
-                Pinned Daily Rituals ({pinnedToolItems.length})
-              </span>
-            </div>
-            <span className="text-[10px] text-medium font-medium">On Today Tab</span>
-          </div>
-
-          <div className="flex items-center gap-2 overflow-x-auto pb-0.5 no-scrollbar">
-            {pinnedToolItems.map((tool) => {
-              const IconComp = tool.icon;
-              return (
-                <button
-                  key={tool.id}
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    onOpenTool(tool.id);
-                  }}
-                  className="h-8 flex items-center gap-1.5 px-2.5 bg-cream hover:bg-sage-pale/60 border border-border/70 rounded-xl shrink-0 text-left transition-colors cursor-pointer group"
-                >
-                  <div className={`w-5 h-5 rounded-md flex items-center justify-center ${tool.color}`}>
-                    <IconComp size={12} />
-                  </div>
-                  <span className="text-[11.5px] font-bold text-charcoal group-hover:text-sage-dark whitespace-nowrap truncate max-w-[120px]">
-                    {tool.title}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
 
 
       {/* 4. Well-Sorted Directory with Uniform Heights */}
