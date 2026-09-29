@@ -6,11 +6,13 @@ import { db as dexieDb } from '../../db';
 import { 
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
-  ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle 
+  ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
+  Pencil, Plus, MapPin, Phone
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
+import { DoctorModal } from '../mobile/DoctorModal';
 import { 
   isBiometricLockEnabled, 
   setBiometricLockEnabled, 
@@ -30,6 +32,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
   const [isNameSaved, setIsNameSaved] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showComplianceModal, setShowComplianceModal] = useState(false);
+  const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Self-service account deletion state
@@ -302,6 +305,86 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
               </div>
             </div>
           </div>
+        </section>
+
+        {/* Primary Obstetrician & Care Team */}
+        <section className="bg-white rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-2xs border border-border/80">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-sage-pale flex items-center justify-center text-sage shrink-0">
+                <Stethoscope className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight">Primary Obstetrician</h3>
+                <p className="text-medium text-xs sm:text-sm mt-0.5">Manage your OB-GYN, hospital, and emergency OPD line</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setIsDoctorModalOpen(true);
+              }}
+              className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0"
+            >
+              {state.doctor?.name ? (
+                <>
+                  <Pencil size={13} />
+                  <span>Edit</span>
+                </>
+              ) : (
+                <>
+                  <Plus size={14} />
+                  <span>Add Doctor</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {state.doctor?.name ? (
+            <div className="p-3.5 sm:p-4 bg-cream/40 border border-border/80 rounded-2xl space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-charcoal text-[15px]">{state.doctor.name}</span>
+                <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">Active</span>
+              </div>
+              {state.doctor.hospital && (
+                <p className="text-[12.5px] text-medium flex items-center gap-1.5">
+                  <MapPin size={13} className="text-sage shrink-0" />
+                  <span>{state.doctor.hospital}</span>
+                </p>
+              )}
+              {state.doctor.phone && (
+                <p className="text-[12px] text-charcoal/80 flex items-center gap-1.5 font-mono">
+                  <Phone size={12} className="text-sage shrink-0" />
+                  <span>{state.doctor.phone}</span>
+                </p>
+              )}
+              {state.doctor.notes && (
+                <p className="text-[11.5px] text-medium pt-1 border-t border-border/50">
+                  {state.doctor.notes}
+                </p>
+              )}
+            </div>
+          ) : (
+            <div className="p-4 bg-cream/30 border border-dashed border-border/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-[13px] text-charcoal">No doctor assigned yet</p>
+                <p className="text-[11.5px] text-medium mt-0.5">
+                  Add your doctor or midwife to enable quick calling and personalized visit checklists.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsDoctorModalOpen(true);
+                }}
+                className="px-3.5 py-1.5 bg-sage hover:bg-sage-dark text-white font-bold text-[12px] rounded-xl shadow-2xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              >
+                + Add Obstetrician
+              </button>
+            </div>
+          )}
         </section>
 
         {/* Preferences */}
@@ -790,6 +873,23 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
           </div>
         </div>
       )}
+
+      {/* Primary Obstetrician Modal */}
+      <DoctorModal
+        isOpen={isDoctorModalOpen}
+        onClose={() => setIsDoctorModalOpen(false)}
+        initialDoctor={state.doctor}
+        onSave={(doctorData) => {
+          updateState({ doctor: doctorData });
+        }}
+        onRemove={() => {
+          updateState({ doctor: null });
+        }}
+        onShowToast={(msg) => {
+          setToastMessage(msg);
+          setTimeout(() => setToastMessage(null), 3000);
+        }}
+      />
 
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">

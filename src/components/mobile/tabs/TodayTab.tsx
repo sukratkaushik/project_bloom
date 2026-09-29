@@ -638,15 +638,30 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             </div>
           </div>
 
-          <a
-            href="tel:+919876543210"
-            onClick={() => triggerHaptic('light')}
-            className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0"
-            title="Call Clinic"
-            aria-label="Call Clinic"
-          >
-            <Phone size={15} />
-          </a>
+          {state.doctor?.phone ? (
+            <a
+              href={`tel:${state.doctor.phone.replace(/[^\d+]/g, '')}`}
+              onClick={() => triggerHaptic('light')}
+              className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0"
+              title={`Call ${state.doctor.name}`}
+              aria-label="Call Doctor"
+            >
+              <Phone size={15} />
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onSelectTab) onSelectTab('care');
+              }}
+              className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0 cursor-pointer"
+              title="Doctor / Care Team"
+              aria-label="Doctor / Care Team"
+            >
+              <Phone size={15} />
+            </button>
+          )}
         </div>
 
         <p className="text-[12px] text-medium mt-2 leading-relaxed">
@@ -654,9 +669,21 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </p>
 
         <div className="mt-3 pt-2.5 border-t border-border/70 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-[11.5px]">
-          <div className="flex items-center gap-1.5 text-medium min-w-0">
+          <div
+            className="flex items-center gap-1.5 text-medium min-w-0 cursor-pointer hover:text-charcoal transition-colors"
+            onClick={() => {
+              if (onSelectTab) {
+                triggerHaptic('light');
+                onSelectTab('care');
+              }
+            }}
+          >
             <Clock size={13} className="text-sage-dark shrink-0" />
-            <span className="font-medium truncate">Dr. Priya Sharma • Cloudnine</span>
+            <span className="font-medium truncate">
+              {state.doctor?.name
+                ? `${state.doctor.name}${state.doctor.hospital ? ` • ${state.doctor.hospital}` : ''}`
+                : 'No doctor assigned • Tap to add'}
+            </span>
           </div>
 
           <div className="flex items-center gap-2 shrink-0 self-end xs:self-auto">

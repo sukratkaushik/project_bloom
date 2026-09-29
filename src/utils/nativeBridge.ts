@@ -301,7 +301,7 @@ export const scheduleKickReminders = async (enabled: boolean): Promise<void> => 
 /**
  * Schedules prenatal doctor appointment alerts (24 hours and 2 hours prior).
  */
-export const scheduleAppointmentAlert = async (appointmentDate: Date, doctorName = 'Dr. Priya'): Promise<void> => {
+export const scheduleAppointmentAlert = async (appointmentDate: Date, doctorName = 'your Obstetrician'): Promise<void> => {
   try {
     const granted = await requestNotificationPermissions();
     if (!granted) return;
