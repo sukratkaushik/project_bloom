@@ -9,7 +9,7 @@ import { SmartAiTab } from './tabs/SmartAiTab';
 import { VaultTab } from './tabs/VaultTab';
 
 import { ArrowLeft, Star, X, ShieldAlert, Phone, Sparkles } from 'lucide-react';
-import { triggerHaptic, initNotificationChannels, registerNotificationActionListener } from '../../utils/nativeBridge';
+import { triggerHaptic, initNotificationChannels, registerNotificationActionListener, isNativeApp } from '../../utils/nativeBridge';
 import { usePlanner } from '../../store';
 import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
@@ -371,20 +371,46 @@ export const MobileShell: React.FC = () => {
         </div>
       )}
 
-      {/* Profile & Settings Modal */}
+      {/* Profile & Settings Screen (Full-Screen Native View) */}
       {showProfileModal && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-5 w-full max-w-md shadow-2xl relative max-h-[85vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-[#FDFBF7] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
+          {/* Native Top App Bar */}
+          <div className={`shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between ${
+            isNativeApp() ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[max(0.75rem,env(safe-area-inset-top))]'
+          }`}>
             <button
-              onClick={() => setShowProfileModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-medium hover:text-charcoal rounded-full"
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowProfileModal(false);
+              }}
+              className="flex items-center gap-1.5 text-[13.5px] font-bold text-charcoal hover:text-sage-dark active:scale-95 transition-all p-1 -ml-1 cursor-pointer"
+              aria-label="Back"
             >
-              <X size={20} />
+              <ArrowLeft size={18} />
+              <span>Back</span>
             </button>
-            <h3 className="font-serif font-bold text-charcoal text-[18px] mb-3">
-              Settings & Pregnancy Profile
-            </h3>
-            <Profile />
+            <h2 className="font-serif font-bold text-charcoal text-[16px] tracking-tight text-center">
+              Settings & Profile
+            </h2>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowProfileModal(false);
+              }}
+              className="text-[13px] font-bold text-sage-dark hover:underline active:scale-95 transition-transform p-1 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+
+          {/* Full-width Scrollable Content Container */}
+          <div 
+            className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-4 pb-28 max-w-lg mx-auto w-full custom-scrollbar"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <Profile isMobileModal={true} />
           </div>
         </div>
       )}
