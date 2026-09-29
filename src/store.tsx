@@ -73,6 +73,7 @@ const defaultState: PlannerState = {
     readiness: true, hospitalbag: true, birthplan: true, decisions: true, postpartum: true,
     notes: true,
   },
+  doctor: null,
   isRestoring: false,
 };
 

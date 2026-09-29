@@ -504,7 +504,9 @@ export const MobileShell: React.FC = () => {
               Schedule Prenatal Visit
             </h3>
             <p className="text-[12px] text-medium mb-3">
-              Coordinate your next scan milestone with Dr. Priya Sharma at Cloudnine Hospital.
+              {state.doctor?.name
+                ? `Coordinate your next scan milestone with ${state.doctor.name}${state.doctor.hospital ? ` at ${state.doctor.hospital}` : ''}.`
+                : 'Coordinate your next scan milestone with your obstetrician and hospital OPD.'}
             </p>
             <button
               type="button"

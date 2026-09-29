@@ -3,9 +3,11 @@ import {
   Stethoscope, Phone, Calendar, Plus, CheckSquare, Square,
   Activity, Share2, AlertTriangle, ShieldCheck, Clock, FileText,
   Bell, RefreshCw, MessageCircle, ChevronRight, CheckCircle2,
-  CalendarCheck, MapPin, HeartPulse
+  CalendarCheck, MapPin, HeartPulse, Pencil, UserCheck
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
+import { usePlanner } from '../../../store';
+import { DoctorModal } from '../DoctorModal';
 
 interface CareTabProps {
   onOpenTool: (toolId: string) => void;
@@ -27,6 +29,8 @@ export const CareTab: React.FC<CareTabProps> = ({
   onOpenNotifications,
   onShowToast,
 }) => {
+  const { state, updateState } = usePlanner();
+  const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedQuestionCategory, setSelectedQuestionCategory] = useState<string>('All');
   const [prepQuestions, setPrepQuestions] = useState<QuestionItem[]>([
     { id: 1, text: 'Lower back tightness at Week 24 normal?', category: 'Symptoms', done: false },
@@ -106,9 +110,16 @@ export const CareTab: React.FC<CareTabProps> = ({
     setNewQuestionText('');
   };
 
+  const doctor = state.doctor;
+  const hasDoctor = Boolean(doctor && doctor.name && doctor.name.trim().length > 0);
+  const cleanPhone = doctor?.phone ? doctor.phone.replace(/[^\d+]/g, '') : '';
+  const cleanPhoneForWa = doctor?.phone ? doctor.phone.replace(/[^\d]/g, '') : '';
+  const doctorShortName = hasDoctor && doctor?.name ? doctor.name.split(',')[0].trim() : 'Obstetrician';
+
   const handleShareFhir = () => {
     triggerHaptic('success');
-    onShowToast('📋 Generated FHIR R4 Clinical JSON bundle for Dr. Priya Sharma');
+    const doctorLabel = hasDoctor && doctor?.name ? doctor.name : 'Primary Care Provider';
+    onShowToast(`📋 Generated FHIR R4 Clinical JSON bundle for ${doctorLabel}`);
   };
 
   const filteredQuestions = prepQuestions.filter(
@@ -119,48 +130,121 @@ export const CareTab: React.FC<CareTabProps> = ({
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* 1. OB-GYN Clinical Care Team Hero Card */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3 min-w-0">
+        {hasDoctor && doctor ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
+                <Stethoscope size={24} />
+              </div>
+              <div className="min-w-0">
+                <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
+                  Primary Obstetrician
+                </span>
+                <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight truncate">
+                  {doctor.name}
+                </h3>
+                <p className="text-[11.5px] text-medium mt-0.5 flex items-center gap-1 truncate">
+                  <MapPin size={11} className="text-sage shrink-0" />
+                  <span className="truncate">{doctor.hospital || 'Obstetrics & Gynecology'}</span>
+                </p>
+                {doctor.notes && (
+                  <p className="text-[10.5px] text-sage-dark/90 mt-0.5 font-medium truncate">
+                    {doctor.notes}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex items-center gap-1.5 shrink-0 ml-2">
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsDoctorModalOpen(true);
+                }}
+                className="w-8 h-8 rounded-full bg-cream hover:bg-sage-pale text-charcoal hover:text-sage-dark border border-border/70 flex items-center justify-center shadow-2xs active:scale-95 transition-all cursor-pointer"
+                aria-label="Edit Doctor Details"
+                title="Edit Doctor Details"
+              >
+                <Pencil size={13} />
+              </button>
+
+              {doctor.phone ? (
+                <a
+                  href={`tel:${cleanPhone}`}
+                  onClick={() => triggerHaptic('light')}
+                  className="w-8 h-8 rounded-full bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all"
+                  aria-label="Call Doctor"
+                  title={`Call ${doctor.name}`}
+                >
+                  <Phone size={14} />
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setIsDoctorModalOpen(true);
+                  }}
+                  className="w-8 h-8 rounded-full bg-cream text-medium hover:text-charcoal border border-border/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all cursor-pointer"
+                  aria-label="Add Phone Number"
+                  title="Add Phone Number"
+                >
+                  <Phone size={14} />
+                </button>
+              )}
+
+              {doctor.phone ? (
+                <a
+                  href={`https://wa.me/${cleanPhoneForWa}?text=${encodeURIComponent(`Hello ${doctor.name}, query from Bloom app`)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => triggerHaptic('light')}
+                  className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs hover:bg-emerald-700 active:scale-95 transition-all"
+                  aria-label="WhatsApp Clinic"
+                  title="WhatsApp OPD"
+                >
+                  <MessageCircle size={14} />
+                </a>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-3">
             <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
               <Stethoscope size={24} />
             </div>
-            <div className="min-w-0">
-              <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
-                Primary Obstetrician
-              </span>
-              <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight truncate">
-                Dr. Priya Sharma, MS
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
+                  Primary Obstetrician
+                </span>
+                <span className="text-[10px] font-bold text-medium bg-cream px-2 py-0.5 rounded-full border border-border/60">
+                  Not Assigned
+                </span>
+              </div>
+              <h3 className="font-serif font-bold text-charcoal text-[15.5px] leading-tight mt-0.5">
+                Add Your Primary Obstetrician
               </h3>
-              <p className="text-[11.5px] text-medium mt-0.5 flex items-center gap-1 truncate">
-                <MapPin size={11} className="text-sage shrink-0" />
-                <span className="truncate">Cloudnine Hospital • Whitefield</span>
+              <p className="text-[11.5px] text-medium mt-1 leading-snug">
+                Save your OB-GYN, hospital, and emergency contact for 1-tap calls, WhatsApp, and visit prep.
               </p>
+              <div className="mt-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    triggerHaptic('light');
+                    setIsDoctorModalOpen(true);
+                  }}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sage hover:bg-sage-dark active:scale-95 text-white font-bold text-[12px] rounded-xl shadow-xs transition-all cursor-pointer"
+                >
+                  <Plus size={14} />
+                  <span>Add Primary Obstetrician</span>
+                </button>
+              </div>
             </div>
           </div>
-
-          <div className="flex items-center gap-1.5 shrink-0 ml-2">
-            <a
-              href="tel:+919876543210"
-              onClick={() => triggerHaptic('light')}
-              className="w-8 h-8 rounded-full bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all"
-              aria-label="Call Clinic"
-              title="Call Clinic"
-            >
-              <Phone size={14} />
-            </a>
-            <a
-              href="https://wa.me/919876543210?text=Namaste%20Cloudnine%20Care%20Team,%20query%20from%20Bloom%20App"
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => triggerHaptic('light')}
-              className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs hover:bg-emerald-700 active:scale-95 transition-all"
-              aria-label="WhatsApp Clinic"
-              title="WhatsApp OPD"
-            >
-              <MessageCircle size={14} />
-            </a>
-          </div>
-        </div>
+        )}
 
         {/* Patient Clinical Info Bar with Symmetric Equal-Height Boxes */}
         <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-4 gap-2 text-center">
@@ -343,7 +427,7 @@ export const CareTab: React.FC<CareTabProps> = ({
           <div className="flex items-center gap-1.5">
             <FileText size={15} className="text-sage-dark" />
             <h3 className="font-serif font-bold text-charcoal text-[14px]">
-              Questions for Dr. Priya
+              Questions for {doctorShortName}
             </h3>
           </div>
           <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.2 rounded-full whitespace-nowrap">
@@ -402,7 +486,7 @@ export const CareTab: React.FC<CareTabProps> = ({
             type="text"
             value={newQuestionText}
             onChange={(e) => setNewQuestionText(e.target.value)}
-            placeholder="Add a question for Dr. Priya..."
+            placeholder={`Add a question for ${doctorShortName}...`}
             className="flex-1 h-9 bg-cream/70 border border-border/80 rounded-xl px-3 text-[12px] text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage placeholder:text-light"
           />
           <button
@@ -512,16 +596,30 @@ export const CareTab: React.FC<CareTabProps> = ({
                 <span>Call 108</span>
               </a>
               <a
-                href="tel:+919876543210"
+                href={cleanPhone ? `tel:${cleanPhone}` : 'tel:+919876543210'}
                 onClick={() => triggerHaptic('light')}
                 className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-critical/30 text-critical text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-critical/10 active:scale-95 transition-all"
               >
-                <span>Hospital Triage</span>
+                <span>{doctor?.hospital ? doctor.hospital.split('•')[0].trim() : 'Hospital Triage'}</span>
               </a>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Doctor Management Modal */}
+      <DoctorModal
+        isOpen={isDoctorModalOpen}
+        onClose={() => setIsDoctorModalOpen(false)}
+        initialDoctor={state.doctor}
+        onSave={(doctorData) => {
+          updateState({ doctor: doctorData });
+        }}
+        onRemove={() => {
+          updateState({ doctor: null });
+        }}
+        onShowToast={onShowToast}
+      />
     </div>
   );
 };

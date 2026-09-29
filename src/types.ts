@@ -158,4 +158,13 @@ export type PlannerState = {
   connectedWearables?: string[];
   lastWearableSyncTime?: number;
   aiProcessingConsent?: boolean;
+  doctor?: DoctorInfo | null;
+};
+
+export type DoctorInfo = {
+  name: string;
+  hospital?: string;
+  phone?: string;
+  email?: string;
+  notes?: string;
 };
