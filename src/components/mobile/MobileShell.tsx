@@ -291,11 +291,19 @@ export const MobileShell: React.FC = () => {
       {/* 5. Modals & Sheets */}
       {/* 108 Emergency SOS Modal */}
       {showSosModal && (
-        <div className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative border border-critical/20">
+        <div 
+          className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowSosModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative border border-critical/20"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setShowSosModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-medium hover:text-charcoal rounded-full"
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
+              aria-label="Close"
             >
               <X size={20} />
             </button>
@@ -331,11 +339,19 @@ export const MobileShell: React.FC = () => {
 
       {/* Language Selector Modal */}
       {showLanguageModal && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative">
+        <div 
+          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowLanguageModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setShowLanguageModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-medium hover:text-charcoal rounded-full"
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
+              aria-label="Close"
             >
               <X size={20} />
             </button>
@@ -417,11 +433,19 @@ export const MobileShell: React.FC = () => {
 
       {/* Pricing / Pro Modal */}
       {showPricingModal && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative">
+        <div 
+          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowPricingModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setShowPricingModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-medium hover:text-charcoal rounded-full"
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
+              aria-label="Close"
             >
               <X size={20} />
             </button>
@@ -432,7 +456,7 @@ export const MobileShell: React.FC = () => {
               Our Pregnancy PRO
             </h3>
             <p className="text-[12.5px] text-medium mt-1 leading-relaxed">
-              Unlimited Qwen2.5 clinical AI consults, multi-subject food safety vision, and instant FHIR R4 exports.
+              Unlimited maternal AI consults, multi-subject food safety vision, and instant FHIR R4 medical exports.
             </p>
             <div className="mt-4 p-3 bg-sage-pale/60 border border-sage/30 rounded-2xl">
               <span className="text-[11px] font-bold text-sage-dark uppercase block">
@@ -460,11 +484,19 @@ export const MobileShell: React.FC = () => {
 
       {/* Schedule Visit Modal */}
       {showScheduleModal && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative">
+        <div 
+          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setShowScheduleModal(false)}
+        >
+          <div 
+            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
+              type="button"
               onClick={() => setShowScheduleModal(false)}
-              className="absolute top-4 right-4 p-1.5 text-medium hover:text-charcoal rounded-full"
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
+              aria-label="Close"
             >
               <X size={20} />
             </button>

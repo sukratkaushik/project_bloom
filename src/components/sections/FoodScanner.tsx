@@ -1202,39 +1202,49 @@ export const FoodScanner: React.FC = () => {
         {result && result.isFood !== false && (
           <div className="bg-white p-6 sm:p-7 rounded-[20px] border-[1.5px] border-border shadow-sm space-y-6 animate-in slide-in-from-bottom-4 duration-400">
             
-            {/* Header: Dish Title & Source */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-border">
-              <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-sage px-2 py-0.5 rounded bg-sage-pale">
+            {/* Header: Dish Title & Serving Multiplier Bar */}
+            <div className="space-y-3 pb-4 border-b border-border/70">
+              <div className="w-full min-w-0">
+                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-sage-dark px-2.5 py-0.5 rounded-full bg-sage/15 border border-sage/20">
                     {result.sourceType === 'barcode' ? 'Open Food Facts Database' : 'Clinical AI Vision'}
                   </span>
                   {result.brandName && (
                     <span className="text-[12px] font-medium text-light">• {result.brandName}</span>
                   )}
                 </div>
-                <h3 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal">
+                <h3 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-snug break-words">
                   {result.dishName || 'Scanned Meal'}
                 </h3>
-                <p className="text-[13px] text-medium">
+                <p className="text-[13px] text-medium mt-1">
                   {result.servingDescription || 'Standard portion estimated'}
                 </p>
               </div>
 
-              {/* Portion Multiplier Slider / Toggles */}
-              <div className="flex items-center gap-2 bg-cream p-1.5 rounded-[12px] border border-border self-start sm:self-center">
-                <span className="text-[11.5px] font-semibold text-medium px-1">Portion:</span>
-                {[0.5, 1.0, 1.5, 2.0].map((mul) => (
-                  <button
-                    key={mul}
-                    onClick={() => setPortion(mul)}
-                    className={`px-2.5 py-1 rounded-[8px] text-[12px] font-bold transition-all cursor-pointer ${
-                      portion === mul ? 'bg-sage text-white shadow-xs' : 'text-charcoal hover:bg-white'
-                    }`}
-                  >
-                    {mul}x
-                  </button>
-                ))}
+              {/* Portion Multiplier - Dedicated Responsive Row */}
+              <div className="flex items-center justify-between gap-3 bg-cream/70 dark:bg-stone-800/80 p-1.5 sm:p-2 rounded-xl border border-border/80">
+                <span className="text-[12px] font-bold text-charcoal/80 dark:text-stone-300 pl-1.5">
+                  Serving Size:
+                </span>
+                <div className="flex items-center gap-1">
+                  {[0.5, 1.0, 1.5, 2.0].map((mul) => (
+                    <button
+                      key={mul}
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('selection');
+                        setPortion(mul);
+                      }}
+                      className={`px-3 py-1 rounded-lg text-[12px] font-bold transition-all cursor-pointer ${
+                        portion === mul
+                          ? 'bg-sage-dark text-white shadow-2xs'
+                          : 'text-charcoal/70 dark:text-stone-300 hover:bg-white/60 dark:hover:bg-stone-700/60'
+                      }`}
+                    >
+                      {mul}x
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -1277,98 +1287,138 @@ export const FoodScanner: React.FC = () => {
             {/* Circular Macro Cards (Cal AI Style) */}
             <div>
               <div className="flex items-center justify-between mb-3">
-                <h4 className="text-[12px] font-bold tracking-[1.2px] uppercase text-charcoal flex items-center gap-1.5">
-                  <Flame size={15} className="text-amber-500" /> Macronutrient Breakdown ({portion}x Portion)
+                <h4 className="text-[11px] font-bold tracking-wider uppercase text-charcoal flex items-center gap-1.5">
+                  <Flame size={14} className="text-amber-500 shrink-0" /> Macros ({portion}x portion)
                 </h4>
-                <span className="text-[14px] font-bold text-charcoal">
-                  {currentCalories} <span className="text-[12px] font-normal text-light">kcal</span>
-                </span>
+                <div className="flex items-baseline gap-1 bg-amber-50/80 dark:bg-amber-950/30 px-2.5 py-1 rounded-lg border border-amber-200/50 dark:border-amber-900/30">
+                  <span className="text-[13px] font-bold text-charcoal">{currentCalories}</span>
+                  <span className="text-[11px] font-medium text-light">kcal</span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
                 {/* Protein */}
-                <div className="p-3.5 rounded-[14px] bg-cream/60 border border-border text-center">
-                  <span className="text-[11.5px] font-semibold text-medium block mb-1">Protein</span>
-                  <div className="text-[20px] font-extrabold text-charcoal leading-none mb-1">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-cream/60 dark:bg-stone-800/60 border border-border text-center">
+                  <span className="text-[11px] sm:text-[11.5px] font-semibold text-medium block mb-1">Protein</span>
+                  <div className="text-[19px] sm:text-[20px] font-extrabold text-charcoal leading-none mb-1.5">
                     {currentProtein}g
                   </div>
                   <div className="w-full bg-border/60 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-sage h-full rounded-full" style={{ width: `${Math.min(100, (currentProtein / 25) * 100)}%` }} />
                   </div>
-                  <span className="text-[10px] text-light mt-1 block">RDA ~75g/day</span>
+                  <span className="text-[10px] text-light mt-1.5 block truncate">RDA ~75g/day</span>
                 </div>
 
                 {/* Carbs */}
-                <div className="p-3.5 rounded-[14px] bg-cream/60 border border-border text-center">
-                  <span className="text-[11.5px] font-semibold text-medium block mb-1">Carbs</span>
-                  <div className="text-[20px] font-extrabold text-charcoal leading-none mb-1">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-cream/60 dark:bg-stone-800/60 border border-border text-center">
+                  <span className="text-[11px] sm:text-[11.5px] font-semibold text-medium block mb-1">Carbs</span>
+                  <div className="text-[19px] sm:text-[20px] font-extrabold text-charcoal leading-none mb-1.5">
                     {currentCarbs}g
                   </div>
                   <div className="w-full bg-border/60 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-amber-500 h-full rounded-full" style={{ width: `${Math.min(100, (currentCarbs / 60) * 100)}%` }} />
                   </div>
-                  <span className="text-[10px] text-light mt-1 block">Complex energy</span>
+                  <span className="text-[10px] text-light mt-1.5 block truncate">Complex energy</span>
                 </div>
 
                 {/* Fats */}
-                <div className="p-3.5 rounded-[14px] bg-cream/60 border border-border text-center">
-                  <span className="text-[11.5px] font-semibold text-medium block mb-1">Fats</span>
-                  <div className="text-[20px] font-extrabold text-charcoal leading-none mb-1">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-cream/60 dark:bg-stone-800/60 border border-border text-center">
+                  <span className="text-[11px] sm:text-[11.5px] font-semibold text-medium block mb-1">Fats</span>
+                  <div className="text-[19px] sm:text-[20px] font-extrabold text-charcoal leading-none mb-1.5">
                     {currentFats}g
                   </div>
                   <div className="w-full bg-border/60 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-rose-400 h-full rounded-full" style={{ width: `${Math.min(100, (currentFats / 20) * 100)}%` }} />
                   </div>
-                  <span className="text-[10px] text-light mt-1 block">Hormone balance</span>
+                  <span className="text-[10px] text-light mt-1.5 block truncate">Hormone balance</span>
                 </div>
 
                 {/* Fiber */}
-                <div className="p-3.5 rounded-[14px] bg-cream/60 border border-border text-center">
-                  <span className="text-[11.5px] font-semibold text-medium block mb-1">Fiber</span>
-                  <div className="text-[20px] font-extrabold text-charcoal leading-none mb-1">
+                <div className="p-3 sm:p-3.5 rounded-xl bg-cream/60 dark:bg-stone-800/60 border border-border text-center">
+                  <span className="text-[11px] sm:text-[11.5px] font-semibold text-medium block mb-1">Fiber</span>
+                  <div className="text-[19px] sm:text-[20px] font-extrabold text-charcoal leading-none mb-1.5">
                     {currentFiber}g
                   </div>
                   <div className="w-full bg-border/60 h-1.5 rounded-full overflow-hidden">
                     <div className="bg-emerald-600 h-full rounded-full" style={{ width: `${Math.min(100, (currentFiber / 10) * 100)}%` }} />
                   </div>
-                  <span className="text-[10px] text-light mt-1 block">Prevents constipation</span>
+                  <span className="text-[10px] text-light mt-1.5 block truncate">Prevents constipation</span>
                 </div>
               </div>
             </div>
 
             {/* Trimester-Critical Micronutrients (OPIN Differentiator) */}
-            <div className="p-4 sm:p-5 rounded-[16px] bg-sage-pale/40 border border-sage/30">
+            <div className="p-4 sm:p-5 rounded-2xl bg-sage-pale/40 dark:bg-stone-800/70 border border-sage/30 dark:border-stone-700">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-[12px] font-bold tracking-[1.2px] uppercase text-sage-dark flex items-center gap-1.5">
                   <Sparkles size={15} /> Prenatal Micronutrient Density
                 </h4>
-                <span className="text-[11px] font-semibold text-sage-dark bg-white px-2 py-0.5 rounded-full border border-sage/20">
+                <span className="text-[11px] font-semibold text-sage-dark bg-white dark:bg-stone-900 px-2.5 py-0.5 rounded-full border border-sage/20">
                   FOGSI Standards
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="bg-white p-3 rounded-[12px] border border-sage/20">
-                  <div className="text-[11px] font-semibold text-medium">Folate (B9)</div>
-                  <div className="text-[18px] font-bold text-sage-dark mt-0.5">{currentFolate} mcg</div>
-                  <div className="text-[10.5px] text-light mt-0.5">Target: 400–600 mcg/day</div>
+              <div className="space-y-2.5">
+                {/* Folate Row */}
+                <div className="bg-white dark:bg-stone-900/90 p-3 rounded-xl border border-sage/20 flex items-center justify-between gap-3 shadow-3xs">
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-bold text-charcoal dark:text-cream flex items-center gap-1.5">
+                      <span>Folate (Vitamin B9)</span>
+                      <span className="text-[10px] font-semibold text-sage-dark bg-sage-pale px-1.5 py-0.2 rounded">Neural Tube</span>
+                    </div>
+                    <div className="text-[11px] text-medium mt-0.5">Target: 400–600 mcg/day</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[16px] font-extrabold text-sage-dark dark:text-sage-light">
+                      {currentFolate} <span className="text-[12px] font-normal text-medium">mcg</span>
+                    </div>
+                    <div className="text-[10.5px] font-semibold text-charcoal/60 dark:text-stone-300">
+                      ~{Math.min(100, Math.round((currentFolate / 500) * 100))}% RDA
+                    </div>
+                  </div>
                 </div>
 
-                <div className="bg-white p-3 rounded-[12px] border border-sage/20">
-                  <div className="text-[11px] font-semibold text-medium">Elemental Iron</div>
-                  <div className="text-[18px] font-bold text-sage-dark mt-0.5">{currentIron} mg</div>
-                  <div className="text-[10.5px] text-light mt-0.5">Target: 27–30 mg/day</div>
+                {/* Iron Row */}
+                <div className="bg-white dark:bg-stone-900/90 p-3 rounded-xl border border-sage/20 flex items-center justify-between gap-3 shadow-3xs">
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-bold text-charcoal dark:text-cream flex items-center gap-1.5">
+                      <span>Elemental Iron</span>
+                      <span className="text-[10px] font-semibold text-rose-600 bg-rose-50 px-1.5 py-0.2 rounded">Hemoglobin</span>
+                    </div>
+                    <div className="text-[11px] text-medium mt-0.5">Target: 27–30 mg/day</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[16px] font-extrabold text-sage-dark dark:text-sage-light">
+                      {currentIron} <span className="text-[12px] font-normal text-medium">mg</span>
+                    </div>
+                    <div className="text-[10.5px] font-semibold text-charcoal/60 dark:text-stone-300">
+                      ~{Math.min(100, Math.round((currentIron / 28) * 100))}% RDA
+                    </div>
+                  </div>
                 </div>
 
-                <div className="bg-white p-3 rounded-[12px] border border-sage/20">
-                  <div className="text-[11px] font-semibold text-medium">Calcium</div>
-                  <div className="text-[18px] font-bold text-sage-dark mt-0.5">{currentCalcium} mg</div>
-                  <div className="text-[10.5px] text-light mt-0.5">Target: 1,000 mg/day</div>
+                {/* Calcium Row */}
+                <div className="bg-white dark:bg-stone-900/90 p-3 rounded-xl border border-sage/20 flex items-center justify-between gap-3 shadow-3xs">
+                  <div className="min-w-0">
+                    <div className="text-[12.5px] font-bold text-charcoal dark:text-cream flex items-center gap-1.5">
+                      <span>Calcium</span>
+                      <span className="text-[10px] font-semibold text-amber-700 bg-amber-50 px-1.5 py-0.2 rounded">Skeletal & Bones</span>
+                    </div>
+                    <div className="text-[11px] text-medium mt-0.5">Target: 1,000 mg/day</div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <div className="text-[16px] font-extrabold text-sage-dark dark:text-sage-light">
+                      {currentCalcium} <span className="text-[12px] font-normal text-medium">mg</span>
+                    </div>
+                    <div className="text-[10.5px] font-semibold text-charcoal/60 dark:text-stone-300">
+                      ~{Math.min(100, Math.round((currentCalcium / 1000) * 100))}% RDA
+                    </div>
+                  </div>
                 </div>
               </div>
 
               {result.trimesterAdvice && (
-                <div className="mt-3.5 text-[12.5px] text-sage-dark/90 leading-relaxed bg-white/70 p-3 rounded-[10px]">
+                <div className="mt-3 text-[12.5px] text-sage-dark dark:text-stone-200 leading-relaxed bg-white/80 dark:bg-stone-900/80 p-3 rounded-xl border border-sage/20">
                   💡 <strong>OB-GYN Tip:</strong> {result.trimesterAdvice}
                 </div>
               )}
