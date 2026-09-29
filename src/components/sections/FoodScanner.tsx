@@ -24,13 +24,16 @@ import {
   Info, 
   Flame,
   ArrowRight,
-  ExternalLink
+  ExternalLink,
+  Search,
+  X
 } from 'lucide-react';
 import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
+import { triggerHaptic } from '../../utils/nativeBridge';
 
 interface Macronutrients {
   calories: number;
@@ -756,46 +759,109 @@ export const FoodScanner: React.FC = () => {
       <div className="animate-in fade-in duration-300 max-w-4xl mx-auto pb-12">
         
         {/* Header Title */}
-        <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-pale text-sage-dark text-[12px] font-semibold tracking-wide uppercase mb-2">
-              <Bot size={14} className="text-sage" /> Maternal Clinical Vision & Database
-            </div>
-            <h2 className="font-serif text-[clamp(26px,3.8vw,36px)] font-bold text-charcoal leading-tight">
-              Our Pregnancy AI Food Guide
-            </h2>
-            <p className="text-[14px] text-medium max-w-[620px] leading-relaxed mt-1">
-              Snap a photo, scan a packaged barcode via Open Food Facts, or describe your meal for instant maternal safety, macro breakdown, and trimester micronutrients.
-            </p>
+        <div className="mb-4">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-pale text-sage-dark text-[11.5px] font-semibold tracking-wide uppercase mb-2">
+            <Bot size={14} className="text-sage" /> Maternal Clinical Vision & Database
           </div>
+          <h2 className="font-serif text-[clamp(24px,3.8vw,34px)] font-bold text-charcoal leading-tight">
+            Our Pregnancy AI Food Guide
+          </h2>
+          <p className="text-[13.5px] sm:text-[14px] text-medium max-w-[620px] leading-relaxed mt-1">
+            Snap a photo, scan a packaged barcode via Open Food Facts, or describe your meal for instant maternal safety, macro breakdown, and trimester micronutrients.
+          </p>
+        </div>
 
-          {/* Multimodal Mode Selector Tabs */}
-          <div className="flex bg-cream border border-border rounded-[12px] p-1 self-start md:self-auto shrink-0 shadow-xs">
-            <button
-              onClick={() => setActiveTab('camera')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[9px] text-[13px] font-semibold transition-all ${
-                activeTab === 'camera' ? 'bg-white text-charcoal shadow-sm' : 'text-medium hover:text-charcoal'
+        {/* Multimodal Mode Selector Tabs (Sleek Material 3 Segmented Control) */}
+        <div className="w-full bg-[#F3EFE9] dark:bg-stone-800 p-1.5 rounded-2xl border border-border/80 shadow-3xs grid grid-cols-3 gap-1.5 mb-5 select-none">
+          {/* Tab 1: Camera */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setActiveTab('camera');
+            }}
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'camera'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
+                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+            }`}
+            aria-selected={activeTab === 'camera'}
+            role="tab"
+          >
+            <div
+              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+                activeTab === 'camera'
+                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
+                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
               }`}
             >
-              <Camera size={15} /> Photo & Camera
-            </button>
-            <button
-              onClick={() => setActiveTab('barcode')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[9px] text-[13px] font-semibold transition-all ${
-                activeTab === 'barcode' ? 'bg-white text-charcoal shadow-sm' : 'text-medium hover:text-charcoal'
+              <Camera size={16} className={activeTab === 'camera' ? 'stroke-[2.4]' : 'stroke-[2]'} />
+            </div>
+            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+              <span className="inline md:hidden">Camera</span>
+              <span className="hidden md:inline">Camera & Photo</span>
+            </span>
+          </button>
+
+          {/* Tab 2: Barcode */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setActiveTab('barcode');
+            }}
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'barcode'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
+                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+            }`}
+            aria-selected={activeTab === 'barcode'}
+            role="tab"
+          >
+            <div
+              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+                activeTab === 'barcode'
+                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
+                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
               }`}
             >
-              <Barcode size={15} /> Barcode DB
-            </button>
-            <button
-              onClick={() => setActiveTab('text')}
-              className={`flex items-center gap-1.5 px-3.5 py-2 rounded-[9px] text-[13px] font-semibold transition-all ${
-                activeTab === 'text' ? 'bg-white text-charcoal shadow-sm' : 'text-medium hover:text-charcoal'
+              <Barcode size={16} className={activeTab === 'barcode' ? 'stroke-[2.4]' : 'stroke-[2]'} />
+            </div>
+            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+              <span className="inline md:hidden">Barcode</span>
+              <span className="hidden md:inline">Barcode Database</span>
+            </span>
+          </button>
+
+          {/* Tab 3: Voice / Text */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('selection');
+              setActiveTab('text');
+            }}
+            className={`group relative flex items-center justify-center gap-1.5 xs:gap-2 sm:gap-2.5 py-2.5 px-1 xs:px-2 sm:px-3 rounded-xl transition-all duration-200 cursor-pointer ${
+              activeTab === 'text'
+                ? 'bg-white dark:bg-stone-900 text-charcoal dark:text-white shadow-xs border border-border/70 font-bold'
+                : 'text-charcoal/70 dark:text-stone-300 hover:text-charcoal hover:bg-white/40 font-semibold'
+            }`}
+            aria-selected={activeTab === 'text'}
+            role="tab"
+          >
+            <div
+              className={`w-7 h-7 xs:w-7.5 xs:h-7.5 rounded-lg flex items-center justify-center shrink-0 transition-all duration-200 ${
+                activeTab === 'text'
+                  ? 'bg-sage-dark text-white shadow-2xs scale-105'
+                  : 'bg-white/80 border border-border/70 text-charcoal/80 group-hover:text-charcoal group-hover:bg-white shadow-3xs'
               }`}
             >
-              <Mic size={15} /> Voice / Text
-            </button>
-          </div>
+              <Mic size={16} className={activeTab === 'text' ? 'stroke-[2.4]' : 'stroke-[2]'} />
+            </div>
+            <span className="text-[11.5px] xs:text-[12px] sm:text-[13px] whitespace-nowrap tracking-tight">
+              <span className="inline md:hidden">Voice / Text</span>
+              <span className="hidden md:inline">Voice & Text Log</span>
+            </span>
+          </button>
         </div>
 
         {/* AI Consent Guard */}
@@ -804,38 +870,44 @@ export const FoodScanner: React.FC = () => {
         )}
 
         {/* Input Methods Card */}
-        <div className="bg-white p-6 rounded-[20px] border-[1.5px] border-border shadow-xs mb-8 transition-all">
+        <div className="bg-white p-4 xs:p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-border/80 shadow-xs mb-8 transition-all">
           
           {/* TAB 1: Camera & Photo Upload */}
           {activeTab === 'camera' && (
             <div>
               {!imagePreview ? (
                 <div className="space-y-4">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                     {/* Shutter / Take Photo Button */}
                     <button
                       type="button"
-                      onClick={() => cameraInputRef.current?.click()}
-                      className="group border-2 border-dashed border-sage/60 hover:border-sage bg-sage-pale/20 hover:bg-sage-pale/40 rounded-[14px] p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all"
+                      onClick={() => {
+                        triggerHaptic('light');
+                        cameraInputRef.current?.click();
+                      }}
+                      className="group border-2 border-dashed border-sage/60 hover:border-sage bg-sage-pale/25 hover:bg-sage-pale/40 rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-3xs"
                     >
-                      <div className="w-14 h-14 rounded-full bg-sage/15 group-hover:scale-110 text-sage flex items-center justify-center mb-3 transition-transform">
-                        <Camera size={26} />
+                      <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark group-hover:scale-105 flex items-center justify-center mb-2.5 transition-transform shadow-3xs">
+                        <Camera size={24} className="stroke-[2.2]" />
                       </div>
-                      <h3 className="font-semibold text-charcoal text-[15px] mb-1">Take Live Photo</h3>
-                      <p className="text-[12.5px] text-medium">Use mobile camera to snap meal plate</p>
+                      <h3 className="font-bold text-charcoal text-[14.5px] mb-0.5">Take Live Photo</h3>
+                      <p className="text-[12px] text-medium">Use mobile camera to snap meal plate</p>
                     </button>
 
                     {/* File Upload Button */}
                     <button
                       type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="group border-2 border-dashed border-border hover:border-charcoal/40 bg-cream/30 hover:bg-cream rounded-[14px] p-8 flex flex-col items-center justify-center text-center cursor-pointer transition-all"
+                      onClick={() => {
+                        triggerHaptic('light');
+                        fileInputRef.current?.click();
+                      }}
+                      className="group border-2 border-dashed border-border hover:border-charcoal/40 bg-cream/35 hover:bg-cream rounded-2xl p-6 flex flex-col items-center justify-center text-center cursor-pointer transition-all shadow-3xs"
                     >
-                      <div className="w-14 h-14 rounded-full bg-border/60 group-hover:scale-110 text-charcoal flex items-center justify-center mb-3 transition-transform">
-                        <Upload size={26} />
+                      <div className="w-12 h-12 rounded-2xl bg-cream-dark/60 text-charcoal group-hover:scale-105 flex items-center justify-center mb-2.5 transition-transform shadow-3xs">
+                        <Upload size={24} className="stroke-[2.2]" />
                       </div>
-                      <h3 className="font-semibold text-charcoal text-[15px] mb-1">Upload from Gallery</h3>
-                      <p className="text-[12.5px] text-light">JPEG, PNG, WEBP up to 5MB</p>
+                      <h3 className="font-bold text-charcoal text-[14.5px] mb-0.5">Upload from Gallery</h3>
+                      <p className="text-[12px] text-light">JPEG, PNG, WEBP up to 5MB</p>
                     </button>
                   </div>
 
@@ -883,9 +955,12 @@ export const FoodScanner: React.FC = () => {
 
                   {!result && (
                     <button
-                      onClick={analyzeImage}
+                      onClick={() => {
+                        triggerHaptic('medium');
+                        analyzeImage();
+                      }}
                       disabled={isAnalyzing || isAiConsentBlocked(state.aiProcessingConsent)}
-                      className="w-full p-4 bg-sage text-white rounded-[12px] font-sans text-[15px] font-bold tracking-[0.3px] transition-all hover:bg-sage-dark disabled:opacity-60 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
+                      className="w-full p-4 bg-sage-dark text-white rounded-xl font-sans text-[15px] font-bold tracking-[0.3px] transition-all hover:bg-sage disabled:opacity-60 flex items-center justify-center gap-2 shadow-sm cursor-pointer"
                     >
                       {isAnalyzing ? (
                         <>
@@ -908,54 +983,88 @@ export const FoodScanner: React.FC = () => {
           {/* TAB 2: Barcode Lookup (Open Food Facts Database) */}
           {activeTab === 'barcode' && (
             <div className="space-y-4">
-              <div className="flex items-center gap-2">
-                <div className="relative flex-1">
-                  <input
-                    type="text"
-                    value={barcodeInput}
-                    onChange={(e) => setBarcodeInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && handleBarcodeLookup()}
-                    placeholder="Enter 8 to 13-digit product barcode (e.g. 8901030383700)..."
-                    className="w-full pl-10 pr-4 py-3 bg-cream/50 border border-border rounded-[12px] text-[14px] text-charcoal focus:outline-none focus:border-sage transition-colors"
-                  />
-                  <Barcode className="absolute left-3.5 top-1/2 -translate-y-1/2 text-medium" size={18} />
+              <div>
+                <label className="block text-[11px] font-bold text-charcoal/70 uppercase tracking-wider mb-1.5">
+                  Packaged Food Barcode Number
+                </label>
+                <div className="flex items-center gap-2">
+                  <div className="relative min-w-0 flex-1">
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      value={barcodeInput}
+                      onChange={(e) => setBarcodeInput(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleBarcodeLookup()}
+                      placeholder="8 to 13-digit barcode (e.g. 8901030383700)..."
+                      className="w-full pl-10 pr-9 py-3 bg-cream/40 border border-border/90 rounded-xl text-[13.5px] xs:text-[14px] text-charcoal placeholder:text-medium/70 focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all font-mono"
+                    />
+                    <Barcode className="absolute left-3 top-1/2 -translate-y-1/2 text-sage-dark shrink-0" size={18} />
+                    {barcodeInput && (
+                      <button
+                        type="button"
+                        onClick={() => setBarcodeInput('')}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 p-1 text-medium hover:text-charcoal rounded-full"
+                        aria-label="Clear input"
+                      >
+                        <X size={15} />
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      handleBarcodeLookup();
+                    }}
+                    disabled={isSearchingBarcode || !barcodeInput.trim()}
+                    className="px-3.5 xs:px-4 sm:px-5 py-3 bg-sage-dark hover:bg-sage text-white font-bold rounded-xl text-[13px] sm:text-[14px] disabled:opacity-50 transition-all flex items-center gap-1.5 shrink-0 shadow-2xs active:scale-95 cursor-pointer"
+                  >
+                    {isSearchingBarcode ? <Loader2 size={16} className="animate-spin" /> : <Search size={16} />}
+                    <span className="hidden xs:inline">Search DB</span>
+                    <span className="xs:hidden">Search</span>
+                  </button>
                 </div>
-                <button
-                  onClick={() => handleBarcodeLookup()}
-                  disabled={isSearchingBarcode || !barcodeInput.trim()}
-                  className="px-5 py-3 bg-sage text-white font-semibold rounded-[12px] text-[14px] hover:bg-sage-dark disabled:opacity-50 transition-colors flex items-center gap-2 shrink-0 cursor-pointer"
-                >
-                  {isSearchingBarcode ? <Loader2 size={16} className="animate-spin" /> : <ArrowRight size={16} />}
-                  <span>Search DB</span>
-                </button>
               </div>
 
               {/* Popular Barcode Presets */}
-              <div>
-                <p className="text-[12px] font-semibold text-medium uppercase tracking-wider mb-2">
-                  Try Sample Pregnancy Packaged Snacks:
-                </p>
-                <div className="flex flex-wrap gap-2">
+              <div className="pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-[11.5px] font-bold text-charcoal/80 uppercase tracking-wider flex items-center gap-1.5">
+                    <Sparkles size={12} className="text-amber-600" />
+                    Try Sample Pregnancy Packaged Snacks:
+                  </span>
+                  <span className="text-[11px] text-medium">1-Tap Lookup</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {POPULAR_BARCODES.map((item) => (
                     <button
                       key={item.code}
+                      type="button"
                       onClick={() => {
+                        triggerHaptic('light');
                         setBarcodeInput(item.code);
                         handleBarcodeLookup(item.code);
                       }}
-                      className="px-3 py-1.5 rounded-full bg-cream border border-border text-[12px] text-charcoal hover:border-sage hover:text-sage transition-all text-left flex items-center gap-1.5 cursor-pointer"
+                      className="p-2.5 rounded-xl bg-cream/50 hover:bg-sage-pale/40 border border-border/80 text-[12px] text-charcoal hover:border-sage/50 transition-all text-left flex items-center justify-between group active:scale-[0.98] cursor-pointer shadow-3xs"
                     >
-                      <Barcode size={13} className="text-sage" />
-                      <span>{item.name}</span>
+                      <div className="flex items-center gap-2 min-w-0 pr-1">
+                        <div className="w-6 h-6 rounded-md bg-white border border-border/70 flex items-center justify-center shrink-0 text-sage-dark">
+                          <Barcode size={13} />
+                        </div>
+                        <span className="font-semibold text-charcoal text-[12px] group-hover:text-sage-dark truncate">
+                          {item.name}
+                        </span>
+                      </div>
+                      <ArrowRight size={13} className="text-light group-hover:text-charcoal shrink-0 transition-transform group-hover:translate-x-0.5" />
                     </button>
                   ))}
                 </div>
               </div>
 
-              <div className="p-3.5 rounded-[12px] bg-sage-pale/30 border border-sage/20 text-[12px] text-sage-dark flex items-start gap-2">
-                <Info size={15} className="shrink-0 mt-0.5" />
-                <span>
-                  Connected to <strong>Open Food Facts</strong> open-source database (3M+ packaged items worldwide). Automatically verifies manufacturer ingredients, additives, sodium, and pasteurization.
+              <div className="p-3.5 rounded-xl bg-sage-pale/35 border border-sage/20 text-[12px] text-sage-dark flex items-start gap-2.5 shadow-3xs">
+                <ShieldCheck size={16} className="shrink-0 mt-0.5 text-sage" />
+                <span className="leading-relaxed">
+                  Connected to <strong>Open Food Facts</strong> open clinical database (3M+ packaged items worldwide). Automatically verifies manufacturer ingredients, additives, sodium levels, and pasteurization safety.
                 </span>
               </div>
             </div>
