@@ -1,11 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import {
-  Search, Star, Footprints, Timer, Activity, Heart, Droplets,
-  Apple, BookOpen, Users, Sparkles, Camera, Baby, Plane,
-  Calendar, ShoppingBag, DollarSign, Clock, Syringe, FileText,
-  Building, HeartHandshake, Briefcase, FileCheck2,
-  HelpCircle, CheckCircle2, Wind, X, ArrowRight
-} from 'lucide-react';
+import { Search, Star, X } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 
 import { ALL_PREGNANCY_TOOLS, CATEGORY_CHIPS, ToolDefinition } from '../toolsData';
@@ -139,52 +133,6 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
         </div>
       )}
 
-      {/* 3. Active Clinical Spotlight Hero Card */}
-      {!searchQuery && selectedCategory === 'All' && (
-        <div className="bg-gradient-to-r from-sage-pale/80 via-white to-cream border border-sage/40 rounded-3xl p-4 shadow-xs relative overflow-hidden">
-          <div className="flex items-center justify-between gap-3">
-            <div className="min-w-0 flex-1">
-              <span className="text-[9.5px] font-bold uppercase tracking-wider text-sage-dark bg-sage/15 px-2 py-0.5 rounded-full inline-block mb-1">
-                Clinical Spotlight
-              </span>
-              <h3 className="font-serif font-bold text-charcoal text-[15.5px] leading-tight truncate">
-                AI Food & Calorie Guide
-              </h3>
-              <p className="text-[12px] text-medium mt-0.5 truncate">
-                Instant meal calories, FOGSI vitamins, and trimester safety.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('medium');
-                onOpenTool('foodscanner');
-              }}
-              className="w-11 h-11 rounded-2xl bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all shrink-0 cursor-pointer"
-              aria-label="Open AI Food Guide"
-            >
-              <Camera size={20} />
-            </button>
-          </div>
-
-          <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11.5px]">
-            <span className="text-sage-dark font-medium flex items-center gap-1">
-              <Sparkles size={13} /> Camera & Barcode Scanner
-            </span>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                onOpenTool('foodscanner');
-              }}
-              className="text-sage-dark font-bold hover:underline flex items-center gap-0.5 cursor-pointer"
-            >
-              <span>Scan Meal</span>
-              <ArrowRight size={13} />
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* 4. Well-Sorted Directory with Uniform Heights */}
       <div className="space-y-2.5">
