@@ -210,9 +210,16 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
             </div>
 
             <div>
-              <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70 mb-1.5">
-                Your Name (Optional)
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70">
+                  Preferred Name
+                </label>
+                {isNameSaved && (
+                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Check size={11} /> Saved
+                  </span>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 <input
                   type="text"
@@ -221,13 +228,13 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                     setUserName(e.target.value);
                     if (isNameSaved) setIsNameSaved(false);
                   }}
-                  placeholder="How should we call you?"
-                  className="min-w-0 flex-1 p-3 bg-cream/30 border border-border/80 rounded-xl text-[13.5px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all placeholder:text-light"
+                  placeholder="e.g., Ananya"
+                  className="min-w-0 flex-1 px-3.5 py-2.5 bg-cream/40 border border-border/80 rounded-xl text-[13.5px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all placeholder:text-light"
                 />
                 <button 
                   type="button"
                   onClick={handleNameSave}
-                  className={`shrink-0 px-4 py-3 text-white font-bold text-[13px] rounded-xl transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 active:scale-95 ${
+                  className={`shrink-0 h-10 px-4 text-white font-bold text-[13px] rounded-xl transition-all shadow-2xs cursor-pointer flex items-center justify-center gap-1.5 active:scale-95 ${
                     isNameSaved
                       ? 'bg-emerald-600 hover:bg-emerald-700'
                       : 'bg-sage hover:bg-sage-dark'
@@ -311,20 +318,20 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
 
           <div className="space-y-3">
             {/* Weight Unit */}
-            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-3 p-3.5 bg-cream/40 rounded-2xl border border-border/70">
+            <div className="flex items-center justify-between gap-3 p-3.5 bg-cream/40 rounded-2xl border border-border/70">
               <div className="min-w-0 flex-1">
                 <h4 className="font-semibold text-charcoal text-[13.5px] sm:text-sm flex items-center gap-2">
                   <Weight className="w-4 h-4 text-sage shrink-0" />
                   <span>Unit of Measurement</span>
                 </h4>
                 <p className="text-medium text-[11.5px] sm:text-xs mt-0.5 leading-snug">
-                  Choose how you want to track your weight in Vitals.
+                  Weight tracking unit (Vitals)
                 </p>
               </div>
-              <div className="inline-flex p-1 bg-white border border-border/80 rounded-xl shrink-0 self-end xs:self-auto shadow-2xs">
+              <div className="inline-flex p-1 bg-white border border-border/80 rounded-xl shrink-0 shadow-2xs">
                 <button
                   type="button"
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`w-11 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
                     state.weightUnit !== 'lbs'
                       ? 'bg-sage text-white shadow-3xs'
                       : 'text-medium hover:text-charcoal'
@@ -338,7 +345,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                 </button>
                 <button
                   type="button"
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`w-11 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
                     state.weightUnit === 'lbs'
                       ? 'bg-sage text-white shadow-3xs'
                       : 'text-medium hover:text-charcoal'
@@ -354,20 +361,20 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
             </div>
 
             {/* Calendar Start Day */}
-            <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-3 p-3.5 bg-cream/40 rounded-2xl border border-border/70">
+            <div className="flex items-center justify-between gap-3 p-3.5 bg-cream/40 rounded-2xl border border-border/70">
               <div className="min-w-0 flex-1">
                 <h4 className="font-semibold text-charcoal text-[13.5px] sm:text-sm flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-sage shrink-0" />
                   <span>Calendar Start Day</span>
                 </h4>
                 <p className="text-medium text-[11.5px] sm:text-xs mt-0.5 leading-snug">
-                  First day of the week for calendars in the app.
+                  First day of the week
                 </p>
               </div>
-              <div className="inline-flex p-1 bg-white border border-border/80 rounded-xl shrink-0 self-end xs:self-auto shadow-2xs">
+              <div className="inline-flex p-1 bg-white border border-border/80 rounded-xl shrink-0 shadow-2xs">
                 <button
                   type="button"
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`w-11 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
                     state.calendarStartDay !== 'sunday'
                       ? 'bg-sage text-white shadow-3xs'
                       : 'text-medium hover:text-charcoal'
@@ -381,7 +388,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                 </button>
                 <button
                   type="button"
-                  className={`px-3.5 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                  className={`w-11 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer text-center ${
                     state.calendarStartDay === 'sunday'
                       ? 'bg-sage text-white shadow-3xs'
                       : 'text-medium hover:text-charcoal'

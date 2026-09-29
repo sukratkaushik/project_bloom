@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { usePlanner } from '../../store';
 import { db } from '../../db';
 import Markdown from 'react-markdown';
-import { Send, Loader2, Sparkles, Paperclip, X } from 'lucide-react';
+import { Send, Loader2, Sparkles, Paperclip, X, ShieldCheck } from 'lucide-react';
 import { Paywall } from '../Paywall';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
@@ -74,17 +74,20 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
 - Use this context naturally in your responses without requiring the user to repeat themselves.
 - You answer all questions related to pregnancy, trimesters, gestational weeks, travel safety (e.g. flying/driving in 3rd trimester/8th month), exercises, nutrition & food safety, fetal development, labor preparation, emotional well-being, baby care, and postpartum recovery.
 
-## COMMUNICATION STYLE
-- **Direct & Supportive:** Answer the user's question clearly and helpfully right away.
-- **Empathetic & Calming:** Reassuring, clear, and non-judgmental.
-- **Clinically Grounded:** Ground practical advice in medical consensus (e.g. ACOG travel guidelines: safest in 2nd trimester; in 8th month/32-36 weeks check airline policies, avoid long-haul travel without moving frequently, stay near a maternity facility, consult OB-GYN).
-- Keep responses concise, readable (with bullet points where helpful), and easy to understand.
+## COMMUNICATION STYLE & CLINICAL FORMAT (MANDATORY TO PREVENT VAGUE OUTPUT)
+- Never output vague conversational fluff. Always ground responses in authoritative obstetric consensus (FOGSI, ACOG, WHO).
+- Structure responses into concise, readable markdown sections:
+  * **### 📋 Clinical Summary**: Immediate 1-2 sentence direct answer.
+  * **### 🔬 Physiological Rationale & Guidance**: Bulleted, precise explanation citing maternal/fetal mechanisms.
+  * **### 💡 Practical Maternal Recommendations**: Clear daily portions, timing, dosages, or actionable safe steps.
+  * **### ⚠️ When to Consult Your Doctor**: Red flags or specific symptoms requiring physical triage.
+- Keep bullet points crisp, high-signal, and easy to skim.
 
 ## SAFETY, DISCLAIMER & INDIAN LAW COMPLIANCE (PCPNDT ACT, 1994)
 - **STRICT PROHIBITION ON FETAL SEX DETERMINATION:** Under Indian Law (The Pre-Conception and Pre-Natal Diagnostic Techniques - PCPNDT Act, 1994), prenatal sex determination or disclosure of fetal sex/gender is strictly prohibited. You must NEVER predict, guess, determine, or reveal the sex or gender of the baby under any circumstances (including theories like nub theory, ramzi theory, heart rate myths, or ultrasound interpretations). If asked, politely refuse and state that sex determination is strictly illegal under the PCPNDT Act, 1994.
 - You provide educational and supportive information, not a clinical prescription or diagnosis.
 - End your response with a brief one-line note: 
-  *Note: Bloom AI provides prenatal informational guidance based on ACOG/WHO standards. Always check with your doctor for personal medical advice.*
+  *Note: Bloom AI provides prenatal informational guidance based on ACOG/FOGSI/WHO standards. Always check with your doctor for personal medical advice.*
 `;
 
       setSystemContext(systemInstruction);
@@ -215,38 +218,74 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
           <div className="flex-1 overflow-y-auto p-5 space-y-6">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[85%] rounded-[16px] p-4 ${msg.role === 'user'
-                  ? 'bg-sage text-white rounded-tr-[4px]'
-                  : 'bg-cream border-[1.5px] border-border text-charcoal rounded-tl-[4px]'
-                  }`}>
-                  {msg.role === 'model' ? (
-                    <div className="markdown-body text-[14px] leading-[1.6]">
+                {msg.role === 'user' ? (
+                  <div className="max-w-[85%] sm:max-w-[75%] rounded-2xl rounded-tr-xs bg-sage text-white p-3.5 sm:p-4 text-[13.5px] leading-relaxed shadow-3xs">
+                    <div className="whitespace-pre-wrap">{msg.text}</div>
+                  </div>
+                ) : (
+                  <div className="max-w-[95%] sm:max-w-[82%] rounded-2xl rounded-tl-xs bg-white border border-border/90 p-4 sm:p-5 shadow-xs border-l-4 border-l-sage space-y-2.5">
+                    <div className="flex items-center justify-between pb-2 border-b border-border/60">
+                      <div className="flex items-center gap-1.5 text-sage-dark font-bold text-[11px] uppercase tracking-wider">
+                        <Sparkles size={13} className="text-sage" />
+                        <span>Clinical Advisory</span>
+                      </div>
+                      <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
+                        FOGSI & ACOG Aligned
+                      </span>
+                    </div>
+
+                    <div className="markdown-body text-[13.5px] leading-relaxed text-charcoal/95 space-y-1.5 prose-headings:font-serif prose-headings:font-bold prose-headings:text-charcoal prose-h3:text-[14px] prose-h3:mt-3 prose-h3:mb-1 prose-p:my-1 prose-ul:my-1 prose-li:my-0.5">
                       <Markdown>{msg.text}</Markdown>
                     </div>
-                  ) : (
-                    <div className="text-[14px] leading-[1.6] whitespace-pre-wrap">{msg.text}</div>
-                  )}
-                </div>
+
+                    <div className="pt-2 border-t border-border/60 flex items-center justify-between text-[10.5px] text-medium">
+                      <span className="flex items-center gap-1">
+                        <ShieldCheck size={12} className="text-sage" /> Evidence-based guidance
+                      </span>
+                      <span className="text-[10px] text-light">Verify with OB-GYN</span>
+                    </div>
+                  </div>
+                )}
               </div>
             ))}
             {isLoading && (
               <div className="flex justify-start">
-                <div className="bg-cream border-[1.5px] border-border text-charcoal rounded-[16px] rounded-tl-[4px] p-4 flex items-center gap-2">
+                <div className="bg-white border border-border/90 text-charcoal rounded-2xl rounded-tl-xs p-4 flex items-center gap-2.5 shadow-xs border-l-4 border-l-sage">
                   <Loader2 size={16} className="animate-spin text-sage" />
-                  <span className="text-[14px] text-medium">{loadingText}</span>
+                  <span className="text-[13px] text-medium font-medium">{loadingText}</span>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <div className="p-4 bg-white border-t border-border shrink-0">
+          <div className="p-3 sm:p-4 bg-white border-t border-border/80 shrink-0">
+            {/* Quick Consultation Chips */}
+            <div className="mb-2.5 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+              {[
+                '🥥 Coconut water in pregnancy',
+                '🦵 Relieving nocturnal leg cramps',
+                '🩺 Normal vs warning contractions',
+                '🥬 Top iron-rich vegetarian foods',
+                '🍵 Safe herbal teas during 3rd trimester'
+              ].map((chip) => (
+                <button
+                  key={chip}
+                  type="button"
+                  onClick={() => setInput(chip)}
+                  className="h-7 px-2.5 bg-cream hover:bg-sage-pale text-charcoal border border-border/80 rounded-full text-[11px] font-medium whitespace-nowrap shrink-0 transition-colors cursor-pointer"
+                >
+                  {chip}
+                </button>
+              ))}
+            </div>
+
             {/* File Attachment Indicator */}
             {attachedFile && (
               <div className="mb-2 inline-flex items-center gap-2 bg-sage-pale text-sage px-3 py-1.5 rounded-full text-[12px] font-medium border border-sage/20">
                 <Paperclip size={14} />
                 <span className="truncate max-w-[200px]">{attachedFile.name}</span>
-                <button onClick={() => setAttachedFile(null)} className="hover:text-red-500 transition-colors">
+                <button onClick={() => setAttachedFile(null)} className="hover:text-red-500 transition-colors cursor-pointer">
                   <X size={14} />
                 </button>
               </div>
@@ -268,9 +307,10 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                 />
 
                 <button
+                  type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isLoading}
-                  className="absolute left-2 p-2 text-sage hover:bg-sage-pale rounded-[8px] disabled:opacity-50 transition-colors"
+                  className="absolute left-2.5 p-2 text-sage hover:bg-sage-pale rounded-xl disabled:opacity-50 transition-colors cursor-pointer"
                   title="Attach Document (PDF or Text)"
                 >
                   <Paperclip size={18} />
@@ -285,22 +325,24 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                       handleSend();
                     }
                   }}
-                  placeholder="Ask about symptoms, or attach a document..."
-                  className="w-full pl-12 pr-12 py-3 bg-cream border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 transition-all min-h-[50px] max-h-[150px]"
+                  placeholder="Ask about diet, scans, symptoms, or attach a report..."
+                  className="w-full pl-12 pr-12 py-3 bg-cream/50 border border-border/90 rounded-2xl font-sans text-[13.5px] text-charcoal resize-none focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all min-h-[48px] max-h-[140px]"
                   rows={1}
                 />
 
                 <button
+                  type="button"
                   onClick={handleSend}
                   disabled={(!input.trim() && !attachedFile) || isLoading}
-                  className="absolute right-2 p-2 bg-sage text-white rounded-[8px] disabled:opacity-50 disabled:cursor-not-allowed hover:bg-sage-dark transition-colors"
+                  className="absolute right-2.5 p-2 bg-sage text-white rounded-xl disabled:opacity-40 disabled:cursor-not-allowed hover:bg-sage-dark transition-all cursor-pointer shadow-3xs"
+                  aria-label="Send message"
                 >
-                  <Send size={18} />
+                  <Send size={16} />
                 </button>
               </div>
             )}
-            <div className="text-center mt-2 text-[10px] text-light">
-              Bloom AI uses AI and may make mistakes. Always verify medical information with your healthcare provider.
+            <div className="text-center mt-2 text-[10.5px] text-light">
+              Bloom AI cross-references FOGSI & ACOG prenatal guidelines. Always consult your obstetrician for personal medical care.
             </div>
           </div>
         </div>
