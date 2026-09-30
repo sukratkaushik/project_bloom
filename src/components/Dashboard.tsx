@@ -41,6 +41,7 @@ import { Header } from './Header';
 import { Footer } from './Footer';
 import { MedicalReports } from './sections/MedicalReports';
 import { GuidedBreathingAudio } from './sections/GuidedBreathingAudio';
+import { UserFlowGuide } from './UserFlowGuide';
 
 import { navigate } from '../utils/navigation';
 import { isNativeApp } from '../utils/nativeBridge';
@@ -52,7 +53,7 @@ const VALID_PAGES = [
   'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
   'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
   'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
-  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar'
+  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar', 'guide'
 ];
 
 const getPageFromPath = (): string => {
@@ -254,6 +255,7 @@ export const Dashboard: React.FC = () => {
                 {activePage === 'admin-panel' && <AdminPanel />}
                 {activePage === 'notes' && <Notes />}
                 {activePage === 'profile' && <Profile />}
+                {activePage === 'guide' && <UserFlowGuide onNavigate={setActivePage} />}
                 {(activePage === 'breathing' || activePage === 'garbhsanskar') && <GuidedBreathingAudio />}
               </motion.div>
             </AnimatePresence>

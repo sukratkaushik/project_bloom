@@ -43,6 +43,7 @@ import { LaborReadiness } from '../sections/LaborReadiness';
 import { Feedback } from '../sections/Feedback';
 import { Profile } from '../sections/Profile';
 import { GuidedBreathingAudio } from '../sections/GuidedBreathingAudio';
+import { UserFlowGuide } from '../UserFlowGuide';
 
 export const MobileShell: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -166,6 +167,7 @@ export const MobileShell: React.FC = () => {
       case 'garbhsanskar': return <GuidedBreathingAudio />;
       case 'feedback': return <Feedback />;
       case 'profile': return <Profile />;
+      case 'guide': return <UserFlowGuide onNavigate={handleOpenTool} />;
       default: return <KickCounter />;
     }
   };

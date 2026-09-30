@@ -7,7 +7,7 @@ import {
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
-  Pencil, Plus, MapPin, Phone
+  Pencil, Plus, MapPin, Phone, ArrowRight, Map
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
@@ -304,6 +304,36 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                 )}
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* OPIN User Journey & Architecture Guide */}
+        <section className="bg-gradient-to-br from-[#F4EBE1]/70 via-cream to-white rounded-2xl sm:rounded-[24px] p-5 sm:p-6 shadow-xs border border-sage/30 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1.5 max-w-xl">
+              <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-sage-pale text-sage-dark text-[11px] font-bold uppercase tracking-wider">
+                <span>🌸</span>
+                <span>User Journey & Architecture</span>
+              </div>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-charcoal leading-tight">
+                How Our Pregnancy Works
+              </h3>
+              <p className="text-[13px] sm:text-[13.5px] text-medium leading-relaxed">
+                Step-by-step interactive roadmap: Calibrating your gestational timeline, linking your doctor, securing clinical records in the local vault, and 1-click OB-GYN consultations.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                navigate('/dashboard/guide');
+              }}
+              className="self-start sm:self-center shrink-0 px-5 py-2.5 bg-sage hover:bg-sage-dark text-white font-bold text-[13px] rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer active:scale-95"
+            >
+              <span>Explore User Flow</span>
+              <ArrowRight size={16} />
+            </button>
           </div>
         </section>
 

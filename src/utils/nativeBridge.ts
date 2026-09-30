@@ -23,7 +23,7 @@ export const getPlatform = (): 'android' | 'ios' | 'web' => {
  * Gracefully falls back to navigator.vibrate on mobile web / PWA browsers.
  */
 export const triggerHaptic = async (
-  type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' = 'light'
+  type: 'light' | 'medium' | 'heavy' | 'success' | 'warning' | 'error' | 'selection' = 'light'
 ): Promise<void> => {
   try {
     if (Capacitor.isNativePlatform()) {
@@ -36,6 +36,9 @@ export const triggerHaptic = async (
           break;
         case 'heavy':
           await Haptics.impact({ style: ImpactStyle.Heavy });
+          break;
+        case 'selection':
+          await Haptics.selectionStart();
           break;
         case 'success':
           await Haptics.notification({ type: NotificationType.Success });
@@ -51,6 +54,7 @@ export const triggerHaptic = async (
       // Web vibration API fallback
       switch (type) {
         case 'light':
+        case 'selection':
           navigator.vibrate(15);
           break;
         case 'medium':

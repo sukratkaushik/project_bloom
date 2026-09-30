@@ -49,22 +49,26 @@ export const QuickLogSheet: React.FC<QuickLogSheetProps> = ({
     triggerHaptic('medium');
     try {
       const activeJourneyId = state.activeJourneyId || 'default-journey';
-      const todayStr = new Date().toISOString().split('T')[0];
+      const now = Date.now();
 
-      const existing = await db.kickLogs
-        .where('[journeyId+date]')
-        .equals([activeJourneyId, todayStr])
+      const recent = await db.kickSessions
+        .where('journeyId')
+        .equals(activeJourneyId)
+        .reverse()
         .first();
 
-      const newCount = (existing?.count || 0) + 1;
+      const isToday = recent && (now - recent.startTime < 24 * 60 * 60 * 1000);
+      const newCount = (isToday && recent ? recent.kickCount : 0) + 1;
 
-      await db.kickLogs.put({
-        id: existing?.id || uuidv4(),
+      await db.kickSessions.put({
+        id: (isToday && recent) ? recent.id : uuidv4(),
         journeyId: activeJourneyId,
-        date: todayStr,
-        count: newCount,
-        durationMinutes: existing?.durationMinutes || 0,
-        timestamp: Date.now(),
+        startTime: (isToday && recent) ? recent.startTime : now,
+        endTime: now,
+        kickCount: newCount,
+        completed: newCount >= 10,
+        createdAt: (isToday && recent) ? recent.createdAt : now,
+        updatedAt: now,
       });
 
       onShowToast(`🦶 Fetal kick recorded (${newCount}/10 target)!`);

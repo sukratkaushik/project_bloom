@@ -46,7 +46,6 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
         return [];
       }
     },
-    [],
     []
   );
 
