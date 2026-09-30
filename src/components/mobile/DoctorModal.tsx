@@ -61,6 +61,8 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({
     return null;
   }, [email]);
 
+  if (!isOpen) return null;
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedName = name.trim();
