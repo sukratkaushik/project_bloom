@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import {
   Stethoscope,
@@ -51,16 +51,6 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({
     }
   }, [isOpen, initialDoctor]);
 
-  const missingAtSuggestion = useMemo(() => {
-    if (!email || email.includes('@')) return null;
-    const trimmed = email.trim();
-    const match = trimmed.match(/^(.+?)(gmail\.com|yahoo\.com|outlook\.com|icloud\.com|hotmail\.com|cloudnine.*\.com|hospital.*\.com)$/i);
-    if (match && match[1] && match[2]) {
-      return `${match[1]}@${match[2]}`;
-    }
-    return null;
-  }, [email]);
-
   if (!isOpen) return null;
 
   const handleSave = (e: React.FormEvent) => {
@@ -72,13 +62,9 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({
       return;
     }
 
-    let finalEmail = email.trim();
-    if (finalEmail && !finalEmail.includes('@') && missingAtSuggestion) {
-      finalEmail = missingAtSuggestion;
-    }
-
+    const finalEmail = email.trim();
     if (finalEmail && !finalEmail.includes('@')) {
-      setError('Please include an "@" in the email address (e.g. name@hospital.com).');
+      setError('Please enter a valid email address with "@" (e.g. opd@cloudninecare.com).');
       triggerHaptic('warning');
       return;
     }
@@ -239,44 +225,9 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({
 
           {/* Email Address */}
           <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-charcoal/70">
-                Clinic Email (Optional)
-              </label>
-              <div className="flex items-center gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setEmail((prev) => {
-                      if (!prev) return '@';
-                      if (prev.includes('@')) return prev;
-                      return `${prev}@`;
-                    });
-                  }}
-                  className="text-[10px] font-bold bg-cream border border-border/80 px-2 py-0.5 rounded-md text-medium hover:text-charcoal transition-colors cursor-pointer"
-                  title="Insert @ symbol"
-                >
-                  + @
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setEmail((prev) => {
-                      if (!prev) return '@gmail.com';
-                      if (prev.endsWith('@')) return `${prev}gmail.com`;
-                      if (prev.includes('@')) return prev;
-                      return `${prev}@gmail.com`;
-                    });
-                  }}
-                  className="text-[10px] font-bold bg-cream border border-border/80 px-2 py-0.5 rounded-md text-medium hover:text-charcoal transition-colors cursor-pointer"
-                  title="Insert @gmail.com"
-                >
-                  + @gmail.com
-                </button>
-              </div>
-            </div>
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-charcoal/70 mb-1.5">
+              Clinic Email (Optional)
+            </label>
             <div className="relative">
               <input
                 type="email"
@@ -292,19 +243,6 @@ export const DoctorModal: React.FC<DoctorModalProps> = ({
               />
               <Mail size={15} className="absolute left-3 top-3 text-medium" />
             </div>
-            {missingAtSuggestion && (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setEmail(missingAtSuggestion);
-                }}
-                className="mt-1.5 flex items-center gap-1.5 text-[11.5px] text-sage-dark font-medium bg-sage/10 hover:bg-sage/20 border border-sage/30 px-2.5 py-1.5 rounded-lg transition-colors cursor-pointer w-full text-left"
-              >
-                <Check size={13} className="shrink-0 text-sage-dark" />
-                <span className="truncate">Did you mean <strong>{missingAtSuggestion}</strong>? Tap to fix</span>
-              </button>
-            )}
           </div>
 
           {/* Consultation Notes / OPD Hours */}
