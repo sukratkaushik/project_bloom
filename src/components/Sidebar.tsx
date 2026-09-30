@@ -21,7 +21,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   },
   smart: {
     label: "Smart Tools",
-    items: ['askourpregnancy', 'foodscanner', 'babynames', 'travel']
+    items: ['askourpregnancy', 'foodscanner', 'guide', 'babynames', 'travel']
   },
   tasks: {
     label: "Planning & Tasks",
@@ -153,6 +153,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
     { id: 'askourpregnancy', icon: '✨', label: 'Bloom AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
+    { id: 'guide', icon: '🗺️', label: 'User Flow & Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
     { id: 'travel', icon: '✈️', label: 'Safe Travel Guide' },
     { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },

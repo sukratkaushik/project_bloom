@@ -15,6 +15,7 @@ export default defineConfig(({mode}) => {
         includeAssets: ['**/*'],
         workbox: {
           navigateFallbackDenylist: [/^\/__\/.*/],  // Don't intercept Firebase reserved URLs (auth handler, etc.)
+          maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
         manifest: {
           name: 'Bloom Pregnancy Planner',

@@ -413,3 +413,6 @@ export const exportToPDF = async (state: PlannerState) => {
 
   doc.save('our-pregnancy-plan.pdf');
 };
+
+/** Alias for clinical care plan export */
+export const exportCarePlanPdf = exportToPDF;
