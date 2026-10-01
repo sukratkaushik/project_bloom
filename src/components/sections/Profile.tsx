@@ -7,12 +7,13 @@ import {
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
-  Pencil, Plus, MapPin, Phone, ArrowRight, Map
+  Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
+import { PartnerModal } from '../mobile/PartnerModal';
 import { 
   isBiometricLockEnabled, 
   setBiometricLockEnabled, 
@@ -33,6 +34,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Self-service account deletion state
@@ -412,6 +414,127 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                 className="px-3.5 py-1.5 bg-sage hover:bg-sage-dark text-white font-bold text-[12px] rounded-xl shadow-2xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
               >
                 + Add Obstetrician
+              </button>
+            </div>
+          )}
+        </section>
+
+        {/* Partner & Support Person */}
+        <section className="bg-white rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-2xs border border-border/80">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-blush-pale flex items-center justify-center text-blush shrink-0">
+                <Heart className="w-5 h-5 fill-blush/30" />
+              </div>
+              <div className="min-w-0">
+                <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight truncate">Partner & Support Person</h3>
+                <p className="text-medium text-xs sm:text-sm mt-0.5 truncate">Define your partner to assign tasks, share updates & sync</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setIsPartnerModalOpen(true);
+              }}
+              className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0 ml-2"
+            >
+              {state.partner?.name ? (
+                <>
+                  <Pencil size={13} />
+                  <span>Edit</span>
+                </>
+              ) : (
+                <>
+                  <Plus size={14} />
+                  <span>Add Partner</span>
+                </>
+              )}
+            </button>
+          </div>
+
+          {state.partner?.name ? (
+            <div className="p-3.5 sm:p-4 bg-cream/40 border border-border/80 rounded-2xl space-y-2.5">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-charcoal text-[15px]">{state.partner.name}</span>
+                  <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
+                    {state.partner.relationship || 'Partner'}
+                  </span>
+                </div>
+                {state.partner.phone && (
+                  <div className="flex items-center gap-1.5">
+                    <a
+                      href={`https://wa.me/${state.partner.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hi ${state.partner.name}! 🌸 Sharing an update from Our Pregnancy.`)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-[11.5px] rounded-lg border border-emerald-200 transition-colors flex items-center gap-1"
+                      title="Open WhatsApp chat"
+                    >
+                      <MessageCircle size={13} />
+                      <span>WhatsApp</span>
+                    </a>
+                    <a
+                      href={`tel:${state.partner.phone.replace(/[^\d+]/g, '')}`}
+                      className="px-2.5 py-1 bg-cream hover:bg-black/5 text-charcoal font-semibold text-[11.5px] rounded-lg border border-border/80 transition-colors flex items-center gap-1"
+                      title="Call partner"
+                    >
+                      <Phone size={12} />
+                      <span>Call</span>
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {state.partner.phone && (
+                <p className="text-[12px] text-charcoal/80 flex items-center gap-1.5 font-mono">
+                  <Phone size={12} className="text-sage shrink-0" />
+                  <span>{state.partner.phone}</span>
+                </p>
+              )}
+
+              {state.partner.email && (
+                <p className="text-[12px] text-medium flex items-center gap-1.5">
+                  <span className="text-[11px] font-bold uppercase text-charcoal/60">Email:</span>
+                  <span>{state.partner.email}</span>
+                </p>
+              )}
+
+              {state.partner.notes && (
+                <p className="text-[11.5px] text-medium pt-1 border-t border-border/50">
+                  {state.partner.notes}
+                </p>
+              )}
+
+              <div className="pt-2 border-t border-border/50 flex items-center justify-between text-[11.5px]">
+                <span className="text-medium">Want milestones to appear inside their app?</span>
+                <button
+                  type="button"
+                  onClick={() => navigate('partnersync')}
+                  className="font-bold text-sage-dark hover:underline flex items-center gap-1"
+                >
+                  <span>Open Partner Sync</span>
+                  <ArrowRight size={12} />
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-4 bg-cream/30 border border-dashed border-border/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <p className="font-medium text-[13px] text-charcoal">No partner or support person defined yet</p>
+                <p className="text-[11.5px] text-medium mt-0.5">
+                  Add their name and phone to assign tasks, share milestone updates via WhatsApp, and sync in real time.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsPartnerModalOpen(true);
+                }}
+                className="px-3.5 py-1.5 bg-blush hover:opacity-90 text-white font-bold text-[12px] rounded-xl shadow-2xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+              >
+                + Define Partner
               </button>
             </div>
           )}
@@ -914,6 +1037,32 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
         }}
         onRemove={() => {
           updateState({ doctor: null });
+        }}
+        onShowToast={(msg) => {
+          setToastMessage(msg);
+          setTimeout(() => setToastMessage(null), 3000);
+        }}
+      />
+
+      {/* Partner & Support Person Modal */}
+      <PartnerModal
+        isOpen={isPartnerModalOpen}
+        onClose={() => setIsPartnerModalOpen(false)}
+        initialPartner={state.partner}
+        onSave={(partnerData) => {
+          updateState({
+            partner: partnerData,
+            birthPlan: {
+              ...state.birthPlan,
+              personalDetails: {
+                ...state.birthPlan?.personalDetails,
+                partnerName: partnerData.name
+              }
+            }
+          });
+        }}
+        onRemove={() => {
+          updateState({ partner: null });
         }}
         onShowToast={(msg) => {
           setToastMessage(msg);

@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { syncEngine } from '../../syncEngine';
-import { ShieldCheck, Copy, Check, Users, ChevronDown, ChevronUp } from 'lucide-react';
+import { ShieldCheck, Copy, Check, Users, ChevronDown, ChevronUp, MessageCircle, Heart, Pencil, Plus } from 'lucide-react';
 import { usePlanner } from '../../store';
 import { Paywall } from '../Paywall';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS, POSTPARTUM_TASKS } from '../../data';
+import { PartnerModal } from '../mobile/PartnerModal';
 
 export const PartnerSync: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -12,6 +13,7 @@ export const PartnerSync: React.FC = () => {
   const [status, setStatus] = useState<string>('Disconnected');
   const [copied, setCopied] = useState(false);
   const [expandedTaskCategory, setExpandedTaskCategory] = useState<string | null>(null);
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
 
   useEffect(() => {
     syncEngine.onStatusChange = (newStatus: string) => {
@@ -255,6 +257,49 @@ export const PartnerSync: React.FC = () => {
           </div>
         </div>
 
+        {/* Defined Partner Info Banner */}
+        <div className="bg-white border-[1.5px] border-border rounded-2xl p-4 sm:p-5 shadow-sm flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-10 h-10 rounded-2xl bg-blush-pale text-blush flex items-center justify-center shrink-0 border border-blush/20">
+              <Heart size={20} className="fill-blush/30" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="font-bold text-charcoal text-[15px] truncate">
+                  {state.partner?.name || 'No Partner Defined'}
+                </span>
+                {state.partner?.relationship && (
+                  <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
+                    {state.partner.relationship}
+                  </span>
+                )}
+              </div>
+              <p className="text-[12px] text-medium truncate mt-0.5">
+                {state.partner?.phone 
+                  ? `WhatsApp: ${state.partner.phone} • Tasks assignable`
+                  : 'Define partner to send WhatsApp milestones and live sync'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsPartnerModalOpen(true)}
+            className="px-3.5 py-1.5 bg-cream hover:bg-black/5 text-charcoal font-semibold text-[12px] rounded-xl border border-border transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+          >
+            {state.partner?.name ? (
+              <>
+                <Pencil size={12} />
+                <span>Edit Partner</span>
+              </>
+            ) : (
+              <>
+                <Plus size={13} />
+                <span>Define Partner</span>
+              </>
+            )}
+          </button>
+        </div>
+
         <div className="bg-white border-[1.5px] border-border rounded-2xl p-6 sm:p-8 shadow-sm">
           <div className="flex items-center justify-between mb-6 pb-6 border-b border-border">
             <div>
@@ -299,10 +344,21 @@ export const PartnerSync: React.FC = () => {
                       <label className="text-[11px] font-semibold tracking-wider text-light uppercase mb-1.5 block">Your Sync Code</label>
                       <div className="flex gap-2 mb-3">
                         <input type="text" readOnly value={hostId} className="flex-1 p-3 bg-cream border border-border rounded-xl font-mono text-[13px] text-charcoal outline-none" />
-                        <button onClick={copyToClipboard} className="p-3 bg-sage-pale border border-sage text-sage rounded-xl hover:bg-sage hover:text-white transition-colors">
+                        <button onClick={copyToClipboard} className="p-3 bg-sage-pale border border-sage text-sage rounded-xl hover:bg-sage hover:text-white transition-colors" title="Copy code">
                           {copied ? <Check size={18} /> : <Copy size={18} />}
                         </button>
                       </div>
+                      {state.partner?.phone && (
+                        <a
+                          href={`https://wa.me/${state.partner.phone.replace(/[^\d]/g, '')}?text=${encodeURIComponent(`Hi ${state.partner.name || 'there'}! 🌸 Here is my partner sync code for Our Pregnancy: ${hostId}\n\nOpen your app, go to Partner Sync, enter this code, and our pregnancy milestones and tasks will sync in real time! 💕`)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full py-2.5 mb-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 font-semibold text-[13px] rounded-xl transition-colors flex items-center justify-center gap-2 cursor-pointer"
+                        >
+                          <MessageCircle size={15} />
+                          <span>Send Code to {state.partner.name} on WhatsApp</span>
+                        </a>
+                      )}
                       <button onClick={handleDisconnect} className="w-full py-3 bg-red-50 text-red-600 border border-red-200 hover:bg-red-100 dark:bg-red-950/30 dark:text-red-400 dark:border-red-900/40 dark:hover:bg-red-900/40 font-medium text-[14px] rounded-xl transition-colors">
                         Stop Hosting
                       </button>
@@ -350,6 +406,28 @@ export const PartnerSync: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* Partner Modal */}
+      <PartnerModal
+        isOpen={isPartnerModalOpen}
+        onClose={() => setIsPartnerModalOpen(false)}
+        initialPartner={state.partner}
+        onSave={(partnerData) => {
+          updateState({
+            partner: partnerData,
+            birthPlan: {
+              ...state.birthPlan,
+              personalDetails: {
+                ...state.birthPlan?.personalDetails,
+                partnerName: partnerData.name
+              }
+            }
+          });
+        }}
+        onRemove={() => {
+          updateState({ partner: null });
+        }}
+      />
     </Paywall>
   );
 };
