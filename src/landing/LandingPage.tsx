@@ -136,6 +136,40 @@ export const LandingPage: React.FC = () => {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    try {
+      setIsLoggingIn(true);
+      const user = await signInWithGoogle();
+      if (user) {
+        triggerWelcomeEmailIfNewCallable();
+        setShowEmailModal(false);
+
+        // Try to restore user journey from cloud (Firestore)
+        const restored = await restoreJourney(user.uid);
+
+        if (restored) {
+          navigate('/dashboard');
+        } else if (state.isSetup && state.activeJourneyId) {
+          navigate('/dashboard');
+        } else {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+          navigate('/setup');
+        }
+      }
+    } catch (error: any) {
+      if (error?.code !== 'auth/popup-closed-by-user') {
+        console.error("Login failed", error);
+        if (error?.code === 'auth/network-request-failed') {
+          alert("Network request failed. Please check your internet connection and try again.");
+        } else {
+          alert(`Failed to log in with Google: ${error?.message || "Please try again."}`);
+        }
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [isRegistering, setIsRegistering] = useState(false);
   const [showVerifyNotice, setShowVerifyNotice] = useState(false);
@@ -631,25 +665,21 @@ export const LandingPage: React.FC = () => {
                     </button>
                   </div>
 
-                  {!isNative && (
-                    <>
-                      <div className="relative flex py-1 items-center">
-                        <div className="flex-grow border-t border-border"></div>
-                        <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
-                        <div className="flex-grow border-t border-border"></div>
-                      </div>
+                  <div className="relative flex py-1 items-center">
+                    <div className="flex-grow border-t border-border"></div>
+                    <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
+                    <div className="flex-grow border-t border-border"></div>
+                  </div>
 
-                      <button
-                        type="button"
-                        onClick={handleStart}
-                        disabled={isLoggingIn}
-                        className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
-                      >
-                        {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                        Continue with Google
-                      </button>
-                    </>
-                  )}
+                  <button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={isLoggingIn}
+                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                  >
+                    {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
+                    Continue with Google
+                  </button>
                 </form>
               </>
             )}
