@@ -198,7 +198,6 @@ const AppContent: React.FC = () => {
         isLocked={isBiometricLocked}
         onUnlocked={() => setIsBiometricLocked(false)}
       />
-      <div id="google_translate_element" className="hidden"></div>
     </div>
   );
 };
