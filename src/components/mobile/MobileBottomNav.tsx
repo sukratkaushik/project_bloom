@@ -48,7 +48,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onS
                   </span>
                 )}
               </div>
-              <span className={`text-[11px] mt-1 leading-none ${isActive ? 'font-bold' : 'font-medium'}`}>
+              <span className={`text-[10px] xs:text-[11px] mt-0.5 leading-tight text-center truncate max-w-full px-0.5 ${isActive ? 'font-bold' : 'font-medium'}`}>
                 {tab.label}
               </span>
               {isActive && (
