@@ -94,7 +94,10 @@ export const PrivacyPolicy: React.FC = () => {
             <li><strong>Right to nominee:</strong> You have the right to nominate someone to exercise these rights on your behalf.</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Grievance Representative</h2>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Strict Prohibition of Fetal Sex Determination (PCPNDT Act, 1994)</h2>
+          <p>In strict accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (Prohibition of Sex Selection) Act, 1994 (PCPNDT Act)</strong>, prenatal determination or disclosure of the sex/gender of a fetus is strictly illegal in India. Our Pregnancy does not provide, support, predict, or reveal fetal gender or sex under any circumstances across its tracking algorithms, AI assistants, OCR document scanners, or checklist milestones. Any inquiries or automated inputs attempting fetal sex identification are strictly blocked and prohibited on our platform.</p>
+
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">7. Grievance Representative</h2>
           <p>If you have any complaints or concerns regarding your data, please contact our support and grievance representative:</p>
           <div className="bg-sage-pale p-4 rounded-[12px] mt-4">
             <p className="font-semibold text-charcoal">Representative: Sukrat Kaushik</p>
@@ -141,10 +144,14 @@ export const TermsOfService: React.FC = () => {
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">4. Acceptable Use</h2>
           <p>You agree not to use the app in any way that causes, or may cause, damage to the app or impairment of the availability or accessibility of the app.</p>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Governing Law & Jurisdiction</h2>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Prohibition of Fetal Sex Determination (PCPNDT Act, 1994)</h2>
+          <p className="font-semibold text-blush">STRICT LEGAL PROHIBITION: Under Indian Law (The Pre-Conception and Pre-Natal Diagnostic Techniques - PCPNDT Act, 1994), prenatal sex determination or disclosure of fetal sex/gender is strictly prohibited and constitutes a criminal offense.</p>
+          <p>You agree not to use Our Pregnancy, its AI assistants, milestone planners, or document analysis tools to determine, predict, or seek information regarding the sex of an unborn fetus. Our Pregnancy strictly complies with the PCPNDT Act, 1994, and reserves the right to terminate access for any user violating these provisions.</p>
+
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Governing Law & Jurisdiction</h2>
           <p>These Terms shall be governed by and construed in accordance with the applicable laws. Any disputes arising out of or in connection with these Terms shall be subject to the exclusive jurisdiction of the competent courts.</p>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">6. Changes to Terms</h2>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">7. Changes to Terms</h2>
           <p>We reserve the right to modify or replace these Terms at any time. We will provide notice of any significant changes.</p>
         </div>
       </div>

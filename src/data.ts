@@ -9,7 +9,7 @@ export const DEV_TASKS: Record<string, Task[]> = {
     { id:'d5', text:'Booking your first antenatal appointment', crit:false },
   ],
   t2: [
-    { id:'d6', text:'Finding out (or choosing not to find out) the sex', crit:false },
+    { id:'d6', text:'Celebrating the 20-week halfway milestone', crit:false },
     { id:'d7', text:'Feeling baby move for the very first time', crit:false },
     { id:'d8', text:'Taking your first bump photo', crit:false },
     { id:'d9', text:'Sharing your news publicly', crit:false },
