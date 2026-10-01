@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification, connectAuthEmulator } from 'firebase/auth';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification, connectAuthEmulator, signInWithCredential } from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, connectFirestoreEmulator, serverTimestamp } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
@@ -176,8 +176,37 @@ export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
   if (isNativeApp()) {
-    throw new Error('Google Sign-In is not supported in the mobile app. Please sign in or register with Email.');
+    try {
+      const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
+      const result = await FirebaseAuthentication.signInWithGoogle();
+      let idToken = result.credential?.idToken;
+      if (!idToken) {
+        const tokenRes = await FirebaseAuthentication.getIdToken();
+        idToken = tokenRes.token;
+      }
+      if (!idToken) {
+        throw new Error('Google Sign-In did not return an identity token. Please try again.');
+      }
+      const credential = GoogleAuthProvider.credential(idToken);
+      const userCredential = await signInWithCredential(auth, credential);
+      return userCredential.user;
+    } catch (error: any) {
+      const msg = (error?.message || '').toLowerCase();
+      // Handle user cancellation gracefully
+      if (
+        msg.includes('cancel') ||
+        msg.includes('canceled') ||
+        msg.includes('cancelled') ||
+        error?.code === '16' ||
+        error?.code === 'auth/popup-closed-by-user'
+      ) {
+        return null;
+      }
+      console.error("Error signing in with Google natively:", error);
+      throw error;
+    }
   }
+
   try {
     // Try popup first (works on most browsers)
     const result = await signInWithPopup(auth, googleProvider);
@@ -302,6 +331,14 @@ export const resetPassword = async (email: string) => {
 
 export const logout = async () => {
   try {
+    if (isNativeApp()) {
+      try {
+        const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
+        await FirebaseAuthentication.signOut();
+      } catch (e) {
+        console.warn("Native sign-out warning:", e);
+      }
+    }
     await signOut(auth);
   } catch (error) {
     console.error("Error signing out", error);
