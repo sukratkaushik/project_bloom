@@ -159,6 +159,7 @@ export type PlannerState = {
   lastWearableSyncTime?: number;
   aiProcessingConsent?: boolean;
   doctor?: DoctorInfo | null;
+  partner?: PartnerInfo | null;
 };
 
 export type DoctorInfo = {
@@ -166,5 +167,13 @@ export type DoctorInfo = {
   hospital?: string;
   phone?: string;
   email?: string;
+  notes?: string;
+};
+
+export type PartnerInfo = {
+  name: string;
+  phone?: string;
+  email?: string;
+  relationship?: string;
   notes?: string;
 };

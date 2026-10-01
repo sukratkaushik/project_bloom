@@ -74,6 +74,7 @@ const defaultState: PlannerState = {
     notes: true,
   },
   doctor: null,
+  partner: null,
   isRestoring: false,
 };
 
