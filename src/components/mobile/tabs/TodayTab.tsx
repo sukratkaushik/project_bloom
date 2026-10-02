@@ -317,40 +317,40 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           triggerHaptic('light');
           onOpenTool(tool.id);
         }}
-        className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[156px] h-full"
+        className="bg-gradient-to-b from-[#FCFAF7] to-[#F9F6F0] border border-[#E8E2D8] rounded-2xl p-3 xs:p-3.5 shadow-[0_2px_8px_rgba(44,62,80,0.03)] hover:border-sage/50 transition-all active:scale-[0.985] cursor-pointer flex flex-col justify-between min-h-[156px] h-full"
       >
         <div>
           {/* Card Top: Icon + Badge + Unpin Star */}
           <div className="flex items-center justify-between mb-2">
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${tool.color}`}>
-              <IconComp size={17} />
+            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-3xs ${tool.color}`}>
+              <IconComp size={16} strokeWidth={1.8} />
             </div>
 
             <div className="flex items-center gap-1">
               {isInteractiveWater ? (
-                <span className="text-[9px] font-bold text-blue-600 bg-blue-50 border border-blue-200/60 px-1.5 py-0.2 rounded-full whitespace-nowrap">
-                  {totalWaterMl >= waterGoalMl ? 'GOAL MET' : `${waterPercent}%`}
+                <span className="text-[9.5px] font-normal text-sky-700 bg-sky-50/90 border border-sky-200/60 px-2 py-0.5 rounded-full whitespace-nowrap tracking-wide">
+                  {totalWaterMl >= waterGoalMl ? 'Goal met' : `${waterPercent}%`}
                 </span>
               ) : isInteractiveSupps ? (
                 <span
-                  className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border whitespace-nowrap ${
+                  className={`text-[9.5px] font-normal px-2 py-0.5 rounded-full border whitespace-nowrap tracking-wide ${
                     allSuppsTaken
-                      ? 'text-emerald-700 bg-emerald-50 border-emerald-200'
-                      : 'text-amber-700 bg-amber-50 border-amber-200'
+                      ? 'text-emerald-700 bg-emerald-50/90 border-emerald-200/60'
+                      : 'text-amber-700 bg-amber-50/90 border-amber-200/60'
                   }`}
                 >
-                  {allSuppsTaken ? 'TAKEN ✓' : `${takenSupps.length}/3`}
+                  {allSuppsTaken ? 'Taken ✓' : `${takenSupps.length}/3`}
                 </span>
               ) : isInteractiveKicks ? (
-                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full whitespace-nowrap">
-                  {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
+                <span className="text-[9.5px] font-normal text-sage-dark bg-sage-pale/90 border border-sage/20 px-2 py-0.5 rounded-full whitespace-nowrap tracking-wide">
+                  {latestKicks >= 10 ? 'Goal met' : 'Active'}
                 </span>
               ) : isInteractiveVitals ? (
-                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border whitespace-nowrap ${bpStatus.color}`}>
+                <span className={`text-[9.5px] font-normal px-2 py-0.5 rounded-full border whitespace-nowrap tracking-wide ${bpStatus.color}`}>
                   {bpStatus.label}
                 </span>
               ) : tool.badge ? (
-                <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full whitespace-nowrap">
+                <span className="text-[9.5px] font-normal text-sage-dark bg-sage-pale/90 border border-sage/20 px-2 py-0.5 rounded-full whitespace-nowrap tracking-wide">
                   {tool.badge}
                 </span>
               ) : null}
@@ -363,11 +363,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                     triggerHaptic('light');
                     onTogglePin(tool.id);
                   }}
-                  className="p-1 text-amber-500 hover:text-amber-600 rounded-full hover:bg-amber-50/80 transition-colors cursor-pointer"
+                  className="p-1 text-amber-400 hover:text-amber-500 rounded-full hover:bg-amber-50/60 transition-colors cursor-pointer"
                   title="Unpin from Daily Rituals"
                   aria-label={`Unpin ${tool.title}`}
                 >
-                  <Star size={13} className="fill-amber-400 text-amber-500" />
+                  <Star size={13} className="fill-amber-400/90 text-amber-400" />
                 </button>
               )}
             </div>
@@ -375,62 +375,62 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
           {/* Card Middle: Title & Metrics / Subtitle */}
           <div className="my-auto py-0.5">
-            <p className="text-[11.5px] font-semibold text-medium truncate">{tool.title}</p>
+            <p className="text-[12px] font-normal text-medium tracking-tight truncate">{tool.title}</p>
 
             {isInteractiveWater ? (
               <>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-sans font-normal text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {(totalWaterMl / 1000).toFixed(2)}L
                   </span>
-                  <span className="font-sans text-[13px] text-medium font-medium">/ 2.5L</span>
+                  <span className="font-sans text-[13px] text-medium font-normal">/ 2.5L</span>
                 </div>
-                <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
+                <div className="w-full bg-[#EAE5DC] rounded-full h-1.5 mt-2 overflow-hidden">
                   <div
-                    className="bg-blue-500 h-full rounded-full transition-all duration-300"
+                    className="bg-sky-400 h-full rounded-full transition-all duration-300"
                     style={{ width: `${waterPercent}%` }}
                   />
                 </div>
               </>
             ) : isInteractiveSupps ? (
               <>
-                <p className="text-[11.5px] text-charcoal font-bold mt-0.5 truncate">
+                <p className="text-[12.5px] text-charcoal font-normal mt-0.5 truncate">
                   Folic, Iron, Calcium
                 </p>
-                <p className="text-[10px] text-light mt-0.5 truncate">
+                <p className="text-[11px] text-medium font-normal mt-0.5 truncate">
                   {allSuppsTaken ? 'All daily essentials logged' : 'Tap to mark as taken'}
                 </p>
               </>
             ) : isInteractiveKicks ? (
               <>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-sans font-normal text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {latestKicks}
                   </span>
-                  <span className="font-sans text-[13px] text-medium font-medium">/ 10 kicks</span>
+                  <span className="font-sans text-[13px] text-medium font-normal">/ 10 kicks</span>
                 </div>
-                <p className="text-[10px] text-light mt-0.5 truncate">
+                <p className="text-[11px] text-medium font-normal mt-0.5 truncate">
                   {latestKicks >= 10 ? 'Goal met today! ✨' : 'Target: 10 kicks'}
                 </p>
               </>
             ) : isInteractiveVitals ? (
               <>
-                <div className="flex items-baseline gap-1.5 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1 mt-0.5">
+                  <span className="font-sans font-normal text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {latestBp}
                   </span>
-                  <span className="font-sans text-[13px] text-medium font-medium">mmHg</span>
+                  <span className="font-sans text-[13px] text-medium font-normal">mmHg</span>
                 </div>
-                <p className="text-[10px] text-light mt-0.5 truncate">
+                <p className="text-[11px] text-medium font-normal mt-0.5 truncate">
                   Pulse: {latestPulse} bpm
                 </p>
               </>
             ) : (
               <>
-                <p className="text-[12px] font-bold text-charcoal mt-0.5 truncate">
+                <p className="text-[12.5px] font-normal text-charcoal mt-0.5 truncate">
                   {tool.ritualSubtitle || tool.title}
                 </p>
-                <p className="text-[10.5px] text-medium mt-0.5 truncate">
+                <p className="text-[11px] text-medium font-normal mt-0.5 truncate">
                   {tool.desc}
                 </p>
               </>
@@ -438,30 +438,30 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
         </div>
 
-        {/* Card Bottom: Standardized 1-Tap Action Button (Unified symmetric styling matching Mood & Energy) */}
+        {/* Card Bottom: Standardized 1-Tap Action Button (Warm, refined, no-bold) */}
         {isInteractiveWater ? (
           <button
             type="button"
             onClick={handleQuickWater}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2.5 w-full h-8 py-1 bg-[#FAF8F5] hover:bg-[#F3EFE8] text-charcoal/90 border border-[#E6E0D6] text-[11.5px] font-normal rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap shadow-3xs"
           >
-            <Plus size={12} strokeWidth={2.5} className="text-medium" />
-            <span>+250ml Glass</span>
+            <Plus size={12} strokeWidth={1.8} className="text-medium" />
+            <span>250ml Glass</span>
           </button>
         ) : isInteractiveSupps ? (
           <button
             type="button"
             onClick={handleQuickSupplements}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2.5 w-full h-8 py-1 bg-[#FAF8F5] hover:bg-[#F3EFE8] text-charcoal/90 border border-[#E6E0D6] text-[11.5px] font-normal rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap shadow-3xs"
           >
             {allSuppsTaken ? (
               <>
-                <CheckCircle2 size={12} className="text-emerald-600" />
-                <span className="text-emerald-800 font-bold">Taken Today ✓</span>
+                <CheckCircle2 size={12} strokeWidth={1.8} className="text-emerald-600" />
+                <span className="text-emerald-700 font-normal">Taken Today ✓</span>
               </>
             ) : (
               <>
-                <Plus size={12} strokeWidth={2.5} className="text-medium" />
+                <Plus size={12} strokeWidth={1.8} className="text-medium" />
                 <span>Mark Taken</span>
               </>
             )}
@@ -470,10 +470,10 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <button
             type="button"
             onClick={handleQuickKick}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2.5 w-full h-8 py-1 bg-[#FAF8F5] hover:bg-[#F3EFE8] text-charcoal/90 border border-[#E6E0D6] text-[11.5px] font-normal rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap shadow-3xs"
           >
-            <Plus size={12} strokeWidth={2.5} className="text-medium" />
-            <span>+1 Kick</span>
+            <Plus size={12} strokeWidth={1.8} className="text-medium" />
+            <span>1 Kick</span>
           </button>
         ) : isInteractiveVitals ? (
           <button
@@ -483,9 +483,9 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool('vitals');
             }}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2.5 w-full h-8 py-1 bg-[#FAF8F5] hover:bg-[#F3EFE8] text-charcoal/90 border border-[#E6E0D6] text-[11.5px] font-normal rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap shadow-3xs"
           >
-            <Plus size={12} strokeWidth={2.5} className="text-medium" />
+            <Plus size={12} strokeWidth={1.8} className="text-medium" />
             <span>Log Vitals</span>
           </button>
         ) : (
@@ -496,7 +496,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool(tool.id);
             }}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2.5 w-full h-8 py-1 bg-[#FAF8F5] hover:bg-[#F3EFE8] text-charcoal/90 border border-[#E6E0D6] text-[11.5px] font-normal rounded-xl active:scale-[0.98] transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap shadow-3xs"
           >
             <span>{tool.actionLabel || 'Open Tool →'}</span>
           </button>
@@ -823,13 +823,13 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   triggerHaptic('light');
                   onOpenAddRituals();
                 }}
-                className="border-2 border-dashed border-border/80 hover:border-sage/60 rounded-2xl p-3.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[148px]"
+                className="border border-dashed border-[#DFD8CC] hover:border-sage/60 bg-[#FAF8F5]/60 hover:bg-[#FAF8F5] rounded-2xl p-3.5 flex flex-col items-center justify-center text-center transition-all cursor-pointer group min-h-[156px]"
               >
-                <div className="w-8 h-8 rounded-full bg-cream group-hover:bg-sage-pale text-medium group-hover:text-sage-dark flex items-center justify-center mb-1.5 transition-colors">
-                  <Plus size={16} />
+                <div className="w-8 h-8 rounded-full bg-[#F3EFE8] group-hover:bg-sage-pale text-medium group-hover:text-sage-dark flex items-center justify-center mb-1.5 transition-colors">
+                  <Plus size={15} strokeWidth={1.8} />
                 </div>
-                <span className="text-[12px] font-bold text-charcoal group-hover:text-sage-dark">Add Ritual</span>
-                <span className="text-[10px] text-light mt-0.5">Explore 26 tools</span>
+                <span className="text-[12px] font-normal text-charcoal/90 group-hover:text-sage-dark">Add Ritual</span>
+                <span className="text-[10.5px] font-normal text-light mt-0.5">Explore 26 tools</span>
               </button>
             )}
           </div>
