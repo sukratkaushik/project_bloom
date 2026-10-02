@@ -92,10 +92,14 @@ export const MobileShell: React.FC = () => {
   // Pinned Rituals
   const [pinnedIds, setPinnedIds] = useState<string[]>(() => {
     try {
-      const saved = localStorage.getItem('bloom_pinned_rituals');
-      return saved ? JSON.parse(saved) : ['kickcounter', 'hydration', 'vitals', 'askourpregnancy'];
+      const saved = localStorage.getItem('bloom_pinned_rituals_v2');
+      if (saved) return JSON.parse(saved);
+      // Clean default: core essentials without forcing kick counter or vitals
+      const defaultRituals = ['hydration', 'nutrition', 'askourpregnancy'];
+      localStorage.setItem('bloom_pinned_rituals_v2', JSON.stringify(defaultRituals));
+      return defaultRituals;
     } catch {
-      return ['kickcounter', 'hydration', 'vitals', 'askourpregnancy'];
+      return ['hydration', 'nutrition', 'askourpregnancy'];
     }
   });
 
@@ -109,7 +113,7 @@ export const MobileShell: React.FC = () => {
       const exists = prev.includes(toolId);
       const updated = exists ? prev.filter((id) => id !== toolId) : [...prev, toolId];
       try {
-        localStorage.setItem('bloom_pinned_rituals', JSON.stringify(updated));
+        localStorage.setItem('bloom_pinned_rituals_v2', JSON.stringify(updated));
       } catch (e) {
         console.warn('Could not save pinned rituals', e);
       }
