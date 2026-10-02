@@ -38,10 +38,11 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     user && (
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
+      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
       user.providerData.some((p) => p.providerId === 'google.com')
     )
   );
-  const isSetupComplete = (state.isSetup && isVerified) || (isNative && state.isSetup);
+  const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);
 
   const handleLogin = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -101,21 +102,46 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               <span className="text-[16px] sm:text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
             </button>
             
-            {!isSetupComplete ? (
-              <>
-                <button type="button" onClick={handleLogin} className="bg-transparent text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 py-1.5 sm:px-4 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0">
-                  Log In
-                </button>
-                <button type="button" onClick={handleSignUp} className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0">
-                  Sign Up
-                </button>
-              </>
-            ) : (
-              <button type="button" onClick={handleDashboard} disabled={isLoggingIn} className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 whitespace-nowrap shrink-0">
+            {isLoggedInAndSetup ? (
+              <button 
+                type="button" 
+                onClick={handleDashboard} 
+                disabled={isLoggingIn} 
+                className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm flex items-center justify-center gap-1 sm:gap-2 disabled:opacity-50 whitespace-nowrap shrink-0 cursor-pointer"
+              >
                 {isLoggingIn ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : null}
                 <span className="sm:hidden">Dashboard</span>
                 <span className="hidden sm:inline">Open Dashboard</span>
               </button>
+            ) : (
+              <>
+                {state.isSetup && (
+                  <button 
+                    type="button" 
+                    onClick={handleDashboard} 
+                    className="bg-white border border-border text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    <span className="sm:hidden">Dashboard</span>
+                    <span className="hidden sm:inline">Guest Dashboard</span>
+                  </button>
+                )}
+                <button 
+                  type="button" 
+                  onClick={handleLogin} 
+                  className="bg-transparent text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 py-1.5 sm:px-4 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Log In
+                </button>
+                {!state.isSetup && (
+                  <button 
+                    type="button" 
+                    onClick={handleSignUp} 
+                    className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
+                  >
+                    Sign Up
+                  </button>
+                )}
+              </>
             )}
           </div>
         </nav>

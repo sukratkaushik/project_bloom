@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS } from '../data';
 import { Task } from '../types';
-import { auth } from '../firebase';
+import { auth, signInWithGoogle } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
@@ -38,7 +38,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
 };
 
 export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, filterTasks, isMobile = false }) => {
-  const { state, toggleDarkMode, resetPlan, toggleFavoritePage } = usePlanner();
+  const { state, toggleDarkMode, resetPlan, toggleFavoritePage, restoreJourney } = usePlanner();
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -498,13 +498,38 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           <span>Export Care Plan PDF</span>
         </button>
 
-        <button
-          onClick={handleLogout}
-          className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-critical/85 hover:text-critical hover:bg-critical-bg hover:border-critical/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
-        >
-          <span>🚪</span>
-          <span>Log Out</span>
-        </button>
+        {!auth.currentUser ? (
+          <button
+            type="button"
+            onClick={async () => {
+              try {
+                const user = await signInWithGoogle();
+                if (user) {
+                  const restored = await restoreJourney(user.uid);
+                  if (!restored && state.isSetup) {
+                    const { saveJourney } = await import('../cloudSync');
+                    await saveJourney(user.uid, state);
+                  }
+                }
+              } catch (e) {
+                console.error("Sign-in failed", e);
+              }
+            }}
+            className="w-full py-2.5 px-3.5 bg-sage text-white rounded-[10px] font-sans text-[13px] font-bold hover:bg-sage-dark transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
+          >
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 bg-white rounded-full p-0.5 shrink-0" />
+            <span>Sign in with Google</span>
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleLogout}
+            className="w-full py-2.5 px-3.5 bg-white dark:bg-charcoal/15 border border-border/80 dark:border-border/20 rounded-[10px] font-sans text-[13px] font-medium text-critical/85 hover:text-critical hover:bg-critical-bg hover:border-critical/30 transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
+          >
+            <span>🚪</span>
+            <span>Log Out</span>
+          </button>
+        )}
       </div>
 
     </div>

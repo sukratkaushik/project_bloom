@@ -80,28 +80,22 @@ export const LandingPage: React.FC = () => {
     user && (
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
+      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
       user.providerData.some((p) => p.providerId === 'google.com')
     )
   );
-  const isSetupComplete = (state.isSetup && isVerified) || (isNative && state.isSetup);
+  const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);
 
   const handleStart = async () => {
     try {
-      if (isSetupComplete || (isNative && state.isSetup)) {
+      if (isLoggedInAndSetup) {
         navigate('/dashboard');
         return;
       }
 
-      // In Native Android App: Start tracking journey directly via Setup screen
-      if (isNative) {
-        updateState({ hasStartedOnboarding: true, isSetup: false });
-        navigate('/setup');
-        return;
-      }
-
       setIsLoggingIn(true);
-      const user = await signInWithGoogle();
-      if (user) {
+      const googleUser = await signInWithGoogle();
+      if (googleUser) {
         triggerWelcomeEmailIfNewCallable();
         setShowEmailModal(false);
 
@@ -112,7 +106,7 @@ export const LandingPage: React.FC = () => {
         }
 
         // Try to restore from cloud
-        const restored = await restoreJourney(user.uid);
+        const restored = await restoreJourney(googleUser.uid);
 
         if (restored) {
           navigate('/dashboard');
@@ -122,11 +116,13 @@ export const LandingPage: React.FC = () => {
         }
       }
     } catch (error: any) {
-      if (error?.code !== 'auth/popup-closed-by-user') {
+      const msg = String(error?.message || '').toLowerCase();
+      const code = String(error?.code || '');
+      if (error?.code !== 'auth/popup-closed-by-user' && !msg.includes('cancel') && !msg.includes('12501') && code !== '12501' && code !== '16') {
         console.error("Login failed", error);
 
         if (error?.code === 'auth/network-request-failed') {
-          alert("Network request failed. This often happens if third-party cookies are blocked, or an ad blocker is preventing the login popup. Please disable your ad blocker or allow third-party cookies for this site, then try again.");
+          alert("Network request failed. Please check your internet connection.");
         } else {
           alert(`Failed to log in with Google: ${error?.message || "Please try again."}`);
         }
@@ -157,7 +153,9 @@ export const LandingPage: React.FC = () => {
         }
       }
     } catch (error: any) {
-      if (error?.code !== 'auth/popup-closed-by-user') {
+      const msg = String(error?.message || '').toLowerCase();
+      const code = String(error?.code || '');
+      if (error?.code !== 'auth/popup-closed-by-user' && !msg.includes('cancel') && !msg.includes('12501') && code !== '12501' && code !== '16') {
         console.error("Login failed", error);
         if (error?.code === 'auth/network-request-failed') {
           alert("Network request failed. Please check your internet connection and try again.");
@@ -210,10 +208,6 @@ export const LandingPage: React.FC = () => {
   };
 
   const handleEmailLoginClick = () => {
-    if (isSetupComplete) {
-      navigate('/dashboard');
-      return;
-    }
     setShowEmailModal(true);
   };
 
@@ -675,11 +669,29 @@ export const LandingPage: React.FC = () => {
                     type="button"
                     onClick={handleGoogleSignIn}
                     disabled={isLoggingIn}
-                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px]"
+                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
                   >
                     {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
                     Continue with Google
                   </button>
+
+                  <div className="text-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowEmailModal(false);
+                        if (state.isSetup) {
+                          navigate('/dashboard');
+                        } else {
+                          updateState({ hasStartedOnboarding: true });
+                          navigate('/setup');
+                        }
+                      }}
+                      className="text-[12px] text-light hover:text-charcoal underline transition-colors cursor-pointer"
+                    >
+                      Skip sign-in and continue as Guest →
+                    </button>
+                  </div>
                 </form>
               </>
             )}
@@ -719,19 +731,28 @@ export const LandingPage: React.FC = () => {
               type="button"
               onClick={handleStart}
               disabled={isLoggingIn}
-              className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70"
+              className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isSetupComplete ? "Go to Dashboard" : "Start Tracking"}
+              {isLoggedInAndSetup ? "Go to Dashboard" : "Start Tracking with Google"}
               {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
             </button>
-            {!isSetupComplete && (
+            {!isLoggedInAndSetup && (
               <button
                 type="button"
-                onClick={() => { setIsRegistering(true); handleEmailLoginClick(); }}
-                className="inline-flex items-center justify-center gap-2 bg-white border-[1.5px] border-sage text-sage rounded-full font-semibold px-8 py-4 text-[17px] hover:bg-sage-pale transition-colors w-full sm:w-auto"
+                onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }}
+                className="inline-flex items-center justify-center gap-2 bg-white border-[1.5px] border-sage text-sage rounded-full font-semibold px-8 py-4 text-[17px] hover:bg-sage-pale transition-colors w-full sm:w-auto cursor-pointer"
               >
-                Sign Up with Email
+                Log In / Email Sign In
+              </button>
+            )}
+            {state.isSetup && !isLoggedInAndSetup && (
+              <button
+                type="button"
+                onClick={() => navigate('/dashboard')}
+                className="inline-flex items-center justify-center gap-1.5 text-medium hover:text-charcoal font-semibold px-4 py-4 text-[15px] transition-colors whitespace-nowrap cursor-pointer"
+              >
+                <span>Continue as Guest</span> ➜
               </button>
             )}
             <a href="#how-it-works" className="font-medium text-medium px-4 py-4 hover:text-charcoal transition-colors whitespace-nowrap">

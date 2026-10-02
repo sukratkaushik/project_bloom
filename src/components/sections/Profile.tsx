@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../store';
-import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable } from '../../firebase';
+import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable, signInWithGoogle } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
 import { 
@@ -27,10 +27,11 @@ interface ProfileProps {
 }
 
 export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
-  const { state, updateState } = usePlanner();
+  const { state, updateState, restoreJourney } = usePlanner();
   
   const [userName, setUserName] = useState(state.userName || '');
   const [isNameSaved, setIsNameSaved] = useState(false);
+  const [isSigningInGoogle, setIsSigningInGoogle] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
@@ -208,11 +209,65 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
               <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70 mb-1.5">
                 Email Address
               </label>
-              <div className="p-3 bg-cream/40 border border-border/80 rounded-xl text-[13px] text-charcoal/80 font-medium truncate">
-                {auth.currentUser?.email || 'Not signed in'}
+              <div className="p-3 bg-cream/40 border border-border/80 rounded-xl text-[13px] text-charcoal/80 font-medium truncate flex items-center justify-between">
+                <span>{auth.currentUser?.email || 'Not signed in (Guest Mode)'}</span>
+                {auth.currentUser && (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Check size={11} /> Synced
+                  </span>
+                )}
               </div>
               <p className="text-[11px] text-medium mt-1">Your email is managed securely via Google Sign-In.</p>
             </div>
+
+            {!auth.currentUser && (
+              <div className="p-4 sm:p-5 bg-gradient-to-r from-sage-pale/60 to-cream/60 border border-sage/40 rounded-2xl space-y-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full bg-white shadow-xs flex items-center justify-center shrink-0">
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <h4 className="font-semibold text-charcoal text-[14px]">Connect Google Account</h4>
+                    <p className="text-[12px] text-medium">Sync your data between the website and Android app</p>
+                  </div>
+                </div>
+                <p className="text-[12px] text-charcoal/80 leading-relaxed">
+                  You are currently using guest mode. Sign in with Google to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
+                </p>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    try {
+                      setIsSigningInGoogle(true);
+                      const googleUser = await signInWithGoogle();
+                      if (googleUser) {
+                        const restored = await restoreJourney(googleUser.uid);
+                        if (!restored && state.isSetup) {
+                          const { saveJourney } = await import('../../cloudSync');
+                          await saveJourney(googleUser.uid, state);
+                        }
+                        setToastMessage("Signed in with Google! Your data is synced.");
+                        setTimeout(() => setToastMessage(null), 3500);
+                      }
+                    } catch (err: any) {
+                      console.error("Profile Google Sign-In error:", err);
+                      alert(`Google Sign-In: ${err?.message || 'Please try again.'}`);
+                    } finally {
+                      setIsSigningInGoogle(false);
+                    }
+                  }}
+                  disabled={isSigningInGoogle}
+                  className="w-full sm:w-auto px-5 py-2.5 bg-sage text-white rounded-xl font-bold text-[13px] hover:bg-sage-dark transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                >
+                  {isSigningInGoogle ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 brightness-200" />
+                  )}
+                  <span>Sign in with Google to Sync</span>
+                </button>
+              </div>
+            )}
 
             <div>
               <div className="flex items-center justify-between mb-1.5">
