@@ -178,7 +178,7 @@ export const signInWithGoogle = async () => {
   if (isNativeApp()) {
     try {
       const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
-      const result = await FirebaseAuthentication.signInWithGoogle();
+      const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
       let idToken = result.credential?.idToken;
       if (!idToken) {
         const tokenRes = await FirebaseAuthentication.getIdToken();
