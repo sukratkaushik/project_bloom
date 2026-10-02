@@ -113,3 +113,30 @@ class CloudSync {
 }
 
 export const cloudSync = new CloudSync();
+
+/**
+ * Save user pregnancy journey state to Firestore
+ */
+export const saveJourney = async (uid: string, state: any) => {
+  try {
+    const journeyId = state.activeJourneyId || `journey_${uid}`;
+    const journeyRef = doc(firestoreDb, 'journeys', journeyId);
+    await setDoc(journeyRef, {
+      ...state,
+      userId: uid,
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    // Ensure user profile points to this active journey
+    const userRef = doc(firestoreDb, 'users', uid);
+    await setDoc(userRef, {
+      isSetup: true,
+      activeJourneyId: journeyId,
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    console.log(`CloudSync: Saved journey ${journeyId} for user ${uid}`);
+  } catch (error) {
+    console.error("CloudSync: Failed to save journey", error);
+  }
+};
