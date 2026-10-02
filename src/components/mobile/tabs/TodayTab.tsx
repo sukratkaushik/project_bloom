@@ -150,14 +150,69 @@ export const TodayTab: React.FC<TodayTabProps> = ({
   );
   const latestKicks = todayKickSessions?.[0]?.kickCount || 0;
 
-  const todayVitals = useLiveQuery(
-    () => db.vitalsLogs.where('journeyId').equals(activeJourneyId).reverse().limit(1).toArray(),
+  const latestBpLog = useLiveQuery(
+    async () => {
+      const logs = await db.vitalsLogs
+        .where('journeyId')
+        .equals(activeJourneyId)
+        .reverse()
+        .filter((l) => {
+          const sys = Number(l.systolic);
+          const dia = Number(l.diastolic);
+          return !isNaN(sys) && !isNaN(dia) && sys > 0 && dia > 0;
+        })
+        .limit(1)
+        .toArray();
+      return logs[0];
+    },
     [activeJourneyId]
   );
-  const latestBp = todayVitals?.[0]
-    ? `${todayVitals[0].systolic}/${todayVitals[0].diastolic}`
+
+  const latestPulseLog = useLiveQuery(
+    async () => {
+      const logs = await db.vitalsLogs
+        .where('journeyId')
+        .equals(activeJourneyId)
+        .reverse()
+        .filter((l) => {
+          const p = Number(l.pulse);
+          return !isNaN(p) && p > 0;
+        })
+        .limit(1)
+        .toArray();
+      return logs[0];
+    },
+    [activeJourneyId]
+  );
+
+  const hasValidBp = Boolean(
+    latestBpLog &&
+    !isNaN(Number(latestBpLog.systolic)) &&
+    !isNaN(Number(latestBpLog.diastolic)) &&
+    Number(latestBpLog.systolic) > 0 &&
+    Number(latestBpLog.diastolic) > 0
+  );
+
+  const latestBp = hasValidBp
+    ? `${Number(latestBpLog!.systolic)}/${Number(latestBpLog!.diastolic)}`
     : '118/76';
-  const latestPulse = todayVitals?.[0]?.pulse || 74;
+
+  const latestPulse = latestPulseLog?.pulse || 74;
+
+  const bpStatus = React.useMemo(() => {
+    if (!hasValidBp || !latestBpLog) {
+      return { label: 'NORMAL', color: 'text-emerald-700 bg-emerald-50 border-emerald-200/60' };
+    }
+    const sys = Number(latestBpLog.systolic);
+    const dia = Number(latestBpLog.diastolic);
+    if (sys >= 140 || dia >= 90) {
+      return { label: 'ELEVATED', color: 'text-rose-700 bg-rose-50 border-rose-200/60' };
+    }
+    if (sys >= 130 || dia >= 85) {
+      return { label: 'ATTENTION', color: 'text-amber-700 bg-amber-50 border-amber-200/60' };
+    }
+    return { label: 'NORMAL', color: 'text-emerald-700 bg-emerald-50 border-emerald-200/60' };
+  }, [hasValidBp, latestBpLog]);
 
   const todaySupplements = useLiveQuery(
     () => db.supplementLogs.where('[journeyId+date]').equals([activeJourneyId, todayStr]).toArray(),
@@ -291,8 +346,8 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                   {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
                 </span>
               ) : isInteractiveVitals ? (
-                <span className="text-[9px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-1.5 py-0.2 rounded-full whitespace-nowrap">
-                  NORMAL
+                <span className={`text-[9px] font-bold px-1.5 py-0.2 rounded-full border whitespace-nowrap ${bpStatus.color}`}>
+                  {bpStatus.label}
                 </span>
               ) : tool.badge ? (
                 <span className="text-[9px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-1.5 py-0.2 rounded-full whitespace-nowrap">
@@ -325,10 +380,10 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             {isInteractiveWater ? (
               <>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
                     {(totalWaterMl / 1000).toFixed(2)}L
                   </span>
-                  <span className="text-[10px] text-light font-medium">/ 2.5L</span>
+                  <span className="text-[10.5px] text-light font-medium">/ 2.5L</span>
                 </div>
                 <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
                   <div
@@ -349,7 +404,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             ) : isInteractiveKicks ? (
               <>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
                     {latestKicks}
                   </span>
                   <span className="text-[10.5px] text-medium font-medium">/ 10 kicks</span>
@@ -361,10 +416,10 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             ) : isInteractiveVitals ? (
               <>
                 <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-serif font-bold text-charcoal text-[18px] leading-tight">
+                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
                     {latestBp}
                   </span>
-                  <span className="text-[9.5px] text-light font-bold">mmHg</span>
+                  <span className="text-[10px] text-light font-semibold">mmHg</span>
                 </div>
                 <p className="text-[10px] text-light mt-0.5 truncate">
                   Pulse: {latestPulse} bpm
@@ -383,34 +438,30 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
         </div>
 
-        {/* Card Bottom: Standardized 1-Tap Action Button */}
+        {/* Card Bottom: Standardized 1-Tap Action Button (Unified symmetric styling matching Mood & Energy) */}
         {isInteractiveWater ? (
           <button
             type="button"
             onClick={handleQuickWater}
-            className="mt-2 w-full h-8 py-1 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
-            <Plus size={12} strokeWidth={2.5} />
+            <Plus size={12} strokeWidth={2.5} className="text-medium" />
             <span>+250ml Glass</span>
           </button>
         ) : isInteractiveSupps ? (
           <button
             type="button"
             onClick={handleQuickSupplements}
-            className={`mt-2 w-full h-8 py-1 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap ${
-              allSuppsTaken
-                ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
-                : 'bg-sage text-white hover:bg-sage-dark shadow-2xs'
-            }`}
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
             {allSuppsTaken ? (
               <>
                 <CheckCircle2 size={12} className="text-emerald-600" />
-                <span>Taken Today ✓</span>
+                <span className="text-emerald-800 font-bold">Taken Today ✓</span>
               </>
             ) : (
               <>
-                <Plus size={12} strokeWidth={2.5} />
+                <Plus size={12} strokeWidth={2.5} className="text-medium" />
                 <span>Mark Taken</span>
               </>
             )}
@@ -419,9 +470,9 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           <button
             type="button"
             onClick={handleQuickKick}
-            className="mt-2 w-full h-8 py-1 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
-            <Plus size={12} strokeWidth={2.5} />
+            <Plus size={12} strokeWidth={2.5} className="text-medium" />
             <span>+1 Kick</span>
           </button>
         ) : isInteractiveVitals ? (
@@ -432,10 +483,10 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool('vitals');
             }}
-            className="mt-2 w-full h-8 py-1 bg-rose-50 text-rose-700 border border-rose-200/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
-            <Activity size={12} />
-            <span>+ Log Vitals</span>
+            <Plus size={12} strokeWidth={2.5} className="text-medium" />
+            <span>Log Vitals</span>
           </button>
         ) : (
           <button
@@ -445,7 +496,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               triggerHaptic('light');
               onOpenTool(tool.id);
             }}
-            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-bold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0 whitespace-nowrap"
+            className="mt-2 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0 whitespace-nowrap"
           >
             <span>{tool.actionLabel || 'Open Tool →'}</span>
           </button>
@@ -733,16 +784,16 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
                 <Heart size={17} />
               </div>
-              <span className="text-[9.5px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full">
-                NORMAL
+              <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${bpStatus.color}`}>
+                {bpStatus.label}
               </span>
             </div>
             <p className="text-[11.5px] font-semibold text-medium">Blood Pressure</p>
             <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="font-serif font-bold text-charcoal text-[20px] leading-tight">
+              <span className="font-sans font-bold text-charcoal text-[20px] leading-tight tracking-tight">
                 {latestBp}
               </span>
-              <span className="text-[10px] text-light font-bold">mmHg</span>
+              <span className="text-[10.5px] text-light font-semibold">mmHg</span>
             </div>
           </div>
 
@@ -771,20 +822,20 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             </div>
             <p className="text-[11.5px] font-semibold text-medium">Fetal Kicks</p>
             <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="font-serif font-bold text-charcoal text-[20px] leading-tight">
+              <span className="font-sans font-bold text-charcoal text-[20px] leading-tight tracking-tight">
                 {latestKicks}
               </span>
               <span className="text-[11px] text-medium font-medium">/ 10 today</span>
             </div>
           </div>
 
-          {/* Micro 1-Tap Quick Log Button */}
+          {/* Micro 1-Tap Quick Log Button (Unified matching Mood & Energy) */}
           <button
             type="button"
             onClick={handleQuickKick}
-            className="mt-2.5 w-full h-8 bg-sage text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all flex items-center justify-center gap-1 cursor-pointer shrink-0"
+            className="mt-2.5 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
           >
-            <Plus size={13} strokeWidth={2.5} />
+            <Plus size={12} strokeWidth={2.5} className="text-medium" />
             <span>+1 Kick</span>
           </button>
         </div>

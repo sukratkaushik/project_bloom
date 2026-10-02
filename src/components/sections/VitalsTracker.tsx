@@ -673,10 +673,12 @@ export const VitalsTracker: React.FC = () => {
                   <p className="text-[13px] text-medium">{dateStr}</p>
                   <div className="flex flex-wrap items-center gap-3">
                     {isBP ? (
-                      <span className="font-serif text-[20px] text-charcoal">{log.systolic}/{log.diastolic}</span>
+                      <span className="font-sans font-bold text-[18px] text-charcoal">
+                        {log.systolic && log.diastolic ? `${log.systolic}/${log.diastolic}` : '—'}
+                      </span>
                     ) : isWearable ? (
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-serif text-[17px] text-charcoal flex items-center gap-1.5">
+                        <span className="font-medium text-[15px] text-charcoal flex items-center gap-1.5">
                           <span>{WEARABLE_DEVICES.find(d => d.id === log.source)?.icon || '💚'}</span>
                           <span>{WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source}</span>
                         </span>
@@ -692,7 +694,7 @@ export const VitalsTracker: React.FC = () => {
                         )}
                       </div>
                     ) : (
-                      <span className="font-serif text-[20px] text-charcoal">{log.weight} {log.unit}</span>
+                      <span className="font-sans font-bold text-[18px] text-charcoal">{log.weight} {log.unit}</span>
                     )}
                     {isBP && <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${tagColor}`}>BP</span>}
                     {isWearable && (
