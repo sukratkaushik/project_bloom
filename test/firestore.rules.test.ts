@@ -46,6 +46,10 @@ describe('Firestore Security Rules: trackingData isolation', () => {
           uid: 'user_b',
           createdAt: Date.now(),
         });
+        // Admin user profile document
+        await setDoc(doc(firestore, 'users', 'admin_doc_user'), {
+          role: 'admin',
+        });
       });
     }
   });
@@ -92,8 +96,9 @@ describe('Firestore Security Rules: trackingData isolation', () => {
 
   // Case 3: Admin (matching isAdmin()'s conditions) can read any user's trackingData.
   it('Case 3: Admin can read and write any user trackingData', async () => {
+    // 3a. Admin via custom claim: role == 'admin'
     const adminContext = testEnv.authenticatedContext('admin_user', {
-      email: 'sukrat.kaushik@ourpregnancy.in',
+      role: 'admin',
     });
     const adminDb = adminContext.firestore();
 
@@ -110,6 +115,34 @@ describe('Firestore Security Rules: trackingData isolation', () => {
 
     // Admin reading User B's trackingData
     await assertSucceeds(getDoc(targetDocRef));
+
+    // 3b. Admin via custom claim: admin == true
+    const adminClaimContext = testEnv.authenticatedContext('admin_claim_user', {
+      admin: true,
+    });
+    const adminClaimDb = adminClaimContext.firestore();
+    const claimDocRef = doc(adminClaimDb, 'journeys', 'journey_user_b', 'trackingData', 'admin_claim_check');
+    await assertSucceeds(
+      setDoc(claimDocRef, {
+        type: 'kick',
+        data: { count: 20 },
+        updatedAt: Date.now(),
+      })
+    );
+    await assertSucceeds(getDoc(claimDocRef));
+
+    // 3c. Admin via Firestore database role (users/{uid}.role == 'admin')
+    const adminDocContext = testEnv.authenticatedContext('admin_doc_user');
+    const adminDocDb = adminDocContext.firestore();
+    const docRoleRef = doc(adminDocDb, 'journeys', 'journey_user_b', 'trackingData', 'admin_doc_check');
+    await assertSucceeds(
+      setDoc(docRoleRef, {
+        type: 'kick',
+        data: { count: 30 },
+        updatedAt: Date.now(),
+      })
+    );
+    await assertSucceeds(getDoc(docRoleRef));
   });
 
   // Case 4: Unauthenticated requests are denied, as before.
