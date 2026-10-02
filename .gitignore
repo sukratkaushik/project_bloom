@@ -23,6 +23,9 @@ keystore.properties
 
 # Android Binaries
 *.apk
+!OurPregnancy.apk
+!app-release.apk
+!public/OurPregnancy.apk
 *.aab
 
 

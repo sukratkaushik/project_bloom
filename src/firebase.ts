@@ -197,7 +197,10 @@ export const signInWithGoogle = async () => {
         msg.includes('cancel') ||
         msg.includes('canceled') ||
         msg.includes('cancelled') ||
+        msg.includes('12501') ||
         error?.code === '16' ||
+        error?.code === '12501' ||
+        error?.code === 12501 ||
         error?.code === 'auth/popup-closed-by-user'
       ) {
         return null;

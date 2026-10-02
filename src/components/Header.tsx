@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { LanguageSelector } from './LanguageSelector';
 import { navigate } from '../utils/navigation';
+import { auth } from '../firebase';
 
 interface HeaderProps {
   isMobileMenuOpen?: boolean;
@@ -18,6 +19,12 @@ export const Header: React.FC<HeaderProps> = ({
   hideMenuIcon = false 
 }) => {
   const { state, updateState, toggleDarkMode } = usePlanner();
+  const [currentUser, setCurrentUser] = useState(auth.currentUser);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((u) => setCurrentUser(u));
+    return () => unsubscribe();
+  }, []);
 
   return (
     <header className="bg-white border-b border-border sticky top-0 z-50 shadow-sm no-print w-full">
@@ -73,6 +80,25 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
           <LanguageSelector />
+
+          {!currentUser ? (
+            <button
+              onClick={() => navigate('/dashboard/profile')}
+              className="px-2.5 py-1 text-[11px] sm:text-[12px] font-bold bg-sage text-white rounded-full hover:bg-sage-dark transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer shrink-0"
+              title="Sign in with Google to sync your journey"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-3.5 h-3.5 bg-white rounded-full p-0.5 shrink-0" />
+              <span>Sign In</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate('/dashboard/profile')}
+              className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-sage text-white font-bold text-[11px] sm:text-[12px] flex items-center justify-center hover:opacity-90 transition-opacity shadow-2xs shrink-0 cursor-pointer"
+              title={`Logged in as ${currentUser.email}`}
+            >
+              {(currentUser.displayName || currentUser.email || 'U').charAt(0).toUpperCase()}
+            </button>
+          )}
           
           {/* Mobile Dark Mode Toggle */}
           <button
