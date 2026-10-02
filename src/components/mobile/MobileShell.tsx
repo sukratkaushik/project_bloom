@@ -610,11 +610,11 @@ export const MobileShell: React.FC = () => {
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="font-bold text-charcoal text-[12.5px] truncate">
+                          <span className="font-medium text-charcoal text-[13px] truncate">
                             {tool.title}
                           </span>
                           {tool.badge && (
-                            <span className="text-[8.5px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border text-medium shrink-0">
+                            <span className="text-[9px] font-normal px-1.5 py-0.2 rounded-md bg-white border border-border text-medium shrink-0">
                               {tool.badge}
                             </span>
                           )}
