@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { usePlanner } from '../../store';
-import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable, signInWithGoogle } from '../../firebase';
+import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable, signInWithGoogle, logout } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
 import { 
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
-  Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle
+  Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle, LogOut
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
@@ -24,10 +25,11 @@ import {
 
 interface ProfileProps {
   isMobileModal?: boolean;
+  onClose?: () => void;
 }
 
-export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
-  const { state, updateState, restoreJourney } = usePlanner();
+export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose }) => {
+  const { state, updateState, restoreJourney, resetPlan } = usePlanner();
   
   const [userName, setUserName] = useState(state.userName || '');
   const [isNameSaved, setIsNameSaved] = useState(false);
@@ -37,6 +39,33 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // Logout state
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      if (auth.currentUser) {
+        await logout();
+      }
+      resetPlan();
+      triggerHaptic('light');
+      if (onClose) onClose();
+      window.location.hash = '';
+      navigate('/', true);
+    } catch (err: any) {
+      console.error("Logout error:", err);
+      resetPlan();
+      if (onClose) onClose();
+      window.location.hash = '';
+      navigate('/', true);
+    } finally {
+      setIsLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
+  };
 
   // Self-service account deletion state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -206,18 +235,49 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
           
           <div className="space-y-4">
             <div>
-              <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70 mb-1.5">
-                Email Address
-              </label>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70">
+                  Email Address
+                </label>
+                {auth.currentUser ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="flex items-center gap-1.5 text-[11.5px] font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200/80 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer active:scale-95 shadow-3xs"
+                    title="Log Out of this account"
+                  >
+                    <LogOut size={12} strokeWidth={2} />
+                    <span>Log Out</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="flex items-center gap-1.5 text-[11.5px] font-semibold text-charcoal hover:text-sage-dark bg-cream hover:bg-sage-pale/60 border border-border/80 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer active:scale-95 shadow-3xs"
+                    title="Exit guest mode and log in"
+                  >
+                    <LogOut size={12} strokeWidth={2} className="text-medium" />
+                    <span>Exit to Login</span>
+                  </button>
+                )}
+              </div>
               <div className="p-3 bg-cream/40 border border-border/80 rounded-xl text-[13px] text-charcoal/80 font-medium truncate flex items-center justify-between">
-                <span>{auth.currentUser?.email || 'Not signed in (Guest Mode)'}</span>
-                {auth.currentUser && (
-                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full flex items-center gap-1">
+                <span className="truncate mr-2">{auth.currentUser?.email || 'Not signed in (Guest Mode)'}</span>
+                {auth.currentUser ? (
+                  <span className="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/60 px-2 py-0.5 rounded-full flex items-center gap-1 shrink-0">
                     <Check size={11} /> Synced
+                  </span>
+                ) : (
+                  <span className="text-[10.5px] font-medium text-medium bg-cream border border-border/60 px-2 py-0.5 rounded-full shrink-0">
+                    Local Device
                   </span>
                 )}
               </div>
-              <p className="text-[11px] text-medium mt-1">Your email is managed securely via Google Sign-In.</p>
+              <p className="text-[11px] text-medium mt-1">
+                {auth.currentUser
+                  ? 'Your account is securely connected via Google / Firebase.'
+                  : 'You are currently using guest mode. Sign in to sync your data.'}
+              </p>
             </div>
 
             {!auth.currentUser && (
@@ -234,38 +294,49 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
                 <p className="text-[12px] text-charcoal/80 leading-relaxed">
                   You are currently using guest mode. Sign in with Google to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
                 </p>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      setIsSigningInGoogle(true);
-                      const googleUser = await signInWithGoogle();
-                      if (googleUser) {
-                        const restored = await restoreJourney(googleUser.uid);
-                        if (!restored && state.isSetup) {
-                          const { saveJourney } = await import('../../cloudSync');
-                          await saveJourney(googleUser.uid, state);
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        setIsSigningInGoogle(true);
+                        const googleUser = await signInWithGoogle();
+                        if (googleUser) {
+                          const restored = await restoreJourney(googleUser.uid);
+                          if (!restored && state.isSetup) {
+                            const { saveJourney } = await import('../../cloudSync');
+                            await saveJourney(googleUser.uid, state);
+                          }
+                          setToastMessage("Signed in with Google! Your data is synced.");
+                          setTimeout(() => setToastMessage(null), 3500);
                         }
-                        setToastMessage("Signed in with Google! Your data is synced.");
-                        setTimeout(() => setToastMessage(null), 3500);
+                      } catch (err: any) {
+                        console.error("Profile Google Sign-In error:", err);
+                        alert(`Google Sign-In: ${err?.message || 'Please try again.'}`);
+                      } finally {
+                        setIsSigningInGoogle(false);
                       }
-                    } catch (err: any) {
-                      console.error("Profile Google Sign-In error:", err);
-                      alert(`Google Sign-In: ${err?.message || 'Please try again.'}`);
-                    } finally {
-                      setIsSigningInGoogle(false);
-                    }
-                  }}
-                  disabled={isSigningInGoogle}
-                  className="w-full sm:w-auto px-5 py-2.5 bg-sage text-white rounded-xl font-bold text-[13px] hover:bg-sage-dark transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
-                >
-                  {isSigningInGoogle ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                  ) : (
-                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 brightness-200" />
-                  )}
-                  <span>Sign in with Google to Sync</span>
-                </button>
+                    }}
+                    disabled={isSigningInGoogle}
+                    className="w-full sm:w-auto px-5 py-2.5 bg-sage text-white rounded-xl font-bold text-[13px] hover:bg-sage-dark transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                  >
+                    {isSigningInGoogle ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 brightness-200" />
+                    )}
+                    <span>Sign in with Google to Sync</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowLogoutConfirm(true)}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-white hover:bg-sage-pale/40 text-charcoal border border-border/80 rounded-xl font-semibold text-[12.5px] transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+                  >
+                    <LogOut size={13} className="text-medium" />
+                    <span>Exit Guest Mode & Log In</span>
+                  </button>
+                </div>
               </div>
             )}
 
@@ -815,6 +886,56 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
           </div>
         </section>
 
+        {/* Account & Session Management */}
+        <section className="bg-white rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-2xs border border-border/80">
+          <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-5">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-amber-50 border border-amber-200/60 flex items-center justify-center text-amber-700 shrink-0">
+              <LogOut className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight">Account & Session</h3>
+              <p className="text-medium text-xs sm:text-sm mt-0.5">Manage your active sign-in session and switch accounts</p>
+            </div>
+          </div>
+
+          <div className="bg-cream/20 border border-border/80 rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] uppercase tracking-wider text-medium font-medium">Current Status</span>
+                {auth.currentUser ? (
+                  <span className="text-[11px] font-medium text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.5 rounded-full">
+                    Signed In
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-medium text-charcoal/70 bg-cream border border-border/80 px-2 py-0.5 rounded-full">
+                    Guest Mode
+                  </span>
+                )}
+              </div>
+              <p className="text-sm font-medium text-charcoal">
+                {auth.currentUser?.email || 'Local guest profile (Not synced)'}
+              </p>
+              <p className="text-xs text-medium leading-relaxed">
+                {auth.currentUser
+                  ? 'Sign out to log in with a different account or return to the welcome screen.'
+                  : 'Exit guest mode to sign in with your Google account or email address.'}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowLogoutConfirm(true);
+              }}
+              className="px-4 py-2.5 rounded-xl border border-charcoal/20 bg-charcoal hover:bg-black active:scale-95 text-white font-medium text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-3xs shrink-0 self-stretch sm:self-auto"
+            >
+              <LogOut size={15} />
+              <span>{auth.currentUser ? 'Log Out' : 'Exit Guest Mode & Log In'}</span>
+            </button>
+          </div>
+        </section>
+
         {/* Legal Links — High-End Inset Grouped List Pattern */}
         <section className="bg-white rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-2xs border border-border/80">
           <div className="flex items-center gap-2.5 sm:gap-3 mb-4 sm:mb-5">
@@ -981,8 +1102,8 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
         />
       )}
 
-      {showDisclaimer && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
+      {showDisclaimer && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-[24px] p-8 max-w-[480px] w-full shadow-2xl animate-in fade-in zoom-in duration-300">
             <div className="w-12 h-12 bg-sage-pale rounded-full flex items-center justify-center mb-5 mx-auto">
               <span className="text-sage text-2xl">⚕️</span>
@@ -998,10 +1119,12 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
               Close
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
-      {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+
+      {showDeleteModal && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
           <div className="bg-white rounded-[24px] max-w-[480px] w-full p-6 sm:p-8 shadow-2xl border border-red-100 space-y-5 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 text-red-600">
               <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
@@ -1079,7 +1202,65 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false }) => {
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
+      )}
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && typeof document !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[100] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="bg-white rounded-[24px] max-w-[420px] w-full p-6 sm:p-7 shadow-2xl border border-border/80 space-y-4 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-full bg-amber-50 border border-amber-200/80 flex items-center justify-center shrink-0 text-amber-700">
+                <LogOut className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-lg sm:text-xl font-medium text-charcoal">
+                  {auth.currentUser ? 'Log out of Bloom?' : 'Exit Guest Mode?'}
+                </h3>
+                <p className="text-xs text-medium mt-0.5">
+                  {auth.currentUser ? 'You will be returned to the sign-in screen.' : 'Return to sign-in screen to log in or create an account.'}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-xs sm:text-[13px] text-charcoal/80 bg-cream/30 p-3.5 rounded-xl border border-border/70 leading-relaxed font-normal">
+              {auth.currentUser
+                ? 'Your pregnancy data and health rituals are safely stored in your cloud account. You can log back in at any time to resume.'
+                : 'Any un-synced data will remain stored on this device until cleared. To sync across devices, be sure to sign in with Google or your email.'}
+            </p>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowLogoutConfirm(false)}
+                disabled={isLoggingOut}
+                className="px-4 py-2.5 rounded-xl border border-border/80 text-charcoal text-xs sm:text-sm font-medium hover:bg-cream/40 transition-colors disabled:opacity-50 cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-charcoal hover:bg-black text-white text-xs sm:text-sm font-medium shadow-sm disabled:opacity-50 transition-all cursor-pointer"
+              >
+                {isLoggingOut ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Signing out...</span>
+                  </>
+                ) : (
+                  <>
+                    <LogOut className="w-4 h-4" />
+                    <span>{auth.currentUser ? 'Log Out' : 'Exit to Sign In'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>,
+        document.body
       )}
 
       {/* Primary Obstetrician Modal */}

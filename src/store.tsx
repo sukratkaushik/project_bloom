@@ -581,6 +581,12 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
   };
 
   const resetPlan = () => {
+    try {
+      db.appState.delete('global').catch(() => {});
+      localStorage.removeItem('bloom_planner');
+    } catch (e) {
+      console.warn('Error clearing appState on resetPlan', e);
+    }
     setState((prev) => ({
       ...defaultState,
       isDarkModeActive: prev.isDarkModeActive

@@ -41,6 +41,9 @@ android {
             }
         }
     }
+    aaptOptions {
+        ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:<dir>_*:!CVS:!thumbs.db:!picasa.ini:!*~:*.apk'
+    }
 }
 
 repositories {
