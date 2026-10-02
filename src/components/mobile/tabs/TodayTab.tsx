@@ -379,11 +379,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
             {isInteractiveWater ? (
               <>
-                <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {(totalWaterMl / 1000).toFixed(2)}L
                   </span>
-                  <span className="text-[10.5px] text-light font-medium">/ 2.5L</span>
+                  <span className="font-sans text-[13px] text-medium font-medium">/ 2.5L</span>
                 </div>
                 <div className="w-full bg-border/60 rounded-full h-1.5 mt-1.5 overflow-hidden">
                   <div
@@ -403,11 +403,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               </>
             ) : isInteractiveKicks ? (
               <>
-                <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {latestKicks}
                   </span>
-                  <span className="text-[10.5px] text-medium font-medium">/ 10 kicks</span>
+                  <span className="font-sans text-[13px] text-medium font-medium">/ 10 kicks</span>
                 </div>
                 <p className="text-[10px] text-light mt-0.5 truncate">
                   {latestKicks >= 10 ? 'Goal met today! ✨' : 'Target: 10 kicks'}
@@ -415,11 +415,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
               </>
             ) : isInteractiveVitals ? (
               <>
-                <div className="flex items-baseline gap-1 mt-0.5">
-                  <span className="font-sans font-bold text-charcoal text-[18px] leading-tight tracking-tight">
+                <div className="flex items-baseline gap-1.5 mt-0.5">
+                  <span className="font-sans font-bold text-charcoal text-[15px] sm:text-[16px] leading-tight tracking-tight">
                     {latestBp}
                   </span>
-                  <span className="text-[10px] text-light font-semibold">mmHg</span>
+                  <span className="font-sans text-[13px] text-medium font-medium">mmHg</span>
                 </div>
                 <p className="text-[10px] text-light mt-0.5 truncate">
                   Pulse: {latestPulse} bpm
@@ -769,79 +769,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </div>
       </div>
 
-      {/* 4. Side-by-Side Bento Vitals Grid (Blood Pressure & Kicks) */}
-      <div className="grid grid-cols-2 gap-3">
-        {/* Left Bento: Blood Pressure & Heart Rate */}
-        <div
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('vitals');
-          }}
-          className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[148px]"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center">
-                <Heart size={17} />
-              </div>
-              <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-full border ${bpStatus.color}`}>
-                {bpStatus.label}
-              </span>
-            </div>
-            <p className="text-[11.5px] font-semibold text-medium">Blood Pressure</p>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="font-sans font-bold text-charcoal text-[20px] leading-tight tracking-tight">
-                {latestBp}
-              </span>
-              <span className="text-[10.5px] text-light font-semibold">mmHg</span>
-            </div>
-          </div>
-
-          <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center justify-between text-[11px] text-medium h-8">
-            <span>Pulse</span>
-            <span className="font-bold text-charcoal">{latestPulse} bpm</span>
-          </div>
-        </div>
-
-        {/* Right Bento: Fetal Kick Counter with 1-Tap Micro Action */}
-        <div
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('kickcounter');
-          }}
-          className="bg-white border border-border/80 rounded-2xl p-3 xs:p-3.5 shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer flex flex-col justify-between min-h-[148px]"
-        >
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center">
-                <Footprints size={17} />
-              </div>
-              <span className="text-[9.5px] font-bold text-sage-dark bg-sage-pale border border-sage/20 px-2 py-0.5 rounded-full">
-                {latestKicks >= 10 ? 'GOAL MET' : 'ACTIVE'}
-              </span>
-            </div>
-            <p className="text-[11.5px] font-semibold text-medium">Fetal Kicks</p>
-            <div className="flex items-baseline gap-1 mt-0.5">
-              <span className="font-sans font-bold text-charcoal text-[20px] leading-tight tracking-tight">
-                {latestKicks}
-              </span>
-              <span className="text-[11px] text-medium font-medium">/ 10 today</span>
-            </div>
-          </div>
-
-          {/* Micro 1-Tap Quick Log Button (Unified matching Mood & Energy) */}
-          <button
-            type="button"
-            onClick={handleQuickKick}
-            className="mt-2.5 w-full h-8 py-1 bg-cream hover:bg-sage-pale/60 text-charcoal border border-border/80 text-[11px] font-semibold rounded-xl active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
-          >
-            <Plus size={12} strokeWidth={2.5} className="text-medium" />
-            <span>+1 Kick</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 5. Dynamic Daily Health Rituals from Explore & Customization */}
+      {/* 4. Dynamic Daily Health Rituals from Explore & Customization */}
       <div>
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-1.5">
