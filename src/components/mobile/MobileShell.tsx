@@ -465,7 +465,7 @@ export const MobileShell: React.FC = () => {
             className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-4 pb-28 max-w-lg mx-auto w-full custom-scrollbar"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <Profile isMobileModal={true} />
+            <Profile isMobileModal={true} onClose={() => setShowProfileModal(false)} />
           </div>
         </div>
       )}
