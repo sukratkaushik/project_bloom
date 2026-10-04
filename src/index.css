@@ -38,6 +38,12 @@
   --color-optional: #F4A261;
   --color-optional-bg: #fcf1e8;
 
+  /* Terracotta & Peach accents */
+  --color-terracotta: #C85A32;
+  --color-terracotta-dark: #A24220;
+  --color-terracotta-pale: #FDF3EE;
+  --color-peach: #FAD4C0;
+
   --font-serif: 'Playfair Display', Georgia, serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
