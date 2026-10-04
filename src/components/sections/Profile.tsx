@@ -1093,6 +1093,10 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
           </div>
         </section>
 
+        <p className="text-center text-[11px] text-light pt-2 pb-4 notranslate">
+          Our Pregnancy v1.0.1 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
+        </p>
+
       </div>
 
       {showComplianceModal && (
