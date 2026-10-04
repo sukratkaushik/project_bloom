@@ -564,8 +564,14 @@ export const MobileShell: React.FC = () => {
 
       {/* Add Rituals Sheet */}
       {showAddRitualsModal && (
-        <div className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-end justify-center animate-in fade-in duration-200">
-          <div className="bg-white rounded-t-3xl p-5 w-full max-w-lg shadow-2xl relative max-h-[75vh] flex flex-col">
+        <div 
+          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-end justify-center animate-in fade-in duration-200"
+          onClick={() => setShowAddRitualsModal(false)}
+        >
+          <div 
+            className="bg-white rounded-t-3xl p-5 pb-[max(2.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] w-full max-w-lg shadow-2xl relative max-h-[82vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="w-12 h-1 bg-border rounded-full mx-auto mb-3 shrink-0" />
             <div className="flex items-center justify-between mb-2 shrink-0">
               <div className="flex items-center gap-2">
@@ -577,8 +583,10 @@ export const MobileShell: React.FC = () => {
                 </span>
               </div>
               <button
+                type="button"
                 onClick={() => setShowAddRitualsModal(false)}
                 className="p-1.5 text-medium hover:text-charcoal rounded-full cursor-pointer"
+                aria-label="Close"
               >
                 <X size={18} />
               </button>
@@ -646,13 +654,19 @@ export const MobileShell: React.FC = () => {
               })}
             </div>
 
-            <button
-              type="button"
-              onClick={() => setShowAddRitualsModal(false)}
-              className="mt-3.5 w-full py-2.5 bg-sage-dark text-white font-bold text-[13px] rounded-xl shadow-xs hover:bg-sage transition-colors cursor-pointer shrink-0"
-            >
-              Done
-            </button>
+            <div className="pt-3 shrink-0">
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setShowAddRitualsModal(false);
+                }}
+                className="w-full py-3 bg-sage-dark text-white font-bold text-[14px] rounded-xl shadow-xs hover:bg-sage active:scale-[0.98] transition-all cursor-pointer flex items-center justify-center gap-1.5"
+              >
+                <Check size={16} />
+                <span>Done</span>
+              </button>
+            </div>
           </div>
         </div>
       )}

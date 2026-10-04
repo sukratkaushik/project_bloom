@@ -1094,7 +1094,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
         </section>
 
         <p className="text-center text-[11px] text-light pt-2 pb-4 notranslate">
-          Our Pregnancy v1.0.2 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
+          Our Pregnancy v1.0.3 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
         </p>
 
       </div>

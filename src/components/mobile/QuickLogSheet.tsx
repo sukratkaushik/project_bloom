@@ -86,7 +86,7 @@ export const QuickLogSheet: React.FC<QuickLogSheetProps> = ({
       <div className="absolute inset-0" onClick={onClose} />
 
       {/* Sheet Content */}
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl border-t border-border shadow-2xl p-4 xs:p-5 pb-[max(1.5rem,env(safe-area-inset-bottom))] z-10 animate-in slide-in-from-bottom duration-250">
+      <div className="relative w-full max-w-lg bg-white rounded-t-3xl border-t border-border shadow-2xl p-4 xs:p-5 pb-[max(2.5rem,calc(env(safe-area-inset-bottom,0px)+1.5rem))] z-10 animate-in slide-in-from-bottom duration-250">
         {/* Drag handle pill */}
         <div className="w-12 h-1.5 bg-border rounded-full mx-auto mb-3" />
 

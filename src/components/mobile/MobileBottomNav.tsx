@@ -19,7 +19,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onS
   ];
 
   return (
-    <nav className="w-full bg-white/95 backdrop-blur-md border-t border-border/80 px-2 pb-[max(0.6rem,env(safe-area-inset-bottom))] pt-2 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
+    <nav className="w-full bg-white/95 backdrop-blur-md border-t border-border/80 px-2 pb-[max(0.75rem,calc(env(safe-area-inset-bottom,0px)+0.25rem))] pt-2 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]">
       <div className="flex items-center justify-around max-w-lg mx-auto">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
