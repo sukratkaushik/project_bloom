@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { ArrowLeft, Linkedin, Sparkles, Shield, Heart, Wifi, Lock } from 'lucide-react';
 import { usePlanner } from '../store';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { PublicHeader } from '../components/PublicHeader';
 import { navigate } from '../utils/navigation';
 

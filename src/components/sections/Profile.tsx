@@ -8,10 +8,12 @@ import {
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
-  Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle, LogOut
+  Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle, LogOut,
+  Languages, X
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
 import { PartnerModal } from '../mobile/PartnerModal';
@@ -39,6 +41,22 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  // App Language state
+  const [activeLanguage, setActiveLanguage] = useState<string>(() => getActiveLanguage());
+  const [showLanguageModal, setShowLanguageModal] = useState(false);
+  const [isChangingLanguage, setIsChangingLanguage] = useState(false);
+
+  useEffect(() => {
+    const handleLangChange = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.langCode) {
+        setActiveLanguage(detail.langCode);
+      }
+    };
+    window.addEventListener('app_language_changed', handleLangChange);
+    return () => window.removeEventListener('app_language_changed', handleLangChange);
+  }, []);
 
   // Logout state
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
@@ -764,6 +782,32 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 </button>
               </div>
             </div>
+
+            {/* App Language / भाषा */}
+            <div className="flex items-center justify-between gap-3 p-3.5 bg-cream/40 rounded-2xl border border-border/70 notranslate">
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold text-charcoal text-[13.5px] sm:text-sm flex items-center gap-2">
+                  <Languages className="w-4 h-4 text-sage shrink-0" />
+                  <span>App Language / भाषा</span>
+                </h4>
+                <p className="text-medium text-[11.5px] sm:text-xs mt-0.5 leading-snug">
+                  Choose your permanent language for the entire app
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setShowLanguageModal(true);
+                }}
+                className="px-3 py-1.5 bg-white border border-border/80 hover:border-sage rounded-xl text-xs font-bold text-charcoal hover:text-sage-dark flex items-center gap-1.5 transition-all shadow-2xs shrink-0 cursor-pointer notranslate"
+              >
+                <span className="text-[13px] font-bold text-sage">
+                  {SUPPORTED_LANGUAGES.find(l => l.code === activeLanguage)?.native || 'English'}
+                </span>
+                <ChevronRight size={14} className="text-medium" />
+              </button>
+            </div>
           </div>
         </section>
 
@@ -1094,7 +1138,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
         </section>
 
         <p className="text-center text-[11px] text-light pt-2 pb-4 notranslate">
-          Our Pregnancy v1.0.3 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
+          Our Pregnancy v1.0.4 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
         </p>
 
       </div>
@@ -1309,6 +1353,93 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
           setTimeout(() => setToastMessage(null), 3000);
         }}
       />
+
+      {/* App Language Selection Modal */}
+      {showLanguageModal && (
+        <div 
+          className="fixed inset-0 bg-charcoal/50 backdrop-blur-sm z-[110] flex items-center justify-center p-3.5 xs:p-4 animate-in fade-in duration-200"
+          onClick={() => {
+            if (!isChangingLanguage) setShowLanguageModal(false);
+          }}
+        >
+          <div 
+            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative max-h-[85vh] flex flex-col overflow-hidden notranslate border border-border"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              type="button"
+              disabled={isChangingLanguage}
+              onClick={() => setShowLanguageModal(false)}
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer notranslate disabled:opacity-40"
+              aria-label="Close"
+            >
+              <X size={20} />
+            </button>
+            <div className="mb-3.5 pr-8">
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-full bg-sage-pale flex items-center justify-center text-sage">
+                  <Languages size={15} />
+                </div>
+                <h3 className="font-serif font-bold text-charcoal text-[18px] notranslate">
+                  App Language / भाषा
+                </h3>
+              </div>
+              <p className="text-[11.5px] text-medium mt-1 notranslate leading-relaxed">
+                Select your default language. The app will persist your choice and adapt completely.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2 text-[13px] font-semibold overflow-y-auto max-h-[50vh] pr-1 py-1 custom-scrollbar notranslate">
+              {SUPPORTED_LANGUAGES.map((lang) => {
+                const isSelected = activeLanguage === lang.code;
+                return (
+                  <button
+                    key={lang.code}
+                    type="button"
+                    disabled={isChangingLanguage}
+                    onClick={() => {
+                      if (isChangingLanguage) return;
+                      triggerHaptic('medium');
+                      setIsChangingLanguage(true);
+                      setActiveLanguage(lang.code);
+                      setToastMessage(`Setting language to ${lang.name}...`);
+                      
+                      // Apply language change and trigger smooth reload for full-page translation
+                      changeLanguage(lang.code, true);
+                    }}
+                    className={`p-2.5 xs:p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 relative ${
+                      isSelected
+                        ? 'bg-sage-pale/60 border-sage text-sage-dark shadow-2xs ring-1 ring-sage'
+                        : 'bg-cream/60 hover:bg-cream border-border/80 text-charcoal hover:border-sage-light active:scale-[0.98]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between w-full">
+                      <span className="font-bold text-[13.5px] leading-tight notranslate">
+                        {lang.native}
+                      </span>
+                      {isSelected && (
+                        <div className="w-4.5 h-4.5 rounded-full bg-sage text-white flex items-center justify-center shrink-0">
+                          <Check size={11} strokeWidth={3} />
+                        </div>
+                      )}
+                    </div>
+                    <span className="text-[11px] font-medium opacity-65 notranslate">
+                      {lang.label}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {isChangingLanguage && (
+              <div className="mt-3 py-2 px-3 bg-sage-pale/60 rounded-xl flex items-center justify-center gap-2 text-sage-dark text-xs font-semibold animate-pulse">
+                <Loader2 size={14} className="animate-spin" />
+                <span>Applying language preference...</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">

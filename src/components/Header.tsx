@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
-import { LanguageSelector } from './LanguageSelector';
 import { navigate } from '../utils/navigation';
 import { auth } from '../firebase';
 
@@ -79,7 +78,6 @@ export const Header: React.FC<HeaderProps> = ({
               <a href="/careers" onClick={(e) => { e.preventDefault(); navigate('/careers'); }} className="px-4 py-2.5 text-[13px] font-semibold text-charcoal/80 hover:text-sage hover:bg-sage-pale/40 transition-colors text-left">Careers</a>
             </div>
           </div>
-          <LanguageSelector />
 
           {!currentUser ? (
             <button

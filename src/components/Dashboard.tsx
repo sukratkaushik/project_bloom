@@ -36,7 +36,6 @@ import { AdminPanel } from './sections/AdminPanel';
 
 import { Profile } from './sections/Profile';
 import { FloatingChatbot } from './FloatingChatbot';
-import { LanguageSelector } from './LanguageSelector';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { MedicalReports } from './sections/MedicalReports';

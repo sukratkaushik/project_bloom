@@ -6,20 +6,16 @@ import { auth } from '../../firebase';
 
 interface MobileTopBarProps {
   onOpenProfile: () => void;
-  onOpenLanguage: () => void;
   onOpenSos: () => void;
   onOpenPricing: () => void;
   onOpenQuickLog?: () => void;
-  currentLanguage?: string;
 }
 
 export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   onOpenProfile,
-  onOpenLanguage,
   onOpenSos,
   onOpenPricing,
   onOpenQuickLog,
-  currentLanguage = 'en',
 }) => {
   const { state } = usePlanner();
   const isNative = isNativeApp();
@@ -83,22 +79,6 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
               <span className="hidden sm:inline">Log</span>
             </button>
           )}
-
-          {/* Language Selector Trigger */}
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenLanguage();
-            }}
-            className="h-7 px-1.5 sm:px-2 flex items-center gap-0.5 bg-white border border-border/90 rounded-full text-[10px] sm:text-[11px] font-semibold text-charcoal hover:bg-sage-pale/40 transition-all shadow-2xs shrink-0 active:scale-95 notranslate"
-            aria-label="Select Language"
-          >
-            <span className="text-[11px] leading-none">🇮🇳</span>
-            <span className="text-[9.5px] xs:text-[10px] font-bold text-sage-dark uppercase notranslate">
-              {currentLanguage}
-            </span>
-          </button>
 
           {/* 108 SOS Emergency Button */}
           <button

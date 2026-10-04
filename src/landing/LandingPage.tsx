@@ -33,7 +33,6 @@ import {
   FileText
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
-import { LanguageSelector } from '../components/LanguageSelector';
 import { PublicHeader } from '../components/PublicHeader';
 import { isNativeApp } from '../utils/nativeBridge';
 

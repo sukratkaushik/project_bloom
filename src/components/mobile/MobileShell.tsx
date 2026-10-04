@@ -14,7 +14,7 @@ import { usePlanner } from '../../store';
 import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
 import { ALL_PREGNANCY_TOOLS } from './toolsData';
-import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
+
 
 // Import existing Section tools
 import { KickCounter } from '../sections/KickCounter';
@@ -65,7 +65,6 @@ export const MobileShell: React.FC = () => {
 
   // Modals
   const [showProfileModal, setShowProfileModal] = useState(false);
-  const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [showSosModal, setShowSosModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showAddRitualsModal, setShowAddRitualsModal] = useState(false);
@@ -177,31 +176,15 @@ export const MobileShell: React.FC = () => {
     }
   };
 
-  // Language state
-  const [activeLanguage, setActiveLanguage] = useState<string>(() => getActiveLanguage());
-
-  useEffect(() => {
-    const handleLangChange = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      if (detail?.langCode) {
-        setActiveLanguage(detail.langCode);
-      }
-    };
-    window.addEventListener('app_language_changed', handleLangChange);
-    return () => window.removeEventListener('app_language_changed', handleLangChange);
-  }, []);
-
   return (
     <div className="fixed inset-0 h-screen h-[100dvh] max-h-[100dvh] w-full bg-cream text-charcoal flex flex-col overflow-hidden select-none antialiased selection:bg-sage/20 selection:text-sage-dark">
       {/* 1. Mobile Top Bar (Strictly Fixed at Top, never moves during scroll) */}
       <div className="shrink-0 z-40 w-full bg-[#FDFBF7]">
         <MobileTopBar
           onOpenProfile={() => setShowProfileModal(true)}
-          onOpenLanguage={() => setShowLanguageModal(true)}
           onOpenSos={() => setShowSosModal(true)}
           onOpenPricing={() => setShowPricingModal(true)}
           onOpenQuickLog={() => setShowQuickLogSheet(true)}
-          currentLanguage={activeLanguage}
         />
       </div>
 
@@ -359,72 +342,7 @@ export const MobileShell: React.FC = () => {
         </div>
       )}
 
-      {/* Language Selector Modal */}
-      {showLanguageModal && (
-        <div 
-          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-3.5 xs:p-4 animate-in fade-in duration-200"
-          onClick={() => setShowLanguageModal(false)}
-        >
-          <div 
-            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative max-h-[85vh] flex flex-col overflow-hidden notranslate"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setShowLanguageModal(false)}
-              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer notranslate"
-              aria-label="Close"
-            >
-              <X size={20} />
-            </button>
-            <div className="mb-3">
-              <h3 className="font-serif font-bold text-charcoal text-[18px] notranslate">
-                Choose Language
-              </h3>
-              <p className="text-[11.5px] text-medium mt-0.5 notranslate">
-                Select your preferred language. The app adapts instantly.
-              </p>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-[13px] font-semibold overflow-y-auto max-h-[55vh] pr-1 py-1 custom-scrollbar notranslate">
-              {SUPPORTED_LANGUAGES.map((lang) => {
-                const isSelected = activeLanguage === lang.code;
-                return (
-                  <button
-                    key={lang.code}
-                    type="button"
-                    onClick={() => {
-                      triggerHaptic('light');
-                      setActiveLanguage(lang.code);
-                      setShowLanguageModal(false);
-                      showToast(`Language set to ${lang.name}`);
-                      changeLanguage(lang.code);
-                    }}
-                    className={`p-2.5 xs:p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 relative ${
-                      isSelected
-                        ? 'bg-sage-pale/60 border-sage text-sage-dark shadow-2xs ring-1 ring-sage'
-                        : 'bg-cream/60 hover:bg-cream border-border/80 text-charcoal hover:border-sage-light active:scale-[0.98]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="font-bold text-[13.5px] leading-tight notranslate">
-                        {lang.native}
-                      </span>
-                      {isSelected && (
-                        <div className="w-4.5 h-4.5 rounded-full bg-sage text-white flex items-center justify-center shrink-0">
-                          <Check size={11} strokeWidth={3} />
-                        </div>
-                      )}
-                    </div>
-                    <span className="text-[11px] font-medium opacity-65 notranslate">
-                      {lang.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Profile & Settings Screen (Full-Screen Native View) */}
       {showProfileModal && (

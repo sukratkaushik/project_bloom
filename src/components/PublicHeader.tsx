@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
-import { LanguageSelector } from './LanguageSelector';
 import { auth } from '../firebase';
 import { Loader2 } from 'lucide-react';
 import { isNativeApp } from '../utils/nativeBridge';
@@ -92,7 +91,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
           </div>
 
           <div className="flex flex-nowrap justify-end items-center gap-1 sm:gap-2 md:gap-4">
-            <LanguageSelector />
             <button
               onClick={toggleDarkMode}
               className="p-1.5 sm:p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center"

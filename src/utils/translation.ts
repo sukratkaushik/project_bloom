@@ -72,9 +72,10 @@ export function getActiveLanguage(): string {
 
 /**
  * Triggers Google Translate translation to the requested language code.
- * Handles DOM select manipulation, cookie persistence, and fallbacks.
+ * Handles DOM select manipulation, cookie persistence, and optional clean reload
+ * to ensure all React component text nodes are 100% translated.
  */
-export function changeLanguage(langCode: string): boolean {
+export function changeLanguage(langCode: string, reload: boolean = true): boolean {
   try {
     localStorage.setItem(STORAGE_KEY, langCode);
   } catch (e) {}
@@ -101,16 +102,16 @@ export function changeLanguage(langCode: string): boolean {
     select.value = langCode === 'en' ? '' : langCode;
     select.dispatchEvent(new Event('change', { bubbles: true }));
     
-    // Also dispatch on document for custom listeners
+    // Also dispatch on window for custom listeners
     window.dispatchEvent(new CustomEvent('app_language_changed', { detail: { langCode } }));
-    return true;
   }
 
-  // 4. If Google Translate combo isn't yet in DOM (e.g. still initializing),
-  // a soft reload will boot Google Translate with the newly saved googtrans cookie
-  setTimeout(() => {
-    window.location.reload();
-  }, 100);
+  // 4. Reload if requested to ensure complete translation of all deeply-nested DOM/React components
+  if (reload) {
+    setTimeout(() => {
+      window.location.reload();
+    }, 250);
+  }
 
-  return false;
+  return true;
 }
