@@ -6,7 +6,7 @@ import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
 import { 
   User, Settings, FileText, Weight, Calendar, Cloud, ShieldCheck, 
-  Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
+  Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, ScanFace,
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
   Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle, LogOut,
   Languages, X, Download
@@ -23,7 +23,10 @@ import {
   setBiometricLockEnabled, 
   checkBiometricSupport, 
   authenticateWithBiometrics, 
-  BiometricStatus 
+  BiometricStatus,
+  BiometricMode,
+  getPreferredBiometricMode,
+  setPreferredBiometricMode
 } from '../../utils/biometricService';
 
 interface ProfileProps {
@@ -217,10 +220,26 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
 
   const [isBiometricEnabled, setIsBiometricEnabled] = useState(isBiometricLockEnabled());
   const [biometricInfo, setBiometricInfo] = useState<BiometricStatus | null>(null);
+  const [preferredBiometricMode, setPreferredBiometricModeState] = useState<BiometricMode>(getPreferredBiometricMode());
+  const isAppleDevice = typeof navigator !== 'undefined' && /iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent);
 
   useEffect(() => {
     checkBiometricSupport().then(setBiometricInfo);
   }, []);
+
+  const handleSelectBiometricMode = (mode: BiometricMode) => {
+    triggerHaptic('light');
+    setPreferredBiometricMode(mode);
+    setPreferredBiometricModeState(mode);
+    checkBiometricSupport().then(setBiometricInfo);
+    const modeName = mode === 'face'
+      ? (isAppleDevice ? 'Face ID' : 'Face Unlock')
+      : mode === 'fingerprint'
+      ? (isAppleDevice ? 'Touch ID' : 'Fingerprint')
+      : 'Auto (Face & Fingerprint)';
+    setToastMessage(`Biometric mode set to ${modeName}`);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   const handleToggleBiometric = async (enable: boolean) => {
     if (enable) {
@@ -845,22 +864,30 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
             </div>
 
             {/* Biometric Maternal Privacy Shield */}
-            <div id="biometric-lock-setting" className="p-3.5 bg-sage-pale/40 rounded-2xl border border-sage/30">
+            <div id="biometric-lock-setting" className="p-4 bg-sage-pale/40 rounded-2xl border border-sage/30 space-y-3">
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-7 h-7 rounded-lg bg-sage text-white flex items-center justify-center shrink-0 shadow-2xs">
-                    <Fingerprint className="w-4 h-4" />
+                  <div className="w-8 h-8 rounded-xl bg-sage text-white flex items-center justify-center shrink-0 shadow-2xs">
+                    {preferredBiometricMode === 'face' ? (
+                      <ScanFace className="w-4.5 h-4.5" />
+                    ) : preferredBiometricMode === 'fingerprint' ? (
+                      <Fingerprint className="w-4.5 h-4.5" />
+                    ) : (
+                      <ShieldCheck className="w-4.5 h-4.5" />
+                    )}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 flex-wrap">
                       <h4 className="font-semibold text-charcoal text-[13.5px] sm:text-sm truncate">
                         Biometric App Lock
                       </h4>
-                      {biometricInfo?.isSupported && (
-                        <span className="text-[9px] font-bold uppercase tracking-wider bg-white/90 border border-sage/30 text-sage-dark px-1.5 py-0.2 rounded-full whitespace-nowrap">
-                          {biometricInfo.label}
-                        </span>
-                      )}
+                      <span className="text-[9.5px] font-bold uppercase tracking-wider bg-white/95 border border-sage/30 text-sage-dark px-2 py-0.5 rounded-full whitespace-nowrap shadow-3xs">
+                        {preferredBiometricMode === 'face'
+                          ? (isAppleDevice ? 'Face ID' : 'Face Unlock')
+                          : preferredBiometricMode === 'fingerprint'
+                          ? (isAppleDevice ? 'Touch ID' : 'Fingerprint')
+                          : 'Face ID & Fingerprint'}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -874,9 +901,66 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-sage"></div>
                 </label>
               </div>
-              <p className="text-medium text-[11.5px] sm:text-xs mt-2 leading-relaxed">
-                Lock maternal vitals and medical logs behind hardware-backed {biometricInfo?.label || 'Fingerprint'}. Requires authentication on launch and after 1 minute of inactivity.
+
+              <p className="text-medium text-[11.5px] sm:text-xs leading-relaxed">
+                {preferredBiometricMode === 'face'
+                  ? `Lock maternal vitals and medical logs behind hardware-backed ${isAppleDevice ? 'Face ID' : 'Face Unlock'}. Requires authentication on launch and after 1 minute of inactivity.`
+                  : preferredBiometricMode === 'fingerprint'
+                  ? `Lock maternal vitals and medical logs behind hardware-backed ${isAppleDevice ? 'Touch ID' : 'Fingerprint'}. Requires authentication on launch and after 1 minute of inactivity.`
+                  : `Lock maternal vitals and medical logs behind hardware-backed Face Unlock, Fingerprint, or PIN. Requires authentication on launch and after 1 minute of inactivity.`}
               </p>
+
+              {/* Preferred Authentication Method Selector (PhonePe style) */}
+              <div className="pt-2.5 border-t border-sage/20 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal/70">
+                    Preferred Authentication Method
+                  </span>
+                  <span className="text-[10px] text-sage-dark font-medium bg-white/80 px-2 py-0.5 rounded-full border border-sage/25">
+                    PhonePe / Banking Grade
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-1.5 p-1 bg-white/80 rounded-xl border border-sage/20">
+                  <button
+                    type="button"
+                    onClick={() => handleSelectBiometricMode('auto')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] sm:text-[11.5px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                      preferredBiometricMode === 'auto'
+                        ? 'bg-sage text-white shadow-2xs'
+                        : 'text-charcoal/70 hover:bg-sage-pale/60 hover:text-charcoal'
+                    }`}
+                  >
+                    <ShieldCheck size={12} />
+                    <span>Auto / Both</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectBiometricMode('face')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] sm:text-[11.5px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                      preferredBiometricMode === 'face'
+                        ? 'bg-sage text-white shadow-2xs'
+                        : 'text-charcoal/70 hover:bg-sage-pale/60 hover:text-charcoal'
+                    }`}
+                  >
+                    <ScanFace size={12} />
+                    <span>Face {isAppleDevice ? 'ID' : 'Unlock'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectBiometricMode('fingerprint')}
+                    className={`py-1.5 px-2 rounded-lg text-[11px] sm:text-[11.5px] font-bold transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-95 ${
+                      preferredBiometricMode === 'fingerprint'
+                        ? 'bg-sage text-white shadow-2xs'
+                        : 'text-charcoal/70 hover:bg-sage-pale/60 hover:text-charcoal'
+                    }`}
+                  >
+                    <Fingerprint size={12} />
+                    <span>Fingerprint</span>
+                  </button>
+                </div>
+              </div>
             </div>
 
             <div className="p-3.5 bg-cream/30 rounded-2xl border border-border/70">

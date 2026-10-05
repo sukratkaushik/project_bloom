@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Fingerprint, Lock, ShieldCheck, ArrowRight, RefreshCw } from 'lucide-react';
+import { Fingerprint, ScanFace, Lock, ShieldCheck, ArrowRight, RefreshCw } from 'lucide-react';
 import { authenticateWithBiometrics, checkBiometricSupport, BiometricStatus } from '../utils/biometricService';
 
 interface BiometricSecurityOverlayProps {
@@ -45,6 +45,8 @@ export const BiometricSecurityOverlay: React.FC<BiometricSecurityOverlayProps> =
 
   if (!isLocked) return null;
 
+  const mode = bioStatus?.preferredMode || 'auto';
+
   return (
     <div className="fixed inset-0 z-[99999] bg-[#FAF8F5] flex flex-col items-center justify-between p-8 text-center animate-in fade-in duration-300">
       {/* Top branding */}
@@ -61,16 +63,27 @@ export const BiometricSecurityOverlay: React.FC<BiometricSecurityOverlayProps> =
         <div 
           onClick={triggerAuth}
           className="relative w-28 h-28 rounded-full bg-white shadow-xl border border-sage/20 flex items-center justify-center cursor-pointer active:scale-95 transition-transform hover:shadow-2xl"
+          title="Tap to authenticate"
         >
           <div className="absolute inset-0 bg-sage-light/20 rounded-full animate-ping opacity-30" style={{ animationDuration: '3s' }} />
-          <Fingerprint className="w-14 h-14 text-sage stroke-[1.5]" />
+          {mode === 'face' ? (
+            <ScanFace className="w-14 h-14 text-sage stroke-[1.5]" />
+          ) : mode === 'fingerprint' ? (
+            <Fingerprint className="w-14 h-14 text-sage stroke-[1.5]" />
+          ) : (
+            <ShieldCheck className="w-14 h-14 text-sage stroke-[1.5]" />
+          )}
         </div>
 
         <h2 className="font-serif text-xl text-charcoal font-bold mt-6">
           App Locked
         </h2>
         <p className="text-[14px] text-charcoal/70 mt-2 leading-relaxed">
-          Your pregnancy vitals and health records are protected by hardware-backed biometrics.
+          {mode === 'face'
+            ? 'Your pregnancy vitals and health records are protected by Face ID / Face Unlock.'
+            : mode === 'fingerprint'
+            ? 'Your pregnancy vitals and health records are protected by Fingerprint biometric lock.'
+            : 'Your pregnancy vitals and health records are protected by hardware-backed biometrics & device credentials.'}
         </p>
 
         {errorMessage && (
@@ -92,7 +105,13 @@ export const BiometricSecurityOverlay: React.FC<BiometricSecurityOverlayProps> =
             <RefreshCw className="w-5 h-5 animate-spin" />
           ) : (
             <>
-              <Fingerprint className="w-5 h-5" />
+              {mode === 'face' ? (
+                <ScanFace className="w-5 h-5" />
+              ) : mode === 'fingerprint' ? (
+                <Fingerprint className="w-5 h-5" />
+              ) : (
+                <ShieldCheck className="w-5 h-5" />
+              )}
               <span>Unlock with {bioStatus?.label || 'Biometrics / PIN'}</span>
               <ArrowRight className="w-4 h-4" />
             </>
@@ -100,7 +119,7 @@ export const BiometricSecurityOverlay: React.FC<BiometricSecurityOverlayProps> =
         </button>
 
         <p className="text-[11px] text-charcoal/50">
-          Supports Fingerprint, Face Unlock & Device PIN fallback
+          Supports Face Unlock, Fingerprint & Device PIN fallback
         </p>
       </div>
     </div>
