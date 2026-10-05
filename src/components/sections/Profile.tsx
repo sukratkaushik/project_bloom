@@ -274,32 +274,9 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
           
           <div className="space-y-4">
             <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70">
-                  Email Address
-                </label>
-                {auth.currentUser ? (
-                  <button
-                    type="button"
-                    onClick={() => setShowLogoutConfirm(true)}
-                    className="flex items-center gap-1.5 text-[11.5px] font-semibold text-rose-600 hover:text-rose-700 bg-rose-50 hover:bg-rose-100/80 border border-rose-200/80 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer active:scale-95 shadow-3xs"
-                    title="Log Out of this account"
-                  >
-                    <LogOut size={12} strokeWidth={2} />
-                    <span>Log Out</span>
-                  </button>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => setShowLogoutConfirm(true)}
-                    className="flex items-center gap-1.5 text-[11.5px] font-semibold text-charcoal hover:text-sage-dark bg-cream hover:bg-sage-pale/60 border border-border/80 px-2.5 py-0.5 rounded-lg transition-all cursor-pointer active:scale-95 shadow-3xs"
-                    title="Exit guest mode and log in"
-                  >
-                    <LogOut size={12} strokeWidth={2} className="text-medium" />
-                    <span>Exit to Login</span>
-                  </button>
-                )}
-              </div>
+              <label className="block text-[11px] sm:text-[12px] font-bold tracking-wider uppercase text-charcoal/70 mb-1.5">
+                Email Address
+              </label>
               <div className="p-3 bg-cream/40 border border-border/80 rounded-xl text-[13px] text-charcoal/80 font-medium truncate flex items-center justify-between">
                 <span className="truncate mr-2">{auth.currentUser?.email || 'Not signed in (Guest Mode)'}</span>
                 {auth.currentUser ? (
