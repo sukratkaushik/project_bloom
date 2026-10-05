@@ -294,7 +294,7 @@ export const PartnerSync: React.FC = () => {
             ) : (
               <>
                 <Plus size={13} />
-                <span>Define Partner</span>
+                <span>Add Partner</span>
               </>
             )}
           </button>

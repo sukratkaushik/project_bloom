@@ -516,26 +516,19 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 <p className="text-medium text-xs sm:text-sm mt-0.5">Manage your OB-GYN, hospital, and emergency OPD line</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                setIsDoctorModalOpen(true);
-              }}
-              className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0"
-            >
-              {state.doctor?.name ? (
-                <>
-                  <Pencil size={13} />
-                  <span>Edit</span>
-                </>
-              ) : (
-                <>
-                  <Plus size={14} />
-                  <span>Add Doctor</span>
-                </>
-              )}
-            </button>
+            {state.doctor?.name && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsDoctorModalOpen(true);
+                }}
+                className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0 ml-2"
+              >
+                <Pencil size={13} />
+                <span>Edit</span>
+              </button>
+            )}
           </div>
 
           {state.doctor?.name ? (
@@ -592,30 +585,23 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 <Heart className="w-5 h-5 fill-blush/30" />
               </div>
               <div className="min-w-0">
-                <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight truncate">Partner & Support Person</h3>
-                <p className="text-medium text-xs sm:text-sm mt-0.5 truncate">Define your partner to assign tasks, share updates & sync</p>
+                <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight">Partner & Support Person</h3>
+                <p className="text-medium text-xs sm:text-sm mt-0.5">Assign tasks, share updates & sync in real time</p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                setIsPartnerModalOpen(true);
-              }}
-              className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0 ml-2"
-            >
-              {state.partner?.name ? (
-                <>
-                  <Pencil size={13} />
-                  <span>Edit</span>
-                </>
-              ) : (
-                <>
-                  <Plus size={14} />
-                  <span>Add Partner</span>
-                </>
-              )}
-            </button>
+            {state.partner?.name && (
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsPartnerModalOpen(true);
+                }}
+                className="text-[12px] sm:text-[13px] font-bold text-sage-dark hover:underline cursor-pointer flex items-center gap-1 shrink-0 ml-2"
+              >
+                <Pencil size={13} />
+                <span>Edit</span>
+              </button>
+            )}
           </div>
 
           {state.partner?.name ? (
@@ -686,7 +672,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
           ) : (
             <div className="p-4 bg-cream/30 border border-dashed border-border/80 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div>
-                <p className="font-medium text-[13px] text-charcoal">No partner or support person defined yet</p>
+                <p className="font-medium text-[13px] text-charcoal">No partner or support person added yet</p>
                 <p className="text-[11.5px] text-medium mt-0.5">
                   Add their name and phone to assign tasks, share milestone updates via WhatsApp, and sync in real time.
                 </p>
@@ -697,9 +683,9 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   triggerHaptic('light');
                   setIsPartnerModalOpen(true);
                 }}
-                className="px-3.5 py-1.5 bg-blush hover:opacity-90 text-white font-bold text-[12px] rounded-xl shadow-2xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
+                className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-bold text-[12.5px] rounded-xl shadow-2xs transition-all cursor-pointer whitespace-nowrap active:scale-95"
               >
-                + Define Partner
+                + Add Partner
               </button>
             </div>
           )}
