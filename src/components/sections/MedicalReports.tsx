@@ -28,6 +28,7 @@ import { functions } from '../../firebase';
 import { Paywall } from '../Paywall';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
+import { exportCarePlanPdf } from '../../utils/pdfExport';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -68,6 +69,18 @@ export const MedicalReports: React.FC = () => {
   const [previewReport, setPreviewReport] = useState<MedicalReport | null>(null);
   const [analyzingMap, setAnalyzingMap] = useState<Record<string, boolean>>({});
   const [analysisErrorMap, setAnalysisErrorMap] = useState<Record<string, string | null>>({});
+  const [isExportingCarePlan, setIsExportingCarePlan] = useState(false);
+
+  const handleExportCarePlan = async () => {
+    try {
+      setIsExportingCarePlan(true);
+      await exportCarePlanPdf(state);
+    } catch (e) {
+      console.error('Failed to export Care Plan PDF:', e);
+    } finally {
+      setIsExportingCarePlan(false);
+    }
+  };
 
   const loadReports = async () => {
     if (!state.activeJourneyId) return;
@@ -382,6 +395,16 @@ export const MedicalReports: React.FC = () => {
               <h3 className="text-[14px] font-bold text-charcoal uppercase tracking-[1px]">
                 My Stored Records ({reports.length})
               </h3>
+              <button
+                type="button"
+                onClick={handleExportCarePlan}
+                disabled={isExportingCarePlan}
+                className="px-3 py-1.5 bg-sage hover:bg-sage-dark text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                title="Export complete Care Plan PDF"
+              >
+                <Download size={13} />
+                <span>{isExportingCarePlan ? 'Generating...' : 'Export Care Plan (PDF)'}</span>
+              </button>
             </div>
 
             {reports.length === 0 ? (

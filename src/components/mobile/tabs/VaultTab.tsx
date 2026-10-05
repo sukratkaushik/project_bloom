@@ -7,6 +7,8 @@ import {
   FolderLock, Eye, Plus, Sparkles, Filter, Check
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
+import { usePlanner } from '../../../store';
+import { exportCarePlanPdf } from '../../../utils/pdfExport';
 
 interface VaultTabProps {
   onOpenTool: (toolId: string) => void;
@@ -25,6 +27,9 @@ interface SchemeItem {
 }
 
 export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) => {
+  const { state } = usePlanner();
+  const [isExporting, setIsExporting] = useState(false);
+
   // Segmented top toggle: Govt Schemes vs Medical Records
   const [activeSegment, setActiveSegment] = useState<'schemes' | 'records'>('schemes');
 
@@ -169,9 +174,23 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
     onOpenTool('medical-reports');
   };
 
-  const handleExportAbha = () => {
-    triggerHaptic('success');
-    onShowToast('🔒 ABHA Health Record export generated and encrypted (AES-256)');
+  const handleExportPdf = async () => {
+    try {
+      setIsExporting(true);
+      triggerHaptic('success');
+      onShowToast('📄 Generating Mother\'s Care Plan PDF...');
+      await exportCarePlanPdf(state);
+      onShowToast('✅ Care Plan PDF downloaded! Ready to print or share.');
+    } catch (err) {
+      console.error('Failed to export Care Plan PDF:', err);
+      onShowToast('❌ Could not generate PDF. Please try again.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportAbha = async () => {
+    await handleExportPdf();
   };
 
   return (
@@ -402,11 +421,12 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
               <button
                 type="button"
                 onClick={handleExportAbha}
+                disabled={isExporting}
                 className="h-8 px-2.5 rounded-xl bg-cream hover:bg-sage-pale text-charcoal text-[11px] font-bold flex items-center gap-1 border border-border/70 transition-colors cursor-pointer"
-                title="Export FHIR R4 Bundle"
+                title="Export Care Plan PDF & ABHA Bundle"
               >
-                <Share2 size={13} />
-                <span>Export</span>
+                <Download size={13} />
+                <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
               </button>
             </div>
 
@@ -415,6 +435,41 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
               <span className="font-mono font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-lg">
                 91-8421-9920-5512
               </span>
+            </div>
+          </div>
+
+          {/* Mother's Overall Clinical Health Report (PDF & Print) Banner */}
+          <div className="bg-gradient-to-br from-sage-pale/60 via-white to-cream border border-sage/40 rounded-3xl p-4 shadow-xs">
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-sage text-white flex items-center justify-center shrink-0 shadow-2xs">
+                  <FileText size={20} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="font-serif font-bold text-charcoal text-[15px] leading-tight truncate">
+                    Mother's Overall Health Report
+                  </h3>
+                  <span className="text-[11px] text-sage-dark font-medium mt-0.5 block truncate">
+                    Comprehensive clinical summary for OB-GYN & hospital
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-[11.5px] text-medium mt-2 leading-relaxed">
+              Export and print a complete report including gestational age, maternal vitals history (BP, glucose, weight), medical checklists, emergency contacts, and birth preferences.
+            </p>
+
+            <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center gap-2">
+              <button
+                type="button"
+                onClick={handleExportPdf}
+                disabled={isExporting}
+                className="w-full h-11 rounded-2xl bg-charcoal hover:bg-black text-white text-[12.5px] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99]"
+              >
+                <Download size={15} />
+                <span>{isExporting ? 'Generating Report...' : '📄 Export & Print Care Plan (PDF)'}</span>
+              </button>
             </div>
           </div>
 

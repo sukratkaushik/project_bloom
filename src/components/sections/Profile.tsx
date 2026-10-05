@@ -9,10 +9,11 @@ import {
   Trash2, AlertTriangle, Loader2, Sparkles, Fingerprint, 
   ChevronRight, Check, Lock, Stethoscope, BookOpen, Briefcase, HelpCircle,
   Pencil, Plus, MapPin, Phone, ArrowRight, Map, Heart, Users, MessageCircle, LogOut,
-  Languages, X
+  Languages, X, Download
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { exportCarePlanPdf } from '../../utils/pdfExport';
 import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
@@ -46,6 +47,26 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [activeLanguage, setActiveLanguage] = useState<string>(() => getActiveLanguage());
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
+
+  // PDF Export state
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportCarePlan = async () => {
+    try {
+      setIsExporting(true);
+      triggerHaptic('success');
+      setToastMessage('📄 Generating Care Plan PDF...');
+      await exportCarePlanPdf(state);
+      setToastMessage('✅ Care Plan PDF exported successfully!');
+      setTimeout(() => setToastMessage(null), 3500);
+    } catch (err) {
+      console.error('Failed to export Care Plan PDF:', err);
+      setToastMessage('❌ Could not generate PDF. Please try again.');
+      setTimeout(() => setToastMessage(null), 3500);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   useEffect(() => {
     const handleLangChange = (e: Event) => {
@@ -896,10 +917,23 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
             </div>
 
             <div className="p-3.5 bg-cream/30 rounded-2xl border border-border/70">
-              <h4 className="text-[11px] font-bold tracking-wider uppercase text-charcoal/70 mb-1">Retention Policy</h4>
-              <p className="text-medium text-[11.5px] sm:text-xs leading-relaxed">
-                Your pregnancy journey and health logs are safely preserved in your private cloud profile for as long as your account remains active. You can export a complete summary of your records as a PDF at any time, or permanently delete your account and erase all associated data whenever you wish using the Delete My Account option below.
-              </p>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div className="flex-1">
+                  <h4 className="text-[11px] font-bold tracking-wider uppercase text-charcoal/70 mb-1">Retention & Export Policy</h4>
+                  <p className="text-medium text-[11.5px] sm:text-xs leading-relaxed">
+                    Your pregnancy journey and health logs are safely preserved in your private cloud profile. You can export a complete clinical summary of your records as a PDF at any time, or permanently delete your account below.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleExportCarePlan}
+                  disabled={isExporting}
+                  className="px-3.5 py-2 bg-charcoal hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-center shadow-3xs flex items-center gap-1.5 active:scale-95 whitespace-nowrap"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span>{isExporting ? 'Generating...' : 'Export Care Plan (PDF)'}</span>
+                </button>
+              </div>
             </div>
 
             {/* Self-Service Account Deletion */}

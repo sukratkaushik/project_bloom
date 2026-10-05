@@ -3,10 +3,11 @@ import {
   Stethoscope, Phone, Calendar, Plus, CheckSquare, Square,
   Activity, Share2, AlertTriangle, ShieldCheck, Clock, FileText,
   Bell, RefreshCw, MessageCircle, ChevronRight, CheckCircle2,
-  CalendarCheck, MapPin, HeartPulse, Pencil, UserCheck
+  CalendarCheck, MapPin, HeartPulse, Pencil, UserCheck, Download
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
+import { exportCarePlanPdf } from '../../../utils/pdfExport';
 import { DoctorModal } from '../DoctorModal';
 
 interface CareTabProps {
@@ -116,10 +117,26 @@ export const CareTab: React.FC<CareTabProps> = ({
   const cleanPhoneForWa = doctor?.phone ? doctor.phone.replace(/[^\d]/g, '') : '';
   const doctorShortName = hasDoctor && doctor?.name ? doctor.name.split(',')[0].trim() : 'Obstetrician';
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExportCarePlan = async () => {
+    try {
+      setIsExporting(true);
+      triggerHaptic('success');
+      onShowToast('📄 Generating Clinical Care Plan PDF...');
+      await exportCarePlanPdf(state);
+      onShowToast('✅ Clinical Care Plan PDF downloaded! Ready to print or share.');
+    } catch (err) {
+      console.error('Failed to export Care Plan PDF:', err);
+      onShowToast('❌ Could not generate Care Plan PDF.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const handleShareFhir = () => {
     triggerHaptic('success');
-    const doctorLabel = hasDoctor && doctor?.name ? doctor.name : 'Primary Care Provider';
-    onShowToast(`📋 Generated FHIR R4 Clinical JSON bundle for ${doctorLabel}`);
+    handleExportCarePlan();
   };
 
   const filteredQuestions = prepQuestions.filter(
@@ -264,6 +281,19 @@ export const CareTab: React.FC<CareTabProps> = ({
             <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Allergy</span>
             <span className="font-bold text-emerald-700 text-[11px] truncate mt-0.5">NKDA</span>
           </div>
+        </div>
+
+        {/* 1-Tap Export & Print Doctor Report Button */}
+        <div className="mt-3 pt-2.5 border-t border-border/60">
+          <button
+            type="button"
+            onClick={handleExportCarePlan}
+            disabled={isExporting}
+            className="w-full h-10 rounded-2xl bg-cream hover:bg-sage-pale/60 border border-border/80 text-charcoal hover:text-sage-dark text-[11.5px] font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-[0.99] cursor-pointer"
+          >
+            <Download size={13} className="text-sage-dark" />
+            <span>{isExporting ? 'Generating Report...' : '📄 Export & Print Clinical Care Plan (PDF)'}</span>
+          </button>
         </div>
       </div>
 
