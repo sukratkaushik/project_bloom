@@ -140,17 +140,17 @@ When answering maternal questions:
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* 1. Maternal Sanctuary Hero Card */}
-      <div className="bg-gradient-to-br from-purple-500/10 via-white to-pink-500/10 border border-purple-200/80 rounded-3xl p-4 shadow-xs">
+      <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[9.5px] font-bold uppercase tracking-wider text-purple-700 bg-purple-100/90 px-2.5 py-0.5 rounded-full">
+          <span className="text-[9.5px] font-bold uppercase tracking-wider text-sage-dark bg-sage-pale/90 dark:bg-sage-dark/30 dark:text-sage-light px-2.5 py-0.5 rounded-full border border-sage/20">
             Clinical AI Sanctuary
           </span>
-          <span className="text-[10.5px] font-semibold text-medium">FOGSI Aligned</span>
+          <span className="text-[10.5px] font-semibold text-medium dark:text-stone-400">FOGSI Aligned</span>
         </div>
-        <h2 className="font-serif font-bold text-charcoal text-[17px] leading-tight mt-0.5 truncate">
+        <h2 className="font-serif font-bold text-charcoal dark:text-cream text-[17px] leading-tight mt-0.5 truncate">
           Namaste{motherName ? `, ${motherName.split(' ')[0]}` : ''} 🌸
         </h2>
-        <p className="text-[12px] text-medium mt-1 leading-snug">
+        <p className="text-[12px] text-medium dark:text-stone-400 mt-1 leading-snug">
           Week 24: Fetal hearing is fully active. Talk, sing, or practice gentle Garbh Sanskar today.
         </p>
       </div>
