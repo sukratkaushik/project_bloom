@@ -63,22 +63,6 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
 
         {/* Right Actions */}
         <div className="flex items-center gap-1 xs:gap-1.5 shrink-0">
-          {/* Quick Log Action Trigger */}
-          {onOpenQuickLog && (
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                onOpenQuickLog();
-              }}
-              className="h-7 px-1.5 xs:px-2 sm:px-2.5 flex items-center gap-0.5 sm:gap-1 bg-sage-dark text-white rounded-full text-[10.5px] sm:text-[11px] font-bold hover:bg-sage transition-all shadow-2xs shrink-0 active:scale-95 cursor-pointer"
-              aria-label="Quick Log"
-              title="Quick Health Log"
-            >
-              <span className="text-[12px] leading-none font-bold">+</span>
-              <span className="hidden sm:inline">Log</span>
-            </button>
-          )}
 
           {/* 108 SOS Emergency Button */}
           <button
