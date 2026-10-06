@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
-import { ShieldCheck, AlertTriangle, Lock, HeartPulse, Languages, ExternalLink, Check } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { ShieldCheck, AlertTriangle, Lock, HeartPulse, ExternalLink, Check, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
+import { getActiveLanguage } from '../utils/translation';
 
 export const DPDP_CONSENT_KEY = 'bloom_dpdp_consent_v1';
 
 interface ComplianceConsentModalProps {
   onAccept?: () => void;
+  onClose?: () => void;
   forceOpen?: boolean;
 }
 
 export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
   onAccept,
+  onClose,
   forceOpen = false,
 }) => {
+  const isAlreadyAccepted = (() => {
+    try {
+      const stored = localStorage.getItem(DPDP_CONSENT_KEY);
+      return !!(stored && JSON.parse(stored)?.accepted);
+    } catch {
+      return false;
+    }
+  })();
+
   const [isOpen, setIsOpen] = useState<boolean>(() => {
     if (forceOpen) return true;
     try {
@@ -22,11 +35,31 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     }
   });
 
-  const [lang, setLang] = useState<'en' | 'hi'>('en');
-  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false);
-  const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
+  const [lang, setLang] = useState<'en' | 'hi'>(() => {
+    return getActiveLanguage() === 'hi' ? 'hi' : 'en';
+  });
+
+  useEffect(() => {
+    const handleLangChange = () => {
+      setLang(getActiveLanguage() === 'hi' ? 'hi' : 'en');
+    };
+    window.addEventListener('app_language_changed', handleLangChange);
+    return () => window.removeEventListener('app_language_changed', handleLangChange);
+  }, []);
+
+  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState<boolean>(isAlreadyAccepted);
+  const [acceptedPrivacy, setAcceptedPrivacy] = useState<boolean>(isAlreadyAccepted);
 
   if (!isOpen) return null;
+
+  const handleClose = () => {
+    setIsOpen(false);
+    if (onClose) {
+      onClose();
+    } else if (onAccept) {
+      onAccept();
+    }
+  };
 
   const handleAgreeAndContinue = () => {
     try {
@@ -44,6 +77,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     }
     setIsOpen(false);
     if (onAccept) onAccept();
+    if (onClose) onClose();
   };
 
   const handleQuickAcceptAll = () => {
@@ -64,13 +98,24 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     }
     setIsOpen(false);
     if (onAccept) onAccept();
+    if (onClose) onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-charcoal/70 backdrop-blur-sm animate-in fade-in duration-300">
-      <div className="bg-white rounded-[28px] max-w-lg w-full max-h-[90dvh] flex flex-col shadow-2xl border border-border overflow-hidden">
+  const modalNode = (
+    <div 
+      className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-charcoal/70 backdrop-blur-sm animate-in fade-in duration-300"
+      onClick={(e) => {
+        if (e.target === e.currentTarget && (forceOpen || isAlreadyAccepted)) {
+          handleClose();
+        }
+      }}
+    >
+      <div 
+        className="bg-white rounded-[28px] max-w-lg w-full max-h-[90dvh] flex flex-col shadow-2xl border border-border overflow-hidden animate-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
         
-        {/* Header with Language Switcher */}
+        {/* Header without separate language toggle; reflects profile language */}
         <div className="bg-gradient-to-r from-sage-pale/80 via-cream to-cream p-5 sm:p-6 border-b border-border/60 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-sage-dark/10 flex items-center justify-center text-sage-dark">
@@ -78,23 +123,25 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
             </div>
             <div>
               <h2 className="font-serif text-lg sm:text-xl font-bold text-charcoal leading-tight">
-                {lang === 'en' ? 'Maternal Care & Data Consent' : 'मातृत्व सुरक्षा एवं डेटा सहमति'}
+                {lang === 'hi' ? 'मातृत्व सुरक्षा एवं डेटा सहमति' : 'Maternal Care & Data Consent'}
               </h2>
               <p className="text-[12px] text-charcoal/60 font-medium">
-                {lang === 'en' ? 'Compliance with DPDP Act 2023 & CDSCO' : 'DPDP अधिनियम 2023 और CDSCO दिशानिर्देश'}
+                {lang === 'hi' ? 'DPDP अधिनियम 2023 और CDSCO दिशानिर्देश' : 'Compliance with DPDP Act 2023 & CDSCO'}
               </p>
             </div>
           </div>
 
-          <button
-            type="button"
-            onClick={() => setLang(l => (l === 'en' ? 'hi' : 'en'))}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white border border-border text-xs font-semibold text-charcoal shadow-sm active:scale-95 transition-all hover:bg-cream cursor-pointer"
-            title="Switch language / भाषा बदलें"
-          >
-            <Languages className="w-3.5 h-3.5 text-sage-dark" />
-            <span>{lang === 'en' ? 'हिन्दी' : 'English'}</span>
-          </button>
+          {(forceOpen || isAlreadyAccepted) && (
+            <button
+              type="button"
+              onClick={handleClose}
+              className="w-9 h-9 rounded-full bg-charcoal/5 hover:bg-charcoal/10 text-charcoal/70 hover:text-charcoal flex items-center justify-center transition-colors cursor-pointer"
+              aria-label="Close"
+              title="Close"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
         </div>
 
         {/* Scrollable Content Body */}
@@ -200,32 +247,52 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
 
         {/* Footer Actions */}
         <div className="p-4 sm:p-5 bg-cream/70 border-t border-border/80 flex flex-col sm:flex-row gap-2.5">
-          <button
-            type="button"
-            disabled={!acceptedDisclaimer || !acceptedPrivacy}
-            onClick={handleAgreeAndContinue}
-            className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all ${
-              acceptedDisclaimer && acceptedPrivacy
-                ? 'bg-[#3F5E4D] hover:bg-[#2F473A] text-white shadow-md active:scale-[0.98] cursor-pointer'
-                : 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed'
-            }`}
-          >
-            <Check className="w-4 h-4 stroke-[2.5]" />
-            <span>
-              {lang === 'en' ? 'Accept & Continue' : 'स्वीकार करें और जारी रखें'}
-            </span>
-          </button>
+          {isAlreadyAccepted ? (
+            <button
+              type="button"
+              onClick={handleClose}
+              className="w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 bg-[#3F5E4D] hover:bg-[#2F473A] text-white shadow-md active:scale-[0.98] cursor-pointer transition-all"
+            >
+              <Check className="w-4 h-4 stroke-[2.5]" />
+              <span>
+                {lang === 'hi' ? 'सहमति सहेजी गई (बंद करें)' : 'Consent Confirmed (Close)'}
+              </span>
+            </button>
+          ) : (
+            <>
+              <button
+                type="button"
+                disabled={!acceptedDisclaimer || !acceptedPrivacy}
+                onClick={handleAgreeAndContinue}
+                className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                  acceptedDisclaimer && acceptedPrivacy
+                    ? 'bg-[#3F5E4D] hover:bg-[#2F473A] text-white shadow-md active:scale-[0.98] cursor-pointer'
+                    : 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed'
+                }`}
+              >
+                <Check className="w-4 h-4 stroke-[2.5]" />
+                <span>
+                  {lang === 'hi' ? 'स्वीकार करें और जारी रखें' : 'Accept & Continue'}
+                </span>
+              </button>
 
-          <button
-            type="button"
-            onClick={handleQuickAcceptAll}
-            className="w-full sm:w-auto text-[11px] sm:text-xs text-charcoal/70 hover:text-sage-dark px-3 py-2 text-center underline font-medium cursor-pointer"
-          >
-            {lang === 'en' ? 'Agree to All' : 'सभी पर सहमति दें'}
-          </button>
+              <button
+                type="button"
+                onClick={handleQuickAcceptAll}
+                className="w-full sm:w-auto text-[11px] sm:text-xs text-charcoal/70 hover:text-sage-dark px-3 py-2 text-center underline font-medium cursor-pointer"
+              >
+                {lang === 'hi' ? 'सभी पर सहमति दें' : 'Agree to All'}
+              </button>
+            </>
+          )}
         </div>
 
       </div>
     </div>
   );
+
+  if (typeof document !== 'undefined') {
+    return createPortal(modalNode, document.body);
+  }
+  return modalNode;
 };

@@ -1084,19 +1084,14 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
               className="w-full flex items-center justify-between p-3.5 hover:bg-sage-pale/30 active:bg-sage-pale/50 transition-colors cursor-pointer group text-left"
             >
               <div className="flex items-center gap-3 min-w-0 pr-2">
-                <div className="w-7 h-7 rounded-lg bg-terracotta/10 text-terracotta flex items-center justify-center shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-sage-pale text-sage-dark flex items-center justify-center shrink-0">
                   <ShieldCheck size={16} />
                 </div>
-                <span className="font-medium text-charcoal text-[13px] sm:text-sm group-hover:text-terracotta transition-colors truncate">
-                  DPDP Data Rights & Consent (Bilingual)
+                <span className="font-medium text-charcoal text-[13px] sm:text-sm group-hover:text-sage-dark transition-colors truncate">
+                  DPDP Data Rights & Consent
                 </span>
               </div>
-              <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-terracotta font-bold text-[10px] bg-terracotta/10 px-2 py-0.5 rounded-full border border-terracotta/20">
-                  Review
-                </span>
-                <ChevronRight size={15} className="text-light group-hover:text-charcoal transition-colors" />
-              </div>
+              <ChevronRight size={15} className="text-light group-hover:text-charcoal transition-colors shrink-0" />
             </button>
 
             {/* 2. Medical Disclaimer */}
@@ -1227,6 +1222,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
       {showComplianceModal && (
         <ComplianceConsentModal
           forceOpen={true}
+          onClose={() => setShowComplianceModal(false)}
           onAccept={() => setShowComplianceModal(false)}
         />
       )}
