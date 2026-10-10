@@ -1,34 +1,49 @@
-# Bloom - The Privacy-First Pregnancy Companion for Indian Mothers
+# Our Pregnancy (Bloom)
 
-## Introduction
-Bloom is a comprehensive, privacy-focused pregnancy tracking and planning application designed specifically for the unique needs of expecting mothers in India. It combines essential medical tracking with localized cultural context, government scheme guides, and AI-powered assistance.
+> A privacy-first, offline-capable pregnancy tracker and maternal health companion tailored for expecting mothers in India.
 
-## Key Features & Tools
-- **Pregnancy Tracker:** Week-by-week size and milestone tracking.
-- **Medical Tools:** Kick Counter, Contraction Timer, Blood Pressure & Vitals Tracker.
-- **Wellness:** Mood Logger, Hydration Tracker, Nutrition & Symptom Tracking.
-- **Planning:** Birth Plan Builder, Hospital Bag Checklist.
-- **Localized Indian Context:** Comprehensive guides on Indian government maternity schemes (JSY, PMMVY, JSSK), Indian foods safety database, and localized emergency contacts (108, 112).
-- **AI Integration (Premium):** 
-  - **AskBloom:** An AI assistant providing WHO-grounded pregnancy advice.
-  - **AI Food Scanner:** An AI tool to photograph meals for instant safety ratings based on Indian diets.
-  - **AI Name Generator:** A cultural and personalized baby name suggestion engine.
-- **Partner Sync:** Securely link accounts with a partner to share the pregnancy journey in real-time.
+## Overview
+Our Pregnancy (https://ourpregnancy.in) is an evidence-grounded maternal health platform built for Indian mothers and families. It integrates clinical monitoring tools, week-by-week fetal development tracking, Indian cultural and dietary contexts, government maternity schemes, and AI-assisted wellness tools into a local-first, privacy-respecting progressive web application.
 
-## Data & Privacy Policy
-Bloom is built with a "local-first" architecture. All sensitive health data is encrypted and stored securely. The application uses data to train its LLM models strictly for the purpose of improving its helpful, expert-level AI companion tools, without compromising user anonymity or security.
+## Core Navigation & Links
+- [Homepage](https://ourpregnancy.in/): Comprehensive overview of features, security principles, and product highlights.
+- [Team](https://ourpregnancy.in/team): The clinical advisors, maternal wellness experts, and engineers building Our Pregnancy.
+- [Health Blogs](https://ourpregnancy.in/blogs): Evidence-backed articles on prenatal health, trimester milestones, Indian nutrition, and postpartum recovery.
+- [Careers](https://ourpregnancy.in/careers): Open roles in engineering, clinical research, and community health.
+- [Privacy Policy](https://ourpregnancy.in/privacy): Detailed information on our local-first offline architecture, data minimization, end-to-end encryption, and consent policies.
+- [Terms of Service](https://ourpregnancy.in/terms): User agreement, service conditions, and medical disclaimer.
 
-## Pricing Plans
-Bloom operates on a transparent, 3-tier freemium model:
-1. **Free Forever (₹0/mo):** Includes core health trackers (Kick, BP, Contractions), Birth Plan Builder, Wellness Trackers, and Government Scheme guides.
-2. **Bloom Plus (₹99/mo):** Includes everything in Free, plus Partner Sync, PDF Export for health reports, and unlimited custom notes.
-3. **Bloom Premium (₹299/mo):** Includes everything in Plus, along with full access to the AI suite (AskBloom Assistant, AI Food Scanner, AI Name Generator).
+## Clinical & Daily Tracking Tools
+- **Week-by-Week Gestational Timeline:** Interactive timeline calculating gestational age, trimester progress, estimated due date (EDD via LMP, conception, or ultrasound), and comparative baby size analogies.
+- **Kick Counter:** Fetal movement recording with session timers and frequency tracking following standard obstetric counting protocols.
+- **Contraction Timer:** Active labor tracking measuring contraction duration and frequency with automatic 5-1-1 rule alerts indicating when to head to the hospital.
+- **Blood Pressure & Vitals Tracker:** Systolic, diastolic, and pulse logging with clinical range thresholds (flagging hypertension and preeclampsia risk indicators).
+- **Symptom & Mood Logger:** Multi-symptom logging (nausea, fatigue, cramping, edema, etc.) paired with daily emotional state tracking.
+- **Hydration & Nutrition Tracker:** Daily water consumption targets and prenatal supplement tracking (iron, folic acid, calcium, vitamins).
+- **Birth Plan Builder:** Customized delivery preferences covering labor environment, pain relief options, partner involvement, and newborn immediate care.
+- **Hospital Bag Checklist:** Itemized, trimester-sorted checklist categorized for mother, baby, and birth partner.
 
-## Target Audience
-Expecting mothers residing in India, or anyone navigating a pregnancy looking for a beautifully designed, ad-free, secure application that understands Indian cultural contexts and diets.
+## AI & Intelligent Assistance
+- **Ask Our Pregnancy AI Companion:** Conversational assistant grounded in WHO (World Health Organization) and ACOG maternal guidelines for prenatal education and peace of mind.
+- **AI Food Safety Scanner:** Camera-enabled scanner analyzing grocery items, street food, and traditional Indian recipes (e.g., unpasteurized dairy, raw papaya, specific herbs) for pregnancy safety.
+- **AI Indian Baby Name Explorer:** Curated database and generative naming tool supporting Sanskrit, Hindi, Urdu, Punjabi, Tamil, Telugu, and other regional traditions with linguistic meanings.
+- **Medical Report Summarizer:** Document parser helping mothers understand lab reports (CBC, ultrasound notes, glucose tolerance tests) in plain, reassuring language.
 
-## Technical Context
-Built with React, Vite, and Tailwind CSS. The AI functionality provides prenatal guidance, food safety analysis, and medical report summaries.
+## Indian Cultural & Institutional Support
+- **Maternity Schemes Navigator:** Eligibility criteria and application steps for Indian government welfare schemes, including Janani Suraksha Yojana (JSY), Pradhan Mantri Matru Vandana Yojana (PMMVY), and Janani Shishu Suraksha Karyakram (JSSK).
+- **Emergency Directory:** One-tap emergency dispatch contacts (108 National Ambulance, 112 National Emergency, 102 Maternity Ambulance) and nearby hospital routing.
+
+## Privacy, Security & Data Ownership
+- **Local-First Storage:** User records are stored locally on the device using IndexedDB (Dexie.js), ensuring complete functionality without internet access.
+- **Zero Advertising & No Data Brokerage:** Personal medical logs are never sold or shared with data brokers.
+- **Optional Cloud Backup & Partner Sync:** Encrypted cloud backup via Google Cloud Firestore with real-time peer-to-peer sync (WebRTC) for sharing updates directly with a partner or doula.
+- **Explicit Consent Controls:** Granular consent mechanisms for cloud backups and AI features in compliance with DPDP (Digital Personal Data Protection) standards.
+
+## Technical Stack
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, Lucide Icons, Framer Motion.
+- **Client Database:** Dexie.js (IndexedDB) with reactive live queries.
+- **Cloud Infrastructure:** Firebase Authentication, Cloud Firestore, Firebase Functions.
+- **Offline / PWA:** Vite PWA with service worker caching for offline reliability.
 
 ---
-*This file is intended to provide context to Large Language Models (LLMs) indexing or interacting with the Bloom application.*
+*Maintained for LLM indexing, search agents, and automated companion discovery by the Our Pregnancy Team.*
