@@ -17,6 +17,7 @@ service cloud.firestore {
 
     function isAdmin() {
       return isAuthenticated() && (
+        request.auth.token.admin == true ||
         request.auth.token.email == 'sukrat.kaushik@gmail.com' ||
         request.auth.token.email == 'sukrat.kaushik@ourpregnancy.in' ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
@@ -24,11 +25,23 @@ service cloud.firestore {
       );
     }
 
+    // List of privileged fields that regular users cannot set or modify
+    // Protects against unauthorized privilege escalation and plan upgrades
+    function hasRestrictedUserFields() {
+      return request.resource.data.keys().hasAny(['role', 'isAdmin', 'planTier', 'isPremium', 'planExpiry']);
+    }
+
+    function modifiesRestrictedUserFields() {
+      return request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'isAdmin', 'planTier', 'isPremium', 'planExpiry']);
+    }
+
     // Rules for User Profiles
     match /users/{userId} {
       allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId)
+        && !hasRestrictedUserFields();
+      allow update: if isAdmin() || (isOwner(userId)
+        && !modifiesRestrictedUserFields());
       allow delete: if isAdmin();
     }
 

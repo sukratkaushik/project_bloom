@@ -151,4 +151,188 @@ describe('Firestore Security Rules: trackingData isolation', () => {
       assert.strictEqual(snap.data()?.type, t);
     }
   });
+
+  // --- User Profile Privilege Escalation & Plan Security ---
+
+  it('Case 6: User CANNOT create a profile with role="admin", isAdmin=true, or premium plan fields', async () => {
+    const attackerContext = testEnv.authenticatedContext('attacker_uid');
+    const db = attackerContext.firestore();
+
+    // Attempt create with role: 'admin'
+    await assertFails(
+      setDoc(doc(db, 'users', 'attacker_uid'), {
+        uid: 'attacker_uid',
+        email: 'attacker@example.com',
+        role: 'admin',
+      })
+    );
+
+    // Attempt create with isAdmin: true
+    await assertFails(
+      setDoc(doc(db, 'users', 'attacker_uid'), {
+        uid: 'attacker_uid',
+        email: 'attacker@example.com',
+        isAdmin: true,
+      })
+    );
+
+    // Attempt create with planTier: 'premium'
+    await assertFails(
+      setDoc(doc(db, 'users', 'attacker_uid'), {
+        uid: 'attacker_uid',
+        email: 'attacker@example.com',
+        planTier: 'premium',
+      })
+    );
+
+    // Attempt create with isPremium: true
+    await assertFails(
+      setDoc(doc(db, 'users', 'attacker_uid'), {
+        uid: 'attacker_uid',
+        email: 'attacker@example.com',
+        isPremium: true,
+      })
+    );
+
+    // Attempt create with planExpiry
+    await assertFails(
+      setDoc(doc(db, 'users', 'attacker_uid'), {
+        uid: 'attacker_uid',
+        email: 'attacker@example.com',
+        planExpiry: Date.now() + 1000000,
+      })
+    );
+  });
+
+  it('Case 7: User CAN create their own profile without restricted fields', async () => {
+    const normalUserContext = testEnv.authenticatedContext('normal_user_1');
+    const db = normalUserContext.firestore();
+
+    await assertSucceeds(
+      setDoc(doc(db, 'users', 'normal_user_1'), {
+        uid: 'normal_user_1',
+        email: 'normal@example.com',
+        displayName: 'Normal User',
+        isSetup: false,
+        isEmailVerified: false,
+        createdAt: Date.now(),
+        updatedAt: Date.now(),
+      })
+    );
+  });
+
+  it('Case 8: User CANNOT update their existing profile to escalate role or upgrade planTier', async () => {
+    // Seed existing profile
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, 'users', 'existing_user'), {
+        uid: 'existing_user',
+        email: 'existing@example.com',
+        displayName: 'Existing User',
+        role: 'user',
+        planTier: 'free',
+        createdAt: Date.now(),
+      });
+    });
+
+    const userContext = testEnv.authenticatedContext('existing_user');
+    const db = userContext.firestore();
+    const userDocRef = doc(db, 'users', 'existing_user');
+
+    // Attempt to update role to 'admin'
+    await assertFails(
+      setDoc(userDocRef, { role: 'admin' }, { merge: true })
+    );
+
+    // Attempt to update planTier to 'premium'
+    await assertFails(
+      setDoc(userDocRef, { planTier: 'premium' }, { merge: true })
+    );
+
+    // Attempt to add isAdmin: true
+    await assertFails(
+      setDoc(userDocRef, { isAdmin: true }, { merge: true })
+    );
+
+    // Attempt to add isPremium: true
+    await assertFails(
+      setDoc(userDocRef, { isPremium: true }, { merge: true })
+    );
+
+    // Attempt to add planExpiry
+    await assertFails(
+      setDoc(userDocRef, { planExpiry: Date.now() + 9999999 }, { merge: true })
+    );
+  });
+
+  it('Case 9: User CAN update permitted fields on their own profile', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, 'users', 'permitted_user'), {
+        uid: 'permitted_user',
+        displayName: 'Old Name',
+        isSetup: false,
+      });
+    });
+
+    const userContext = testEnv.authenticatedContext('permitted_user');
+    const db = userContext.firestore();
+    const userDocRef = doc(db, 'users', 'permitted_user');
+
+    // Permitted updates: displayName, isSetup, consent
+    await assertSucceeds(
+      setDoc(userDocRef, {
+        displayName: 'New Name',
+        isSetup: true,
+        consentGiven: true,
+        updatedAt: Date.now(),
+      }, { merge: true })
+    );
+  });
+
+  it('Case 10: Admin with custom claim admin=true CAN update user role and planTier', async () => {
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, 'users', 'target_user'), {
+        uid: 'target_user',
+        role: 'user',
+        planTier: 'free',
+      });
+    });
+
+    // Admin authenticated via token custom claim
+    const adminContext = testEnv.authenticatedContext('admin_super', {
+      admin: true,
+    });
+    const adminDb = adminContext.firestore();
+    const targetDocRef = doc(adminDb, 'users', 'target_user');
+
+    // Admin can update role and planTier
+    await assertSucceeds(
+      setDoc(targetDocRef, {
+        role: 'admin',
+        planTier: 'premium',
+        planExpiry: Date.now() + 30 * 24 * 60 * 60 * 1000,
+      }, { merge: true })
+    );
+  });
+
+  it('Case 11: Non-admin CANNOT delete profile; Admin CAN delete profile', async () => {
+    const { deleteDoc } = await import('firebase/firestore');
+
+    await testEnv.withSecurityRulesDisabled(async (context) => {
+      const adminDb = context.firestore();
+      await setDoc(doc(adminDb, 'users', 'deletable_user'), {
+        uid: 'deletable_user',
+      });
+    });
+
+    // Non-admin attempt
+    const userContext = testEnv.authenticatedContext('deletable_user');
+    await assertFails(deleteDoc(doc(userContext.firestore(), 'users', 'deletable_user')));
+
+    // Admin attempt
+    const adminContext = testEnv.authenticatedContext('admin_claimer', { admin: true });
+    await assertSucceeds(deleteDoc(doc(adminContext.firestore(), 'users', 'deletable_user')));
+  });
 });
