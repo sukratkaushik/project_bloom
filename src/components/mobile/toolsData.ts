@@ -4,7 +4,7 @@ import {
   Apple, BookOpen, Users, Sparkles, Camera, Baby, Plane,
   Calendar, ShoppingBag, DollarSign, Clock, Syringe, FileText,
   Building, HeartHandshake, Briefcase, FileCheck2,
-  HelpCircle, CheckCircle2, Wind, Pill
+  HelpCircle, Wind, Pill
 } from 'lucide-react';
 
 export interface ToolDefinition {
@@ -283,16 +283,6 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'Build Plan →',
   },
   {
-    id: 'readiness',
-    title: 'Labor Readiness Score',
-    desc: 'Bishop score & cervical preparation guidance',
-    category: 'Labor & Postpartum',
-    icon: CheckCircle2,
-    color: 'text-indigo-700 bg-indigo-50',
-    ritualSubtitle: 'Bishop score guidance',
-    actionLabel: 'Check Score →',
-  },
-  {
     id: 'feedback',
     title: 'Feedback & Support',
     desc: 'Share your pregnancy journey suggestions',
@@ -310,7 +300,7 @@ export const CATEGORY_CHIPS = [
   { label: 'Smart AI', count: 5, key: 'Smart AI & Guidance' },
   { label: 'Milestones', count: 4, key: 'Milestones & Prep' },
   { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
-  { label: 'Labor Prep', count: 4, key: 'Labor & Postpartum' },
+  { label: 'Labor Prep', count: 3, key: 'Labor & Postpartum' },
 ];
 
 export const getToolById = (id: string): ToolDefinition | undefined => {

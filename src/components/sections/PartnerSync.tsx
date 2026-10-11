@@ -134,7 +134,6 @@ export const PartnerSync: React.FC = () => {
       title: 'Labor & Postpartum',
       desc: 'Hospital bag, birth preferences & recovery',
       items: [
-        { key: 'readiness', label: 'Labor Readiness', desc: 'Bishop score & cervical prep' },
         { key: 'hospitalbag', label: 'Hospital Bag Checklist', desc: 'Items packed for hospital delivery' },
         { key: 'birthplan', label: 'Birth Plan Builder', desc: 'Birth choices & support person role' },
         { key: 'postpartum', label: 'Postpartum Healing', desc: 'Fourth trimester recovery & care', tasks: POSTPARTUM_TASKS },

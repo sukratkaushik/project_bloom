@@ -40,7 +40,6 @@ import { GovernmentSchemes } from '../sections/GovernmentSchemes';
 import { Postpartum } from '../sections/Postpartum';
 import { HospitalBag } from '../sections/HospitalBag';
 import { BirthPlanBuilder } from '../sections/BirthPlanBuilder';
-import { LaborReadiness } from '../sections/LaborReadiness';
 import { Feedback } from '../sections/Feedback';
 import { Profile } from '../sections/Profile';
 import { GuidedBreathingAudio } from '../sections/GuidedBreathingAudio';
@@ -168,7 +167,6 @@ export const MobileShell: React.FC = () => {
       case 'postpartum': return <Postpartum filterTasks={filterTasks} />;
       case 'hospitalbag': return <HospitalBag />;
       case 'birthplan': return <BirthPlanBuilder />;
-      case 'readiness': return <LaborReadiness />;
       case 'breathing':
       case 'garbhsanskar': return <GuidedBreathingAudio />;
       case 'feedback': return <Feedback />;

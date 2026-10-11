@@ -33,7 +33,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   },
   labor: {
     label: "Labor & Postpartum",
-    items: ['readiness', 'hospitalbag', 'birthplan', 'postpartum']
+    items: ['hospitalbag', 'birthplan', 'postpartum']
   }
 };
 
@@ -162,7 +162,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'medical', icon: '🏥', label: 'Medical', progress: getProgress(medTasks) },
     { id: 'medical-reports', icon: '📂', label: 'Medical Reports' },
     { id: 'schemes', icon: '🏛', label: 'Government Schemes' },
-    { id: 'readiness', icon: '🔮', label: 'Labor Readiness' },
     { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag' },
     { id: 'birthplan', icon: '📜', label: 'Birth Plan Builder' },
     { id: 'postpartum', icon: '🍃', label: 'Early Parenthood' },

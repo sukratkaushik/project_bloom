@@ -99,7 +99,7 @@ export type SyncPermissions = {
   medical: boolean;
   schemes: boolean;
 
-  readiness: boolean;
+  readiness?: boolean;
   hospitalbag: boolean;
   birthplan: boolean;
   decisions: boolean;

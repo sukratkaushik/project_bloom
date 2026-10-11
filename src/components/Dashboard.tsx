@@ -11,7 +11,6 @@ import { Deadlines } from './sections/Deadlines';
 import { Postpartum } from './sections/Postpartum';
 import { Notes } from './sections/Notes';
 import { SymptomLogger } from './sections/SymptomLogger';
-import { LaborReadiness } from './sections/LaborReadiness';
 import { FoodScanner } from './sections/FoodScanner';
 import { AskOurPregnancy } from './sections/AskOurPregnancy';
 import { KickCounter } from './sections/KickCounter';
@@ -48,7 +47,7 @@ import { MobileShell } from './mobile/MobileShell';
 
 const VALID_PAGES = [
   'tracker', 'dev', 'medical', 'medical-reports', 'prep', 'finance', 
-  'deadlines', 'postpartum', 'symptoms', 'readiness', 'foodscanner', 
+  'deadlines', 'postpartum', 'symptoms', 'foodscanner', 
   'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
   'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
   'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
@@ -234,7 +233,6 @@ export const Dashboard: React.FC = () => {
                 {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
                 {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
                 {activePage === 'symptoms' && <SymptomLogger />}
-                {activePage === 'readiness' && <LaborReadiness setActivePage={setActivePage} />}
                 {activePage === 'foodscanner' && <FoodScanner />}
                 {activePage === 'askourpregnancy' && <AskOurPregnancy />}
                 {activePage === 'kickcounter' && <KickCounter />}
