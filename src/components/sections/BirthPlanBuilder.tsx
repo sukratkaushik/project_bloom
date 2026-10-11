@@ -932,16 +932,7 @@ export const BirthPlanBuilder: React.FC = () => {
             onRemoveCustom={removeCustomOption}
           />
 
-          <div className="mt-4">
-            <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Cultural or religious customs during labour</label>
-            <input 
-              type="text" 
-              value={plan.cultural || ''} 
-              onChange={e => updateField('cultural', e.target.value)} 
-              className="w-full p-3 border border-border/80 rounded-[12px] bg-white text-charcoal focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all font-sans text-[14px]" 
-              placeholder="e.g. Traditional prayers, birth hymns..." 
-            />
-          </div>
+
         </Section>
 
         <Section 
@@ -960,16 +951,7 @@ export const BirthPlanBuilder: React.FC = () => {
             onAddCustom={addCustomOption}
             onRemoveCustom={removeCustomOption}
           />
-          <div className="mt-4">
-            <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Special pain relief requests</label>
-            <input 
-              type="text" 
-              value={plan.painReliefNotes || ''} 
-              onChange={e => updateField('painReliefNotes', e.target.value)} 
-              className="w-full p-3 border border-border/80 rounded-[12px] bg-white text-charcoal focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all font-sans text-[14px]" 
-              placeholder="e.g. Please do not offer unless I explicitly ask" 
-            />
-          </div>
+
         </Section>
 
         <Section 
@@ -1071,16 +1053,7 @@ export const BirthPlanBuilder: React.FC = () => {
             onRemoveCustom={removeCustomOption}
           />
 
-          <div className="mt-4">
-            <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Postnatal Customs/Diet</label>
-            <input 
-              type="text" 
-              value={plan.postnatalCustoms || ''} 
-              onChange={e => updateField('postnatalCustoms', e.target.value)} 
-              className="w-full p-3 border border-border/80 rounded-[12px] bg-white text-charcoal focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all font-sans text-[14px]" 
-              placeholder="e.g. Warm water diet, postpartum soup preferences..." 
-            />
-          </div>
+
         </Section>
 
         <Section 
@@ -1121,15 +1094,7 @@ export const BirthPlanBuilder: React.FC = () => {
             onRemoveCustom={removeCustomOption}
           />
 
-          <div className="mt-4">
-            <label className="text-[11px] font-bold uppercase tracking-[1px] text-light mb-1.5 block">Other personal/cultural preferences</label>
-            <textarea 
-              value={plan.otherPreferences || ''} 
-              onChange={e => updateField('otherPreferences', e.target.value)} 
-              className="w-full p-3 border border-border/80 rounded-[12px] bg-white text-charcoal focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all font-sans text-[14px] h-24 resize-y" 
-              placeholder="Any additional instructions or preferences for your labor team..." 
-            />
-          </div>
+
         </Section>
       </div>
 
