@@ -4,6 +4,12 @@ import { usePlanner } from '../../store';
 import { WEEKLY_DATA } from '../../weeklyData';
 import { ChevronLeft, ChevronRight, Calendar, Sparkles } from 'lucide-react';
 import { DailyKnowledgeDrop } from './DailyKnowledgeDrop';
+import {
+  FETAL_GROWTH_RANGES,
+  getRelevantScanForWeek,
+  FetalScanRecord,
+} from '../../utils/fetalGrowth';
+import { FetalGrowthReassuranceModal } from '../FetalGrowthReassuranceModal';
 
 const MOTIVATIONAL_QUOTES = [
   "A beautiful journey begins with a single step. You've got this!", // 1
@@ -101,6 +107,31 @@ export const PregnancyTracker: React.FC = () => {
 
   const weekData = WEEKLY_DATA.find(d => d.week === selectedWeek) || WEEKLY_DATA[0];
   const progressPercent = (selectedWeek / 40) * 100;
+
+  // Fetal Growth Range & Scan Personalization State
+  const [isFetalReassuranceOpen, setIsFetalReassuranceOpen] = useState(false);
+  const [activeFetalScan, setActiveFetalScan] = useState<FetalScanRecord | null>(() =>
+    getRelevantScanForWeek(selectedWeek)
+  );
+
+  useEffect(() => {
+    setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+  }, [selectedWeek]);
+
+  useEffect(() => {
+    const handleScanUpdated = () => {
+      setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+    };
+    window.addEventListener('bloom_fetal_scan_updated', handleScanUpdated);
+    return () => {
+      window.removeEventListener('bloom_fetal_scan_updated', handleScanUpdated);
+    };
+  }, [selectedWeek]);
+
+  const growthRange = FETAL_GROWTH_RANGES[selectedWeek] || {
+    lengthRange: weekData.length,
+    weightRange: weekData.weight,
+  };
 
   return (
     <div className="space-y-6">
@@ -240,22 +271,64 @@ export const PregnancyTracker: React.FC = () => {
           Size of a <span className="text-sage font-semibold">{weekData.babySizeAnalogy}</span>
         </h3>
 
-        <div key={`measurements-${selectedWeek}`} className="flex items-center gap-3 mt-3 mb-6 relative z-10">
-          <div className="px-4 py-1.5 rounded-full bg-sage-pale/40 text-sage-dark text-[13px] font-bold border border-sage/20 shadow-xs flex items-center gap-1.5">
-            <span>📏 Length:</span> <span className="font-sans font-medium text-charcoal">{weekData.length}</span>
+        <div key={`measurements-${selectedWeek}`} className="flex flex-col items-center gap-2 mt-3 mb-6 relative z-10 w-full max-w-md">
+          <div className="flex flex-wrap items-center justify-center gap-2.5">
+            {/* Length Tile */}
+            <div
+              onClick={() => setIsFetalReassuranceOpen(true)}
+              className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-bold border shadow-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.98] ${
+                activeFetalScan?.lengthCm
+                  ? 'bg-sage text-white border-sage'
+                  : 'bg-sage-pale/40 text-sage-dark border-sage/20 hover:bg-sage-pale/70'
+              }`}
+            >
+              <span>📏 {activeFetalScan?.lengthCm ? 'Doctor Length:' : 'Est. Length:'}</span>
+              <span className={`font-sans font-semibold ${activeFetalScan?.lengthCm ? 'text-white' : 'text-charcoal'}`}>
+                {activeFetalScan?.lengthCm ? `${activeFetalScan.lengthCm} cm` : growthRange.lengthRange}
+              </span>
+            </div>
+
+            {/* Weight Tile */}
+            <div
+              onClick={() => setIsFetalReassuranceOpen(true)}
+              className={`px-3.5 py-1.5 rounded-full text-[12.5px] font-bold border shadow-xs flex items-center gap-1.5 cursor-pointer transition-all active:scale-[0.98] ${
+                activeFetalScan?.weightGrams
+                  ? 'bg-sage text-white border-sage'
+                  : 'bg-sage-pale/40 text-sage-dark border-sage/20 hover:bg-sage-pale/70'
+              }`}
+            >
+              <span>⚖️ {activeFetalScan?.weightGrams ? 'Doctor Weight:' : 'Est. Weight:'}</span>
+              <span className={`font-sans font-semibold ${activeFetalScan?.weightGrams ? 'text-white' : 'text-charcoal'}`}>
+                {activeFetalScan?.weightGrams ? `${activeFetalScan.weightGrams} g` : growthRange.weightRange}
+              </span>
+            </div>
           </div>
-          <div className="px-4 py-1.5 rounded-full bg-sage-pale/40 text-sage-dark text-[13px] font-bold border border-sage/20 shadow-xs flex items-center gap-1.5">
-            <span>⚖️ Weight:</span> <span className="font-sans font-medium text-charcoal">{weekData.weight}</span>
-          </div>
+
+          {/* Reassurance pill */}
+          <button
+            type="button"
+            onClick={() => setIsFetalReassuranceOpen(true)}
+            className={`mt-1 text-[11px] font-medium px-3 py-1 rounded-full border transition-all cursor-pointer flex items-center gap-1.5 ${
+              activeFetalScan
+                ? 'bg-sage-pale text-sage-dark border-sage/30'
+                : 'bg-white/80 text-charcoal/80 border-border/70 hover:bg-white'
+            }`}
+          >
+            {activeFetalScan ? (
+              <span>✨ Doctor Scan Verified ({activeFetalScan.scanType}) • Manage scan ›</span>
+            ) : (
+              <span>🌿 Est. Range • Genetics & diet shape baby&apos;s unique growth • Learn why ›</span>
+            )}
+          </button>
         </div>
 
         <p key={`baby-dev-desc-${selectedWeek}`} className="text-[14px] text-medium leading-relaxed max-w-[480px] mb-6 relative z-10">
           {weekData.babyDev}
         </p>
 
-        {/* Disclaimer */}
-        <p className="text-[11px] text-medium/60 leading-normal max-w-[500px] border-t border-charcoal/5 pt-4 mt-2 font-sans font-normal relative z-10">
-          *Disclaimer: These size comparisons are approximate references and indications based on clinical studies. For exact measurements and personalized growth assessments, it is best to consult with your obstetrician/gynecologist.*
+        {/* Disclaimer with link */}
+        <p className="text-[11px] text-medium/70 leading-normal max-w-[500px] border-t border-charcoal/5 pt-3.5 mt-2 font-sans font-normal relative z-10">
+          *Growth reference based on Indian pediatric & fetal standards (GARBH-Ini / FOGSI). Parental genetics and nutrition naturally guide your baby&apos;s growth curve. Consult your OB-GYN ultrasound for definitive measurements.
         </p>
       </motion.div>
 
@@ -297,6 +370,19 @@ export const PregnancyTracker: React.FC = () => {
           </p>
         </motion.div>
       </div>
+
+      {/* Fetal Growth Reassurance & Scan Personalization Modal */}
+      <FetalGrowthReassuranceModal
+        isOpen={isFetalReassuranceOpen}
+        onClose={() => setIsFetalReassuranceOpen(false)}
+        currentWeek={selectedWeek}
+        activeScan={activeFetalScan}
+        lengthRange={growthRange.lengthRange}
+        weightRange={growthRange.weightRange}
+        onScanSaved={() => {
+          setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+        }}
+      />
     </div>
   );
 };

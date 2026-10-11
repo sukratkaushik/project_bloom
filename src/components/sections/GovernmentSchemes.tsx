@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Building, ExternalLink, HeartHandshake, MapPin, ShieldCheck, Sparkles, Filter, Scale, Briefcase, Baby, HeartPulse, Clock, FileText } from 'lucide-react';
 import { Paywall } from '../Paywall';
+import { ContextBanner } from '../ContextBanner';
 
 export interface Scheme {
   id: string;
@@ -642,75 +643,55 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
 
   return (
     <Paywall featureName="GovernmentSchemes">
-      <div className="space-y-6 animate-in fade-in duration-300">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-sage/15 text-sage flex items-center justify-center shrink-0">
-              <Building className="w-6 h-6" />
-            </div>
-            <div>
-              <h1 className="font-serif text-[clamp(26px,4vw,36px)] font-normal text-charcoal leading-tight">
-                Maternity & Health Schemes
-              </h1>
-              <p className="text-[13.5px] text-medium">
-                Official Indian Central & State Government benefits for pregnancy, delivery, and newborn care.
-              </p>
-            </div>
-          </div>
-        </div>
+      <div className="space-y-4 xs:space-y-5 animate-in fade-in duration-300">
+        {/* Context Banner */}
+        <ContextBanner description="Official Indian Central & State Government benefits for pregnancy, delivery, and newborn care." />
 
         {/* Filter Controls Bar */}
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] p-4 sm:p-5 shadow-sm space-y-4">
+        <div className="bg-white dark:bg-[#1E293B] border border-border/80 dark:border-white/10 rounded-xl p-3 xs:p-3.5 shadow-3xs space-y-2.5">
           <div className="max-w-md">
             {/* State Selector Dropdown */}
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-light mb-1.5 flex items-center gap-1.5">
-              <MapPin size={13} className="text-sage" /> Select Your State / Region
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-light dark:text-gray-400 mb-1 flex items-center gap-1.5">
+              <MapPin size={12} className="text-sage" /> Select Your State / Region
             </label>
             <div className="relative">
               <select
                 value={selectedState}
                 onChange={(e) => setSelectedState(e.target.value)}
-                className="w-full bg-cream/70 border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] font-medium text-charcoal focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all cursor-pointer appearance-none"
+                className="w-full bg-cream/50 dark:bg-white/5 border border-border/80 dark:border-white/10 rounded-lg px-3 py-2 text-[13px] font-medium text-charcoal dark:text-white focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-all cursor-pointer appearance-none"
               >
-                <option value="National">🇮🇳 National (All-India Central Schemes)</option>
+                <option value="National">All-India Central Schemes</option>
                 <optgroup label="── States & Union Territories ──">
                   {INDIAN_STATES_AND_UTS.filter(s => s !== 'National').map(state => (
                     <option key={state} value={state}>
-                      📍 {state}
+                      {state}
                     </option>
                   ))}
                 </optgroup>
               </select>
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-light">
+              <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-light text-[11px]">
                 ▼
               </div>
             </div>
           </div>
 
           {/* Active Filter Summary */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-border/70 text-[12.5px]">
-            <div className="flex items-center gap-2 text-charcoal">
-              <span className="font-medium">
-                Showing <strong className="text-sage-dark font-bold">{filteredSchemes.length}</strong> schemes
+          <div className="flex items-center justify-between gap-2 pt-2 border-t border-border/60 dark:border-white/10 text-[12px]">
+            <div className="flex items-center min-w-0 overflow-hidden text-charcoal dark:text-gray-200">
+              <span className="font-semibold whitespace-nowrap">
+                {filteredSchemes.length} schemes
               </span>
-              {selectedState !== 'National' ? (
-                <span className="text-light">
-                  ({nationalCount} Central Govt + {stateCount} {selectedState} State)
-                </span>
-              ) : (
-                <span className="text-light">
-                  (All Central Government Schemes)
-                </span>
-              )}
+              <span className="text-light dark:text-gray-400 text-[11.5px] ml-1.5 truncate">
+                {selectedState !== 'National' ? `(${nationalCount} Central · ${stateCount} State)` : '(All Central Govt)'}
+              </span>
             </div>
 
             {selectedState !== 'National' && (
               <button
                 onClick={() => setSelectedState('National')}
-                className="text-[11.5px] text-sage-dark font-medium hover:underline flex items-center gap-1"
+                className="text-[11px] text-sage font-medium hover:underline shrink-0 px-2 py-0.5 rounded bg-sage/10 dark:bg-sage/20"
               >
-                Reset to National only
+                Reset
               </button>
             )}
           </div>
@@ -718,70 +699,80 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
 
         {/* Schemes Grid */}
         {filteredSchemes.length === 0 ? (
-          <div className="bg-white border border-border rounded-[16px] p-12 text-center shadow-sm">
-            <div className="w-14 h-14 bg-sage-pale rounded-full flex items-center justify-center mx-auto mb-3 text-sage">
-              <Building size={26} />
+          <div className="bg-white dark:bg-[#1E293B] border border-border/80 dark:border-white/10 rounded-xl p-8 text-center shadow-3xs">
+            <div className="w-12 h-12 bg-sage-pale rounded-full flex items-center justify-center mx-auto mb-2.5 text-sage">
+              <Building size={22} />
             </div>
-            <h3 className="font-serif text-[18px] text-charcoal mb-1">No matching schemes found</h3>
-            <p className="text-[13.5px] text-medium max-w-md mx-auto mb-4">
+            <h3 className="font-serif text-[16px] text-charcoal dark:text-white mb-1">No matching schemes found</h3>
+            <p className="text-[12.5px] text-medium dark:text-gray-300 max-w-md mx-auto mb-3">
               We couldn't find any schemes for {selectedState}.
             </p>
             <button
               onClick={() => { setSearchQuery(''); setSelectedState('National'); }}
-              className="px-4 py-2 bg-sage text-white rounded-[10px] text-[13px] font-semibold hover:bg-sage-dark transition-colors"
+              className="px-3.5 py-1.5 bg-sage text-white rounded-lg text-[12.5px] font-semibold hover:bg-sage-dark transition-colors"
             >
               Reset Filters
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
             {filteredSchemes.map(scheme => (
               <div
                 key={scheme.id}
-                className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[16px] shadow-sm overflow-hidden flex flex-col group hover:border-sage dark:hover:border-sage/50 hover:shadow-md transition-all duration-200"
+                className="bg-white dark:bg-[#1E293B] border border-border/80 dark:border-white/10 rounded-xl shadow-3xs overflow-hidden flex flex-col group hover:border-sage/60 dark:hover:border-sage/50 transition-all duration-200"
               >
                 {/* Card Header */}
-                <div className="p-5 border-b border-border dark:border-white/10 bg-gray-50/60 dark:bg-white/[0.03] flex items-center justify-between gap-4">
-                  <div className="flex items-center gap-3.5">
-                    <div className="text-[28px] shrink-0">{scheme.icon}</div>
-                    <h3 className="font-bold text-charcoal dark:text-white text-[16px] leading-snug">
-                      {scheme.name}
-                    </h3>
+                <div className="px-3.5 py-3 border-b border-border/60 dark:border-white/10 bg-cream/30 dark:bg-white/[0.02]">
+                  <div className="flex items-center justify-between gap-2 mb-1.5">
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <span className="text-[17px] shrink-0 leading-none">{scheme.icon}</span>
+                      <span className="text-[11px] font-semibold text-light dark:text-gray-400 truncate">
+                        {scheme.scope === 'national' ? 'Central Govt' : scheme.scope}
+                      </span>
+                    </div>
+                    {scheme.badge && (
+                      <span className="shrink-0 text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-sage/10 text-sage dark:bg-sage/20 dark:text-sage-pale uppercase tracking-wider">
+                        {scheme.badge}
+                      </span>
+                    )}
                   </div>
+                  <h3 className="font-serif text-[15px] font-semibold text-charcoal dark:text-white leading-snug">
+                    {scheme.name}
+                  </h3>
                 </div>
 
                 {/* Card Body */}
-                <div className="p-5 space-y-4 flex-1 flex flex-col justify-between">
-                  <div className="space-y-3.5">
+                <div className="p-3.5 space-y-3 flex-1 flex flex-col justify-between text-[12.5px]">
+                  <div className="space-y-2.5">
                     <div>
-                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1 flex items-center gap-1">
-                        <Sparkles size={12} className="text-sage" /> Benefit
+                      <dt className="text-[10px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <Sparkles size={11} className="text-sage" /> Benefit
                       </dt>
-                      <dd className="text-[13.5px] text-charcoal dark:text-gray-200 leading-relaxed">{scheme.benefit}</dd>
+                      <dd className="text-charcoal dark:text-gray-200 leading-relaxed font-medium">{scheme.benefit}</dd>
                     </div>
 
-                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-3 rounded-[10px] border border-sage-pale dark:border-sage/25">
-                      <dt className="text-[10.5px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5 flex items-center gap-1">
-                        <ShieldCheck size={12} className="text-sage dark:text-sage-pale" /> Who Qualifies?
+                    <div className="bg-sage/5 dark:bg-sage/10 p-2.5 rounded-lg border border-sage/15 dark:border-sage/20">
+                      <dt className="text-[10px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                        <ShieldCheck size={11} className="text-sage dark:text-sage-pale" /> Who Qualifies?
                       </dt>
-                      <dd className="text-[12.5px] text-charcoal/90 dark:text-gray-300 leading-relaxed">{scheme.who}</dd>
+                      <dd className="text-charcoal/90 dark:text-gray-300 leading-relaxed text-[12px]">{scheme.who}</dd>
                     </div>
 
                     <div>
-                      <dt className="text-[10.5px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">How to Apply</dt>
-                      <dd className="text-[12.5px] text-medium dark:text-gray-300 leading-relaxed">{scheme.how}</dd>
+                      <dt className="text-[10px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-0.5">How to Apply</dt>
+                      <dd className="text-medium dark:text-gray-300 leading-relaxed text-[12px]">{scheme.how}</dd>
                     </div>
                   </div>
 
                   {scheme.link && (
-                    <div className="pt-3 border-t border-border/70 dark:border-white/10 flex justify-end">
+                    <div className="pt-2 border-t border-border/60 dark:border-white/10 flex justify-end">
                       <a
                         href={scheme.link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[12px] font-semibold text-sage-dark dark:text-sage-pale hover:underline"
+                        className="inline-flex items-center gap-1 text-[11.5px] font-semibold text-sage hover:underline"
                       >
-                        {scheme.link.label} <ExternalLink size={12} />
+                        {scheme.link.label} <ExternalLink size={11} />
                       </a>
                     </div>
                   )}
@@ -792,22 +783,22 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
         )}
 
         {/* ASHA Info Card */}
-        <div className="bg-sage border border-sage-dark rounded-[16px] p-6 shadow-sm flex flex-col sm:flex-row items-center sm:items-start gap-4 text-white text-center sm:text-left mt-8">
-          <div className="bg-white/20 p-3 rounded-full shrink-0">
-            <HeartHandshake className="w-8 h-8 text-white" />
+        <div className="bg-sage border border-sage-dark rounded-xl p-4 sm:p-5 shadow-3xs flex flex-col sm:flex-row items-center sm:items-start gap-3.5 text-white text-center sm:text-left">
+          <div className="bg-white/20 p-2.5 rounded-full shrink-0">
+            <HeartHandshake className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h3 className="font-serif text-[22px] mb-2">Your ASHA & Anganwadi Worker is your best guide</h3>
-            <p className="text-[14.5px] opacity-90 leading-relaxed max-w-3xl">
+            <h3 className="font-serif text-[18px] mb-1">Your ASHA & Anganwadi Worker is your best guide</h3>
+            <p className="text-[12.5px] opacity-90 leading-relaxed max-w-3xl">
               Every village and urban ward across India has dedicated ASHA (Accredited Social Health Activist) and Anganwadi workers. They help you register for Central (PMMVY, JSY) and State-specific maternity kits, assist with your MCP health card, and accompany you to the hospital for delivery.
             </p>
           </div>
         </div>
 
         {/* Official Portals Footer */}
-        <div className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[16px] shadow-sm p-6 mt-6">
-          <h3 className="font-semibold text-charcoal dark:text-white text-[15px] mb-4">Official Central Government Portals</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className="bg-white dark:bg-[#1E293B] border border-border/80 dark:border-white/10 rounded-xl shadow-3xs p-4 sm:p-5">
+          <h3 className="font-semibold text-charcoal dark:text-white text-[13.5px] mb-3">Official Central Government Portals</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
             {[
               { label: 'PMMVY Official Registration', url: 'https://pmmvy.wcd.gov.in', domain: 'pmmvy.wcd.gov.in' },
               { label: 'National Health Mission (JSY/JSSK)', url: 'https://nhm.gov.in', domain: 'nhm.gov.in' },
@@ -819,35 +810,35 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex flex-col p-3 border border-border dark:border-white/10 rounded-[10px] hover:bg-cream/50 dark:hover:bg-white/5 hover:border-sage transition-all group"
+                className="flex flex-col p-2.5 border border-border/80 dark:border-white/10 rounded-lg hover:bg-cream/40 dark:hover:bg-white/5 hover:border-sage transition-all group"
               >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-[13.5px] text-charcoal dark:text-white group-hover:text-sage-dark dark:group-hover:text-sage-light">{link.label}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-medium dark:text-gray-400 group-hover:text-sage" />
+                <div className="flex items-center justify-between mb-0.5">
+                  <span className="font-medium text-[12.5px] text-charcoal dark:text-white group-hover:text-sage truncate">{link.label}</span>
+                  <ExternalLink className="w-3 h-3 text-medium dark:text-gray-400 group-hover:text-sage shrink-0 ml-1" />
                 </div>
-                <span className="text-[11.5px] text-medium dark:text-gray-400">{link.domain}</span>
+                <span className="text-[11px] text-medium dark:text-gray-400">{link.domain}</span>
               </a>
             ))}
           </div>
         </div>
 
         {/* Statutory Legal Rights & Workplace Protections */}
-        <div className="bg-white dark:bg-[#1E293B] border-[1.5px] border-border dark:border-white/10 rounded-[20px] shadow-sm p-6 sm:p-8 mt-8 space-y-6">
-          <div className="flex items-center gap-3.5 border-b border-border/70 dark:border-white/10 pb-5">
-            <div className="w-12 h-12 rounded-2xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
-              <Scale className="w-6 h-6" />
+        <div className="bg-white dark:bg-[#1E293B] border border-border/80 dark:border-white/10 rounded-xl shadow-3xs p-4 sm:p-6 space-y-4">
+          <div className="flex items-center gap-3 border-b border-border/60 dark:border-white/10 pb-3.5">
+            <div className="w-10 h-10 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+              <Scale className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-serif text-[clamp(20px,3vw,26px)] font-semibold text-charcoal dark:text-white leading-tight">
-                Legal Rights &amp; Workplace Protections for Pregnant Women
+              <h3 className="font-serif text-[18px] sm:text-[20px] font-semibold text-charcoal dark:text-white leading-tight">
+                Legal Rights &amp; Workplace Protections
               </h3>
-              <p className="text-[13.5px] text-medium dark:text-gray-300">
+              <p className="text-[12px] text-medium dark:text-gray-300">
                 Mandatory paid leave, dismissal immunity, and healthcare protections enacted under Indian law.
               </p>
             </div>
           </div>
 
-          <div className="flex flex-col gap-6">
+          <div className="flex flex-col gap-3.5">
             {LEGAL_MATERNITY_BENEFITS.map((item) => {
               const IconComp = {
                 briefcase: Briefcase,
@@ -861,37 +852,37 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
               return (
                 <div
                   key={item.id}
-                  className="bg-cream/40 dark:bg-white/[0.03] border-[1.5px] border-border dark:border-white/10 rounded-[18px] p-6 sm:p-7 flex flex-col justify-between hover:border-sage dark:hover:border-sage/50 hover:shadow-sm transition-all group w-full"
+                  className="bg-cream/30 dark:bg-white/[0.02] border border-border/80 dark:border-white/10 rounded-xl p-3.5 sm:p-4 flex flex-col justify-between hover:border-sage/60 dark:hover:border-sage/50 transition-all group w-full"
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-3">
                     {/* Header: Icon & Full-width Title */}
-                    <div className="flex items-center gap-3.5 pb-3 border-b border-border/60 dark:border-white/10">
-                      <div className="w-11 h-11 rounded-xl bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
-                        <IconComp className="w-5 h-5" />
+                    <div className="flex items-center gap-2.5 pb-2 border-b border-border/50 dark:border-white/10">
+                      <div className="w-8 h-8 rounded-lg bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale flex items-center justify-center shrink-0">
+                        <IconComp className="w-4 h-4" />
                       </div>
-                      <h4 className="font-serif text-[19px] sm:text-[21px] font-semibold text-charcoal dark:text-white group-hover:text-sage dark:group-hover:text-sage-pale transition-colors leading-snug">
+                      <h4 className="font-serif text-[15px] sm:text-[16px] font-semibold text-charcoal dark:text-white group-hover:text-sage transition-colors leading-snug">
                         {item.title}
                       </h4>
                     </div>
 
                     {/* Benefit Provided by Government */}
-                    <div className="pt-1">
-                      <dt className="text-[11px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-1">
+                    <div>
+                      <dt className="text-[10px] font-bold text-light dark:text-gray-400 uppercase tracking-wider mb-0.5">
                         Benefit Provided by Government
                       </dt>
-                      <dd className="text-[14px] text-charcoal dark:text-gray-200 leading-relaxed">
+                      <dd className="text-[12.5px] text-charcoal dark:text-gray-200 leading-relaxed font-medium">
                         {item.benefit}
                       </dd>
                     </div>
 
                     {/* Key Protection Callout */}
-                    <div className="bg-sage-pale/25 dark:bg-sage/10 p-4 rounded-[14px] border border-sage-pale dark:border-sage/25 flex items-start gap-3.5">
-                      <ShieldCheck className="w-5 h-5 text-sage dark:text-sage-pale shrink-0 mt-0.5" />
+                    <div className="bg-sage/5 dark:bg-sage/10 p-2.5 rounded-lg border border-sage/15 dark:border-sage/20 flex items-start gap-2.5">
+                      <ShieldCheck className="w-4 h-4 text-sage dark:text-sage-pale shrink-0 mt-0.5" />
                       <div>
-                        <dt className="text-[11px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5">
+                        <dt className="text-[10px] font-bold text-sage dark:text-sage-pale uppercase tracking-wider mb-0.5">
                           Key Legal Protection
                         </dt>
-                        <dd className="text-[13px] text-charcoal/90 dark:text-gray-200 leading-relaxed font-medium">
+                        <dd className="text-[12px] text-charcoal/90 dark:text-gray-200 leading-relaxed font-medium">
                           {item.keyProtection}
                         </dd>
                       </div>
@@ -899,21 +890,21 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
                   </div>
 
                   {/* Legal Source Hyperlink Bar */}
-                  <div className="pt-4 mt-4 border-t border-border/70 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[12.5px]">
-                    <div className="flex items-center gap-2">
-                      <span className="text-light dark:text-gray-400 text-[11.5px] font-medium">
+                  <div className="pt-2.5 mt-2.5 border-t border-border/60 dark:border-white/10 flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-[11.5px]">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <span className="text-light dark:text-gray-400 text-[11px] font-medium">
                         Legal Source:
                       </span>
                       <a
                         href={item.legalSource.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1.5 font-bold text-sage-dark dark:text-sage-pale hover:underline"
+                        className="inline-flex items-center gap-1 font-bold text-sage hover:underline"
                       >
-                        {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={12} />
+                        {item.legalSource.actName} ({item.legalSource.section}) <ExternalLink size={10} />
                       </a>
                     </div>
-                    <span className="text-[11.5px] text-light dark:text-gray-400 italic">
+                    <span className="text-[10.5px] text-light dark:text-gray-400 italic">
                       {item.legalSource.authority}
                     </span>
                   </div>
@@ -923,9 +914,9 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
           </div>
 
           {/* Legal Enforcement Note */}
-          <div className="p-4 sm:p-5 bg-cream/70 dark:bg-white/[0.04] border border-border dark:border-white/10 rounded-[14px] flex items-start gap-3.5 text-[13px] text-medium dark:text-gray-300">
-            <div className="p-2 rounded-lg bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale shrink-0 mt-0.5">
-              <FileText className="w-4 h-4" />
+          <div className="p-3 bg-cream/50 dark:bg-white/[0.03] border border-border/80 dark:border-white/10 rounded-lg flex items-start gap-2.5 text-[12px] text-medium dark:text-gray-300">
+            <div className="p-1.5 rounded-md bg-sage/15 dark:bg-sage/25 text-sage dark:text-sage-pale shrink-0 mt-0.5">
+              <FileText className="w-3.5 h-3.5" />
             </div>
             <p className="leading-relaxed">
               <strong className="text-charcoal dark:text-white font-semibold">Enforcement &amp; Redressal:</strong>{' '}

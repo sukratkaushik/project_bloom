@@ -4,6 +4,8 @@ export type WeeklyData = {
   babySizeAnalogy: string;
   length: string;
   weight: string;
+  lengthRange?: string;
+  weightRange?: string;
   babyDev: string;
   bodyChanges: string;
 };

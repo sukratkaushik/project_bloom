@@ -745,10 +745,15 @@ export const LandingPage: React.FC = () => {
                 Log In / Email Sign In
               </button>
             )}
-            {state.isSetup && !isLoggedInAndSetup && (
+            {!isLoggedInAndSetup && (
               <button
                 type="button"
-                onClick={() => navigate('/dashboard')}
+                onClick={() => {
+                  if (!state.isSetup) {
+                    updateState({ isSetup: true, hasStartedOnboarding: true, dueDate: state.dueDate || new Date(Date.now() + 151 * 86400000).toISOString() });
+                  }
+                  navigate('/dashboard');
+                }}
                 className="inline-flex items-center justify-center gap-1.5 text-medium hover:text-charcoal font-semibold px-4 py-4 text-[15px] transition-colors whitespace-nowrap cursor-pointer"
               >
                 <span>Continue as Guest</span> ➜

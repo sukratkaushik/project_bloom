@@ -23,11 +23,11 @@ export const CustomTaskList: React.FC<CustomTaskListProps> = ({ sectionId, title
   const customTasks = state.customTasks[sectionId] || [];
 
   return (
-    <div className="mt-8">
-      <h3 className="font-serif text-[22px] font-medium mb-4 text-charcoal">{title}</h3>
+    <div className="mt-7">
+      <h3 className="font-serif text-[18px] xs:text-[19px] font-medium mb-3 text-charcoal">{title}</h3>
       
       {customTasks.length > 0 && (
-        <div className="mb-4">
+        <div className="mb-3">
           <TaskList tasks={customTasks} filterTasks={(t) => t} />
         </div>
       )}
@@ -38,14 +38,14 @@ export const CustomTaskList: React.FC<CustomTaskListProps> = ({ sectionId, title
           value={newTaskText}
           onChange={(e) => setNewTaskText(e.target.value)}
           placeholder="Add a custom task..."
-          className="flex-1 p-[10px_15px] border-[1.5px] border-border rounded-[11px] font-sans text-[14px] text-charcoal bg-white focus:outline-none focus:border-sage transition-colors placeholder:text-light"
+          className="flex-1 py-2 px-3 border border-border/80 rounded-xl font-sans text-[13px] text-charcoal bg-white focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage/20 transition-all placeholder:text-light/70 shadow-3xs"
         />
         <button
           type="submit"
           disabled={!newTaskText.trim()}
-          className="px-4 bg-sage text-white rounded-[11px] font-semibold text-[13px] hover:bg-sage-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="px-3.5 py-2 bg-sage text-white rounded-xl font-semibold text-[13px] hover:bg-sage-dark transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center active:scale-95 shadow-3xs"
         >
-          <Plus size={18} />
+          <Plus size={16} />
         </button>
       </form>
     </div>

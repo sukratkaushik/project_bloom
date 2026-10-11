@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../../store';
-import { Plus, Trash2, Sparkles, X, Check, BookOpen, AlertCircle } from 'lucide-react';
+import { Plus, Trash2, Sparkles, X, Check, BookOpen } from 'lucide-react';
+import { triggerHaptic } from '../../utils/nativeBridge';
 
 const SUGGESTED_TOPICS = [
   { title: 'Postpartum Meal Prep & Freezing', placeholder: 'Meals to freeze, grocery delivery notes, snack ideas...' },
@@ -25,6 +26,7 @@ export const Notes: React.FC = () => {
       setError('Please provide a topic title.');
       return;
     }
+    triggerHaptic('medium');
     addCustomNoteTopic(newTitle.trim(), newDetails.trim(), newPlaceholder.trim());
     setNewTitle('');
     setNewDetails('');
@@ -34,6 +36,7 @@ export const Notes: React.FC = () => {
   };
 
   const handleSelectSuggestion = (s: { title: string; placeholder: string }) => {
+    triggerHaptic('light');
     setNewTitle(s.title);
     setNewPlaceholder(s.placeholder);
     setError('');
@@ -56,28 +59,30 @@ export const Notes: React.FC = () => {
   }) => {
     const hasContent = Boolean(state.notes[id] && state.notes[id].trim());
     return (
-      <div className="group relative">
-        <div className="flex items-center justify-between mb-2">
-          <label className="text-[11px] font-semibold tracking-[1px] uppercase text-medium flex items-center gap-1.5">
+      <div className="bg-white border border-border/80 rounded-2xl p-4 sm:p-5 shadow-2xs hover:border-sage/40 transition-all">
+        <div className="flex items-center justify-between mb-2.5">
+          <label className="text-[11.5px] font-bold tracking-wider uppercase text-charcoal/80 flex items-center gap-1.5">
             {isCustom && <span className="w-2 h-2 rounded-full bg-sage" />}
-            {label}
+            <span>{label}</span>
           </label>
           <div className="flex items-center gap-2">
             {hasContent && (
-              <span className="text-[11px] font-medium text-sage flex items-center gap-1">
-                <Check size={12} /> Saved
+              <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full flex items-center gap-1">
+                <Check size={11} /> Saved
               </span>
             )}
             {isCustom && onDelete && (
               <button
                 type="button"
                 onClick={() => {
+                  triggerHaptic('light');
                   if (window.confirm(`Delete topic "${label}" and its notes?`)) {
                     onDelete();
                   }
                 }}
-                className="text-light hover:text-critical p-1 rounded-md transition-colors cursor-pointer"
+                className="text-light hover:text-critical p-1 rounded-lg transition-colors cursor-pointer"
                 title="Delete topic"
+                aria-label={`Delete topic ${label}`}
               >
                 <Trash2 size={15} />
               </button>
@@ -87,7 +92,7 @@ export const Notes: React.FC = () => {
         <textarea
           value={state.notes[id] || ''}
           onChange={(e) => setNote(id, e.target.value)}
-          className={`w-full p-3.5 border-[1.5px] border-border rounded-[12px] font-sans text-[14px] text-charcoal bg-white resize-y transition-all leading-[1.65] focus:outline-none focus:border-sage focus:ring-[3px] focus:ring-sage/10 placeholder:text-light placeholder:italic ${minHeight}`}
+          className={`w-full p-3 border border-border/70 rounded-xl text-[13.5px] text-charcoal bg-cream/30 resize-y transition-all leading-relaxed focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage placeholder:text-light placeholder:italic ${minHeight}`}
           placeholder={placeholder}
         />
       </div>
@@ -95,46 +100,50 @@ export const Notes: React.FC = () => {
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <div className="mb-7 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+    <div className="space-y-5 animate-in fade-in duration-200">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-2 mb-1.5">
-            <BookOpen className="w-7 h-7 text-sage" />
-            <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal">Notes & Journal</h2>
-          </div>
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-            A space that's entirely yours — questions, thoughts, names, memories, and custom pregnancy topics.
+          <h2 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-tight">
+            Notes & Bump Journal
+          </h2>
+          <p className="text-[12.5px] text-medium mt-0.5">
+            Personal reflections, questions for your OB-GYN & custom pregnancy logs
           </p>
         </div>
-        <div className="flex items-center gap-2.5 shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <button
             type="button"
-            onClick={() => setIsAddingTopic(true)}
-            className="px-3.5 py-2 bg-sage hover:bg-sage-dark text-white rounded-[10px] font-sans text-[13px] font-semibold cursor-pointer transition-all shadow-sm flex items-center gap-1.5"
+            onClick={() => {
+              triggerHaptic('light');
+              setIsAddingTopic(true);
+            }}
+            className="h-9 px-3.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-[12.5px] font-bold cursor-pointer transition-all shadow-2xs flex items-center gap-1.5"
           >
-            <Plus size={16} /> Add Topic
+            <Plus size={15} />
+            <span>Add Topic</span>
           </button>
           <button
             type="button"
             onClick={() => {
+              triggerHaptic('light');
               import('../../utils/pdfExport').then((module) => {
                 module.exportToPDF(state);
               });
             }}
-            className="px-3.5 py-2 bg-sage-pale border-[1.5px] border-sage rounded-[10px] font-sans text-[13px] font-medium text-sage cursor-pointer transition-all hover:bg-sage hover:text-white"
+            className="h-9 px-3.5 bg-white border border-border/80 hover:bg-cream rounded-xl text-[12.5px] font-bold text-charcoal cursor-pointer transition-all shadow-2xs flex items-center gap-1.5"
           >
-            📄 Export PDF
+            <span>Export PDF</span>
           </button>
         </div>
       </div>
 
-      <div className="grid gap-5">
+      <div className="space-y-3.5">
         {/* Core Default Topics */}
         <NoteField
           id="notesAppt"
-          label="Questions for my next appointment"
-          placeholder="Write down anything you want to ask your midwife or OB so you don't forget in the moment…"
-          minHeight="min-h-[120px]"
+          label="Questions for next doctor visit"
+          placeholder="Write down anything you want to ask your obstetrician so you don't forget in the moment…"
+          minHeight="min-h-[100px]"
         />
         <NoteField
           id="notesNames"
@@ -144,29 +153,29 @@ export const Notes: React.FC = () => {
         />
         <NoteField
           id="notesSupport"
-          label="Support people & roles"
-          placeholder="Who is at the birth? Who is on call for older kids? Who brings meals? Who is the 3am call?"
-          minHeight="min-h-[100px]"
+          label="Support people & birth circle"
+          placeholder="Who is at the birth? Who brings postpartum meals? Emergency contact..."
+          minHeight="min-h-[80px]"
         />
         <NoteField
           id="notesCultural"
-          label="Cultural, spiritual & personal wishes"
-          placeholder="Ceremonies, naming traditions, dietary requirements, faith-based preferences…"
+          label="Cultural, spiritual & family traditions"
+          placeholder="Godh Bharai / Seemantham wishes, naming traditions, dietary requirements…"
           minHeight="min-h-[80px]"
         />
         <NoteField
           id="notesWishes"
-          label="Wishes & hopes — a note to yourself"
-          placeholder="What do you want to remember about this time? What are your hopes for your growing family? Write freely…"
-          minHeight="min-h-[140px]"
+          label="Hopes & reflections — a note to yourself"
+          placeholder="What do you want to remember about this time? How are you feeling today?"
+          minHeight="min-h-[100px]"
         />
 
         {/* User-Added Custom Topics Section Header */}
         {state.customNoteTopics && state.customNoteTopics.length > 0 && (
-          <div className="pt-3 border-t border-border/80 flex items-center justify-between">
-            <h3 className="text-[12px] font-bold uppercase tracking-[1.5px] text-medium flex items-center gap-2">
+          <div className="pt-2 flex items-center justify-between">
+            <h3 className="text-[12px] font-bold uppercase tracking-wider text-charcoal/80 flex items-center gap-2">
               <span>My Custom Topics</span>
-              <span className="px-2 py-0.5 rounded-full bg-sage/15 text-sage text-[11px] font-bold">
+              <span className="px-2 py-0.2 rounded-full bg-sage-pale text-sage-dark text-[11px] font-bold">
                 {state.customNoteTopics.length}
               </span>
             </h3>
@@ -180,7 +189,7 @@ export const Notes: React.FC = () => {
             id={topic.id}
             label={topic.title}
             placeholder={topic.placeholder || 'Write your thoughts, questions, or notes here...'}
-            minHeight="min-h-[100px]"
+            minHeight="min-h-[90px]"
             isCustom={true}
             onDelete={() => deleteCustomNoteTopic(topic.id)}
           />
@@ -190,19 +199,24 @@ export const Notes: React.FC = () => {
         {!isAddingTopic ? (
           <button
             type="button"
-            onClick={() => setIsAddingTopic(true)}
-            className="w-full py-4 border-2 border-dashed border-border hover:border-sage rounded-[14px] text-[13.5px] font-medium text-medium hover:text-sage flex items-center justify-center gap-2 transition-all cursor-pointer bg-white/40 hover:bg-sage-pale/20 mt-2"
+            onClick={() => {
+              triggerHaptic('light');
+              setIsAddingTopic(true);
+            }}
+            className="w-full py-3.5 border-2 border-dashed border-border/80 hover:border-sage rounded-2xl text-[13px] font-bold text-medium hover:text-sage-dark flex items-center justify-center gap-2 transition-all cursor-pointer bg-white/50 hover:bg-cream"
           >
-            <Plus size={16} /> Add Another Topic
+            <Plus size={16} />
+            <span>Add Custom Journal Topic</span>
           </button>
         ) : (
           <form
             onSubmit={handleAddTopic}
-            className="p-5 border-[1.5px] border-sage/40 rounded-[16px] bg-white shadow-sm space-y-4 animate-in fade-in slide-in-from-bottom-2 mt-2"
+            className="p-4 sm:p-5 border border-sage/30 rounded-3xl bg-white shadow-xs space-y-3.5 animate-in fade-in"
           >
-            <div className="flex items-center justify-between pb-3 border-b border-border">
-              <h4 className="text-[14px] font-semibold text-charcoal flex items-center gap-2">
-                <Sparkles size={16} className="text-sage" /> Add New Topic to Journal
+            <div className="flex items-center justify-between pb-2 border-b border-border/70">
+              <h4 className="text-[14px] font-serif font-bold text-charcoal flex items-center gap-2">
+                <Sparkles size={16} className="text-sage" />
+                <span>Add Custom Topic</span>
               </h4>
               <button
                 type="button"
@@ -219,20 +233,16 @@ export const Notes: React.FC = () => {
 
             {/* Quick Suggestions */}
             <div>
-              <label className="text-[11px] font-bold uppercase tracking-wider text-light block mb-1.5">
-                Quick Inspiration (Click to prefill)
-              </label>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-light block mb-1.5">
+                Quick Inspirations
+              </span>
               <div className="flex flex-wrap gap-1.5">
-                {SUGGESTED_TOPICS.map((s) => (
+                {SUGGESTED_TOPICS.map((s, idx) => (
                   <button
-                    key={s.title}
+                    key={idx}
                     type="button"
                     onClick={() => handleSelectSuggestion(s)}
-                    className={`text-[12px] px-2.5 py-1 rounded-full border transition-all cursor-pointer ${
-                      newTitle === s.title
-                        ? 'bg-sage text-white border-sage font-medium'
-                        : 'bg-gray-50 border-border text-medium hover:border-sage hover:text-sage'
-                    }`}
+                    className="text-[11.5px] px-2.5 py-1 rounded-lg bg-cream hover:bg-sage-pale border border-border/70 hover:border-sage/40 text-charcoal font-medium transition-colors cursor-pointer"
                   >
                     + {s.title}
                   </button>
@@ -240,73 +250,43 @@ export const Notes: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-3 pt-1">
-              <div>
-                <label className="text-[11px] font-bold uppercase tracking-wider text-light block mb-1">
-                  Topic Title *
-                </label>
-                <input
-                  type="text"
-                  value={newTitle}
-                  onChange={(e) => {
-                    setNewTitle(e.target.value);
-                    if (error) setError('');
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddTopic();
-                    }
-                  }}
-                  placeholder="e.g., Doula Questions, Postpartum Meal Prep, Baby Shower Wishes..."
-                  className={`w-full p-3 bg-cream border rounded-xl text-[14px] text-charcoal outline-none transition-colors ${
-                    error ? 'border-critical focus:border-critical ring-2 ring-critical/10' : 'border-border focus:border-sage'
-                  }`}
-                  autoFocus
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold uppercase tracking-wider text-light block mb-1">
-                  Notes & Details (Optional)
-                </label>
-                <textarea
-                  value={newDetails}
-                  onChange={(e) => setNewDetails(e.target.value)}
-                  placeholder={newPlaceholder || "Write down your questions, thoughts, or notes here..."}
-                  rows={3}
-                  className="w-full p-3 bg-cream border border-border rounded-xl text-[14px] text-charcoal outline-none focus:border-sage resize-y leading-[1.6]"
-                />
-              </div>
-
-              {error && (
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-[12.5px] text-critical font-medium">
-                  <AlertCircle size={15} className="shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
+            <div className="space-y-2">
+              <input
+                type="text"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                placeholder="Topic Title (e.g. Sibling Preparation)"
+                className="w-full px-3.5 py-2.5 border border-border/80 rounded-xl text-[13.5px] text-charcoal bg-cream/40 focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
+              />
+              <input
+                type="text"
+                value={newPlaceholder}
+                onChange={(e) => setNewPlaceholder(e.target.value)}
+                placeholder="Helpful prompt placeholder (optional)"
+                className="w-full px-3.5 py-2.5 border border-border/80 rounded-xl text-[13px] text-charcoal bg-cream/40 focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
+              />
             </div>
 
-            <div className="flex justify-end gap-2.5 pt-2">
+            {error && (
+              <p className="text-[12px] text-critical font-medium">{error}</p>
+            )}
+
+            <div className="flex gap-2 justify-end pt-1">
               <button
                 type="button"
                 onClick={() => {
                   setIsAddingTopic(false);
                   setError('');
                 }}
-                className="px-4 py-2 border border-border text-medium hover:bg-gray-100 rounded-xl text-[13px] font-medium transition-colors cursor-pointer"
+                className="px-3.5 py-2 rounded-xl text-[12.5px] font-bold text-medium hover:bg-cream transition-colors cursor-pointer"
               >
                 Cancel
               </button>
               <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleAddTopic();
-                }}
-                className="px-5 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-[13px] font-semibold flex items-center gap-1.5 transition-all cursor-pointer shadow-sm active:scale-95"
+                type="submit"
+                className="px-4 py-2 bg-sage hover:bg-sage-dark text-white rounded-xl text-[12.5px] font-bold transition-all shadow-2xs cursor-pointer"
               >
-                <Check size={15} /> Save Topic
+                Create Topic
               </button>
             </div>
           </form>

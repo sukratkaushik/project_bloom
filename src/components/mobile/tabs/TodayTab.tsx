@@ -26,6 +26,12 @@ import {
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { ALL_PREGNANCY_TOOLS, getToolById, ToolDefinition } from '../toolsData';
+import {
+  FETAL_GROWTH_RANGES,
+  getRelevantScanForWeek,
+  FetalScanRecord,
+} from '../../../utils/fetalGrowth';
+import { FetalGrowthReassuranceModal } from '../../FetalGrowthReassuranceModal';
 
 interface TodayTabProps {
   onOpenTool: (toolId: string) => void;
@@ -81,6 +87,33 @@ export const TodayTab: React.FC<TodayTabProps> = ({
 
   // Selected week developmental data from weeklyData.ts
   const weekInfo = WEEKLY_DATA[selectedWeek - 1] || WEEKLY_DATA[0];
+
+  // Fetal Growth Range & Scan Personalization State
+  const [isFetalReassuranceOpen, setIsFetalReassuranceOpen] = useState(false);
+  const [activeFetalScan, setActiveFetalScan] = useState<FetalScanRecord | null>(() =>
+    getRelevantScanForWeek(selectedWeek)
+  );
+
+  // Update active scan when selectedWeek changes or when a scan is updated
+  useEffect(() => {
+    setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+  }, [selectedWeek]);
+
+  useEffect(() => {
+    const handleScanUpdated = () => {
+      setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+    };
+    window.addEventListener('bloom_fetal_scan_updated', handleScanUpdated);
+    return () => {
+      window.removeEventListener('bloom_fetal_scan_updated', handleScanUpdated);
+    };
+  }, [selectedWeek]);
+
+  // Derived growth ranges
+  const growthRange = FETAL_GROWTH_RANGES[selectedWeek] || {
+    lengthRange: weekInfo.length,
+    weightRange: weekInfo.weight,
+  };
 
   // Trimester calculation based on selected week
   let trimesterName = 'Trimester 1 • Early Formation';
@@ -615,22 +648,106 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
         </div>
 
-        {/* Baby Metrology Row */}
-        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-3 gap-1.5 xs:gap-2 text-center">
-          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Size</span>
-            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] truncate mt-0.5" title={weekInfo.babySizeAnalogy}>
-              {weekInfo.babySizeAnalogy}
-            </p>
+        {/* Baby Metrology Row (Option C: Replaced by Doctor's Scan or Healthy Range) */}
+        <div className="mt-3.5 pt-3 border-t border-border/60">
+          <div className="grid grid-cols-3 gap-1.5 xs:gap-2 text-center">
+            {/* Size Card */}
+            <div className="bg-white/85 rounded-xl py-2 px-1 xs:px-1.5 border border-border/60 flex flex-col justify-center shadow-2xs">
+              <span className="text-medium text-[9px] xs:text-[9.5px] uppercase font-bold tracking-wider block">Size</span>
+              <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] truncate mt-0.5" title={weekInfo.babySizeAnalogy}>
+                {weekInfo.babySizeAnalogy}
+              </p>
+            </div>
+
+            {/* Length Card: Doctor Scan or Range */}
+            <div
+              onClick={() => {
+                triggerHaptic('light');
+                setIsFetalReassuranceOpen(true);
+              }}
+              className={`rounded-xl py-2 px-1 xs:px-1.5 border flex flex-col justify-center cursor-pointer transition-all active:scale-[0.98] ${
+                activeFetalScan?.lengthCm
+                  ? 'bg-sage-pale/60 border-sage/40 shadow-2xs'
+                  : 'bg-white/85 border-border/60 hover:border-sage/40 shadow-2xs'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-medium text-[9px] xs:text-[9.5px] uppercase font-bold tracking-wider block truncate">
+                  {activeFetalScan?.lengthCm ? 'Doctor Scan' : 'Est. Length'}
+                </span>
+                {activeFetalScan?.lengthCm && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage-dark animate-pulse" />
+                )}
+              </div>
+              <p className={`font-bold text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate ${
+                activeFetalScan?.lengthCm ? 'text-sage-dark' : 'text-charcoal'
+              }`}>
+                {activeFetalScan?.lengthCm ? `${activeFetalScan.lengthCm} cm` : growthRange.lengthRange}
+              </p>
+            </div>
+
+            {/* Weight Card: Doctor Scan or Range */}
+            <div
+              onClick={() => {
+                triggerHaptic('light');
+                setIsFetalReassuranceOpen(true);
+              }}
+              className={`rounded-xl py-2 px-1 xs:px-1.5 border flex flex-col justify-center cursor-pointer transition-all active:scale-[0.98] ${
+                activeFetalScan?.weightGrams
+                  ? 'bg-sage-pale/60 border-sage/40 shadow-2xs'
+                  : 'bg-white/85 border-border/60 hover:border-sage/40 shadow-2xs'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <span className="text-medium text-[9px] xs:text-[9.5px] uppercase font-bold tracking-wider block truncate">
+                  {activeFetalScan?.weightGrams ? 'Doctor Scan' : 'Est. Weight'}
+                </span>
+                {activeFetalScan?.weightGrams && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-sage-dark animate-pulse" />
+                )}
+              </div>
+              <p className={`font-bold text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate ${
+                activeFetalScan?.weightGrams ? 'text-sage-dark' : 'text-charcoal'
+              }`}>
+                {activeFetalScan?.weightGrams ? `${activeFetalScan.weightGrams} g` : growthRange.weightRange}
+              </p>
+            </div>
           </div>
-          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Length</span>
-            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate">{weekInfo.length}</p>
-          </div>
-          <div className="bg-white/80 rounded-xl py-2 px-1 xs:px-1.5 border border-border/50 flex flex-col justify-center">
-            <span className="text-medium text-[9px] xs:text-[9.5px] sm:text-[10px] uppercase font-bold tracking-wider block">Weight</span>
-            <p className="font-bold text-charcoal text-[11px] xs:text-[12px] sm:text-[13px] mt-0.5 truncate">{weekInfo.weight}</p>
-          </div>
+
+          {/* Genetic & Dietary Reassurance Tag / Doctor Verified Badge */}
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setIsFetalReassuranceOpen(true);
+            }}
+            className={`mt-2.5 w-full py-1.5 px-2.5 rounded-xl text-[10.5px] xs:text-[11px] font-medium flex items-center justify-between gap-1.5 transition-all cursor-pointer ${
+              activeFetalScan
+                ? 'bg-sage-pale/80 text-sage-dark border border-sage/30 hover:bg-sage-pale'
+                : 'bg-white/70 text-charcoal/80 border border-border/60 hover:bg-white hover:text-charcoal'
+            }`}
+          >
+            <div className="flex items-center gap-1.5 truncate">
+              {activeFetalScan ? (
+                <>
+                  <Sparkles size={12} className="text-sage-dark shrink-0" />
+                  <span className="font-bold truncate">
+                    ✨ Doctor Scan Verified ({activeFetalScan.scanType})
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-sage-dark font-bold shrink-0">🌿</span>
+                  <span className="truncate">
+                    Est. Range • Genetics & diet shape your baby&apos;s growth
+                  </span>
+                </>
+              )}
+            </div>
+            <span className="text-[10px] font-bold text-sage-dark underline shrink-0 whitespace-nowrap ml-1">
+              {activeFetalScan ? 'Details ›' : 'Learn why ›'}
+            </span>
+          </button>
         </div>
 
         {/* Weekly Fetal Highlight Snippet */}
@@ -905,6 +1022,24 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Fetal Growth Reassurance & Scan Personalization Modal */}
+      <FetalGrowthReassuranceModal
+        isOpen={isFetalReassuranceOpen}
+        onClose={() => setIsFetalReassuranceOpen(false)}
+        currentWeek={selectedWeek}
+        activeScan={activeFetalScan}
+        lengthRange={growthRange.lengthRange}
+        weightRange={growthRange.weightRange}
+        onOpenVaultScan={() => {
+          if (onSelectTab) onSelectTab('vault');
+          else onOpenTool('medical-reports');
+        }}
+        onScanSaved={() => {
+          setActiveFetalScan(getRelevantScanForWeek(selectedWeek));
+          if (onShowToast) onShowToast('Ultrasound scan saved & dashboard updated!');
+        }}
+      />
     </div>
   );
 };

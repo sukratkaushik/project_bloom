@@ -1,14 +1,221 @@
 import React, { useState } from 'react';
 import { usePlanner } from '../store';
-import { getFunctions, httpsCallable } from 'firebase/functions';
-import { functions } from '../firebase';
-import { Bot, Sparkles, ShieldCheck, Loader2, Lock, Gift } from 'lucide-react';
+import { 
+  Bot, 
+  Sparkles, 
+  ShieldCheck, 
+  Loader2, 
+  Gift, 
+  Users, 
+  Calendar, 
+  HeartHandshake, 
+  Stethoscope, 
+  UtensilsCrossed, 
+  FileText, 
+  CheckCircle2, 
+  Smartphone,
+  Check,
+  LockOpen
+} from 'lucide-react';
 import { navigate } from '../utils/navigation';
+import { triggerHaptic } from '../utils/nativeBridge';
 
 interface PaywallProps {
   children: React.ReactNode;
   featureName: 'AskOurPregnancy' | 'FoodScanner' | 'MaternalCare' | 'GovernmentSchemes' | 'Postpartum' | 'PartnerSync' | 'EhrExports';
 }
+
+interface FeatureConfig {
+  tier: 'standard' | 'premium';
+  badge: string;
+  title: string;
+  subtitle: string;
+  icon: React.ElementType;
+  perks: {
+    icon: React.ElementType;
+    title: string;
+    desc: string;
+  }[];
+  includedSummary: string;
+}
+
+const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
+  PartnerSync: {
+    tier: 'standard',
+    badge: 'Bloom Standard • Partner Companion',
+    title: 'Sync Your Journey Together',
+    subtitle: 'Keep your partner connected to every movement, appointment, and milestone in real time.',
+    icon: Users,
+    perks: [
+      {
+        icon: Smartphone,
+        title: 'Real-Time Kick & Vitals Alerts',
+        desc: 'Instant notifications on your partner’s device when baby moves or health logs update.'
+      },
+      {
+        icon: Calendar,
+        title: 'Shared Doctor Scans & Milestones',
+        desc: 'Keep both parents aligned on ultrasound visits, trimester labs, and hospital bags.'
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Zero-Knowledge P2P Encryption',
+        desc: 'Direct peer-to-peer sync with private encryption. Your memories never touch third parties.'
+      }
+    ],
+    includedSummary: 'Also includes Government Schemes, Postpartum Healing & Maternal Clinical Pack'
+  },
+  AskOurPregnancy: {
+    tier: 'premium',
+    badge: 'Bloom Premium • 24/7 AI Companion',
+    title: 'Warm, Empathetic Maternal Guidance',
+    subtitle: 'Ask about symptoms, trimester changes, cravings, or hospital prep anytime, day or night.',
+    icon: Bot,
+    perks: [
+      {
+        icon: Sparkles,
+        title: 'Unlimited Trimester Consultations',
+        desc: 'Instant compassionate guidance tailored specifically to your gestational week and symptoms.'
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Medically-Grounded Safety Standards',
+        desc: 'Curated against verified obstetric protocols, Indian clinical guidelines, and maternal health research.'
+      },
+      {
+        icon: HeartHandshake,
+        title: 'Personalized to Your Profile',
+        desc: 'Context-aware responses factoring in your trimester, diet preferences, and medical history.'
+      }
+    ],
+    includedSummary: 'Includes Food Scanner, EHR Medical Record Vault & all Standard Care features'
+  },
+  FoodScanner: {
+    tier: 'premium',
+    badge: 'Bloom Premium • AI Nutrition Scanner',
+    title: 'Nourish Safely, Every Meal',
+    subtitle: 'Scan meals, restaurant dishes, and packaged snacks for pregnancy-safe ingredients.',
+    icon: UtensilsCrossed,
+    perks: [
+      {
+        icon: ShieldCheck,
+        title: 'Instant Hazard & Heat Detection',
+        desc: 'Detects unpasteurized dairy, raw sprouts, high-mercury fish, and high-heat Ayurvedic spices.'
+      },
+      {
+        icon: Sparkles,
+        title: 'Trimester-Specific Nutrient Balancing',
+        desc: 'Highlights critical iron, calcium, folate, and protein density in every Indian food item.'
+      },
+      {
+        icon: CheckCircle2,
+        title: 'Wholesome Craving Swaps',
+        desc: 'Safe, satisfying alternatives for street foods, sweets, and spicy cravings.'
+      }
+    ],
+    includedSummary: 'Includes Bloom AI Companion, EHR Medical Vault & all Standard Care features'
+  },
+  GovernmentSchemes: {
+    tier: 'standard',
+    badge: 'Bloom Standard • Maternal Welfare',
+    title: 'Claim Your Full Maternity Benefits',
+    subtitle: 'Step-by-step guidance to claim financial assistance under JSY, PMMVY, and state schemes.',
+    icon: FileText,
+    perks: [
+      {
+        icon: Sparkles,
+        title: 'Up to ₹6,000+ Direct DBT Assistance',
+        desc: 'Full eligibility calculators and document checklists for Indian central and state programs.'
+      },
+      {
+        icon: Calendar,
+        title: 'Anganwadi & Hospital Filing Guide',
+        desc: 'Clear guidance for MCP card registration, ASHA worker coordination, and bank DBT setup.'
+      },
+      {
+        icon: ShieldCheck,
+        title: '100% Free & Transparent Process',
+        desc: 'Official direct government routes with zero middleman commissions.'
+      }
+    ],
+    includedSummary: 'Also includes Partner Sync, Postpartum Care & Clinical Maternal Pack'
+  },
+  Postpartum: {
+    tier: 'standard',
+    badge: 'Bloom Standard • Fourth Trimester',
+    title: 'Gentle Postpartum Recovery',
+    subtitle: 'Dedicated physical healing, lactation tracking, and maternal mental wellness screening.',
+    icon: HeartHandshake,
+    perks: [
+      {
+        icon: CheckCircle2,
+        title: 'Physical Recovery Timeline',
+        desc: 'Lochia monitoring, perineal & C-section incision care, and gentle pelvic floor recovery.'
+      },
+      {
+        icon: Sparkles,
+        title: 'Validated EPDS Wellbeing Checks',
+        desc: 'Clinically validated screening for postpartum blues and emotional support resources.'
+      },
+      {
+        icon: Calendar,
+        title: 'Newborn Milestones & Feeds',
+        desc: 'Diaper tallies, feeding logs, and pediatrician vaccination schedule alignment.'
+      }
+    ],
+    includedSummary: 'Also includes Partner Sync, Government Maternity Schemes & Maternal Care Pack'
+  },
+  MaternalCare: {
+    tier: 'standard',
+    badge: 'Bloom Standard • Clinical Pack',
+    title: 'Essential Clinical Checklists',
+    subtitle: 'Trimester-by-trimester medical milestones, lab tests, and doctor discussion guides.',
+    icon: Stethoscope,
+    perks: [
+      {
+        icon: Stethoscope,
+        title: 'Ultrasound & Scan Preparation',
+        desc: 'NT, Anomaly/TIFFA, Doppler, and Growth ultrasound guidelines and questions for your doctor.'
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Critical Clinical Red Flags',
+        desc: 'Early warning checklists for BP elevation, gestational diabetes, and unusual swelling.'
+      },
+      {
+        icon: Calendar,
+        title: 'Doctor Visit Notes & Milestones',
+        desc: 'Keep every obstetrician consultation organized and actionable in one calm place.'
+      }
+    ],
+    includedSummary: 'Also includes Partner Sync, Government Maternity Benefits & Postpartum Care'
+  },
+  EhrExports: {
+    tier: 'premium',
+    badge: 'Bloom Premium • Health Vault',
+    title: 'Doctor-Ready Medical Records',
+    subtitle: 'Generate comprehensive FHIR R4 clinical exports and hospital admission health summaries.',
+    icon: FileText,
+    perks: [
+      {
+        icon: FileText,
+        title: 'One-Tap Clinical PDF Export',
+        desc: 'Formatted obstetric summaries ready to print or WhatsApp to your gynecologist.'
+      },
+      {
+        icon: ShieldCheck,
+        title: 'Hospital Admission Readiness',
+        desc: 'Instant emergency card with blood group, allergies, vitals trends, and emergency contacts.'
+      },
+      {
+        icon: Sparkles,
+        title: 'ABDM & FHIR Compliant Records',
+        desc: 'Structured digital health records matching national Ayushman Bharat health standards.'
+      }
+    ],
+    includedSummary: 'Includes Bloom AI Companion, Food Safety Scanner & all Standard Care features'
+  }
+};
 
 const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature: string, isAdmin: boolean = false) => {
   if (isAdmin) return true;
@@ -23,7 +230,7 @@ const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature:
 export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const { state, updateState } = usePlanner();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [months, setMonths] = useState(3); // default to 3 months for best value
+  const [selectedMonths, setSelectedMonths] = useState<number>(3); // 3 months default for best value
 
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
   const hasAccess = checkAccess(planTier, featureName, state.isAdmin);
@@ -32,120 +239,277 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     return <>{children}</>;
   }
 
-  const isPremiumFeature = ['AskOurPregnancy', 'FoodScanner', 'EhrExports'].includes(featureName);
-  const basePrice = isPremiumFeature ? 499 : 199;
-  const discount = Math.floor(months / 3) * 50;
-  const totalPrice = basePrice * months - discount;
+  const config = FEATURE_CONFIGS[featureName];
+  const isPremiumFeature = config.tier === 'premium';
+  const HeroIcon = config.icon;
+
+  // Pricing calculations
+  const basePricePerMonth = isPremiumFeature ? 499 : 199;
+  const discountAmount = Math.floor(selectedMonths / 3) * (isPremiumFeature ? 100 : 50);
+  const originalTotalPrice = basePricePerMonth * selectedMonths;
+  const finalTotalPrice = originalTotalPrice - discountAmount;
+  const perMonthPrice = Math.round(finalTotalPrice / selectedMonths);
+
+  const durationOptions = [
+    {
+      months: 1,
+      title: '1 Month',
+      subtitle: `₹${basePricePerMonth}/mo`,
+      badge: null,
+      highlight: false
+    },
+    {
+      months: 3,
+      title: '3 Months',
+      subtitle: `₹${Math.round((basePricePerMonth * 3 - (isPremiumFeature ? 100 : 50)) / 3)}/mo`,
+      badge: isPremiumFeature ? 'Save ₹100' : 'Save ₹50',
+      tag: 'Most Popular',
+      highlight: true
+    },
+    {
+      months: 9,
+      title: 'Full Journey',
+      subtitle: `₹${Math.round((basePricePerMonth * 9 - (isPremiumFeature ? 300 : 150)) / 9)}/mo`,
+      badge: isPremiumFeature ? 'Save ₹300' : 'Save ₹150',
+      tag: 'Best Value',
+      highlight: false
+    }
+  ];
+
+  const handleSelectMonths = (m: number) => {
+    triggerHaptic('selection');
+    setSelectedMonths(m);
+  };
 
   const handlePayment = () => {
-    navigate(`/checkout?plan=${isPremiumFeature ? 'premium' : 'standard'}&months=${months}`);
+    triggerHaptic('medium');
+    setIsProcessing(true);
+    navigate(`/checkout?plan=${config.tier}&months=${selectedMonths}`);
+  };
+
+  const handleActivateVip = () => {
+    triggerHaptic('success');
+    updateState({ 
+      isPremium: true, 
+      planTier: isPremiumFeature ? 'premium' : 'standard' 
+    });
   };
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <div className="mb-8">
-        <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-          <Lock className={isPremiumFeature ? "text-gold" : "text-sage"} size={32} />
-          {isPremiumFeature ? 'AI Ultimate Pack' : 'Maternal Care Pack'}
-        </h2>
-        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-          {isPremiumFeature
-            ? 'Unlock advanced AI-powered pregnancy scanners, chatbots, and EHR reports.'
-            : 'Unlock essential clinical checklists, government maternity schemes, and postpartum care.'}
-        </p>
+    <div className="animate-in fade-in duration-300 pb-10 space-y-5 max-w-xl mx-auto">
+      {/* Top Hero Card */}
+      <div className="bg-white border border-border/80 rounded-2xl shadow-2xs overflow-hidden">
+        {/* Soft Header Banner */}
+        <div className={`p-5 sm:p-6 border-b border-border/60 ${
+          isPremiumFeature 
+            ? 'bg-gradient-to-br from-amber-50/80 via-cream/40 to-white' 
+            : 'bg-gradient-to-br from-tulsi-light/50 via-cream/30 to-white'
+        }`}>
+          <div className="flex items-center justify-between gap-2 mb-3">
+            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11.5px] font-semibold tracking-wide uppercase border ${
+              isPremiumFeature
+                ? 'bg-amber-100/70 text-amber-900 border-amber-300/40'
+                : 'bg-tulsi-light text-sage-dark border-sage/20'
+            }`}>
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{config.badge}</span>
+            </span>
+
+            <span className="text-[11px] font-medium text-muted bg-white/80 px-2.5 py-0.5 rounded-full border border-border/60">
+              One-Time Pass
+            </span>
+          </div>
+
+          <div className="flex items-start gap-3.5">
+            <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+              isPremiumFeature
+                ? 'bg-amber-100 text-amber-800 border-amber-200'
+                : 'bg-tulsi-light text-sage-dark border-sage/25'
+            }`}>
+              <HeroIcon className="w-6 h-6" />
+            </div>
+            <div>
+              <h2 className="font-serif text-[22px] sm:text-[24px] font-medium text-charcoal leading-snug">
+                {config.title}
+              </h2>
+              <p className="text-[13px] text-medium mt-1 leading-relaxed">
+                {config.subtitle}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Feature Perks List */}
+        <div className="p-5 sm:p-6 space-y-3 bg-white">
+          <span className="text-[11px] uppercase tracking-wider font-bold text-medium block">
+            What's included in this pack
+          </span>
+
+          <div className="space-y-2.5">
+            {config.perks.map((perk, idx) => {
+              const PerkIcon = perk.icon;
+              return (
+                <div 
+                  key={idx}
+                  className="flex items-start gap-3 p-3 rounded-xl bg-cream/35 border border-border/70"
+                >
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 ${
+                    isPremiumFeature
+                      ? 'bg-amber-100/70 text-amber-800'
+                      : 'bg-tulsi-light text-sage-dark'
+                  }`}>
+                    <PerkIcon className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 space-y-0.5">
+                    <h4 className="text-[13px] font-semibold text-charcoal leading-snug">
+                      {perk.title}
+                    </h4>
+                    <p className="text-[12px] text-medium leading-relaxed">
+                      {perk.desc}
+                    </p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <p className="text-[11.5px] text-medium/80 italic pt-1 text-center sm:text-left">
+            ✨ {config.includedSummary}
+          </p>
+        </div>
       </div>
 
-      <div className={`bg-white dark:bg-[#1E293B] border-[2px] ${isPremiumFeature ? 'border-gold' : 'border-sage'} rounded-[24px] overflow-hidden shadow-xl max-w-[700px] mx-auto`}>
-        <div className={`px-8 py-5 flex items-center justify-between ${isPremiumFeature ? 'bg-gold text-charcoal' : 'bg-sage text-white'}`}>
-          <div className="font-bold text-[18px] flex items-center gap-2">
-            {isPremiumFeature ? 'Our Pregnancy Premium' : 'Our Pregnancy Standard'} <Sparkles className="w-5 h-5 flex-shrink-0" />
+      {/* Pricing & Duration Selection Card */}
+      <div className="bg-white border border-border/80 rounded-2xl shadow-2xs p-5 sm:p-6 space-y-5">
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <h3 className="font-serif text-[18px] text-charcoal font-medium">Choose Duration</h3>
+            <span className="text-[11.5px] text-muted">No auto-renewals</span>
           </div>
-          <div className="text-[11px] font-bold uppercase tracking-wider bg-white/20 px-3 py-1 rounded-full backdrop-blur-sm shadow-sm">
-            Locked Feature
-          </div>
+          <p className="text-[12px] text-medium">Select the timeframe that matches your gestational trimester.</p>
         </div>
 
-        <div className="p-8 sm:p-10">
-          <h3 className="font-serif text-[26px] text-charcoal dark:text-white mb-4">
-            {isPremiumFeature
-              ? 'Unlock Intelligent Features ✨'
-              : 'Unlock Healthcare & Support Guides 🩺'}
-          </h3>
+        {/* 3 Duration Cards */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {durationOptions.map((opt) => {
+            const isSelected = selectedMonths === opt.months;
+            return (
+              <button
+                key={opt.months}
+                type="button"
+                onClick={() => handleSelectMonths(opt.months)}
+                className={`relative flex flex-col items-center text-center p-3 sm:p-3.5 rounded-xl border transition-all cursor-pointer ${
+                  isSelected
+                    ? isPremiumFeature
+                      ? 'bg-amber-50/60 border-amber-400 ring-2 ring-amber-400/20 shadow-2xs'
+                      : 'bg-tulsi-light/60 border-sage ring-2 ring-sage/20 shadow-2xs'
+                    : 'bg-cream/30 border-border/80 hover:bg-cream/60'
+                }`}
+              >
+                {opt.tag && (
+                  <span className={`absolute -top-2.5 px-2 py-0.5 rounded-full text-[9.5px] font-bold uppercase tracking-wider text-white shadow-2xs whitespace-nowrap ${
+                    isPremiumFeature ? 'bg-amber-600' : 'bg-sage'
+                  }`}>
+                    {opt.tag}
+                  </span>
+                )}
 
-          <p className="text-[15px] text-charcoal/80 dark:text-white/80 mb-8 leading-relaxed">
-            {isPremiumFeature
-              ? 'Get 24/7 personal access to Bloom AI (chat support), AI Food Safety Scanners (identifies hidden pregnancy hazards in local snacks/dishes), and formatted FHIR R4 clinical exports.'
-              : 'Get full access to Government Schemes (JSY, PMMVY maternity benefits), Postpartum/Early Parenthood recovery logs, and encrypted Partner Sync functionality.'}
-          </p>
+                <span className={`text-[13px] font-semibold block leading-tight ${
+                  isSelected ? 'text-charcoal' : 'text-charcoal/80'
+                }`}>
+                  {opt.title}
+                </span>
 
-          <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-5 mb-8">
-            <div className="flex justify-between items-center mb-2">
-              <label className="text-[12px] font-bold text-charcoal dark:text-white uppercase tracking-wider">Select Duration</label>
-              <span className={`text-[13px] font-semibold px-2.5 py-0.5 rounded-full ${isPremiumFeature ? 'bg-gold-pale text-gold border border-gold/20' : 'bg-sage-pale text-sage border border-sage/20'}`}>
-                {months} {months === 1 ? 'Month' : 'Months'}
+                <span className={`text-[11.5px] font-medium mt-1 block ${
+                  isSelected ? 'text-sage-dark' : 'text-medium'
+                }`}>
+                  {opt.subtitle}
+                </span>
+
+                {opt.badge && (
+                  <span className={`text-[10px] mt-1.5 font-semibold px-1.5 py-0.2 rounded ${
+                    isSelected 
+                      ? 'bg-white text-sage-dark border border-sage/20' 
+                      : 'bg-border/60 text-medium'
+                  }`}>
+                    {opt.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Total Price Display */}
+        <div className="bg-cream/40 rounded-xl p-4 border border-border/70 flex items-center justify-between">
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="font-serif text-[28px] font-medium text-charcoal">
+                ₹{finalTotalPrice}
               </span>
+              {discountAmount > 0 && (
+                <span className="text-[14px] line-through text-muted font-normal">
+                  ₹{originalTotalPrice}
+                </span>
+              )}
             </div>
-            <input
-              type="range"
-              min={1}
-              max={12}
-              value={months}
-              onChange={(e) => setMonths(Number(e.target.value))}
-              aria-label="Select upgrade duration"
-              className="w-full h-2 rounded-full appearance-none cursor-pointer bg-white dark:bg-[#1E293B] border border-border dark:border-white/10"
-              style={{
-                accentColor: isPremiumFeature ? "var(--color-gold)" : "var(--color-sage)"
-              }}
-            />
-            <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
-              <span>1m</span>
-              <span>3m</span>
-              <span>6m</span>
-              <span>9m</span>
-              <span>12m</span>
-            </div>
+            <span className="text-[12px] text-medium block">
+              {selectedMonths} {selectedMonths === 1 ? 'Month' : 'Months'} full access ({`₹${perMonthPrice}/mo`})
+            </span>
           </div>
 
-          <div className="flex flex-col items-center gap-4 border-t border-border dark:border-white/10 pt-8">
-            <div className="flex items-baseline gap-1.5 mb-2">
-              <span className="text-[36px] font-serif font-bold text-charcoal dark:text-white">₹{totalPrice}</span>
-              <span className="text-[14px] text-medium">/ {months} {months === 1 ? 'month' : 'months'}</span>
-            </div>
-
-            {months >= 3 && (
-              <div className="text-[12px] font-bold text-green-600 dark:text-green-400 flex items-center gap-1.5 bg-green-50 dark:bg-green-950/20 px-3 py-1 rounded-md mb-2">
-                <Gift size={14} /> Includes ₹{Math.floor(months / 3) * 50} discount!
-              </div>
-            )}
-
-            <button
-              onClick={handlePayment}
-              disabled={isProcessing}
-              className={`w-full sm:w-auto min-w-[280px] py-4 px-8 rounded-full font-bold text-[16px] transition-colors shadow-lg flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed
-                ${isPremiumFeature
-                  ? 'bg-gold text-charcoal hover:bg-yellow-400 shadow-gold/20'
-                  : 'bg-sage text-white hover:bg-sage-dark shadow-sage/20'}`}
-            >
-              {isProcessing ? <Loader2 className="w-5 h-5 animate-spin" /> : <ShieldCheck className="w-5 h-5" />}
-              Upgrade Plan
-            </button>
-
-            <button
-              type="button"
-              onClick={() => {
-                updateState({ isPremium: true, planTier: 'premium' });
-              }}
-              className="text-[13px] text-sage-dark hover:text-sage font-bold flex items-center gap-1.5 transition-colors cursor-pointer py-1 px-3 rounded-lg hover:bg-sage-pale/40"
-            >
-              <Sparkles size={14} className="text-gold" />
-              <span>Have promo code? Activate OPIN30 Free VIP Pass →</span>
-            </button>
-
-            <p className="text-[11px] text-light mt-1 italic text-center">
-              Demonstration Mode: Integrate your active Razorpay Key ID in the options.
-            </p>
-          </div>
+          {discountAmount > 0 ? (
+            <span className="text-[11.5px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+              Save ₹{discountAmount}
+            </span>
+          ) : (
+            <span className="text-[11.5px] font-medium text-medium bg-white px-2.5 py-1 rounded-full border border-border/60">
+              Standard Rate
+            </span>
+          )}
         </div>
+
+        {/* Primary Upgrade CTA Button */}
+        <button
+          type="button"
+          onClick={handlePayment}
+          disabled={isProcessing}
+          className={`w-full py-3.5 rounded-2xl font-semibold text-[15px] shadow-sm hover:shadow active:scale-[0.99] transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60 ${
+            isPremiumFeature
+              ? 'bg-amber-600 hover:bg-amber-700 text-white shadow-amber-600/20'
+              : 'bg-sage hover:bg-sage-dark text-white shadow-sage/20'
+          }`}
+        >
+          {isProcessing ? (
+            <Loader2 className="w-5 h-5 animate-spin" />
+          ) : (
+            <LockOpen className="w-4.5 h-4.5" />
+          )}
+          <span>Unlock {isPremiumFeature ? 'Bloom Premium' : 'Bloom Standard Care'}</span>
+        </button>
+
+        {/* Demo / Tester VIP Pass Card */}
+        <div className="p-3.5 bg-gradient-to-br from-tulsi-light/40 via-cream/30 to-white border border-sage/20 rounded-xl text-center space-y-2">
+          <div className="flex items-center justify-center gap-1.5 text-sage-dark font-medium text-[12.5px]">
+            <Sparkles className="w-3.5 h-3.5 text-sage" />
+            <span>Evaluating or Reviewing Project Bloom?</span>
+          </div>
+          <p className="text-[11.5px] text-medium leading-relaxed">
+            Activate the complimentary Beta VIP Pass (OPIN30) for instant preview on this device.
+          </p>
+          <button
+            type="button"
+            onClick={handleActivateVip}
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-white hover:bg-tulsi-light/60 border border-sage/30 text-sage-dark font-semibold text-[12px] rounded-lg shadow-2xs hover:shadow-xs active:scale-95 transition-all cursor-pointer"
+          >
+            <Gift className="w-3.5 h-3.5 text-sage" />
+            <span>Activate Free VIP Pass →</span>
+          </button>
+        </div>
+
+        <p className="text-[11px] text-light text-center">
+          One-time payment • No auto-debit renewals • 100% private, on-device encrypted storage
+        </p>
       </div>
     </div>
   );

@@ -4,7 +4,7 @@ import {
   Apple, BookOpen, Users, Sparkles, Camera, Baby, Plane,
   Calendar, ShoppingBag, DollarSign, Clock, Syringe, FileText,
   Building, HeartHandshake, Briefcase, FileCheck2,
-  HelpCircle, CheckCircle2, Wind, Pill, Map
+  HelpCircle, CheckCircle2, Wind, Pill
 } from 'lucide-react';
 
 export interface ToolDefinition {
@@ -128,7 +128,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     category: 'Smart AI & Guidance',
     icon: Sparkles,
     color: 'text-sage-dark bg-sage-pale',
-    badge: 'FOGSI & ACOG',
+    badge: 'AI Guide',
     ritualSubtitle: 'Empathetic OB-GYN chat',
     actionLabel: 'Ask AI →',
   },
@@ -145,7 +145,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
   },
   {
     id: 'breathing',
-    title: 'Garbh Sanskar & Audio',
+    title: 'Breathing & Garbh Sanskar',
     desc: 'Guided breathing & offline prenatal audio',
     category: 'Smart AI & Guidance',
     icon: Wind,
@@ -173,17 +173,6 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     color: 'text-teal-600 bg-teal-50',
     ritualSubtitle: 'Flying & road guidelines',
     actionLabel: 'View Guide →',
-  },
-  {
-    id: 'guide',
-    title: 'How Our Pregnancy Works',
-    desc: '5-step user journey, doctor setup & data privacy flow',
-    category: 'Smart AI & Guidance',
-    icon: Map,
-    color: 'text-sage-dark bg-sage-pale',
-    badge: 'Guide',
-    ritualSubtitle: 'User flow & journey guide',
-    actionLabel: 'View Flow →',
   },
 
   // Category 3: Planning & Milestones (4 tools)

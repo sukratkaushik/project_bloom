@@ -63,6 +63,9 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
 
   const handleDashboard = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!state.isSetup) {
+      updateState({ isSetup: true, hasStartedOnboarding: true, dueDate: state.dueDate || new Date(Date.now() + 151 * 86400000).toISOString() });
+    }
     navigate('/dashboard');
   };
 

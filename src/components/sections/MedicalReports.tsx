@@ -26,6 +26,7 @@ import {
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { Paywall } from '../Paywall';
+import { ContextBanner } from '../ContextBanner';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
 import { exportCarePlanPdf } from '../../utils/pdfExport';
@@ -306,35 +307,10 @@ export const MedicalReports: React.FC = () => {
   return (
     <Paywall featureName="EhrExports">
       <div className="animate-in fade-in duration-300">
-        <div className="mb-7">
-          <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Medical Reports</h2>
-          <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-            Upload and organize your ultrasound scans, blood test reports, and clinic prescriptions.
-          </p>
-        </div>
-
-        {/* Privacy Notice Banner */}
-        <div className="bg-sage-pale/40 border border-sage/20 rounded-[16px] p-4 mb-3 flex gap-3 items-start">
-          <Lock className="w-5 h-5 text-sage shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-[13px] font-bold text-sage-dark mb-0.5">🔒 Secure Cloud Storage & Privacy</h4>
-            <p className="text-[12px] text-medium leading-relaxed">
-              All medical reports are stored securely in the cloud with strict industry-standard encryption and privacy controls.
-              Your health records are confidential, secure, and accessible across all your linked devices.
-            </p>
-          </div>
-        </div>
-
-        {/* Indian Law Compliance: PCPNDT Act Banner */}
-        <div className="bg-amber-500/10 border border-amber-500/25 rounded-[16px] p-4 mb-6 flex gap-3 items-start">
-          <Scale className="w-5 h-5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
-          <div>
-            <h4 className="text-[13px] font-bold text-amber-900 dark:text-amber-300 mb-0.5">⚖️ Strict Compliance with Indian Law (PCPNDT Act, 1994)</h4>
-            <p className="text-[12px] text-charcoal/85 dark:text-gray-300 leading-relaxed">
-              In accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994</strong>, determination or disclosure of the sex/gender of a fetus is strictly prohibited in India. This application and its AI tools <strong>do not identify, predict, or reveal fetal gender</strong> under any circumstances. This feature is intended solely for organizing your prescriptions, tracking diagnostic test records, and preparing medical summaries for your OB-GYN consultations.
-            </p>
-          </div>
-        </div>
+        {/* Top Context Banner */}
+        <ContextBanner
+          description="Upload and organise your ultrasound scans, blood test reports, and clinical prescriptions. All health records are stored securely in the cloud with strict industry-standard encryption and privacy controls, accessible across all your linked devices."
+        />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-6 items-start">
           {/* Left Column: Upload Area */}
@@ -343,10 +319,10 @@ export const MedicalReports: React.FC = () => {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-[2px] border-dashed rounded-[20px] p-8 flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[240px] cursor-pointer relative bg-white
+              className={`border-[1.5px] border-dashed rounded-xl p-6 sm:p-7 flex flex-col items-center justify-center text-center transition-all duration-300 min-h-[220px] cursor-pointer relative bg-white shadow-3xs
               ${isDragOver
-                  ? 'border-sage bg-sage-pale/20 scale-[1.02]'
-                  : 'border-border hover:border-sage-light hover:shadow-sm'
+                  ? 'border-sage bg-sage-pale/20 scale-[1.01]'
+                  : 'border-border/80 hover:border-sage-light hover:shadow-2xs'
                 }`}
             >
               <input
@@ -357,33 +333,33 @@ export const MedicalReports: React.FC = () => {
                 disabled={isUploading}
               />
 
-              <div className="w-16 h-16 bg-sage-pale/50 text-sage rounded-full flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110">
-                <UploadCloud className="w-8 h-8" />
+              <div className="w-13 h-13 bg-sage-pale/50 text-sage rounded-full flex items-center justify-center mb-3 transition-transform duration-300 group-hover:scale-105">
+                <UploadCloud className="w-7 h-7" />
               </div>
 
-              <h3 className="text-[15px] font-bold text-charcoal mb-1">
+              <h3 className="text-[14px] font-bold text-charcoal mb-1">
                 {isUploading ? "Uploading & encrypting..." : "Upload Medical Report"}
               </h3>
-              <p className="text-[12px] text-medium max-w-[200px] leading-relaxed mb-3">
+              <p className="text-[12px] text-medium max-w-[210px] leading-relaxed mb-2.5">
                 Drag & drop your files here, or click to browse.
               </p>
-              <span className="text-[10px] text-light uppercase tracking-wider font-bold">
+              <span className="text-[10px] text-light uppercase tracking-wider font-semibold px-2 py-0.5 bg-cream rounded-md border border-border/40">
                 PDF, PNG, JPG (Max 10MB)
               </span>
             </div>
 
             {uploadError && (
-              <div className="bg-critical-bg border border-critical/30 rounded-[12px] p-3 flex gap-2 items-start animate-in zoom-in-95 duration-200">
+              <div className="bg-critical-bg border border-critical/30 rounded-xl p-3 flex gap-2 items-start animate-in zoom-in-95 duration-200">
                 <AlertCircle className="w-4 h-4 text-critical shrink-0 mt-0.5" />
                 <span className="text-[12px] text-critical font-medium">{uploadError}</span>
               </div>
             )}
 
-            <div className="bg-white border border-border rounded-[18px] p-5 shadow-sm">
-              <h4 className="text-[13px] font-bold text-charcoal mb-2 flex items-center gap-1.5">
+            <div className="bg-white border border-border/80 rounded-xl p-4 shadow-3xs">
+              <h4 className="text-[12.5px] font-bold text-charcoal mb-1.5 flex items-center gap-1.5">
                 <Info className="w-4 h-4 text-sage" /> Quick Tip
               </h4>
-              <p className="text-[12px] text-medium leading-relaxed">
+              <p className="text-[11.5px] xs:text-[12px] text-medium leading-relaxed">
                 When storing reports, rename them with clear labels (e.g. <em>"12 Week Ultrasound Scan"</em> or <em>"CBC Blood Test - May 2026"</em>) and add important summaries in the doctor notes block.
               </p>
             </div>
@@ -392,14 +368,14 @@ export const MedicalReports: React.FC = () => {
           {/* Right Column: Reports List */}
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pl-1">
-              <h3 className="text-[14px] font-bold text-charcoal uppercase tracking-[1px]">
+              <h3 className="text-[12.5px] font-bold text-charcoal uppercase tracking-[0.8px]">
                 My Stored Records ({reports.length})
               </h3>
               <button
                 type="button"
                 onClick={handleExportCarePlan}
                 disabled={isExportingCarePlan}
-                className="px-3 py-1.5 bg-sage hover:bg-sage-dark text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
+                className="px-3 py-1.5 bg-sage hover:bg-sage-dark text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-3xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
                 title="Export complete Care Plan PDF"
               >
                 <Download size={13} />
@@ -408,11 +384,11 @@ export const MedicalReports: React.FC = () => {
             </div>
 
             {reports.length === 0 ? (
-              <div className="bg-white border border-border rounded-[20px] p-10 text-center flex flex-col items-center justify-center min-h-[300px]">
-                <div className="w-12 h-12 bg-cream text-light rounded-full flex items-center justify-center mb-3">
-                  <FileText className="w-6 h-6" />
+              <div className="bg-white border border-border/80 rounded-xl p-8 text-center flex flex-col items-center justify-center min-h-[260px] shadow-3xs">
+                <div className="w-11 h-11 bg-cream text-light rounded-full flex items-center justify-center mb-3">
+                  <FileText className="w-5 h-5" />
                 </div>
-                <h4 className="text-[14px] font-bold text-charcoal mb-1">No reports uploaded yet</h4>
+                <h4 className="text-[13.5px] font-bold text-charcoal mb-1">No reports uploaded yet</h4>
                 <p className="text-[12px] text-medium max-w-[260px] leading-relaxed">
                   Keep all your screenings, vitals records, and vaccine receipts safe in one place. Drag & drop files on the left to add one!
                 </p>
@@ -422,7 +398,7 @@ export const MedicalReports: React.FC = () => {
                 {reports.map((report) => (
                   <div
                     key={report.id}
-                    className="bg-white border border-border rounded-[18px] p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col gap-4"
+                    className="bg-white border border-border/80 rounded-xl p-4 sm:p-4.5 shadow-3xs hover:shadow-2xs transition-shadow flex flex-col gap-3.5"
                   >
                     <div className="flex items-start gap-4">
                       <div className="p-2 bg-cream border border-border rounded-[12px] shrink-0 mt-0.5">
@@ -624,6 +600,19 @@ export const MedicalReports: React.FC = () => {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* Indian Law Compliance: PCPNDT Act Banner */}
+        <div className="bg-amber-500/5 dark:bg-amber-500/10 border border-amber-500/20 dark:border-amber-500/25 rounded-xl p-3.5 mt-6 flex gap-3 items-start shadow-3xs">
+          <Scale className="w-4.5 h-4.5 text-amber-700 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div>
+            <h4 className="text-[12.5px] font-bold text-amber-900 dark:text-amber-300 mb-0.5">
+              Strict Compliance with Indian Law (PCPNDT Act, 1994)
+            </h4>
+            <p className="text-[11.5px] xs:text-[12px] text-charcoal/85 dark:text-gray-300 leading-relaxed">
+              In accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994</strong>, determination or disclosure of the sex/gender of a fetus is strictly prohibited in India. This application and its AI tools <strong>do not identify, predict, or reveal fetal gender</strong> under any circumstances. This feature is intended solely for organizing your prescriptions, tracking diagnostic test records, and preparing medical summaries for your OB-GYN consultations.
+            </p>
           </div>
         </div>
 

@@ -9,3 +9,7 @@ These instructions define how the AI shouldn behave while updating the Bloom pro
 3. Whenever the user is set up and logged in, the Landing Page will seamlessly adapt to show a "Go to Dashboard" / "Open Dashboard" button instead of the Google sign-in button.
 4. **Logo Protection**: Never overwrite, regenerate, or modify `public/logo.png` or any files in `branding/logos/`. The logo is finalized.
 5. **Sentry Initialization**: Never uncomment or re-enable the Sentry initialization in `src/main.tsx` — the DSN is a placeholder.
+6. **APK Distribution & Sync**: Whenever compiling a new Android APK, always place/replace the latest APK file in:
+   - Project root: `/Users/D067208/gitclones/Project_Bloom/OurPregnancy-Bloom.apk`
+   - Synced Google Drive: `/Users/D067208/Library/CloudStorage/GoogleDrive-sukrat.kaushik@gmail.com/My Drive/Trial Projects/OurPregnancy-Bloom.apk`
+

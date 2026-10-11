@@ -154,7 +154,7 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
       description: 'A quiet, non-judgmental tracking loop designed to catch red flags early without creating unnecessary anxiety.',
       keyActions: [
         'Morning: Review your Daily Knowledge Drop and log mood or hydration',
-        'Meals: Snap food photos or scan barcodes via Open Food Facts for pregnancy safety checks (Folate, Iron, Calcium, Listeria & Papain alerts)',
+        'Meals: Snap food photos or scan packaged barcodes across 3M+ items for pregnancy safety checks (Folate, Iron, Calcium, Listeria & Papain alerts)',
         'Evening: Record blood pressure and resting vitals (especially if tracking pre-eclampsia)',
         'Trimester 3: Kick Counter (fetal movement) and Contraction Timer (5-1-1 labor rule)',
         'Midnight: 24/7 Bloom AI clinical triage for unusual symptoms or nighttime cramps'
@@ -260,7 +260,7 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
         </div>
 
         {/* Step Progression Bar */}
-        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-3">
+        <div className="flex overflow-x-auto no-scrollbar sm:grid sm:grid-cols-5 gap-2 sm:gap-3 pb-1 snap-x">
           {steps.map((s) => {
             const Icon = s.icon;
             const isSelected = activeStep === s.id;
@@ -272,7 +272,7 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
                   triggerHaptic('selection');
                   setActiveStep(s.id);
                 }}
-                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between min-h-[90px] ${
+                className={`p-3 rounded-2xl border text-left transition-all cursor-pointer relative flex flex-col justify-between min-h-[90px] min-w-[135px] sm:min-w-0 shrink-0 snap-start ${
                   isSelected
                     ? 'bg-sage-pale/60 border-sage shadow-xs scale-[1.02]'
                     : 'bg-cream/40 border-border/70 hover:bg-cream hover:border-border'

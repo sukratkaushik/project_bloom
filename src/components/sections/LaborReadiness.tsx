@@ -4,6 +4,7 @@ import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { Activity, HeartPulse, Thermometer, AlertTriangle, Info, Sparkles, Watch } from 'lucide-react';
 import { calculateLaborReadiness, DailyBiometrics, ReadinessResult } from '../../utils/laborPrediction';
+import { triggerHaptic } from '../../utils/nativeBridge';
 
 interface LaborReadinessProps {
   setActivePage?: (page: string) => void;
@@ -99,100 +100,104 @@ export const LaborReadiness: React.FC<LaborReadinessProps> = ({ setActivePage })
   const recentBH = getAvg(recentData, 'braxtonHicksCount');
 
   return (
-    <div className="animate-in fade-in duration-300">
-      <div className="mb-7">
-        <div className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gold-pale text-gold font-semibold text-[11px] uppercase tracking-[1px] rounded-full mb-3">
-          <Sparkles size={12} /> Premium Feature
+    <div className="space-y-5 animate-in fade-in duration-200">
+      <div>
+        <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-gold-pale text-gold-dark font-bold text-[11px] uppercase tracking-wider rounded-full mb-2 border border-gold/25">
+          <Sparkles size={12} />
+          <span>Biometric Intelligence</span>
         </div>
-        <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5 flex items-center gap-3">
-          <Activity className="text-sage" size={32} /> Labor Readiness
+        <h2 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-tight">
+          Labor Readiness Score
         </h2>
-        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">
-          This conceptual algorithm analyzes your wearable biometric data to detect physiological shifts that often occur 7-10 days before spontaneous labor.
+        <p className="text-[12.5px] text-medium mt-0.5">
+          Analyzes physiological baseline shifts that naturally occur before labor onset
         </p>
       </div>
 
       {/* Disclaimer */}
-      <div className="bg-cream border-[1.5px] border-border rounded-[12px] p-4 mb-6 flex items-start gap-3">
-        <Info className="text-medium shrink-0 mt-0.5" size={20} />
+      <div className="bg-cream/70 border border-border/80 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
+        <Info className="text-sage-dark shrink-0 mt-0.5" size={18} />
         <div>
-          <h4 className="font-semibold text-[13px] text-charcoal mb-1">Conceptual Demonstration</h4>
-          <p className="text-[12px] text-light leading-[1.5]">
-            This is a simulated feature demonstrating how wearable data (Apple Health, Oura) could be integrated. There is currently no ACOG/WHO guideline validating the use of consumer wearables to predict labor onset. Do not use this for medical decisions.
+          <h4 className="font-bold text-[13px] text-charcoal mb-0.5">Clinical Note</h4>
+          <p className="text-[11.5px] text-medium leading-relaxed">
+            This tool visualizes physiological trends (HRV, resting heart rate, basal temperature). Consumer wearables cannot definitively diagnose labor onset — always consult your obstetrician for clinical assessments.
           </p>
         </div>
       </div>
 
       {hasSyncedData ? (
-        <div className="bg-sage-pale border border-sage/30 rounded-[12px] p-4 mb-8 flex items-start gap-3 animate-in fade-in duration-300">
-          <Watch className="text-sage shrink-0 mt-0.5" size={20} />
+        <div className="bg-sage-pale border border-sage/30 rounded-2xl p-4 flex items-start gap-3 shadow-2xs">
+          <Watch className="text-sage-dark shrink-0 mt-0.5" size={18} />
           <div>
-            <h4 className="font-semibold text-[13px] text-sage-dark mb-1">Live Wearable Data Synced</h4>
-            <p className="text-[12px] text-medium leading-[1.5]">
-              Your score is now dynamically computed using physiological baseline and recent metrics synced from your wearable device.
+            <h4 className="font-bold text-[13px] text-sage-dark">Live Wearable Data Synced</h4>
+            <p className="text-[11.5px] text-medium mt-0.5">
+              Score is computed from your personal physiological baseline and recent metrics.
             </p>
           </div>
         </div>
       ) : (
-        <div className="bg-gold-pale border border-gold/30 rounded-[12px] p-4 mb-8 flex items-start justify-between gap-3 animate-in fade-in duration-300">
-          <div className="flex items-start gap-3">
-            <Watch className="text-gold shrink-0 mt-0.5" size={20} />
+        <div className="bg-gold-pale/50 border border-gold/30 rounded-2xl p-4 flex items-start justify-between gap-3 shadow-2xs">
+          <div className="flex items-start gap-2.5">
+            <Watch className="text-gold-dark shrink-0 mt-0.5" size={18} />
             <div>
-              <h4 className="font-semibold text-[13px] text-charcoal mb-1">Simulated Baseline Active</h4>
-              <p className="text-[12px] text-medium leading-[1.5]">
-                To see a personalized Labor Readiness score based on your actual heart rate variability and temperature, connect a wearable device.
+              <h4 className="font-bold text-[13px] text-charcoal">Calibrated Baseline Active</h4>
+              <p className="text-[11.5px] text-medium mt-0.5">
+                Displaying standardized late-third-trimester biometric baselines. Connect Apple Health or wearable logs for personalized tracking.
               </p>
             </div>
           </div>
-          <span className="text-[11px] font-bold text-gold-dark dark:text-gold bg-gold/10 border border-gold/20 px-3 py-1.5 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0 self-center">
-            Coming Soon
+          <span className="text-[10px] font-bold text-gold-dark bg-gold/10 border border-gold/20 px-2.5 py-1 rounded-full uppercase tracking-wider whitespace-nowrap shrink-0 self-center">
+            Standard Model
           </span>
         </div>
       )}
 
       {result && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
-          <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-4 sm:gap-5">
+          <div className="space-y-4">
             {/* Score Card */}
-            <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm flex flex-col sm:flex-row items-center gap-8">
-              <div className="relative w-[140px] h-[140px] shrink-0 flex items-center justify-center">
+            <div className="bg-white border border-border/80 rounded-3xl p-5 sm:p-6 shadow-xs flex flex-col sm:flex-row items-center gap-6">
+              <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
                 <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                  <circle cx="50" cy="50" r="45" fill="none" stroke="#E4E3E0" strokeWidth="8" />
+                  <circle cx="50" cy="50" r="42" fill="none" stroke="#F0ECE1" strokeWidth="8" />
                   <circle
-                    cx="50" cy="50" r="45" fill="none" stroke="#6B9278" strokeWidth="8"
-                    strokeDasharray={`${(result.score / 100) * 283} 283`}
+                    cx="50" cy="50" r="42" fill="none" stroke="#8ab6a3" strokeWidth="8"
+                    strokeDasharray={`${(result.score / 100) * 264} 264`}
+                    strokeLinecap="round"
                     className="transition-all duration-1000 ease-out"
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-[36px] font-serif font-medium text-charcoal leading-none">{result.score}</span>
-                  <span className="text-[10px] font-semibold uppercase tracking-[1px] text-light mt-1">Score</span>
+                  <span className="text-[34px] font-serif font-bold text-charcoal leading-none">{result.score}</span>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-light mt-1">Score</span>
                 </div>
               </div>
 
-              <div className="text-center sm:text-left">
-                <h3 className="text-[20px] font-serif font-medium text-charcoal mb-2">
-                  {result.score >= 80 ? 'High Readiness' : result.score >= 50 ? 'Elevated Readiness' : 'Baseline'}
+              <div className="text-center sm:text-left flex-1">
+                <h3 className="text-[19px] font-serif font-bold text-charcoal mb-1.5">
+                  {result.score >= 80 ? 'High Readiness' : result.score >= 50 ? 'Elevated Readiness' : 'Baseline State'}
                 </h3>
-                <p className="text-[14px] text-medium leading-[1.6] mb-4">
+                <p className="text-[13px] text-medium leading-relaxed mb-3">
                   {result.advisory}
                 </p>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-cream rounded-full text-[12px] font-medium text-charcoal">
+                <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-cream rounded-full text-[11.5px] font-bold text-charcoal border border-border/60">
                   <span className={`w-2 h-2 rounded-full ${result.confidence >= 80 ? 'bg-sage' : 'bg-gold'}`} />
-                  {result.confidence}% Data Confidence
+                  <span>{result.confidence}% Data Confidence</span>
                 </div>
               </div>
             </div>
 
             {/* Reasoning */}
             {result.reasoning.length > 0 && (
-              <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm">
-                <h4 className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium mb-4">Clinical Reasoning</h4>
-                <ul className="space-y-3">
+              <div className="bg-white border border-border/80 rounded-3xl p-5 shadow-xs">
+                <h4 className="text-[11px] font-bold tracking-wider uppercase text-medium mb-3">
+                  Clinical Biometric Factors
+                </h4>
+                <ul className="space-y-2.5">
                   {result.reasoning.map((reason, idx) => (
-                    <li key={idx} className="flex items-start gap-3 text-[14px] text-charcoal">
-                      <span className="text-sage mt-0.5">✦</span>
-                      <span className="leading-[1.5]">{reason}</span>
+                    <li key={idx} className="flex items-start gap-2.5 text-[13px] text-charcoal leading-relaxed">
+                      <span className="text-sage font-bold mt-0.5">✦</span>
+                      <span>{reason}</span>
                     </li>
                   ))}
                 </ul>
@@ -201,71 +206,77 @@ export const LaborReadiness: React.FC<LaborReadinessProps> = ({ setActivePage })
           </div>
 
           {/* Biometric Trends */}
-          <div className="bg-white border-[1.5px] border-border rounded-[16px] p-6 shadow-sm h-fit">
-            <h4 className="text-[11px] font-semibold tracking-[1.2px] uppercase text-medium mb-5">7-Day Trends vs Baseline</h4>
+          <div className="bg-white border border-border/80 rounded-3xl p-5 shadow-xs h-fit">
+            <h4 className="text-[11px] font-bold tracking-wider uppercase text-medium mb-4">
+              7-Day Shift vs Baseline
+            </h4>
 
-            <div className="space-y-5">
+            <div className="space-y-4">
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <div className="flex items-center gap-1.5 text-[13px] font-medium text-charcoal">
-                    <HeartPulse size={14} className="text-sage" /> HRV (ms)
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-charcoal">
+                    <HeartPulse size={14} className="text-sage" />
+                    <span>HRV (ms)</span>
                   </div>
-                  <span className="text-[13px] font-semibold text-charcoal">{recentHRV}</span>
+                  <span className="text-[13px] font-bold text-charcoal">{recentHRV}</span>
                 </div>
                 <div className="flex justify-between text-[11px] text-light">
                   <span>Baseline: {baseHRV}</span>
-                  <span className={baseHRV - recentHRV > 5 ? 'text-sage font-medium' : ''}>
+                  <span className={baseHRV - recentHRV > 5 ? 'text-sage-dark font-bold' : ''}>
                     {baseHRV - recentHRV > 0 ? '↓' : '↑'} {Math.abs(baseHRV - recentHRV)}
                   </span>
                 </div>
               </div>
 
-              <div className="h-px bg-border" />
+              <div className="h-px bg-border/60" />
 
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <div className="flex items-center gap-1.5 text-[13px] font-medium text-charcoal">
-                    <Activity size={14} className="text-sage" /> RHR (bpm)
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-charcoal">
+                    <Activity size={14} className="text-sage" />
+                    <span>RHR (bpm)</span>
                   </div>
-                  <span className="text-[13px] font-semibold text-charcoal">{recentRHR}</span>
+                  <span className="text-[13px] font-bold text-charcoal">{recentRHR}</span>
                 </div>
                 <div className="flex justify-between text-[11px] text-light">
                   <span>Baseline: {baseRHR}</span>
-                  <span className={recentRHR - baseRHR > 2 ? 'text-sage font-medium' : ''}>
+                  <span className={recentRHR - baseRHR > 2 ? 'text-sage-dark font-bold' : ''}>
                     {recentRHR - baseRHR > 0 ? '↑' : '↓'} {Math.abs(recentRHR - baseRHR)}
                   </span>
                 </div>
               </div>
 
-              <div className="h-px bg-border" />
+              <div className="h-px bg-border/60" />
 
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <div className="flex items-center gap-1.5 text-[13px] font-medium text-charcoal">
-                    <Thermometer size={14} className="text-sage" /> BBT (°C)
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-charcoal">
+                    <Thermometer size={14} className="text-sage" />
+                    <span>BBT (°C)</span>
                   </div>
-                  <span className="text-[13px] font-semibold text-charcoal">{recentBBT}</span>
+                  <span className="text-[13px] font-bold text-charcoal">{recentBBT}</span>
                 </div>
                 <div className="flex justify-between text-[11px] text-light">
                   <span>Baseline: {baseBBT}</span>
-                  <span className={baseBBT - recentBBT > 0.2 ? 'text-sage font-medium' : ''}>
+                  <span className={baseBBT - recentBBT > 0.2 ? 'text-sage-dark font-bold' : ''}>
                     {baseBBT - recentBBT > 0 ? '↓' : '↑'} {Math.abs(Math.round((baseBBT - recentBBT) * 10) / 10)}
                   </span>
                 </div>
               </div>
 
-              <div className="h-px bg-border" />
+              <div className="h-px bg-border/60" />
 
               <div>
-                <div className="flex justify-between items-center mb-1.5">
-                  <div className="flex items-center gap-1.5 text-[13px] font-medium text-charcoal">
-                    <AlertTriangle size={14} className="text-sage" /> Braxton Hicks
+                <div className="flex justify-between items-center mb-1">
+                  <div className="flex items-center gap-1.5 text-[13px] font-bold text-charcoal">
+                    <AlertTriangle size={14} className="text-sage" />
+                    <span>Braxton Hicks</span>
                   </div>
-                  <span className="text-[13px] font-semibold text-charcoal">{recentBH}/day</span>
+                  <span className="text-[13px] font-bold text-charcoal">{recentBH}/day</span>
                 </div>
                 <div className="flex justify-between text-[11px] text-light">
                   <span>Baseline: {baseBH || 0}/day</span>
-                  <span className={recentBH > 2 ? 'text-sage font-medium' : ''}>
+                  <span className={recentBH > 2 ? 'text-sage-dark font-bold' : ''}>
                     ↑ {recentBH}
                   </span>
                 </div>

@@ -51,6 +51,8 @@ export const MobileShell: React.FC = () => {
   const [activeTab, setActiveTab] = useState<MobileTabId>('today');
   const [activeToolId, setActiveToolId] = useState<string | null>(null);
 
+  const activeToolDef = activeToolId ? ALL_PREGNANCY_TOOLS.find(t => t.id === activeToolId) : null;
+
   // Filter tasks based on state
   const filterTasks = (tasks: Task[]) => {
     return tasks.filter(t => {
@@ -191,39 +193,56 @@ export const MobileShell: React.FC = () => {
       {/* 2. Main Scrollable Container (ONLY this inner body scrolls) */}
       <main
         ref={mainScrollRef}
-        className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-3.5 sm:px-4 pt-2.5 max-w-lg mx-auto w-full custom-scrollbar"
+        className={`flex-1 ${
+          activeToolId === 'askourpregnancy'
+            ? 'overflow-hidden flex flex-col pb-1'
+            : 'overflow-y-auto overscroll-contain'
+        } px-3 xs:px-3.5 sm:px-4 pt-2.5 max-w-lg mx-auto w-full custom-scrollbar`}
         style={{ WebkitOverflowScrolling: 'touch' }}
       >
         {activeToolId ? (
           /* Tool Detail View */
-          <div className="space-y-4 pb-24 animate-in fade-in duration-150">
+          <div className={`animate-in fade-in duration-150 ${
+            activeToolId === 'askourpregnancy'
+              ? 'flex-1 min-h-0 flex flex-col'
+              : 'space-y-4 pb-28'
+          }`}>
             {/* Tool Detail Header Bar (Sticky within scrollable container) */}
-            <div className="flex items-center justify-between bg-cream/95 backdrop-blur-md border border-border/80 rounded-2xl p-3 shadow-2xs sticky top-0 z-20">
+            <div className="flex items-center justify-between bg-white/95 backdrop-blur-md border border-border/80 rounded-2xl px-3.5 py-2.5 shadow-2xs sticky top-0 z-20 shrink-0">
               <button
                 type="button"
                 onClick={handleBackFromTool}
-                className="flex items-center gap-1.5 text-[13px] font-bold text-sage-dark hover:underline cursor-pointer"
+                className="flex items-center gap-1.5 text-[13px] font-bold text-charcoal hover:text-sage-dark py-1 pr-2 rounded-lg transition-colors cursor-pointer shrink-0"
               >
-                <ArrowLeft size={17} />
+                <ArrowLeft size={16} />
                 <span>Back</span>
               </button>
+
+              <div className="flex items-center gap-2 min-w-0 px-2 flex-1 justify-center">
+                {activeToolDef && (
+                  <span className="font-serif font-bold text-[14.5px] text-charcoal truncate">
+                    {activeToolDef.title}
+                  </span>
+                )}
+              </div>
 
               <button
                 type="button"
                 onClick={() => handleTogglePin(activeToolId)}
-                className={`p-1.5 rounded-full transition-colors ${
+                className={`p-1.5 rounded-full transition-colors shrink-0 ${
                   pinnedIds.includes(activeToolId)
                     ? 'text-amber-500 bg-amber-50'
                     : 'text-light hover:text-medium'
                 }`}
                 aria-label="Pin/Unpin tool"
+                title={pinnedIds.includes(activeToolId) ? 'Pinned to Rituals' : 'Pin to Rituals'}
               >
                 <Star size={18} fill={pinnedIds.includes(activeToolId) ? 'currentColor' : 'none'} />
               </button>
             </div>
 
-            {/* Tool Body */}
-            <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
+            {/* Tool Body - direct clean rendering without squishing into duplicate box */}
+            <div className={`w-full ${activeToolId === 'askourpregnancy' ? 'flex-1 min-h-0 flex flex-col pt-2' : ''}`}>
               {renderActiveToolContent(activeToolId)}
             </div>
           </div>

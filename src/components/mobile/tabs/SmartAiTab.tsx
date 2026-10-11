@@ -211,8 +211,8 @@ When answering maternal questions:
               <h3 className="font-serif font-bold text-charcoal dark:text-cream text-[14.5px] leading-tight">
                 Ask Bloom AI Companion
               </h3>
-              <span className="text-[10.5px] text-sage-dark dark:text-sage-light font-medium">
-                Clinical Guidance • FOGSI & ACOG Aligned
+              <span className="text-[10.5px] text-medium dark:text-stone-400 font-medium">
+                Evidence-based clinical guidance
               </span>
             </div>
           </div>

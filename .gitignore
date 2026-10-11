@@ -25,5 +25,8 @@ keystore.properties
 *.apk
 *.aab
 
+scratch/
+
+
 
 

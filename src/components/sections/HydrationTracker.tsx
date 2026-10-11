@@ -64,16 +64,16 @@ export const HydrationTracker: React.FC = () => {
     await db.hydrationLogs.delete(id);
   };
 
-  // UI Colors
-  let ringColor = 'stroke-red-300';
-  if (percentage >= 50) ringColor = 'stroke-sage';
-  else if (percentage >= 25) ringColor = 'stroke-amber-400';
+  // UI Colors - Branded Sage palette (calm, maternal green, never alarming or yellow)
+  let ringColor = 'stroke-sage';
+  if (percentage >= 100) ringColor = 'stroke-sage-dark';
+  else if (percentage >= 80) ringColor = 'stroke-sage';
+  else ringColor = 'stroke-sage';
 
   // Calculate Streak
   const calculateStreak = () => {
     let streak = 0;
     const now = new Date();
-    // Trace back
     for (let i = 0; i < 30; i++) {
         const d = new Date();
         d.setDate(now.getDate() - i);
@@ -81,7 +81,7 @@ export const HydrationTracker: React.FC = () => {
         const dayLogs = logs.filter(l => l.date === dateStr);
         const dayTotal = dayLogs.reduce((acc, log) => acc + log.amountMl, 0);
         if (dayTotal >= goal * 0.8) streak++;
-        else if (i !== 0) break; // if today is incomplete we still count yesterday's streak
+        else if (i !== 0) break;
     }
     return streak;
   };
@@ -91,7 +91,7 @@ export const HydrationTracker: React.FC = () => {
   const currentWeekDays = Array.from({length: 7}, (_, i) => {
     const d = new Date();
     const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1); // adjust when day is sunday
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
     d.setDate(diff + i);
     return d;
   });
@@ -101,7 +101,7 @@ export const HydrationTracker: React.FC = () => {
 
   if (!state.activeJourneyId) {
     return (
-      <div className="p-6 bg-white border border-border rounded-2xl shadow-sm text-center">
+      <div className="p-6 bg-white border border-border/80 rounded-2xl shadow-xs text-center">
         <Droplets className="w-12 h-12 text-medium mx-auto mb-4" />
         <h2 className="font-serif text-2xl text-charcoal mb-2">Hydration Tracker</h2>
         <p className="text-medium text-[15px]">Please complete setup first.</p>
@@ -109,69 +109,82 @@ export const HydrationTracker: React.FC = () => {
     );
   }
 
-  const radius = 90;
+  const radius = 72;
   const circumference = 2 * Math.PI * radius;
   const dashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-300">
-      <div className="flex items-center gap-3">
-        <Droplets className="w-8 h-8 text-sage" />
-        <h1 className="font-serif text-[clamp(28px,4vw,40px)] font-normal text-charcoal">Hydration</h1>
+    <div className="space-y-4 animate-in fade-in duration-300">
+      <div className="flex items-center gap-2.5">
+        <Droplets className="w-7 h-7 text-sage" />
+        <h1 className="font-serif text-[clamp(24px,3.5vw,36px)] font-normal text-charcoal">Hydration</h1>
       </div>
 
       {showDehydrationWarning && (
-        <div className="bg-amber-50 border border-amber-200 text-amber-800 p-4 rounded-[12px] flex items-start gap-4 shadow-sm">
-          <Flame className="w-6 h-6 shrink-0 mt-0.5" />
-          <div>
-            <p className="font-semibold text-[14px]">Stay hydrated!</p>
-            <p className="text-[13px] mt-1">Dehydration can increase Braxton Hicks contractions. Coconut water and buttermilk count toward your intake. 🥥</p>
+        <div className="bg-amber-50/80 border border-amber-200/80 text-amber-900 p-3.5 rounded-xl flex items-start gap-3 shadow-2xs">
+          <Flame className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
+          <div className="text-[13px] leading-relaxed">
+            <span className="font-semibold">Gentle reminder:</span> Staying well hydrated helps prevent Braxton Hicks contractions. Coconut water and chaas count too! 🥥
           </div>
         </div>
       )}
 
       {streak >= 3 && (
-        <div className="bg-green-50 border border-green-200 text-green-800 p-3 rounded-[12px] flex items-center justify-center gap-2 shadow-sm font-semibold text-[14px]">
-          🔥 {streak} Day Streak! Keep it up!
+        <div className="bg-tulsi-light/70 border border-sage/30 text-sage-dark p-2.5 rounded-xl flex items-center justify-center gap-2 shadow-2xs font-semibold text-[13px]">
+          🌱 {streak} Day Streak! Excellent consistency!
         </div>
       )}
 
-      <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6 sm:p-8">
+      {/* Main Hydration Card */}
+      <div className="bg-white border border-border/80 rounded-2xl shadow-xs p-4 sm:p-5">
         
-        {/* Progress Ring */}
-        <div className="flex flex-col items-center justify-center mb-8 relative">
-          <div className="relative w-[220px] h-[220px]">
-             {/* Background circle */}
+        {/* Progress Ring - Compact & Proportional */}
+        <div className="flex flex-col items-center justify-center mb-4 relative">
+          <div className="relative w-[170px] h-[170px]">
+             {/* Background circle track & very light shaded inner circle */}
              <svg className="w-full h-full transform -rotate-90">
-               <circle cx="110" cy="110" r={radius} className="stroke-gray-100" strokeWidth="16" fill="none" />
                <circle 
-                 cx="110" cy="110" r={radius} 
+                 cx="85" 
+                 cy="85" 
+                 r={radius} 
+                 className="stroke-sage/20" 
+                 strokeWidth="12" 
+                 fill="rgba(138, 182, 163, 0.04)" 
+               />
+               <circle 
+                 cx="85" cy="85" r={radius} 
                  className={`transition-all duration-1000 ease-out ${ringColor}`}
-                 strokeWidth="16" fill="none"
+                 strokeWidth="12" fill="none"
                  strokeDasharray={circumference}
                  strokeDashoffset={dashoffset}
                  strokeLinecap="round"
                />
              </svg>
              <div className="absolute inset-0 flex flex-col items-center justify-center">
-               <span className="font-serif text-[40px] text-charcoal leading-none mb-1">{consumed}</span>
-               <span className="text-[13px] text-medium font-semibold uppercase tracking-wider">/ {goal} ml</span>
+               <span className="font-serif text-[34px] sm:text-[38px] text-charcoal leading-none mb-0.5">{consumed}</span>
+               <span className="text-[11.5px] text-medium font-semibold uppercase tracking-wider">/ {goal} ml</span>
                
                {editingGoal ? (
-                 <div className="flex items-center gap-1 mt-2">
-                   <input type="number" value={tempGoal} onChange={e=>setTempGoal(e.target.value)} className="w-[60px] p-1 border border-border rounded text-center text-[12px]" autoFocus />
-                   <button onClick={saveGoal} className="bg-sage text-white p-1 rounded"><Check className="w-3 h-3" /></button>
+                 <div className="flex items-center gap-1.5 mt-1.5 bg-white px-2 py-1 rounded-lg border border-border shadow-2xs">
+                   <input 
+                     type="number" 
+                     value={tempGoal} 
+                     onChange={e => setTempGoal(e.target.value)} 
+                     className="w-[56px] py-0.5 border border-border/80 rounded text-center text-[12px] font-bold text-charcoal outline-none focus:border-sage" 
+                     autoFocus 
+                   />
+                   <button onClick={saveGoal} className="bg-sage hover:bg-sage-dark text-white p-1 rounded-md active:scale-95 transition-all"><Check className="w-3 h-3" /></button>
                  </div>
                ) : (
-                 <button onClick={() => setEditingGoal(true)} className="text-[11px] text-sage font-medium mt-2 hover:underline">Edit Goal</button>
+                 <button onClick={() => setEditingGoal(true)} className="text-[11px] text-sage font-medium mt-1 hover:underline active:scale-95">Edit Goal</button>
                )}
              </div>
           </div>
         </div>
 
-        {/* Quick Add row */}
-        <div className="text-[12px] font-semibold uppercase text-light mb-3 tracking-wider text-center">Quick Add</div>
-        <div className="flex flex-wrap justify-center gap-3">
+        {/* Quick Add Row: Exactly 4 options in ONE responsive row */}
+        <div className="text-[11px] font-bold uppercase text-medium/80 mb-2.5 tracking-wider text-center">Quick Add</div>
+        <div className="grid grid-cols-4 gap-2 sm:gap-2.5 w-full">
           {[
             { label: 'Small', ml: 150 },
             { label: 'Glass', ml: 250 },
@@ -180,68 +193,96 @@ export const HydrationTracker: React.FC = () => {
           ].map(btn => (
             <button
               key={btn.ml}
+              type="button"
               onClick={() => handleAdd(btn.ml)}
-              className="px-4 py-3 bg-cream border border-border rounded-[12px] flex flex-col items-center gap-1 hover:border-sage hover:bg-sage-pale/20 transition-all hover:-translate-y-1 active:scale-95"
+              className="py-2.5 px-1 sm:px-2 bg-cream/70 hover:bg-sage-pale/40 border border-border/80 rounded-xl flex flex-col items-center justify-center gap-1 transition-all active:scale-95 group shadow-2xs hover:border-sage cursor-pointer"
             >
-              <Droplets className="w-5 h-5 text-sage" />
-              <div className="text-[14px] font-semibold text-charcoal">{btn.ml}ml</div>
-              <div className="text-[11px] text-medium">{btn.label}</div>
+              <Droplets className="w-4 h-4 text-sage group-hover:scale-110 transition-transform" />
+              <div className="text-[13px] sm:text-[14px] font-bold text-charcoal leading-none">{btn.ml}ml</div>
+              <div className="text-[10px] sm:text-[11px] text-medium font-medium leading-none">{btn.label}</div>
             </button>
           ))}
         </div>
 
-        {/* Custom Input */}
-        <div className="mt-6 flex justify-center">
-          <div className="flex items-center border border-border rounded-lg bg-gray-50 overflow-hidden shadow-sm">
-            <button onClick={() => setCustomAmount(Math.max(50, parseInt(customAmount)-50).toString())} className="px-4 py-2 text-medium hover:bg-gray-200"><Minus className="w-4 h-4" /></button>
+        {/* Custom Input Row */}
+        <div className="mt-4 flex justify-center">
+          <div className="flex items-center border border-border/80 rounded-xl bg-cream/50 overflow-hidden shadow-2xs">
+            <button 
+              type="button"
+              onClick={() => setCustomAmount(Math.max(50, (parseInt(customAmount, 10) || 0) - 50).toString())} 
+              className="px-3 py-2 text-medium hover:bg-cream hover:text-charcoal active:scale-95 transition-all"
+              aria-label="Decrease custom amount"
+            >
+              <Minus className="w-3.5 h-3.5" />
+            </button>
             <input 
               type="number" 
               value={customAmount} 
               onChange={e => setCustomAmount(e.target.value)}
-              className="w-[80px] text-center bg-transparent border-none outline-none font-semibold text-charcoal"
+              className="w-[64px] text-center bg-transparent border-none outline-none font-semibold text-charcoal text-[14px]"
+              min="50"
+              step="50"
             />
-            <span className="text-medium text-[13px] mr-2 pr-2 border-r border-border">ml</span>
-            <button onClick={() => handleAdd(parseInt(customAmount))} className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-medium text-[13px] flex items-center gap-1">
-              Add
+            <span className="text-medium text-[12px] font-medium mr-2 pr-2 border-r border-border/80">ml</span>
+            <button 
+              type="button"
+              onClick={() => handleAdd(parseInt(customAmount, 10) || 0)} 
+              className="px-3.5 py-2 bg-sage hover:bg-sage-dark active:scale-95 text-white font-medium text-[12.5px] transition-all flex items-center gap-1 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Add</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Week History & Today's Log Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* History 7 day */}
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-sage" />
-            <h3 className="font-semibold text-charcoal text-[16px]">This Week</h3>
+        <div className="bg-white border border-border/80 rounded-2xl shadow-xs p-4">
+          <div className="flex items-center justify-between mb-3.5">
+            <div className="flex items-center gap-1.5">
+              <TrendingUp className="w-4 h-4 text-sage" />
+              <h3 className="font-semibold text-charcoal text-[14.5px]">This Week</h3>
+            </div>
+            <span className="text-[11px] text-medium font-medium">
+              Goal: {goal} ml/day
+            </span>
           </div>
           
-          <div className="flex justify-between items-end h-[60px]">
+          <div className="grid grid-cols-7 gap-1 sm:gap-1.5">
             {currentWeekDays.map((d, i) => {
               const dStr = d.toISOString().split('T')[0];
+              const isToday = dStr === today;
               const dayLogs = logs.filter(l => l.date === dStr);
               const total = dayLogs.reduce((acc, log) => acc + log.amountMl, 0);
               const pct = Math.min((total / goal) * 100, 100);
               
-              let bg = 'bg-gray-100';
+              let bg = 'bg-cream/50 border-border/60 text-light';
               if (total > 0) {
-                if (pct >= 80) bg = 'bg-sage';
-                else if (pct >= 50) bg = 'bg-amber-400';
-                else bg = 'bg-red-300';
+                if (pct >= 80) bg = 'bg-sage border-sage text-white shadow-2xs';
+                else if (pct >= 50) bg = 'bg-tulsi-light border-sage/40 text-sage-dark';
+                else bg = 'bg-tulsi-light/70 border-sage/30 text-sage-dark';
               }
 
               return (
-                <div key={i} className="flex flex-col items-center gap-2 relative group">
-                  <div className={`w-8 h-8 rounded-full ${bg} transition-colors flex items-center justify-center border border-black/5`}>
-                    {pct >= 80 && <Check className="w-4 h-4 text-white" />}
+                <div key={i} className="flex flex-col items-center gap-1.5 relative group">
+                  <div className={`w-8 h-8 rounded-full border transition-all flex items-center justify-center ${bg} ${isToday ? 'ring-2 ring-sage/50 ring-offset-1' : ''}`}>
+                    {pct >= 80 ? (
+                      <Check className="w-3.5 h-3.5 stroke-[2.5]" />
+                    ) : total > 0 ? (
+                      <span className="text-[10px] font-bold">{Math.round(pct)}%</span>
+                    ) : (
+                      <span className="text-[10px] opacity-40">•</span>
+                    )}
                   </div>
-                  <span className="text-[11px] font-medium text-medium uppercase">
-                    {d.toLocaleDateString('en-US', { weekday: 'short' })}
+                  <span className={`text-[10.5px] font-medium uppercase ${isToday ? 'text-sage font-bold' : 'text-medium'}`}>
+                    {d.toLocaleDateString('en-US', { weekday: 'narrow' })}
                   </span>
                   
                   {/* Tooltip */}
-                  <div className="absolute bottom-[calc(100%+8px)] bg-charcoal text-white text-[11px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                    {total}ml / {goal}ml
+                  <div className="absolute bottom-[calc(100%+6px)] bg-charcoal text-white text-[11px] px-2 py-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10 shadow-sm">
+                    {d.toLocaleDateString('en-US', { weekday: 'short' })}: {total}ml / {goal}ml
                   </div>
                 </div>
               );
@@ -250,33 +291,45 @@ export const HydrationTracker: React.FC = () => {
         </div>
 
         {/* Today's Log */}
-        <div className="bg-white border-[1.5px] border-border rounded-[16px] shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-border bg-gray-50/50">
-            <h3 className="font-semibold text-charcoal text-[17px]">Today's Log</h3>
+        <div className="bg-white border border-border/80 rounded-2xl shadow-xs overflow-hidden flex flex-col">
+          <div className="px-4 py-2.5 border-b border-border/70 bg-cream/30 flex items-center justify-between">
+            <h3 className="font-semibold text-charcoal text-[14.5px]">Today's Log</h3>
+            <span className="text-[11px] text-medium font-medium">
+              {todayLogs.length} {todayLogs.length === 1 ? 'entry' : 'entries'}
+            </span>
           </div>
-          <div className="h-[200px] overflow-y-auto">
+          <div className="min-h-[110px] max-h-[180px] overflow-y-auto custom-scrollbar flex-1">
             {todayLogs.length > 0 ? (
-              <div className="divide-y divide-border">
-                {todayLogs.reverse().map(log => (
-                  <div key={log.id} className="flex justify-between items-center p-4 hover:bg-gray-50/50">
-                    <div className="flex items-center gap-3">
-                      <Droplets className="w-4 h-4 text-sage opacity-50" />
-                      <span className="text-[15px] font-semibold text-charcoal">{log.amountMl} ml</span>
+              <div className="divide-y divide-border/60">
+                {todayLogs.slice().reverse().map(log => (
+                  <div key={log.id} className="flex justify-between items-center px-4 py-2 hover:bg-cream/20 transition-colors">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-6 h-6 rounded-full bg-sage-pale/40 flex items-center justify-center text-sage">
+                        <Droplets className="w-3 h-3" />
+                      </div>
+                      <span className="text-[13.5px] font-semibold text-charcoal">{log.amountMl} ml</span>
                     </div>
                     <div className="flex items-center gap-3">
-                      <span className="text-[13px] text-medium">
+                      <span className="text-[11.5px] text-medium">
                         {new Date(log.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                       </span>
-                      <button onClick={() => handleDelete(log.id)} className="text-medium hover:text-critical p-1">
-                        <Trash2 className="w-4 h-4" />
+                      <button 
+                        type="button"
+                        onClick={() => handleDelete(log.id)} 
+                        className="text-medium/60 hover:text-critical p-1 rounded-md hover:bg-critical-bg/40 transition-colors cursor-pointer"
+                        aria-label="Delete water entry"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </div>
                   </div>
                 ))}
               </div>
             ) : (
-              <div className="h-full flex items-center justify-center text-medium text-[14px]">
-                No water logged yet today.
+              <div className="h-full min-h-[110px] flex flex-col items-center justify-center text-center p-4">
+                <Droplets className="w-5 h-5 text-sage/40 mb-1" />
+                <p className="text-charcoal/80 font-medium text-[12.5px]">No water logged yet today</p>
+                <p className="text-medium text-[11px] mt-0.5">Tap any quick option above to record intake.</p>
               </div>
             )}
           </div>

@@ -5,18 +5,48 @@ import { Task } from '../../types';
 import { TaskList } from '../TaskItem';
 import { ContextBanner } from '../ContextBanner';
 import { fmtLong } from '../../utils';
-import { Plus } from 'lucide-react';
+import { Plus, Users } from 'lucide-react';
+import { triggerHaptic } from '../../utils/nativeBridge';
+import { PartnerModal } from '../mobile/PartnerModal';
+import { syncEngine } from '../../syncEngine';
 
 export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filterTasks }) => {
-  const { state, addCustomTask } = usePlanner();
+  const { state, updateState, addCustomTask } = usePlanner();
   const [tri, setTri] = useState('t1');
   const [newTaskText, setNewTaskText] = useState('');
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3200);
+  };
 
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (newTaskText.trim()) {
       addCustomTask(`dev_${tri}`, newTaskText.trim());
       setNewTaskText('');
+    }
+  };
+
+  const handleSyncTrimesterToPartner = () => {
+    triggerHaptic('medium');
+
+    const hasPartner = !!state.partner?.name?.trim();
+    if (!hasPartner) {
+      setIsPartnerModalOpen(true);
+      return;
+    }
+
+    const partnerName = state.partner?.name?.trim() || 'Partner';
+
+    // 1. If P2P WebRTC sync is connected, broadcast
+    if (syncEngine.conn && syncEngine.conn.open) {
+      syncEngine.broadcastState(state);
+      showToast(`Synced ${trimesterLabel} milestones with ${partnerName} ✨`);
+    } else {
+      showToast(`Assigned ${trimesterLabel} milestones to ${partnerName} in Partner Sync ✨`);
     }
   };
 
@@ -38,17 +68,42 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
 
   return (
     <div className="animate-in fade-in duration-300">
-      <div className="mb-7">
-        <h2 className="font-serif text-[clamp(28px,4vw,40px)] font-normal mb-1.5">Development & Expectations</h2>
-        <p className="text-[14px] text-medium max-w-[560px] leading-[1.7]">What's happening in your body — and your baby's — each stage of the journey.</p>
-      </div>
-      
       <ContextBanner />
       
-      <div className="flex gap-1.5 mb-5">
-        <button onClick={() => setTri('t1')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all cursor-pointer ${tri === 't1' ? 'border-blush bg-blush-pale text-blush font-semibold' : 'border-border bg-white text-medium'}`}>First Trimester</button>
-        <button onClick={() => setTri('t2')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all cursor-pointer ${tri === 't2' ? 'border-sage bg-sage-pale text-sage font-semibold' : 'border-border bg-white text-medium'}`}>Second Trimester</button>
-        <button onClick={() => setTri('t3')} className={`px-4 py-2 rounded-[20px] border-[1.5px] font-sans text-[13px] font-medium transition-all cursor-pointer ${tri === 't3' ? 'border-gold bg-gold-pale text-gold font-semibold' : 'border-border bg-white text-medium'}`}>Third Trimester</button>
+      <div className="grid grid-cols-3 gap-1.5 xs:gap-2 mb-4">
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('light'); setTri('t1'); }}
+          className={`py-2 px-1 xs:px-2 rounded-xl border text-[12px] xs:text-[12.5px] font-bold text-center transition-all cursor-pointer truncate ${
+            tri === 't1'
+              ? 'border-blush bg-blush-pale text-blush shadow-2xs'
+              : 'border-border/80 bg-white text-charcoal/70 hover:border-sage hover:text-charcoal'
+          }`}
+        >
+          1st Trimester
+        </button>
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('light'); setTri('t2'); }}
+          className={`py-2 px-1 xs:px-2 rounded-xl border text-[12px] xs:text-[12.5px] font-bold text-center transition-all cursor-pointer truncate ${
+            tri === 't2'
+              ? 'border-sage bg-sage-pale text-sage-dark shadow-2xs'
+              : 'border-border/80 bg-white text-charcoal/70 hover:border-sage hover:text-charcoal'
+          }`}
+        >
+          2nd Trimester
+        </button>
+        <button
+          type="button"
+          onClick={() => { triggerHaptic('light'); setTri('t3'); }}
+          className={`py-2 px-1 xs:px-2 rounded-xl border text-[12px] xs:text-[12.5px] font-bold text-center transition-all cursor-pointer truncate ${
+            tri === 't3'
+              ? 'border-amber-500/80 bg-amber-50 text-amber-800 shadow-2xs'
+              : 'border-border/80 bg-white text-charcoal/70 hover:border-sage hover:text-charcoal'
+          }`}
+        >
+          3rd Trimester
+        </button>
       </div>
 
       {tri === 't1' && (
@@ -107,13 +162,24 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
 
       {/* Unified Trimester Tasks & Milestones Section */}
       <div className="mb-7 mt-6">
-        <div className="flex items-center justify-between gap-2 mb-1 flex-wrap">
-          <div className="font-serif text-[21px] font-medium text-charcoal">
+        <div className="flex items-center justify-between gap-2 mb-1.5 flex-wrap">
+          <div className="font-serif text-[18px] xs:text-[20px] font-medium text-charcoal">
             {trimesterLabel} Milestones & Tasks
           </div>
-          <span className="text-[11.5px] font-semibold text-sage-dark bg-sage-pale/60 px-2.5 py-0.5 rounded-full border border-sage/20">
-            {trimesterWeeks}
-          </span>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={handleSyncTrimesterToPartner}
+              className="px-2.5 py-1 bg-sage-pale text-sage-dark border border-sage/30 hover:bg-sage/20 rounded-xl text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 shadow-3xs"
+              title="Sync trimester milestones with partner"
+            >
+              <Users size={12} />
+              <span>Sync with Partner</span>
+            </button>
+            <span className="text-[11px] font-semibold text-sage-dark bg-sage-pale/60 px-2 py-0.5 rounded-full border border-sage/20">
+              {trimesterWeeks}
+            </span>
+          </div>
         </div>
         <p className="text-[12.5px] text-medium mb-3.5">
           Standard milestones for this stage. Add your own custom tasks anytime.
@@ -141,6 +207,48 @@ export const Development: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ 
           </button>
         </form>
       </div>
+
+      {/* Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-charcoal/90 text-white text-[12px] font-medium px-4 py-2 rounded-full shadow-lg border border-white/10 flex items-center gap-2 animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-none">
+          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Partner Profile Modal */}
+      <PartnerModal
+        isOpen={isPartnerModalOpen}
+        onClose={() => setIsPartnerModalOpen(false)}
+        initialPartner={state.partner}
+        taskTitleToAssign={`${trimesterLabel} Milestones`}
+        onSave={(partnerData) => {
+          const updatedState = {
+            ...state,
+            partner: partnerData,
+            birthPlan: {
+              ...state.birthPlan,
+              personalDetails: {
+                ...state.birthPlan?.personalDetails,
+                partnerName: partnerData.name,
+              },
+            },
+          };
+
+          updateState(updatedState);
+
+          if (syncEngine.conn && syncEngine.conn.open) {
+            syncEngine.broadcastState(updatedState);
+          }
+
+          showToast(`Partner saved! Linked with ${partnerData.name} 💕`);
+          setIsPartnerModalOpen(false);
+        }}
+        onRemove={() => {
+          updateState({ partner: null });
+          showToast('Partner profile removed');
+        }}
+      />
     </div>
   );
 };

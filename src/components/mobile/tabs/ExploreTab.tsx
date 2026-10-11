@@ -44,7 +44,7 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search 29 pregnancy tools, scans, schemes..."
+            placeholder={`Search ${tools.length} pregnancy tools, scans, schemes...`}
             className="w-full pl-10 pr-9 py-2.5 bg-white border border-border/80 rounded-2xl text-[13px] font-medium text-charcoal placeholder:text-light focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage shadow-2xs transition-shadow"
           />
           {searchQuery && (

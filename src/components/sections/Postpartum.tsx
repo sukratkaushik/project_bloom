@@ -22,48 +22,48 @@ export const Postpartum: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ f
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 mb-5">
-          <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5">
+          <div className="bg-white border border-border/80 rounded-2xl p-5 shadow-3xs">
             <h4 className="font-serif text-[18px] font-medium mb-2.5 text-charcoal">Your Recovery</h4>
-            <ul className="list-none">
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Physical healing takes 6–8 weeks minimum</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Postpartum bleeding (lochia) for 2–6 weeks</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Night sweats and hormonal shifts are normal</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Pelvic floor recovery begins immediately</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>C-section recovery needs extra time and support</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>6-week check-up with your GP / OB is critical</li>
+            <ul className="list-none space-y-1">
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Physical healing takes 6–8 weeks minimum</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Postpartum bleeding (lochia) for 2–6 weeks</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Night sweats and hormonal shifts are normal</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Pelvic floor recovery begins gently</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>C-section recovery needs extra care & support</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>6-week check-up with your OB is essential</li>
             </ul>
           </div>
-          <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5">
+          <div className="bg-white border border-border/80 rounded-2xl p-5 shadow-3xs">
             <h4 className="font-serif text-[18px] font-medium mb-2.5 text-charcoal">Baby's First Weeks</h4>
-            <ul className="list-none">
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Newborns sleep 14–17 hours/day in short bursts</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Feeding every 2–3 hours (breast or bottle)</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Jaundice is common and usually mild</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Cord stump falls off at 1–3 weeks</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Newborn hearing and vision screening</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>First paediatrician visit within 3–5 days</li>
+            <ul className="list-none space-y-1">
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Newborns sleep 14–17 hours/day in short bursts</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Feeding every 2–3 hours (breast or bottle)</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Jaundice is common and usually mild</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Cord stump falls off naturally at 1–3 weeks</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Newborn hearing and vision screening</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>First paediatrician visit within 3–5 days</li>
             </ul>
           </div>
-          <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5">
+          <div className="bg-white border border-border/80 rounded-2xl p-5 shadow-3xs">
             <h4 className="font-serif text-[18px] font-medium mb-2.5 text-charcoal">Mental & Emotional Health</h4>
-            <ul className="list-none">
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>"Baby blues" affect up to 80% of new parents</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Postpartum depression is common and treatable</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Anxiety, intrusive thoughts — seek support early</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Partners can also experience postpartum depression</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Know your support contacts before baby arrives</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Sleep deprivation amplifies all emotions</li>
+            <ul className="list-none space-y-1">
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>"Baby blues" affect up to 80% of new parents</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Postpartum depression is common and treatable</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Anxiety or intrusive thoughts — seek support early</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Partners can also experience emotional strain</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Save key helpline contacts before delivery</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Rest whenever baby sleeps to recover</li>
             </ul>
           </div>
-          <div className="bg-white border-[1.5px] border-border rounded-[14px] p-5">
+          <div className="bg-white border border-border/80 rounded-2xl p-5 shadow-3xs">
             <h4 className="font-serif text-[18px] font-medium mb-2.5 text-charcoal">Practical First Weeks</h4>
-            <ul className="list-none">
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Accept all help that is offered</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Set up a feeding station before birth</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Batch-cook or arrange meal support</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Limit visitors in the first week</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Register baby's birth within required timeframe</li>
-              <li className="text-[13px] text-medium py-1 flex gap-1.5"><span className="text-sage-light text-[18px] leading-[1.2] shrink-0">·</span>Add baby to health insurance immediately</li>
+            <ul className="list-none space-y-1">
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Accept family and community help with grace</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Set up a comfortable feeding station before birth</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Arrange postpartum nourishment & meals</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Set gentle boundaries around visitors in week 1</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Register baby's birth certificate on time</li>
+              <li className="text-[13px] text-medium py-0.5 flex gap-1.5"><span className="text-sage text-[16px] leading-[1.2] shrink-0">✦</span>Add baby to health insurance immediately</li>
             </ul>
           </div>
         </div>
