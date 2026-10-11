@@ -65,6 +65,7 @@ export type HospitalBagItem = {
   category: 'mama' | 'baby' | 'partner' | 'documents';
   packed: boolean;
   isCustom: boolean;
+  assigned?: boolean;
 };
 
 export type CustomSupplement = {

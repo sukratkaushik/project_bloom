@@ -2,17 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../../store';
 import { v4 as uuidv4 } from 'uuid';
 import { 
-  Briefcase, 
-  CheckSquare, 
-  Square,
+  Check,
   Plus,
   Trash2,
-  Printer,
-  Copy,
-  CheckCircle2
+  Users,
+  UserCheck
 } from 'lucide-react';
-import { HospitalBagItem } from '../../types';
+import { HospitalBagItem, PartnerInfo } from '../../types';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { ContextBanner } from '../ContextBanner';
+import { PartnerModal } from '../mobile/PartnerModal';
+import { syncEngine } from '../../syncEngine';
 
 const INITIAL_MAMA = [
   'Maternity notes — 3 printed copies',
@@ -79,8 +79,18 @@ export const HospitalBag: React.FC = () => {
   
   const [activeTab, setActiveTab] = useState<'mama' | 'baby' | 'partner' | 'documents'>('mama');
   const [customItem, setCustomItem] = useState('');
+  const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
+  const [pendingItemToAssign, setPendingItemToAssign] = useState<HospitalBagItem | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Initialize if empty
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3200);
+  };
+
+  const partnerName = state.partner?.name?.trim() || 'Partner';
+
+  // Initialize default items if empty
   useEffect(() => {
     if (!state.hospitalBagItems || state.hospitalBagItems.length === 0) {
       const items: HospitalBagItem[] = [
@@ -97,18 +107,33 @@ export const HospitalBag: React.FC = () => {
   
   const togglePacked = (id: string) => {
     triggerHaptic('light');
-    updateState({
-      hospitalBagItems: items.map(item => 
-        item.id === id ? { ...item, packed: !item.packed } : item
-      )
-    });
+    const updated = items.map(item => 
+      item.id === id ? { ...item, packed: !item.packed } : item
+    );
+    const newState = {
+      ...state,
+      hospitalBagItems: updated
+    };
+    updateState(newState);
+
+    if (syncEngine.conn && syncEngine.conn.open) {
+      syncEngine.broadcastState(newState);
+    }
   };
 
   const deleteItem = (id: string) => {
-    triggerHaptic('light');
-    updateState({
-      hospitalBagItems: items.filter(item => item.id !== id)
-    });
+    triggerHaptic('warning');
+    const updated = items.filter(item => item.id !== id);
+    const newState = {
+      ...state,
+      hospitalBagItems: updated
+    };
+    updateState(newState);
+
+    if (syncEngine.conn && syncEngine.conn.open) {
+      syncEngine.broadcastState(newState);
+    }
+    showToast('Item removed from checklist');
   };
 
   const handleAddCustom = (e: React.FormEvent) => {
@@ -124,35 +149,63 @@ export const HospitalBag: React.FC = () => {
       isCustom: true
     };
 
-    updateState({
-      hospitalBagItems: [...items, newItem]
-    });
+    const newState = {
+      ...state,
+      hospitalBagItems: [newItem, ...items]
+    };
+    updateState(newState);
+
+    if (syncEngine.conn && syncEngine.conn.open) {
+      syncEngine.broadcastState(newState);
+    }
+
     setCustomItem('');
+    showToast('Custom item added');
   };
 
-  const getChecklistText = () => {
-    return `*Hospital Bag Checklist:*\n\n` +
-      `*For Mama:*\n${items.filter(i => i.category === 'mama').map(i => `${i.packed ? '✅' : '☐'} ${i.label}`).join('\n')}\n\n` +
-      `*For Baby:*\n${items.filter(i => i.category === 'baby').map(i => `${i.packed ? '✅' : '☐'} ${i.label}`).join('\n')}\n\n` +
-      `*For Partner:*\n${items.filter(i => i.category === 'partner').map(i => `${i.packed ? '✅' : '☐'} ${i.label}`).join('\n')}\n\n` +
-      `*Documents:*\n${items.filter(i => i.category === 'documents').map(i => `${i.packed ? '✅' : '☐'} ${i.label}`).join('\n')}`;
-  };
-
-  const handleCopy = () => {
+  const toggleAssign = (item: HospitalBagItem) => {
     triggerHaptic('light');
-    navigator.clipboard.writeText(getChecklistText());
-    alert('Copied checklist to clipboard!');
+    const isCurrentlyAssigned = !!item.assigned || !!state.assigned?.[item.id];
+    const newAssigned = !isCurrentlyAssigned;
+
+    const updatedItems = items.map(i =>
+      i.id === item.id ? { ...i, assigned: newAssigned } : i
+    );
+    const updatedAssignedMap = {
+      ...state.assigned,
+      [item.id]: newAssigned
+    };
+    const newState = {
+      ...state,
+      hospitalBagItems: updatedItems,
+      assigned: updatedAssignedMap
+    };
+    updateState(newState);
+
+    if (syncEngine.conn && syncEngine.conn.open) {
+      syncEngine.broadcastState(newState);
+    }
+
+    if (newAssigned) {
+      showToast(`Assigned to ${partnerName} ✨`);
+    } else {
+      showToast(`Unassigned from ${partnerName}`);
+    }
   };
 
-  const handleWhatsAppShare = () => {
-    triggerHaptic('light');
-    const url = `https://wa.me/?text=${encodeURIComponent(getChecklistText())}`;
-    window.open(url, '_blank');
-  };
+  const handleAssignClick = (e: React.MouseEvent, item: HospitalBagItem) => {
+    e.stopPropagation();
+    const isCurrentlyAssigned = !!item.assigned || !!state.assigned?.[item.id];
 
-  const handlePrint = () => {
-    triggerHaptic('light');
-    window.print();
+    // If not yet assigned and no partner is configured yet, open modal to define partner
+    if (!isCurrentlyAssigned && !state.partner?.name?.trim()) {
+      triggerHaptic('medium');
+      setPendingItemToAssign(item);
+      setIsPartnerModalOpen(true);
+      return;
+    }
+
+    toggleAssign(item);
   };
 
   const filteredItems = items.filter(i => i.category === activeTab);
@@ -160,54 +213,16 @@ export const HospitalBag: React.FC = () => {
   const progressPct = items.length ? Math.round((totalPacked / items.length) * 100) : 0;
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
-      <div className="flex items-center justify-between flex-wrap gap-3 no-print">
-        <div>
-          <h2 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-tight">
-            Hospital Bag Checklist
-          </h2>
-          <p className="text-[12.5px] text-medium mt-0.5">
-            Essential packing list for labor ward, postpartum stay & baby welcome
-          </p>
-        </div>
-        
-        <div className="flex items-center gap-1.5 shrink-0">
-          <button 
-            type="button"
-            onClick={handleWhatsAppShare} 
-            className="h-9 px-3 border border-[#25D366]/40 bg-[#25D366]/10 text-[#25D366] rounded-xl hover:bg-[#25D366]/20 transition-colors flex items-center gap-1.5 text-[12px] font-bold cursor-pointer" 
-            title="Share via WhatsApp"
-          >
-            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-            </svg>
-            <span className="hidden sm:inline">Share</span>
-          </button>
-          <button 
-            type="button"
-            onClick={handleCopy} 
-            className="w-9 h-9 border border-border/80 rounded-xl text-charcoal hover:bg-cream bg-white flex items-center justify-center transition-colors cursor-pointer" 
-            title="Copy checklist"
-          >
-            <Copy size={15} />
-          </button>
-          <button 
-            type="button"
-            onClick={handlePrint} 
-            className="w-9 h-9 border border-border/80 rounded-xl text-charcoal hover:bg-cream bg-white flex items-center justify-center transition-colors cursor-pointer" 
-            title="Print checklist"
-          >
-            <Printer size={15} />
-          </button>
-        </div>
-      </div>
+    <div className="space-y-4 animate-in fade-in duration-200">
+      {/* Context Banner */}
+      <ContextBanner description="Essential packing list for labor ward, postpartum stay & baby welcome." />
 
-      {/* Progress Bar Card */}
-      <div className="bg-white border border-border/80 rounded-3xl shadow-xs p-4 sm:p-5 no-print">
+      {/* Overall Readiness Progress Bar Card */}
+      <div className="bg-white border border-border/80 rounded-2xl shadow-3xs p-4 sm:p-5 no-print">
         <div className="flex justify-between items-center mb-2">
           <div className="flex items-center gap-2">
-            <span className="font-serif font-bold text-charcoal text-[15px]">Overall Readiness</span>
-            <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full">
+            <span className="font-serif font-semibold text-charcoal text-[15px]">Overall Readiness</span>
+            <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full border border-sage/20">
               {progressPct}% Packed
             </span>
           </div>
@@ -219,7 +234,7 @@ export const HospitalBag: React.FC = () => {
       </div>
 
       {/* Main Container with Segmented Tabs */}
-      <div className="bg-white border border-border/80 rounded-3xl shadow-xs overflow-hidden">
+      <div className="bg-white border border-border/80 rounded-2xl shadow-3xs overflow-hidden">
         {/* Sleek Segmented Pill Tabs */}
         <div className="p-2 bg-cream/50 border-b border-border/70 flex items-center gap-1.5 overflow-x-auto no-scrollbar no-print">
           {[
@@ -247,7 +262,7 @@ export const HospitalBag: React.FC = () => {
                 }`}
               >
                 <span>{tab.label}</span>
-                <span className={`text-[10px] px-1.5 py-0.2 rounded-md ${
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${
                   isSelected ? 'bg-white/20 text-white' : 'bg-cream-dark/60 text-light'
                 }`}>
                   {packedCount}/{totalCount}
@@ -257,72 +272,167 @@ export const HospitalBag: React.FC = () => {
           })}
         </div>
 
-        {/* List */}
-        <div className="p-4 sm:p-5 print-visible">
-          <h2 className="hidden print:block font-serif text-2xl mb-4 text-charcoal border-b border-border pb-2 capitalize">
-            {activeTab === 'mama' ? 'For Mama' : activeTab === 'baby' ? 'For Baby' : activeTab === 'partner' ? 'For Partner' : 'Documents & Formalities'}
-          </h2>
-          
-          <div className="space-y-1.5">
-            {filteredItems.map(item => (
-              <div 
-                key={item.id} 
-                onClick={() => togglePacked(item.id)}
-                className="flex items-center justify-between gap-3 p-3 hover:bg-cream/40 rounded-xl transition-colors cursor-pointer group select-none"
-              >
-                <div className="flex items-center gap-3 min-w-0 flex-1">
-                  <div className="shrink-0 no-print mt-0.5">
-                    {item.packed ? (
-                      <CheckCircle2 size={19} className="text-sage" />
-                    ) : (
-                      <Square size={19} className="text-light hover:text-medium transition-colors" />
-                    )}
-                  </div>
-                  {/* Print only checkboxes */}
-                  <div className="hidden print:block w-4 h-4 border border-black shrink-0" />
-                  
-                  <span className={`text-[13.5px] leading-snug transition-colors ${
-                    item.packed ? 'text-light line-through' : 'text-charcoal font-medium'
-                  }`}>
-                    {item.label}
-                  </span>
-                </div>
-                
-                <button 
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteItem(item.id);
-                  }} 
-                  className="text-light hover:text-critical p-1.5 rounded-lg transition-colors no-print shrink-0 cursor-pointer"
-                  aria-label="Delete item"
-                >
-                  <Trash2 size={15} />
-                </button>
-              </div>
-            ))}
-          </div>
-
-          <form onSubmit={handleAddCustom} className="mt-4 flex gap-2 pt-4 border-t border-border/70 no-print">
+        {/* Tab Content */}
+        <div className="p-3.5 sm:p-5 print-visible">
+          {/* Add Custom Packing Item (Top Aligned) */}
+          <form onSubmit={handleAddCustom} className="flex gap-2 mb-3.5 no-print">
             <input
               type="text"
               value={customItem}
               onChange={e => setCustomItem(e.target.value)}
               placeholder="Add custom packing item..."
-              className="flex-1 px-3.5 py-2.5 border border-border/80 rounded-xl text-[13px] text-charcoal bg-cream/40 focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
+              className="flex-1 py-2.5 px-3.5 border border-border/80 rounded-xl font-sans text-[13px] text-charcoal bg-white focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage/20 transition-all placeholder:text-light/70 shadow-3xs"
             />
             <button 
               type="submit" 
-              disabled={!customItem.trim()} 
-              className="h-10 px-4 bg-sage text-white rounded-xl font-bold text-[13px] disabled:opacity-40 hover:bg-sage-dark flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 shadow-2xs"
+              disabled={!customItem.trim()}
+              className={`w-10 h-10 bg-sage text-white rounded-xl font-semibold transition-all hover:bg-sage-dark flex items-center justify-center active:scale-95 shadow-3xs shrink-0 cursor-pointer ${
+                !customItem.trim() ? 'opacity-70' : 'opacity-100'
+              }`}
+              title="Add custom item"
+              aria-label="Add custom item"
             >
-              <Plus size={15} /> 
-              <span>Add</span>
+              <Plus size={17} strokeWidth={2.4} />
             </button>
           </form>
+
+          {/* Checklist Items */}
+          <div className="space-y-2">
+            {filteredItems.map(item => {
+              const isAssigned = !!item.assigned || !!state.assigned?.[item.id];
+              return (
+                <div 
+                  key={item.id} 
+                  onClick={() => togglePacked(item.id)}
+                  className={`group flex items-center gap-2.5 xs:gap-3 p-2.5 xs:p-3 border rounded-xl cursor-pointer transition-all select-none ${
+                    item.packed 
+                      ? 'bg-cream/60 border-border/70 opacity-65' 
+                      : 'bg-white border-border/80 hover:border-sage/40 shadow-3xs hover:shadow-2xs'
+                  }`}
+                >
+                  {/* Checkbox */}
+                  <div 
+                    className={`w-5 h-5 rounded-lg border-[1.5px] flex items-center justify-center shrink-0 transition-all ${
+                      item.packed ? 'bg-sage border-sage shadow-3xs' : 'border-border/90 bg-white group-hover:border-sage'
+                    }`}
+                  >
+                    {item.packed && <Check size={13} className="text-white" strokeWidth={3} />}
+                  </div>
+
+                  {/* Print Checkbox */}
+                  <div className="hidden print:block w-4 h-4 border border-black shrink-0" />
+                  
+                  {/* Item Content */}
+                  <div className="flex-1 min-w-0 pr-1">
+                    <div className={`text-[13px] xs:text-[13.5px] leading-snug break-words ${
+                      item.packed ? 'line-through text-light font-normal' : 'text-charcoal font-medium'
+                    }`}>
+                      {item.label}
+                    </div>
+
+                    {/* Assigned to Partner Badge */}
+                    {isAssigned && (
+                      <div className="text-[11px] text-medium mt-1 flex items-center gap-1.5 flex-wrap">
+                        <span className="inline-flex items-center gap-1 bg-sage-pale text-sage-dark border border-sage/30 px-2 py-0.5 rounded-full text-[10px] font-semibold">
+                          <UserCheck size={11} className="stroke-[2.5]" />
+                          <span>Assigned to {partnerName}</span>
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Right Action Icons: Partner Assign/Share (Human Icon) & Delete */}
+                  <div className="shrink-0 flex items-center gap-1 self-center no-print">
+                    <button 
+                      type="button"
+                      onClick={(e) => handleAssignClick(e, item)}
+                      className={`w-7 h-7 xs:w-8 xs:h-8 rounded-xl flex items-center justify-center border transition-all cursor-pointer active:scale-95 ${
+                        isAssigned 
+                          ? 'border-sage/40 bg-sage-pale text-sage-dark shadow-3xs' 
+                          : 'border-border/80 bg-cream/40 text-charcoal/50 hover:text-sage-dark hover:border-sage/40 hover:bg-sage-pale/60'
+                      }`}
+                      title={isAssigned ? `Assigned to ${partnerName} (tap to unassign)` : "Assign to partner"}
+                      aria-label={isAssigned ? `Assigned to ${partnerName}` : "Assign to partner"}
+                    >
+                      {isAssigned ? (
+                        <UserCheck size={13.5} className="stroke-[2.2]" />
+                      ) : (
+                        <Users size={13.5} />
+                      )}
+                    </button>
+
+                    <button 
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteItem(item.id);
+                      }} 
+                      className="w-7 h-7 xs:w-8 xs:h-8 rounded-xl flex items-center justify-center text-charcoal/40 hover:text-critical hover:bg-critical-bg border border-transparent hover:border-critical/20 transition-all cursor-pointer active:scale-95"
+                      title="Delete item"
+                      aria-label="Delete item"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+
+            {filteredItems.length === 0 && (
+              <div className="text-center py-8 text-light text-[13px] italic">
+                No items in this category yet. Add one above!
+              </div>
+            )}
+          </div>
         </div>
       </div>
-      
+
+      {/* Partner Setup & Assignment Modal */}
+      <PartnerModal
+        isOpen={isPartnerModalOpen}
+        onClose={() => {
+          setIsPartnerModalOpen(false);
+          setPendingItemToAssign(null);
+        }}
+        initialPartner={state.partner}
+        taskTitleToAssign={pendingItemToAssign?.label}
+        onSave={(partnerData: PartnerInfo) => {
+          triggerHaptic('success');
+          let updatedItems = items;
+          let updatedAssignedMap = { ...state.assigned };
+
+          if (pendingItemToAssign) {
+            updatedItems = items.map(i =>
+              i.id === pendingItemToAssign.id ? { ...i, assigned: true } : i
+            );
+            updatedAssignedMap[pendingItemToAssign.id] = true;
+          }
+
+          const newState = {
+            ...state,
+            partner: partnerData,
+            hospitalBagItems: updatedItems,
+            assigned: updatedAssignedMap,
+          };
+          updateState(newState);
+
+          if (syncEngine.conn && syncEngine.conn.open) {
+            syncEngine.broadcastState(newState);
+          }
+
+          showToast(`Partner saved! Assigned to ${partnerData.name} 💕`);
+          setIsPartnerModalOpen(false);
+          setPendingItemToAssign(null);
+        }}
+      />
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 bg-charcoal text-white text-[12.5px] font-medium px-4 py-2 rounded-full shadow-lg animate-in fade-in slide-in-from-bottom-2 duration-200 flex items-center gap-2 pointer-events-none">
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       {/* Print rendering for all sections (hidden on screen) */}
       <div className="hidden print:block space-y-8 mt-8">
         {['mama', 'baby', 'partner', 'documents'].filter(t => t !== activeTab).map(category => (
