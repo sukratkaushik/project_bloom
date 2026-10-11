@@ -37,6 +37,7 @@ export type BirthPlan = {
     doctor?: string;
     partnerName?: string;
   };
+  customOptions?: Record<string, string[]>;
   environment?: string[];
   atmosphere?: string[];
   movement?: string[];
