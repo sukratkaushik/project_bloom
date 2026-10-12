@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Send, CheckCircle2, Bug, Sparkles, MessageSquareHeart, Mail, Check } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Send, CheckCircle2, Bug, Sparkles, MessageSquareHeart, Mail, Check, ChevronDown } from 'lucide-react';
 import { auth, db } from '../../firebase';
 import { collection, addDoc } from 'firebase/firestore';
 import { usePlanner } from '../../store';
@@ -10,8 +10,8 @@ export const FEATURE_CATEGORIES = [
   {
     category: 'Overall Experience',
     options: [
-      { id: 'Entire App / General', label: '🌟 Entire App / General Experience' },
-      { id: 'New Feature Idea', label: '💡 New Feature Idea (Not yet in Bloom)' },
+      { id: 'Entire App / General', label: 'Entire App / General Experience' },
+      { id: 'New Feature Idea', label: 'New Feature Idea (Not yet in Bloom)' },
     ]
   },
   {
@@ -90,6 +90,26 @@ export const Feedback: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSuccess, setIsSuccess] = useState<boolean>(false);
   const [copiedEmail, setCopiedEmail] = useState<boolean>(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState<boolean>(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutsideClick);
+    document.addEventListener('touchstart', handleOutsideClick);
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+      document.removeEventListener('touchstart', handleOutsideClick);
+    };
+  }, []);
+
+  const allOptions = FEATURE_CATEGORIES.flatMap((c) => c.options);
+  const currentOpt = allOptions.find((o) => o.id === selectedFeature || o.label === selectedFeature);
+  const currentLabel = currentOpt ? currentOpt.label : selectedFeature;
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText('founder@ourpregnancy.in');
@@ -281,34 +301,66 @@ export const Feedback: React.FC = () => {
           </div>
 
           {/* Full Categorized Dropdown Selector */}
-          <div className="space-y-1">
-            <label htmlFor="feature-selector" className="text-[11.5px] font-medium text-medium block">
+          <div className="space-y-1 relative" ref={dropdownRef}>
+            <label className="text-[11.5px] font-medium text-medium block">
               Or pick from all Bloom tools:
             </label>
-            <div className="relative">
-              <select
-                id="feature-selector"
-                value={selectedFeature}
-                onChange={(e) => {
-                  triggerHaptic('light');
-                  setSelectedFeature(e.target.value);
-                }}
-                className="w-full p-3 rounded-xl border border-border/80 bg-white text-charcoal font-sans text-[13.5px] focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 transition-all appearance-none cursor-pointer"
-              >
-                {FEATURE_CATEGORIES.map((cat) => (
-                  <optgroup key={cat.category} label={cat.category}>
-                    {cat.options.map((opt) => (
-                      <option key={opt.id} value={opt.label}>
-                        {opt.label}
-                      </option>
-                    ))}
-                  </optgroup>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setIsDropdownOpen(!isDropdownOpen);
+              }}
+              className={`w-full p-3 rounded-xl border border-border/80 bg-white text-charcoal font-sans text-[13.5px] text-left flex items-center justify-between transition-all cursor-pointer hover:border-sage/70 focus:outline-none focus:border-sage focus:ring-4 focus:ring-sage/10 ${
+                isDropdownOpen ? 'border-sage ring-4 ring-sage/10' : ''
+              }`}
+            >
+              <span className="truncate pr-2 font-medium text-charcoal text-left">
+                {currentLabel}
+              </span>
+              <ChevronDown
+                size={16}
+                className={`text-medium transition-transform duration-200 shrink-0 ${isDropdownOpen ? 'rotate-180 text-sage' : ''}`}
+              />
+            </button>
+
+            {isDropdownOpen && (
+              <div className="absolute z-50 top-full left-0 right-0 mt-1.5 max-h-[290px] overflow-y-auto bg-white border border-border/90 rounded-2xl shadow-[0_12px_32px_rgba(44,62,80,0.14)] p-1.5 overscroll-contain animate-in fade-in slide-in-from-top-1 duration-150">
+                {FEATURE_CATEGORIES.map((cat, idx) => (
+                  <div key={cat.category} className={idx > 0 ? "pt-2 mt-1 border-t border-border/50" : ""}>
+                    <div className="px-3 py-1.5 text-[10.5px] font-bold uppercase tracking-[1px] text-light text-left select-none">
+                      {cat.category}
+                    </div>
+                    <div className="space-y-0.5">
+                      {cat.options.map((opt) => {
+                        const isSelected = selectedFeature === opt.id || selectedFeature === opt.label;
+                        return (
+                          <button
+                            key={opt.id}
+                            type="button"
+                            onClick={() => {
+                              triggerHaptic('light');
+                              setSelectedFeature(opt.id);
+                              setIsDropdownOpen(false);
+                            }}
+                            className={`w-full text-left px-3 py-2 rounded-xl text-[13px] transition-all flex items-center justify-between cursor-pointer ${
+                              isSelected
+                                ? 'bg-sage-pale text-sage-dark font-semibold shadow-3xs'
+                                : 'text-charcoal hover:bg-cream/80 hover:text-charcoal'
+                            }`}
+                          >
+                            <span className="truncate text-left">{opt.label}</span>
+                            {isSelected && (
+                              <Check size={14} className="text-sage-dark shrink-0 ml-2" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 ))}
-              </select>
-              <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-medium text-[11px]">
-                ▼
               </div>
-            </div>
+            )}
           </div>
 
           {/* Optional New Feature Title Input if 'New Feature Idea' is chosen */}
