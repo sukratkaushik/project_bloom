@@ -212,7 +212,7 @@ export const QuickLogSheet: React.FC<QuickLogSheetProps> = ({
             className="flex-1 py-2 px-3 rounded-xl bg-cream hover:bg-sage-pale/60 border border-border/80 text-[11.5px] font-bold text-charcoal flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
           >
             <Sparkles size={14} className="text-sage-dark" />
-            <span>Ask Bloom AI</span>
+            <span>Ask OPIN AI</span>
           </button>
 
           <button

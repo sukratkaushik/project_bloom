@@ -123,7 +123,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
   // Category 2: Smart AI & Cultural Guidance (5 tools)
   {
     id: 'askourpregnancy',
-    title: 'Ask Bloom AI',
+    title: 'Ask OPIN AI',
     desc: 'Empathetic OB-GYN clinical maternal chat',
     category: 'Smart AI & Guidance',
     icon: Sparkles,

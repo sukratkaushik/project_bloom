@@ -86,7 +86,7 @@ export const SmartAiTab: React.FC<SmartAiTabProps> = ({ onOpenTool }) => {
       const response = await chatCallable({
         message: userMsg,
         dueDate: state.dueDate,
-        systemPrompt: `You are Bloom AI, an executive clinical maternal companion aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
+        systemPrompt: `You are OPIN AI, an executive clinical maternal companion aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
 When answering maternal questions:
 1. Provide a direct, definitive Clinical Summary first.
 2. Outline key maternal/fetal physiological benefits or risks using clean bullet points.
@@ -209,7 +209,7 @@ When answering maternal questions:
             </div>
             <div>
               <h3 className="font-serif font-bold text-charcoal dark:text-cream text-[14.5px] leading-tight">
-                Ask Bloom AI Companion
+                Ask OPIN AI Companion
               </h3>
               <span className="text-[10.5px] text-medium dark:text-stone-400 font-medium">
                 Evidence-based clinical guidance

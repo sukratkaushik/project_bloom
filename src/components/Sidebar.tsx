@@ -151,7 +151,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'hydration', icon: '💧', label: 'Hydration' },
     { id: 'nutrition', icon: '🥗', label: 'Nutrition' },
     { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
-    { id: 'askourpregnancy', icon: '✨', label: 'Bloom AI' },
+    { id: 'askourpregnancy', icon: '✨', label: 'OPIN AI' },
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
     { id: 'travel', icon: '✈️', label: 'Safe Travel Guide' },

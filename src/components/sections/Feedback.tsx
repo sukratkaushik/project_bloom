@@ -11,7 +11,7 @@ export const FEATURE_CATEGORIES = [
     category: 'Overall Experience',
     options: [
       { id: 'Entire App / General', label: 'Entire App / General Experience' },
-      { id: 'New Feature Idea', label: 'New Feature Idea (Not yet in Bloom)' },
+      { id: 'New Feature Idea', label: 'New Feature Idea (Not yet in OPIN)' },
     ]
   },
   {
@@ -41,7 +41,7 @@ export const FEATURE_CATEGORIES = [
       { id: 'Breathing & Garbh Sanskar', label: 'Breathing & Garbh Sanskar Audio' },
       { id: 'Baby Names Finder', label: 'Baby Names Finder' },
       { id: 'Safe Travel Guide', label: 'Safe Travel Guide' },
-      { id: 'Ask Bloom AI', label: 'Ask Bloom AI' },
+      { id: 'Ask OPIN AI', label: 'Ask OPIN AI' },
     ]
   },
   {
@@ -171,14 +171,14 @@ export const Feedback: React.FC = () => {
       }
       return `What improvements or additions would you love to see in ${selectedFeature}?`;
     }
-    return "What's on your mind? Tell us how Bloom is working for you, or what would make it even more welcoming...";
+    return "What's on your mind? Tell us how OPIN is working for you, or what would make it even more welcoming...";
   };
 
   return (
     <div className="animate-in fade-in duration-300 max-w-2xl space-y-4">
       {/* 1. Context Banner replaces the big text header */}
       <ContextBanner 
-        description="Share your feedback, feature ideas, or report any issues. Every note is read directly by our founding team to make Bloom smoother, more supportive, and truly helpful for expectant parents."
+        description="Share your feedback, feature ideas, or report any issues. Every note is read directly by our founding team to make OPIN smoother, more supportive, and truly helpful for expectant parents."
       />
 
       {/* 2. Success Alert */}
@@ -188,7 +188,7 @@ export const Feedback: React.FC = () => {
           <div>
             <h4 className="text-[13.5px] font-bold text-charcoal">Feedback Received!</h4>
             <p className="text-[12.5px] text-medium mt-0.5 leading-relaxed">
-              Thank you for helping us nurture Bloom. Our founding team reviews every submission and incorporates parent suggestions into upcoming updates.
+              Thank you for helping us nurture OPIN. Our founding team reviews every submission and incorporates parent suggestions into upcoming updates.
             </p>
           </div>
         </div>
@@ -303,7 +303,7 @@ export const Feedback: React.FC = () => {
           {/* Full Categorized Dropdown Selector */}
           <div className="space-y-1 relative" ref={dropdownRef}>
             <label className="text-[11.5px] font-medium text-medium block">
-              Or pick from all Bloom tools:
+              Or pick from all OPIN tools:
             </label>
             <button
               type="button"
