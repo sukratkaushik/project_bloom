@@ -3,13 +3,13 @@ import { usePlanner } from '../../store';
 import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
+import { ContextBanner } from '../ContextBanner';
 import { 
   Droplets, 
   Plus, 
   Minus, 
   Check, 
   TrendingUp, 
-  Flame,
   Trash2
 } from 'lucide-react';
 
@@ -96,9 +96,6 @@ export const HydrationTracker: React.FC = () => {
     return d;
   });
 
-  const hour = new Date().getHours();
-  const showDehydrationWarning = hour >= 15 && percentage < 50;
-
   if (!state.activeJourneyId) {
     return (
       <div className="p-6 bg-white border border-border/80 rounded-2xl shadow-xs text-center">
@@ -115,19 +112,13 @@ export const HydrationTracker: React.FC = () => {
 
   return (
     <div className="space-y-4 animate-in fade-in duration-300">
-      <div className="flex items-center gap-2.5">
-        <Droplets className="w-7 h-7 text-sage" />
-        <h1 className="font-serif text-[clamp(24px,3.5vw,36px)] font-normal text-charcoal">Hydration</h1>
-      </div>
-
-      {showDehydrationWarning && (
-        <div className="bg-amber-50/80 border border-amber-200/80 text-amber-900 p-3.5 rounded-xl flex items-start gap-3 shadow-2xs">
-          <Flame className="w-5 h-5 shrink-0 mt-0.5 text-amber-600" />
-          <div className="text-[13px] leading-relaxed">
-            <span className="font-semibold">Gentle reminder:</span> Staying well hydrated helps prevent Braxton Hicks contractions. Coconut water and chaas count too! 🥥
-          </div>
-        </div>
-      )}
+      <ContextBanner 
+        description={
+          <>
+            <strong className="font-semibold text-charcoal">Gentle reminder:</strong> Staying well hydrated helps prevent Braxton Hicks contractions. Coconut water and chaas count too! 🥥
+          </>
+        }
+      />
 
       {streak >= 3 && (
         <div className="bg-tulsi-light/70 border border-sage/30 text-sage-dark p-2.5 rounded-xl flex items-center justify-center gap-2 shadow-2xs font-semibold text-[13px]">
