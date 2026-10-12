@@ -3,6 +3,7 @@ import { usePlanner } from '../../store';
 import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
+import { ContextBanner } from '../ContextBanner';
 import {
   Heart,
   Scale,
@@ -492,138 +493,144 @@ export const VitalsTracker: React.FC = () => {
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       
-      {/* Title */}
-      <div className="flex items-center gap-2.5">
-        <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center text-sage">
-          <Heart className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="font-serif text-[clamp(24px,3.5vw,36px)] font-normal text-charcoal leading-tight">Health Metrics</h1>
-          <p className="text-[12.5px] text-medium font-normal">Blood pressure monitoring, gestational weight & wearable sync</p>
-        </div>
-      </div>
+      {/* Context Banner */}
+      <ContextBanner 
+        description="Blood pressure monitoring, gestational weight & wearable sync." 
+      />
 
       {/* Main Container */}
       <div className="bg-white border border-border/80 rounded-2xl shadow-xs overflow-hidden">
         
-        {/* Modern Segmented Navigation Tabs */}
-        <div className="p-2 sm:p-2.5 border-b border-border/60 bg-cream/40">
-          <div className="flex gap-1.5 p-1 bg-cream-dark/40 rounded-xl">
+        {/* Sleek Segmented Navigation Tabs */}
+        <div className="p-1.5 border-b border-border/60 bg-cream/30">
+          <div className="flex gap-1 p-1 bg-cream-dark/30 rounded-xl">
             <button
               type="button"
-              className={`flex-1 py-2.5 px-3 rounded-lg text-[13px] sm:text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-1.5 px-2 rounded-lg text-[11.5px] xs:text-[12px] transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 activeTab === 'BP' 
-                  ? 'bg-sage text-white shadow-2xs' 
-                  : 'text-medium hover:text-charcoal hover:bg-cream/60'
+                  ? 'bg-sage text-white font-semibold shadow-3xs' 
+                  : 'text-charcoal/70 hover:text-charcoal hover:bg-cream/50 font-medium'
               }`}
               onClick={() => setActiveTab('BP')}
             >
-              <Heart className="w-4 h-4 shrink-0" />
+              <Heart className="w-3.5 h-3.5 shrink-0" />
               <span>Blood Pressure</span>
             </button>
             <button
               type="button"
-              className={`flex-1 py-2.5 px-3 rounded-lg text-[13px] sm:text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-1.5 px-2 rounded-lg text-[11.5px] xs:text-[12px] transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 activeTab === 'WEIGHT' 
-                  ? 'bg-sage text-white shadow-2xs' 
-                  : 'text-medium hover:text-charcoal hover:bg-cream/60'
+                  ? 'bg-sage text-white font-semibold shadow-3xs' 
+                  : 'text-charcoal/70 hover:text-charcoal hover:bg-cream/50 font-medium'
               }`}
               onClick={() => setActiveTab('WEIGHT')}
             >
-              <Scale className="w-4 h-4 shrink-0" />
+              <Scale className="w-3.5 h-3.5 shrink-0" />
               <span>Weight</span>
             </button>
             <button
               type="button"
-              className={`flex-1 py-2.5 px-3 rounded-lg text-[13px] sm:text-[14px] font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+              className={`flex-1 py-1.5 px-2 rounded-lg text-[11.5px] xs:text-[12px] transition-all flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap ${
                 activeTab === 'WEARABLES' 
-                  ? 'bg-sage text-white shadow-2xs' 
-                  : 'text-medium hover:text-charcoal hover:bg-cream/60'
+                  ? 'bg-sage text-white font-semibold shadow-3xs' 
+                  : 'text-charcoal/70 hover:text-charcoal hover:bg-cream/50 font-medium'
               }`}
               onClick={() => setActiveTab('WEARABLES')}
             >
-              <Watch className="w-4 h-4 shrink-0" />
+              <Watch className="w-3.5 h-3.5 shrink-0" />
               <span>Wearables</span>
             </button>
           </div>
         </div>
 
         {/* Tab Body */}
-        <div className="p-4 sm:p-6">
+        <div className="p-3.5 sm:p-5">
           {activeTab !== 'WEARABLES' ? (
-            <div className="space-y-4">
+            <div className="space-y-3.5">
               
               {/* Date & Time Picker Row */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-medium/80 block">Date</label>
-                  <div className="relative">
-                    <input 
-                      type="date" 
-                      value={date} 
-                      onChange={e => setDate(e.target.value)} 
-                      className="w-full px-3 py-2 bg-cream/50 border border-border/80 rounded-xl focus:border-sage focus:bg-white text-[13px] font-medium text-charcoal outline-none transition-all" 
-                    />
-                  </div>
+                  <label className="text-[10.5px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1">
+                    <CalendarIcon className="w-3 h-3 text-sage" />
+                    Date
+                  </label>
+                  <input 
+                    type="date" 
+                    value={date} 
+                    onChange={e => setDate(e.target.value)} 
+                    className="w-full px-3 py-2 bg-cream/40 border border-border/70 rounded-xl focus:border-sage focus:bg-white text-[12.5px] font-medium text-charcoal outline-none transition-all shadow-3xs" 
+                  />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-[11px] font-bold uppercase tracking-wider text-medium/80 block">Time</label>
-                  <div className="relative">
-                    <input 
-                      type="time" 
-                      value={time} 
-                      onChange={e => setTime(e.target.value)} 
-                      className="w-full px-3 py-2 bg-cream/50 border border-border/80 rounded-xl focus:border-sage focus:bg-white text-[13px] font-medium text-charcoal outline-none transition-all" 
-                    />
-                  </div>
+                  <label className="text-[10.5px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1">
+                    <Clock className="w-3 h-3 text-sage" />
+                    Time
+                  </label>
+                  <input 
+                    type="time" 
+                    value={time} 
+                    onChange={e => setTime(e.target.value)} 
+                    className="w-full px-3 py-2 bg-cream/40 border border-border/70 rounded-xl focus:border-sage focus:bg-white text-[12.5px] font-medium text-charcoal outline-none transition-all shadow-3xs" 
+                  />
                 </div>
               </div>
 
               {/* Blood Pressure Input Section */}
               {activeTab === 'BP' ? (
-                <div className="space-y-4 pt-1 animate-in slide-in-from-left-2">
-                  <div className="p-4 bg-gradient-to-br from-cream via-cream/50 to-white rounded-2xl border border-border/80">
-                    <div className="text-[11px] font-bold uppercase tracking-wider text-center text-medium/80 mb-3">
-                      Blood Pressure Reading (mmHg)
+                <div className="space-y-3 pt-0.5 animate-in slide-in-from-left-2 duration-200">
+                  <div className="p-3.5 bg-cream/30 rounded-xl border border-border/80">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1.5">
+                        <Heart className="w-3.5 h-3.5 text-sage" />
+                        Blood Pressure Reading
+                      </span>
+                      <span className="text-[11px] font-medium text-medium">Target: &lt;120/80 mmHg</span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
-                      {/* Systolic Card */}
-                      <div className="bg-white p-3.5 rounded-xl border border-border/80 text-center shadow-2xs focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/10 transition-all">
-                        <span className="text-[10.5px] font-bold text-medium uppercase tracking-wider block mb-1">
-                          Systolic
-                        </span>
-                        <input 
-                          type="number" 
-                          placeholder="120" 
-                          value={systolic} 
-                          onChange={e => setSystolic(e.target.value)} 
-                          className="w-full text-center font-serif text-[32px] sm:text-[36px] text-charcoal outline-none placeholder:text-medium/30 leading-none py-1 bg-transparent" 
-                        />
-                        <span className="text-[10px] text-light block mt-1 font-medium">Upper #</span>
+                    <div className="grid grid-cols-2 gap-2.5 max-w-sm mx-auto">
+                      {/* Systolic Pod */}
+                      <div className="bg-white p-2.5 rounded-xl border border-border/70 text-center shadow-3xs focus-within:border-sage focus-within:ring-1 focus-within:ring-sage/20 transition-all">
+                        <div className="flex items-center justify-between text-[10.5px] text-medium font-medium px-1">
+                          <span>Systolic</span>
+                          <span className="text-[9.5px] text-medium/70">Upper #</span>
+                        </div>
+                        <div className="flex items-baseline justify-center gap-1 my-1">
+                          <input 
+                            type="number" 
+                            placeholder="120" 
+                            value={systolic} 
+                            onChange={e => setSystolic(e.target.value)} 
+                            className="w-20 text-center font-serif text-[26px] font-medium text-charcoal outline-none placeholder:text-medium/30 leading-tight bg-transparent" 
+                          />
+                          <span className="text-[10.5px] text-medium/70 font-sans">mmHg</span>
+                        </div>
                       </div>
 
-                      {/* Diastolic Card */}
-                      <div className="bg-white p-3.5 rounded-xl border border-border/80 text-center shadow-2xs focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/10 transition-all">
-                        <span className="text-[10.5px] font-bold text-medium uppercase tracking-wider block mb-1">
-                          Diastolic
-                        </span>
-                        <input 
-                          type="number" 
-                          placeholder="80" 
-                          value={diastolic} 
-                          onChange={e => setDiastolic(e.target.value)} 
-                          className="w-full text-center font-serif text-[32px] sm:text-[36px] text-charcoal outline-none placeholder:text-medium/30 leading-none py-1 bg-transparent" 
-                        />
-                        <span className="text-[10px] text-light block mt-1 font-medium">Lower #</span>
+                      {/* Diastolic Pod */}
+                      <div className="bg-white p-2.5 rounded-xl border border-border/70 text-center shadow-3xs focus-within:border-sage focus-within:ring-1 focus-within:ring-sage/20 transition-all">
+                        <div className="flex items-center justify-between text-[10.5px] text-medium font-medium px-1">
+                          <span>Diastolic</span>
+                          <span className="text-[9.5px] text-medium/70">Lower #</span>
+                        </div>
+                        <div className="flex items-baseline justify-center gap-1 my-1">
+                          <input 
+                            type="number" 
+                            placeholder="80" 
+                            value={diastolic} 
+                            onChange={e => setDiastolic(e.target.value)} 
+                            className="w-20 text-center font-serif text-[26px] font-medium text-charcoal outline-none placeholder:text-medium/30 leading-tight bg-transparent" 
+                          />
+                          <span className="text-[10.5px] text-medium/70 font-sans">mmHg</span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Dynamic Classification Banner */}
                     {bpClass && (
-                      <div className={`mt-3.5 p-3 rounded-xl text-[12.5px] text-center transition-all ${bpClass.color}`}>
+                      <div className={`mt-2.5 p-2 rounded-lg text-[12px] text-center transition-all ${bpClass.color}`}>
                         {bpClass.label}
                       </div>
                     )}
@@ -631,7 +638,8 @@ export const VitalsTracker: React.FC = () => {
 
                   {/* Pulse Input */}
                   <div className="space-y-1">
-                    <label className="text-[11px] font-bold uppercase tracking-wider text-medium/80 block">
+                    <label className="text-[10.5px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1">
+                      <Activity className="w-3 h-3 text-sage" />
                       Pulse Rate (Optional)
                     </label>
                     <div className="relative">
@@ -640,38 +648,44 @@ export const VitalsTracker: React.FC = () => {
                         placeholder="Pulse in bpm (e.g. 72)" 
                         value={pulse} 
                         onChange={e => setPulse(e.target.value)} 
-                        className="w-full px-3.5 py-2.5 bg-cream/50 border border-border/80 rounded-xl focus:border-sage focus:bg-white text-[13.5px] text-charcoal outline-none transition-all placeholder:text-medium/50" 
+                        className="w-full px-3 py-2 bg-cream/40 border border-border/70 rounded-xl focus:border-sage focus:bg-white text-[12.5px] text-charcoal outline-none transition-all placeholder:text-medium/50 shadow-3xs" 
                       />
-                      <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[12px] text-medium font-medium">bpm</span>
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] text-medium font-medium">bpm</span>
                     </div>
                   </div>
                 </div>
               ) : (
                 /* Weight Input Section */
-                <div className="space-y-4 pt-1 animate-in slide-in-from-right-2">
-                  <div className="p-4 bg-gradient-to-br from-cream via-cream/50 to-white rounded-2xl border border-border/80">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-center text-medium/80 block mb-3">
-                      Current Gestational Weight
-                    </span>
-                    <div className="max-w-xs mx-auto relative bg-white p-3.5 rounded-xl border border-border/80 text-center shadow-2xs focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/10 transition-all">
-                      <input 
-                        type="number" 
-                        step="0.1" 
-                        placeholder="60.5" 
-                        value={weight} 
-                        onChange={e => setWeight(e.target.value)} 
-                        className="w-full text-center font-serif text-[36px] text-charcoal outline-none placeholder:text-medium/30 leading-none py-1 bg-transparent" 
-                      />
-                      <button 
-                        type="button"
-                        onClick={toggleUnit} 
-                        className="absolute right-3 top-1/2 -translate-y-1/2 px-2.5 py-1 bg-cream hover:bg-cream-dark text-charcoal border border-border/80 rounded-lg text-[12px] font-bold transition-colors cursor-pointer"
-                        title="Click to toggle between kg and lbs"
-                      >
-                        {unit}
-                      </button>
+                <div className="space-y-3 pt-0.5 animate-in slide-in-from-right-2 duration-200">
+                  <div className="p-3.5 bg-cream/30 rounded-xl border border-border/80">
+                    <div className="flex items-center justify-between mb-2.5">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1.5">
+                        <Scale className="w-3.5 h-3.5 text-sage" />
+                        Current Gestational Weight
+                      </span>
+                      <span className="text-[11px] font-medium text-medium">Weekly tracking</span>
                     </div>
-                    <p className="text-[11.5px] text-medium text-center mt-2.5">
+                    <div className="max-w-xs mx-auto relative bg-white p-2.5 rounded-xl border border-border/70 text-center shadow-3xs focus-within:border-sage focus-within:ring-1 focus-within:ring-sage/20 transition-all">
+                      <div className="flex items-center justify-center gap-1.5">
+                        <input 
+                          type="number" 
+                          step="0.1" 
+                          placeholder="60.5" 
+                          value={weight} 
+                          onChange={e => setWeight(e.target.value)} 
+                          className="w-24 text-center font-serif text-[26px] font-medium text-charcoal outline-none placeholder:text-medium/30 leading-tight bg-transparent" 
+                        />
+                        <button 
+                          type="button"
+                          onClick={toggleUnit} 
+                          className="px-2 py-0.5 bg-cream hover:bg-cream-dark text-charcoal border border-border/80 rounded-md text-[11px] font-bold transition-colors cursor-pointer"
+                          title="Click to toggle between kg and lbs"
+                        >
+                          {unit}
+                        </button>
+                      </div>
+                    </div>
+                    <p className="text-[11px] text-medium text-center mt-2">
                       Log once a week at the same time (preferably morning) for best accuracy.
                     </p>
                   </div>
@@ -680,13 +694,16 @@ export const VitalsTracker: React.FC = () => {
 
               {/* Notes Input */}
               <div className="space-y-1">
-                <label className="text-[11px] font-bold uppercase tracking-wider text-medium/80 block">Notes (Optional)</label>
+                <label className="text-[10.5px] font-bold uppercase tracking-wider text-charcoal/70 flex items-center gap-1">
+                  <FileText className="w-3 h-3 text-sage" />
+                  Notes (Optional)
+                </label>
                 <input 
                   type="text" 
                   placeholder="How are you feeling? (e.g. relaxed, after walking, slight headache)" 
                   value={notes} 
                   onChange={e => setNotes(e.target.value)} 
-                  className="w-full px-3.5 py-2.5 bg-cream/50 border border-border/80 rounded-xl focus:border-sage focus:bg-white text-[13.5px] text-charcoal outline-none transition-all placeholder:text-medium/50" 
+                  className="w-full px-3 py-2 bg-cream/40 border border-border/70 rounded-xl focus:border-sage focus:bg-white text-[12.5px] text-charcoal outline-none transition-all placeholder:text-medium/50 shadow-3xs" 
                 />
               </div>
 
@@ -694,7 +711,7 @@ export const VitalsTracker: React.FC = () => {
               <button
                 type="button"
                 onClick={handleLogVitals}
-                className="w-full mt-2 py-3.5 bg-sage hover:bg-sage-dark text-white rounded-xl font-medium text-[14.5px] flex items-center justify-center gap-2 transition-all shadow-xs active:scale-95 cursor-pointer"
+                className="w-full mt-1 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl font-medium text-[13.5px] flex items-center justify-center gap-2 transition-all shadow-3xs active:scale-[0.99] cursor-pointer"
               >
                 <Plus className="w-4 h-4" />
                 <span>Log {activeTab === 'BP' ? 'Blood Pressure' : 'Weight'}</span>
