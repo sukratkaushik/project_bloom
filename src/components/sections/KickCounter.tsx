@@ -3,6 +3,7 @@ import { usePlanner } from '../../store';
 import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
+import { ContextBanner } from '../ContextBanner';
 import { 
   Baby, 
   Timer, 
@@ -156,18 +157,12 @@ export const KickCounter: React.FC = () => {
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       
-      {/* Title */}
-      <div className="flex items-center gap-2.5">
-        <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center text-sage">
-          <Baby className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="font-serif text-[clamp(24px,3.5vw,36px)] font-normal text-charcoal leading-tight">Kick Counter</h1>
-          <p className="text-[12.5px] text-medium font-normal">Cardiff Count-to-10 • Track baby's movements & vitality</p>
-        </div>
-      </div>
+      {/* Context Banner */}
+      <ContextBanner 
+        description="Cardiff Count-to-10 standard • Track baby's movements and daily vitality patterns." 
+      />
 
       {/* Main Interactive Session Card */}
       <div className="bg-white border border-border/80 rounded-2xl shadow-xs p-5 sm:p-7 relative overflow-hidden flex flex-col items-center justify-center">
