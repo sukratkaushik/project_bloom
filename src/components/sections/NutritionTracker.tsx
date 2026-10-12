@@ -3,16 +3,13 @@ import { usePlanner } from '../../store';
 import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
+import { ContextBanner } from '../ContextBanner';
 import { 
   Pill, 
-  Leaf, 
   Info, 
   Check, 
-  Droplets, 
-  Heart, 
   Plus, 
   Trash2,
-  Sparkles,
   Search,
   CheckCircle2,
   AlertCircle,
@@ -177,43 +174,27 @@ export const NutritionTracker: React.FC = () => {
   }
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 animate-in fade-in duration-300">
       
-      {/* Title */}
-      <div className="flex items-center gap-2.5">
-        <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center text-sage">
-          <Pill className="w-5 h-5" />
-        </div>
-        <div>
-          <h1 className="font-serif text-[clamp(24px,3.5vw,36px)] font-normal text-charcoal leading-tight">Nutrition</h1>
-          <p className="text-[12.5px] text-medium font-normal">Daily maternal supplements & evidence-based Indian food guide</p>
-        </div>
-      </div>
-
-      {/* Trimester Focus Card - Warm, Welcoming & Brand Aligned */}
-      <div className="bg-gradient-to-br from-tulsi-light/60 via-cream to-white border border-sage/30 rounded-2xl p-4 sm:p-5 shadow-2xs">
-        <div className="flex items-start gap-3.5">
-          <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center text-sage-dark shrink-0 mt-0.5">
-            {currentTrimester === 1 && <Leaf className="w-5 h-5 text-sage" />}
-            {currentTrimester === 2 && <Droplets className="w-5 h-5 text-sage" />}
-            {currentTrimester === 3 && <Sparkles className="w-5 h-5 text-sage" />}
-            {currentTrimester === 'post' && <Heart className="w-5 h-5 text-blush" />}
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="text-[10.5px] font-bold uppercase tracking-wider text-sage-dark bg-sage/15 px-2 py-0.5 rounded-full">
-                {currentTrimester === 'post' ? 'Postpartum Focus' : `Trimester ${currentTrimester} Priority`}
-              </span>
-            </div>
-            <p className="text-[13.5px] text-charcoal leading-relaxed font-normal">
+      {/* Context Banner */}
+      <ContextBanner 
+        description={
+          <div className="space-y-1.5">
+            <p className="text-charcoal/90 text-[12.5px] xs:text-[13px] leading-relaxed">
+              Daily maternal supplements & evidence-based Indian food guide.
+            </p>
+            <p className="text-[12px] xs:text-[12.5px] text-charcoal/85 leading-relaxed pt-1.5 border-t border-border/40">
+              <strong className="font-semibold text-sage-dark">
+                {currentTrimester === 'post' ? 'Postpartum Priority:' : `Trimester ${currentTrimester} Priority:`}
+              </strong>{' '}
               {currentTrimester === 1 && "Focus on Folate — critical for neural tube development. Green leafy vegetables, dal, and fortified atta are excellent sources."}
               {currentTrimester === 2 && "Focus on Iron — your blood volume is expanding. Enjoy palak dal, ragi, and dates. Pair with fresh lemon to boost iron absorption."}
               {currentTrimester === 3 && "Focus on Calcium — supporting baby's bone development. Dahi, paneer, ragi, and til are rich sources. Enjoy 15 minutes of gentle morning sunlight for Vitamin D."}
               {currentTrimester === 'post' && "If breastfeeding, continue your prenatal routine. Prioritize DHA (walnuts, alsi/flaxseed), iodine, and staying well hydrated with warm fluids."}
             </p>
           </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Daily Supplements Section */}
       <div className="bg-white border border-border/80 rounded-2xl shadow-xs overflow-hidden">
