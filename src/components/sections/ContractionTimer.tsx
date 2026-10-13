@@ -3,6 +3,7 @@ import { usePlanner } from '../../store';
 import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
+import { ContextBanner } from '../ContextBanner';
 import { 
   Timer, 
   Activity, 
@@ -15,7 +16,8 @@ import {
   Calendar as CalendarIcon,
   Trash2,
   Play,
-  Square
+  Square,
+  Sparkles
 } from 'lucide-react';
 import { triggerHaptic } from '../../utils/nativeBridge';
 
@@ -237,80 +239,73 @@ export const ContractionTimer: React.FC = () => {
   const analysis = evaluate511();
 
   return (
-    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200">
-      {/* Header bar with session actions */}
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h2 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-tight">
-            Contraction Timer
-          </h2>
-          <p className="text-[12.5px] text-medium mt-0.5">
-            5-1-1 clinical labor rule tracking & surge interval log
-          </p>
-        </div>
-        
-        {records.length > 0 && (
-          <button 
-            type="button"
-            onClick={handleClearSession}
-            className="flex items-center gap-1.5 px-3.5 py-1.5 bg-white border border-border/80 rounded-xl text-[12px] font-bold text-charcoal hover:bg-cream hover:border-sage transition-all shadow-2xs shrink-0 cursor-pointer"
-          >
-            <RotateCcw size={13} className="text-sage" />
-            <span>Save & New</span>
-          </button>
-        )}
-      </div>
+    <div className="space-y-4 animate-in fade-in duration-200">
+      {/* Context Banner */}
+      <ContextBanner 
+        description="5-1-1 Clinical Labor Rule Tracker • Surge interval log to record contraction duration and frequency with clinical precision." 
+      />
 
       {/* 1. Main Timer Hero Card */}
-      <div className="bg-white border border-border/80 rounded-3xl p-5 sm:p-7 shadow-xs flex flex-col items-center relative overflow-hidden">
+      <div className="bg-white border border-border/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col items-center relative overflow-hidden">
         {/* Soft Ambient Background Aura */}
         <div className={`absolute -top-24 w-72 h-72 rounded-full blur-3xl pointer-events-none transition-all duration-700 ${
           activeStartedAt ? 'bg-terracotta/15' : (records.length > 0 ? 'bg-sage/15' : 'bg-cream-dark/40')
         }`} />
 
-        {/* Live Status Badge */}
-        <div className="relative z-10 mb-3">
+        {/* Top Status & Session Control Row */}
+        <div className="relative z-10 w-full flex items-center justify-between mb-2">
           {activeStartedAt ? (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-terracotta-pale border border-terracotta/30 text-terracotta-dark text-[12px] font-bold shadow-2xs animate-pulse">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-terracotta-pale border border-terracotta/30 text-terracotta-dark text-[11.5px] font-semibold shadow-3xs animate-pulse">
               <span className="w-2 h-2 rounded-full bg-terracotta animate-ping" />
               <span>Timing active contraction...</span>
             </div>
           ) : records.length > 0 ? (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-sage-pale border border-sage/30 text-sage-dark text-[12px] font-bold shadow-2xs">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-sage-pale border border-sage/30 text-sage-dark text-[11.5px] font-semibold shadow-3xs">
               <span className="w-2 h-2 rounded-full bg-sage" />
               <span>Resting between contractions</span>
             </div>
           ) : (
-            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cream border border-border/70 text-medium text-[12px] font-bold">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cream border border-border/70 text-medium text-[11.5px] font-semibold">
               <span>Ready for next contraction</span>
             </div>
+          )}
+
+          {records.length > 0 && (
+            <button 
+              type="button"
+              onClick={handleClearSession}
+              className="flex items-center gap-1.5 px-3 py-1 bg-white border border-border/80 rounded-xl text-[11.5px] font-semibold text-charcoal hover:bg-cream hover:border-sage transition-all shadow-3xs cursor-pointer active:scale-95"
+            >
+              <RotateCcw size={12} className="text-sage" />
+              <span>Save & New</span>
+            </button>
           )}
         </div>
 
         {/* Big Playfair Digits */}
-        <div className="relative z-10 font-serif text-[68px] sm:text-[84px] font-bold text-charcoal tracking-tight leading-none my-2 select-none">
+        <div className="relative z-10 font-serif text-[68px] sm:text-[80px] font-bold text-charcoal tracking-tight leading-none my-2 select-none tabular-nums">
           {activeStartedAt ? formatTime(elapsedSeconds) : '00:00'}
         </div>
 
         <p className="relative z-10 text-[12px] text-medium text-center max-w-xs mb-5">
           {activeStartedAt 
-            ? 'Breathe slowly through the surge. Tap "End Contraction" when it subsides.' 
-            : 'Tap "Start Contraction" the moment you feel a tightening surge begin.'}
+            ? 'Breathe gently through the surge. Tap "End" when it subsides.' 
+            : 'Tap "Start" the moment you feel a tightening surge begin.'}
         </p>
 
         {/* Action Buttons */}
-        <div className="relative z-10 grid grid-cols-2 gap-3.5 w-full max-w-md">
+        <div className="relative z-10 grid grid-cols-2 gap-3 w-full max-w-sm">
           <button
             type="button"
             onClick={handleStart}
             disabled={!!activeStartedAt}
-            className={`h-12.5 sm:h-13 rounded-2xl font-bold text-[14.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-[0.98] ${
+            className={`h-12 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-[0.98] ${
               !activeStartedAt 
                 ? 'bg-sage hover:bg-sage-dark text-white shadow-xs' 
                 : 'bg-cream text-light border border-border/60 cursor-not-allowed opacity-50'
             }`}
           >
-            <Play size={16} fill="currentColor" />
+            <Play size={15} fill="currentColor" />
             <span>Start</span>
           </button>
           
@@ -318,33 +313,31 @@ export const ContractionTimer: React.FC = () => {
             type="button"
             onClick={handleEnd}
             disabled={!activeStartedAt}
-            className={`h-12.5 sm:h-13 rounded-2xl font-bold text-[14.5px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-[0.98] ${
+            className={`h-12 rounded-xl font-semibold text-[14px] transition-all flex items-center justify-center gap-2 cursor-pointer shadow-2xs active:scale-[0.98] ${
               activeStartedAt 
                 ? 'bg-terracotta hover:bg-terracotta-dark text-white shadow-xs' 
                 : 'bg-cream text-light border border-border/60 cursor-not-allowed opacity-50'
             }`}
           >
-            <Square size={14} fill="currentColor" />
+            <Square size={13} fill="currentColor" />
             <span>End</span>
           </button>
         </div>
 
         {/* Live Session Quick Summary Row */}
         {records.length > 0 && (
-          <div className="relative z-10 mt-5 pt-3.5 border-t border-border/60 w-full flex items-center justify-around text-center">
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-medium block">Logged</span>
-              <span className="font-serif font-bold text-[15px] text-charcoal">{records.length} {records.length === 1 ? 'surge' : 'surges'}</span>
+          <div className="relative z-10 mt-5 pt-3.5 border-t border-border/60 w-full grid grid-cols-3 divide-x divide-border/60 text-center">
+            <div className="px-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-medium block">Logged</span>
+              <span className="font-serif font-bold text-[14px] text-charcoal mt-0.5 block">{records.length} {records.length === 1 ? 'surge' : 'surges'}</span>
             </div>
-            <div className="w-px h-7 bg-border/60" />
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-medium block">Last Length</span>
-              <span className="font-serif font-bold text-[15px] text-charcoal">{formatDuration(records[records.length - 1].durationMs)}</span>
+            <div className="px-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-medium block">Last Length</span>
+              <span className="font-serif font-bold text-[14px] text-charcoal mt-0.5 block">{formatDuration(records[records.length - 1].durationMs)}</span>
             </div>
-            <div className="w-px h-7 bg-border/60" />
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-medium block">Last Gap</span>
-              <span className="font-serif font-bold text-[15px] text-charcoal">
+            <div className="px-2">
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-medium block">Last Gap</span>
+              <span className="font-serif font-bold text-[14px] text-charcoal mt-0.5 block">
                 {records[records.length - 1].gapMs > 0 ? formatDuration(records[records.length - 1].gapMs) : 'First'}
               </span>
             </div>
@@ -353,113 +346,119 @@ export const ContractionTimer: React.FC = () => {
       </div>
 
       {/* 2. 5-1-1 Clinical Rule Analysis */}
-      {analysis && records.length >= 3 && (
-        <div className={`p-4 sm:p-5 rounded-3xl border transition-all ${
-          analysis.allMet 
-            ? 'bg-gradient-to-br from-terracotta-pale via-white to-cream border-terracotta/40 shadow-xs' 
-            : 'bg-white border-border/80 shadow-2xs'
-        }`}>
-          <div className="flex items-center justify-between gap-2 mb-3">
-            <div className="flex items-center gap-2">
-              <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
-                analysis.allMet ? 'bg-terracotta text-white' : 'bg-sage-pale text-sage-dark'
-              }`}>
-                <Activity size={15} />
-              </div>
-              <h3 className="font-serif font-bold text-charcoal text-[15px] sm:text-[16px]">
-                5-1-1 Labor Rule Progress
-              </h3>
+      <div className={`p-4 sm:p-5 rounded-2xl border transition-all ${
+        analysis?.allMet 
+          ? 'bg-gradient-to-br from-terracotta-pale via-white to-cream border-terracotta/40 shadow-xs' 
+          : 'bg-white border-border/80 shadow-2xs'
+      }`}>
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <div className="flex items-center gap-2">
+            <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${
+              analysis?.allMet ? 'bg-terracotta text-white' : 'bg-sage-pale text-sage-dark'
+            }`}>
+              <Activity size={15} />
             </div>
-            <span className="text-[10.5px] font-bold text-medium">
-              ACOG Standard
-            </span>
+            <h3 className="font-serif font-semibold text-charcoal text-[15px]">
+              5-1-1 Labor Rule Progress
+            </h3>
           </div>
-
-          <div className="grid grid-cols-3 gap-2 mb-3.5">
-            <div className={`p-2.5 rounded-2xl border text-center ${
-              analysis.freqMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/60 border-border/70'
-            }`}>
-              <span className="text-[9.5px] font-bold uppercase tracking-wider text-medium block mb-0.5">
-                Freq (≤5m)
-              </span>
-              <div className="flex items-center justify-center gap-1 font-bold text-[12px] text-charcoal">
-                {analysis.freqMet ? (
-                  <CheckCircle2 size={13} className="text-sage-dark" />
-                ) : (
-                  <span className="text-light text-[11px]">•</span>
-                )}
-                <span>{analysis.freqMet ? 'Met' : 'Pending'}</span>
-              </div>
-            </div>
-
-            <div className={`p-2.5 rounded-2xl border text-center ${
-              analysis.durationMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/60 border-border/70'
-            }`}>
-              <span className="text-[9.5px] font-bold uppercase tracking-wider text-medium block mb-0.5">
-                Duration (≥60s)
-              </span>
-              <div className="flex items-center justify-center gap-1 font-bold text-[12px] text-charcoal">
-                {analysis.durationMet ? (
-                  <CheckCircle2 size={13} className="text-sage-dark" />
-                ) : (
-                  <span className="text-light text-[11px]">•</span>
-                )}
-                <span>{analysis.durationMet ? 'Met' : 'Pending'}</span>
-              </div>
-            </div>
-
-            <div className={`p-2.5 rounded-2xl border text-center ${
-              analysis.timeMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/60 border-border/70'
-            }`}>
-              <span className="text-[9.5px] font-bold uppercase tracking-wider text-medium block mb-0.5">
-                Pattern (1 hr+)
-              </span>
-              <div className="flex items-center justify-center gap-1 font-bold text-[12px] text-charcoal">
-                {analysis.timeMet ? (
-                  <CheckCircle2 size={13} className="text-sage-dark" />
-                ) : (
-                  <span className="text-light text-[11px]">•</span>
-                )}
-                <span>{analysis.timeMet ? 'Met' : 'Pending'}</span>
-              </div>
-            </div>
-          </div>
-
-          {analysis.allMet ? (
-            <div className="bg-terracotta-pale border border-terracotta/30 rounded-2xl p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-terracotta-dark">
-              <div className="flex items-start gap-2">
-                <Phone size={16} className="text-terracotta shrink-0 mt-0.5" />
-                <div>
-                  <h4 className="font-bold text-[13px]">5-1-1 Rule Active: Prepare for Hospital</h4>
-                  <p className="text-[11.5px] text-terracotta-dark/90 mt-0.5">
-                    Your contractions are 5 mins apart, 60s long, sustained for 1 hour. Contact your doctor or triage.
-                  </p>
-                </div>
-              </div>
-              <a
-                href="tel:108"
-                className="w-full sm:w-auto px-4 py-2 bg-terracotta text-white font-bold text-[12px] rounded-xl flex items-center justify-center gap-1.5 shadow-2xs hover:bg-terracotta-dark transition-colors shrink-0 whitespace-nowrap"
-              >
-                <Phone size={13} />
-                <span>Call 108</span>
-              </a>
-            </div>
-          ) : (
-            <p className="text-[11.5px] text-medium italic text-center">
-              Keep timing calmly — your body is preparing. Log at least 3 contractions for continuous analysis.
-            </p>
-          )}
+          <span className="text-[10.5px] font-medium text-medium bg-cream px-2 py-0.5 rounded-full border border-border/60">
+            ACOG Standard
+          </span>
         </div>
-      )}
+
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className={`p-2.5 rounded-xl border text-center transition-colors ${
+            analysis?.freqMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/40 border-border/60'
+          }`}>
+            <span className="text-[9.5px] font-semibold uppercase tracking-wider text-medium block mb-0.5">
+              Freq (≤5m)
+            </span>
+            <div className="flex items-center justify-center gap-1 font-semibold text-[11.5px] text-charcoal">
+              {analysis?.freqMet ? (
+                <>
+                  <CheckCircle2 size={12} className="text-sage-dark" />
+                  <span className="text-sage-dark">Met</span>
+                </>
+              ) : (
+                <span className="text-medium">{records.length >= 3 ? 'Pending' : '—'}</span>
+              )}
+            </div>
+          </div>
+
+          <div className={`p-2.5 rounded-xl border text-center transition-colors ${
+            analysis?.durationMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/40 border-border/60'
+          }`}>
+            <span className="text-[9.5px] font-semibold uppercase tracking-wider text-medium block mb-0.5">
+              Duration (≥60s)
+            </span>
+            <div className="flex items-center justify-center gap-1 font-semibold text-[11.5px] text-charcoal">
+              {analysis?.durationMet ? (
+                <>
+                  <CheckCircle2 size={12} className="text-sage-dark" />
+                  <span className="text-sage-dark">Met</span>
+                </>
+              ) : (
+                <span className="text-medium">{records.length >= 3 ? 'Pending' : '—'}</span>
+              )}
+            </div>
+          </div>
+
+          <div className={`p-2.5 rounded-xl border text-center transition-colors ${
+            analysis?.timeMet ? 'bg-sage-pale/60 border-sage/40' : 'bg-cream/40 border-border/60'
+          }`}>
+            <span className="text-[9.5px] font-semibold uppercase tracking-wider text-medium block mb-0.5">
+              Pattern (1 hr+)
+            </span>
+            <div className="flex items-center justify-center gap-1 font-semibold text-[11.5px] text-charcoal">
+              {analysis?.timeMet ? (
+                <>
+                  <CheckCircle2 size={12} className="text-sage-dark" />
+                  <span className="text-sage-dark">Met</span>
+                </>
+              ) : (
+                <span className="text-medium">{records.length >= 3 ? 'Pending' : '—'}</span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {analysis?.allMet ? (
+          <div className="bg-terracotta-pale border border-terracotta/30 rounded-xl p-3 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-terracotta-dark">
+            <div className="flex items-start gap-2">
+              <Phone size={15} className="text-terracotta shrink-0 mt-0.5" />
+              <div>
+                <h4 className="font-bold text-[12.5px]">5-1-1 Rule Active: Prepare for Hospital</h4>
+                <p className="text-[11px] text-terracotta-dark/90 mt-0.5">
+                  Contractions are 5 mins apart, 60s long, sustained for 1 hour. Contact your doctor or triage team.
+                </p>
+              </div>
+            </div>
+            <a
+              href="tel:108"
+              className="w-full sm:w-auto px-3.5 py-1.5 bg-terracotta text-white font-semibold text-[11.5px] rounded-lg flex items-center justify-center gap-1.5 shadow-2xs hover:bg-terracotta-dark transition-colors shrink-0 whitespace-nowrap"
+            >
+              <Phone size={12} />
+              <span>Call 108</span>
+            </a>
+          </div>
+        ) : (
+          <p className="text-[11px] text-medium text-center">
+            {records.length < 3
+              ? 'Log at least 3 contractions to calculate active 5-1-1 labor frequency and intervals.'
+              : 'Keep timing calmly — your body is preparing. All 3 metrics must be sustained to trigger hospital triage.'}
+          </p>
+        )}
+      </div>
 
       {/* 3. Current Session Logs */}
       {records.length > 0 && (
-        <div className="bg-white border border-border/80 rounded-3xl overflow-hidden shadow-2xs">
-          <div className="px-5 py-3.5 border-b border-border/60 bg-cream/30 flex items-center justify-between">
-            <h3 className="font-serif font-bold text-charcoal text-[15px] sm:text-[16px]">
+        <div className="bg-white border border-border/80 rounded-2xl overflow-hidden shadow-2xs">
+          <div className="px-4 sm:px-5 py-3 border-b border-border/60 bg-cream/30 flex items-center justify-between">
+            <h3 className="font-serif font-semibold text-charcoal text-[15px]">
               Current Session Logs
             </h3>
-            <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full">
+            <span className="text-[11px] font-semibold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full">
               {records.length} {records.length === 1 ? 'surge' : 'surges'}
             </span>
           </div>
@@ -473,7 +472,7 @@ export const ContractionTimer: React.FC = () => {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-[13.5px] text-charcoal">
+                      <span className="font-semibold text-[13.5px] text-charcoal">
                         {formatDuration(record.durationMs)}
                       </span>
                       {record.gapMs > 0 && (
@@ -494,13 +493,13 @@ export const ContractionTimer: React.FC = () => {
       )}
 
       {/* 4. Monthly Calendar Overview (Single Row Header, No Wrap) */}
-      <div className="bg-white border border-border/80 rounded-3xl overflow-hidden shadow-2xs">
-        <div className="px-4 py-3.5 border-b border-border/60 bg-cream/30 flex items-center justify-between gap-2">
+      <div className="bg-white border border-border/80 rounded-2xl overflow-hidden shadow-2xs">
+        <div className="px-4 py-3 border-b border-border/60 bg-cream/30 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-7 h-7 rounded-lg bg-sage-pale flex items-center justify-center text-sage-dark shrink-0">
-              <CalendarIcon size={15} />
+              <CalendarIcon size={14} />
             </div>
-            <h3 className="font-serif font-bold text-charcoal text-[15px] sm:text-[16px] whitespace-nowrap">
+            <h3 className="font-serif font-semibold text-charcoal text-[15px] whitespace-nowrap">
               Calendar Overview
             </h3>
           </div>
@@ -568,11 +567,13 @@ export const ContractionTimer: React.FC = () => {
       </div>
 
       {/* 5. Past Sessions History */}
-      <div className="bg-white border border-border/80 rounded-3xl overflow-hidden shadow-2xs">
-        <div className="px-5 py-3.5 border-b border-border/60 bg-cream/30 flex items-center justify-between">
+      <div className="bg-white border border-border/80 rounded-2xl overflow-hidden shadow-2xs">
+        <div className="px-4 sm:px-5 py-3 border-b border-border/60 bg-cream/30 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Timer className="w-4 h-4 text-sage" />
-            <h3 className="font-serif font-bold text-charcoal text-[15px] sm:text-[16px]">
+            <div className="w-7 h-7 rounded-lg bg-sage-pale flex items-center justify-center text-sage-dark shrink-0">
+              <Timer size={14} />
+            </div>
+            <h3 className="font-serif font-semibold text-charcoal text-[15px]">
               Past Sessions
             </h3>
           </div>
