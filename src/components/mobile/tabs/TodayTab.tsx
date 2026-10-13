@@ -12,8 +12,6 @@ import {
   ChevronRight,
   Plus,
   Calendar,
-  ShieldCheck,
-  Wind,
   Clock,
   Check,
   Stethoscope,
@@ -912,76 +910,6 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             )}
           </div>
         )}
-      </div>
-
-      {/* 6. Mindful Breathing & Garbh Sanskar Card */}
-      <div
-        onClick={() => {
-          triggerHaptic('light');
-          onOpenTool('breathing');
-        }}
-        className="bg-gradient-to-r from-sage-pale/60 via-cream to-rose-50/50 border border-sage-soft/40 rounded-2xl p-4 shadow-2xs hover:border-sage transition-all active:scale-[0.99] cursor-pointer"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-sage-dark text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <Wind size={19} />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-1.5">
-                <span className="text-[10.5px] font-bold text-sage-dark uppercase tracking-wider">
-                  Maternal Peace & Bonding
-                </span>
-                <span className="text-[9px] font-medium bg-emerald-100 text-emerald-800 px-2 py-0.2 rounded-full whitespace-nowrap">
-                  100% Offline
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-charcoal text-[14px] mt-0.5">
-                Pranayama & Garbh Sanskar Audio
-              </h3>
-              <p className="text-[12px] text-medium mt-0.5">
-                4-7-8 relaxing breath, Anulom Vilom, and calming Vedic soundscapes
-              </p>
-            </div>
-          </div>
-          <ChevronRight size={18} className="text-sage-dark shrink-0 ml-2" />
-        </div>
-      </div>
-
-      {/* 7. Government Maternity Aid Milestone Card */}
-      <div className="bg-gradient-to-r from-soft-saffron/10 via-white to-gold/10 border border-soft-saffron/30 rounded-2xl p-4 shadow-2xs">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-xl bg-soft-saffron/20 text-soft-saffron-dark flex items-center justify-center shrink-0 mt-0.5">
-            <ShieldCheck size={20} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center justify-between gap-1 mb-1">
-              <span className="text-[10px] font-bold text-soft-saffron-dark uppercase tracking-wider">
-                Government Maternity Aid • MoHFW
-              </span>
-              <span className="text-[10px] font-bold text-charcoal bg-white/80 px-2 py-0.5 rounded-md border border-soft-saffron/20 shrink-0 whitespace-nowrap">
-                ₹5,000 Direct Benefit
-              </span>
-            </div>
-            <h3 className="font-serif font-bold text-charcoal text-[14px] mt-0.5">
-              PMMVY Form 1A Registration
-            </h3>
-            <p className="text-[12px] text-medium mt-1 leading-relaxed">
-              Submit your MCP card copy to your nearest Anganwadi / ASHA worker to claim your 1st pregnancy installment.
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                onOpenTool('schemes');
-              }}
-              className="mt-2.5 inline-flex items-center gap-1 text-[12px] font-bold text-sage-dark hover:underline cursor-pointer"
-            >
-              <span>Check Eligibility & Download Form</span>
-              <ChevronRight size={14} />
-            </button>
-          </div>
-        </div>
       </div>
 
       {/* Fetal Growth Reassurance & Scan Personalization Modal */}
