@@ -35,6 +35,7 @@ import {
   Layers
 } from 'lucide-react';
 import { Paywall } from '../Paywall';
+import { ContextBanner } from '../ContextBanner';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
@@ -853,18 +854,10 @@ export const FoodScanner: React.FC = () => {
     <Paywall featureName="FoodScanner">
       <div className="animate-in fade-in duration-300 max-w-4xl mx-auto pb-12">
         
-        {/* Header Title */}
-        <div className="mb-4">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sage-pale text-sage-dark text-[11.5px] font-semibold tracking-wide uppercase mb-2">
-            <Bot size={14} className="text-sage" /> Maternal Clinical Vision & Database
-          </div>
-          <h2 className="font-serif text-[clamp(24px,3.8vw,34px)] font-bold text-charcoal leading-tight">
-            Our Pregnancy AI Food Guide
-          </h2>
-          <p className="text-[13.5px] sm:text-[14px] text-medium max-w-[620px] leading-relaxed mt-1">
-            Snap a photo, scan a packaged barcode across 3,000,000+ items worldwide, or describe your meal for instant maternal safety, macro breakdown, and trimester micronutrients.
-          </p>
-        </div>
+        {/* Context Banner */}
+        <ContextBanner 
+          description="Snap a photo, scan a packaged barcode across 3,000,000+ items worldwide, or describe your meal for instant maternal safety, macro breakdown, and trimester micronutrients." 
+        />
 
         {/* Multimodal Mode Selector Tabs (Sleek Material 3 Segmented Control) */}
         <div className="w-full bg-[#EFECE6] dark:bg-stone-800/90 p-1.5 rounded-2xl border border-stone-200/90 dark:border-stone-700/60 shadow-inner grid grid-cols-3 gap-1.5 mb-5 select-none">
