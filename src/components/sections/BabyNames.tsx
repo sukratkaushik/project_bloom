@@ -6,12 +6,49 @@ import {
   Heart,
   Globe,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Copy,
+  Check
 } from 'lucide-react';
 import { CustomSelect } from '../CustomSelect';
+import { ContextBanner } from '../ContextBanner';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { triggerHaptic } from '../../utils/nativeBridge';
+
+const QUICK_THEMES = [
+  '☀️ Light & Radiance',
+  '🌊 Peace & Calm',
+  '🌿 Nature & Earth',
+  '🦁 Strength & Courage',
+  '🌸 Grace & Devotion',
+  '✨ Star & Celestial'
+];
+
+const FALLBACK_NAMES = [
+  { name: 'Advait', meaning: 'Unique, non-dual, spiritual oneness', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
+  { name: 'Aarav', meaning: 'Peaceful, calm wisdom and harmony', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
+  { name: 'Ananya', meaning: 'Incomparable, matchless grace', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
+  { name: 'Diya', meaning: 'Radiant light, lamp of hope', origin: 'Hindi / Sanskrit', gender: 'Girl', style: 'Modern' },
+  { name: 'Ishan', meaning: 'The sun, lord of auspicious wealth', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
+  { name: 'Kabir', meaning: 'Great, revered poet-saint of truth', origin: 'Indian / Arabic', gender: 'Neutral', style: 'Modern' },
+  { name: 'Mira', meaning: 'Prosperous, sea of devotion and grace', origin: 'Sanskrit / Global', gender: 'Girl', style: 'Modern' },
+  { name: 'Neil', meaning: 'Champion, sapphire blue, radiant sky', origin: 'Gaelic / Sanskrit', gender: 'Boy', style: 'Modern' },
+  { name: 'Reyansh', meaning: 'First ray of the morning sun, Lord Vishnu', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
+  { name: 'Tara', meaning: 'Guiding star, radiant shining protector', origin: 'Sanskrit / Global', gender: 'Girl', style: 'Modern' },
+  { name: 'Vivaan', meaning: 'Full of life, dawn rays of morning sun', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
+  { name: 'Zara', meaning: 'Radiance, blooming flower, dawn', origin: 'Arabic / Global', gender: 'Girl', style: 'Modern' },
+  { name: 'Arin', meaning: 'Mountain of strength, enlightened peace', origin: 'Sanskrit / Global', gender: 'Neutral', style: 'Modern' },
+  { name: 'Kiaan', meaning: 'Grace of God, ancient king, royal heritage', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
+  { name: 'Sia', meaning: 'Goddess Sita, white moonlight, beautiful', origin: 'Sanskrit', gender: 'Girl', style: 'Modern' },
+  { name: 'Zoya', meaning: 'Loving, caring, alive and joyous', origin: 'Global / Arabic', gender: 'Girl', style: 'Modern' },
+  { name: 'Reva', meaning: 'Narmada river, star, graceful movement', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
+  { name: 'Dev', meaning: 'Divine, shining, godlike spirit', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
+  { name: 'Ayla', meaning: 'Oak tree, halo of light around moon', origin: 'Global / Turkish', gender: 'Girl', style: 'Nature Inspired' },
+  { name: 'Bodhi', meaning: 'Awakening, spiritual enlightenment', origin: 'Sanskrit', gender: 'Neutral', style: 'Nature Inspired' },
+  { name: 'Ishani', meaning: 'Consort of Shiva, ruling goddess of strength', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
+  { name: 'Yuvan', meaning: 'Youthful vigor, Lord Shiva', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' }
+];
 
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
@@ -23,6 +60,16 @@ export const BabyNames: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [suggestions, setSuggestions] = useState<{ name: string, meaning: string, origin: string }[]>([]);
   const [error, setError] = useState('');
+
+  const [copiedFavorites, setCopiedFavorites] = useState(false);
+
+  const handleCopyFavorites = () => {
+    if (!favoriteNames.length) return;
+    triggerHaptic('success');
+    navigator.clipboard.writeText(favoriteNames.join(', '));
+    setCopiedFavorites(true);
+    setTimeout(() => setCopiedFavorites(false), 2000);
+  };
 
   const handleGenerate = async () => {
     triggerHaptic('medium');
@@ -51,7 +98,7 @@ export const BabyNames: React.FC = () => {
       const cleanText = result.reply.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleanText);
 
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         setSuggestions(parsed);
         triggerHaptic('success');
       } else {
@@ -59,8 +106,23 @@ export const BabyNames: React.FC = () => {
       }
 
     } catch (err) {
-      console.error(err);
-      setError('Something went wrong. Please try again.');
+      console.warn("AI generation fallback to offline curated name bank:", err);
+      // Fallback to offline curated database
+      let filtered = FALLBACK_NAMES.filter(n => {
+        if (gender !== 'Neutral' && n.gender !== gender && n.gender !== 'Neutral') return false;
+        if (startingLetter && !n.name.toUpperCase().startsWith(startingLetter.toUpperCase())) return false;
+        return true;
+      });
+      if (filtered.length === 0) {
+        filtered = FALLBACK_NAMES.filter(n => gender === 'Neutral' || n.gender === gender || n.gender === 'Neutral');
+      }
+      const shuffled = [...filtered].sort(() => 0.5 - Math.random()).slice(0, 6);
+      if (shuffled.length > 0) {
+        setSuggestions(shuffled.map(s => ({ name: s.name, meaning: s.meaning, origin: s.origin })));
+        triggerHaptic('success');
+      } else {
+        setError('Unable to curate suggestions. Please check your network or adjust filters.');
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -69,15 +131,11 @@ export const BabyNames: React.FC = () => {
   const favoriteNames = state.favoriteNames || [];
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-200">
-      <div>
-        <h2 className="font-serif text-[22px] sm:text-[26px] font-bold text-charcoal leading-tight">
-          Name Boutique
-        </h2>
-        <p className="text-[12.5px] text-medium mt-0.5">
-          Curate meaningful names across Sanskrit, traditional Indian & global origins
-        </p>
-      </div>
+    <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 max-w-4xl mx-auto pb-12">
+      {/* Context Banner */}
+      <ContextBanner 
+        description="Discover meaningful, culturally resonant baby names rooted in Vedic Sanskrit, traditional Indian heritages, and short globally-phonetic styles. Filter by gender, auspicious starting syllables, and inspiring life themes to curate and shortlist favorites for your little one." 
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
         {/* Form Section */}
@@ -105,8 +163,8 @@ export const BabyNames: React.FC = () => {
                       }}
                       className={`flex-1 h-10 rounded-xl text-[13px] font-bold transition-all cursor-pointer ${
                         isSelected 
-                          ? 'bg-sage text-white shadow-2xs border border-sage' 
-                          : 'bg-cream text-medium hover:text-charcoal hover:bg-cream-dark/60 border border-border/70'
+                          ? 'bg-sage-dark text-white shadow-2xs border border-sage-dark' 
+                          : 'bg-cream text-charcoal/70 hover:text-charcoal hover:bg-cream-dark/60 border border-border/70'
                       }`}
                     >
                       {g}
@@ -164,11 +222,41 @@ export const BabyNames: React.FC = () => {
               </div>
             </div>
 
+            {/* Quick Inspiration Pills */}
+            <div className="space-y-1.5 pt-0.5">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal/60">
+                Quick Theme Inspirations
+              </span>
+              <div className="flex flex-wrap gap-1.5">
+                {QUICK_THEMES.map(theme => {
+                  const keyword = theme.split(' ')[1] || theme;
+                  const isSelected = keywords.toLowerCase() === keyword.toLowerCase();
+                  return (
+                    <button
+                      key={theme}
+                      type="button"
+                      onClick={() => {
+                        triggerHaptic('light');
+                        setKeywords(keyword);
+                      }}
+                      className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-sage-dark text-white shadow-3xs'
+                          : 'bg-cream text-charcoal/70 hover:bg-border/60 hover:text-charcoal border border-border/60'
+                      }`}
+                    >
+                      {theme}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <button
               type="button"
               onClick={handleGenerate}
               disabled={isGenerating}
-              className="w-full h-12 mt-2 rounded-xl bg-sage hover:bg-sage-dark text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-2xs active:scale-[0.98] cursor-pointer"
+              className="w-full h-12 mt-2 rounded-xl bg-sage-dark hover:bg-sage text-white font-bold text-[14px] flex items-center justify-center gap-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed shadow-2xs active:scale-[0.98] cursor-pointer"
             >
               {isGenerating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
               <span>{isGenerating ? 'Curating Names...' : 'Suggest Names'}</span>
@@ -249,13 +337,34 @@ export const BabyNames: React.FC = () => {
       {/* Favorites List */}
       {favoriteNames.length > 0 && (
         <div className="bg-white border border-border/80 rounded-3xl p-5 shadow-xs">
-          <h3 className="font-serif text-[16px] font-bold text-charcoal mb-3 flex items-center gap-2">
-            <Heart size={16} className="text-rose-500 fill-rose-500" />
-            <span>Saved Favorites</span>
-            <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.2 rounded-full">
-              {favoriteNames.length}
-            </span>
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-serif text-[16px] font-bold text-charcoal flex items-center gap-2">
+              <Heart size={16} className="text-rose-500 fill-rose-500" />
+              <span>Saved Favorites</span>
+              <span className="text-[11px] font-bold text-sage-dark bg-sage-pale px-2 py-0.2 rounded-full">
+                {favoriteNames.length}
+              </span>
+            </h3>
+
+            <button
+              type="button"
+              onClick={handleCopyFavorites}
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[11px] font-bold text-charcoal/70 hover:text-charcoal bg-cream hover:bg-border/60 border border-border/70 transition-colors cursor-pointer"
+              title="Copy favorites shortlist"
+            >
+              {copiedFavorites ? (
+                <>
+                  <Check size={13} className="text-emerald-600" />
+                  <span className="text-emerald-700">Copied!</span>
+                </>
+              ) : (
+                <>
+                  <Copy size={13} />
+                  <span>Copy List</span>
+                </>
+              )}
+            </button>
+          </div>
           <div className="flex flex-wrap gap-2">
             {favoriteNames.map((name) => (
               <div 
