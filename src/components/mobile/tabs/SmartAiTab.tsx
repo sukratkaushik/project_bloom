@@ -118,26 +118,23 @@ When answering maternal questions:
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* 1. Pregnancy Myth Buster Card (Top Spotlight with 50+ Humorous & Evidence-Based Myths) */}
-      <div className="bg-white dark:bg-stone-900 border border-amber-200/80 dark:border-amber-900/40 rounded-3xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
-        {/* Subtle decorative background glow */}
-        <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-100/40 dark:bg-amber-900/10 rounded-full blur-2xl pointer-events-none" />
-
+      <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-xs">
         {/* Header with Counter and Next button */}
-        <div className="flex items-center justify-between mb-2.5 relative z-10">
+        <div className="flex items-center justify-between mb-2.5">
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200/70 dark:border-amber-800/60 flex items-center gap-1">
-              <HelpCircle size={12} className="text-amber-600 dark:text-amber-400" />
+            <span className="text-[10px] font-bold uppercase tracking-wider text-gold-dark dark:text-gold bg-gold-pale dark:bg-gold-dark/20 px-2.5 py-0.5 rounded-full border border-gold/30 flex items-center gap-1">
+              <HelpCircle size={12} className="text-gold-dark dark:text-gold" />
               Daily Myth Buster
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-semibold text-medium dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-semibold text-medium dark:text-stone-400 bg-cream dark:bg-stone-800 px-2 py-0.5 rounded-full border border-border/60">
               #{currentMythIndex + 1} of {PREGNANCY_MYTHS.length}
             </span>
             <button
               type="button"
               onClick={handleNextMyth}
-              className="text-[11px] font-bold text-amber-800 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 bg-amber-100/80 dark:bg-amber-900/40 px-2.5 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
+              className="text-[11px] font-bold text-charcoal dark:text-cream hover:text-gold-dark bg-cream dark:bg-stone-800 hover:bg-gold-pale/60 px-2.5 py-0.5 rounded-full border border-border/80 flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
               title="Next Myth"
             >
               <span>Next</span>
@@ -147,9 +144,9 @@ When answering maternal questions:
         </div>
 
         {/* The Myth Content */}
-        <div className="p-3.5 bg-amber-50/50 dark:bg-stone-800/80 rounded-2xl border border-amber-200/60 dark:border-stone-700/80 relative z-10 space-y-2">
+        <div className="p-3.5 bg-cream/70 dark:bg-stone-800/80 rounded-2xl border border-border/60 dark:border-stone-700/80 space-y-2">
           <div>
-            <span className="text-[9.5px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider block mb-1">
+            <span className="text-[9.5px] font-bold text-critical uppercase tracking-wider block mb-1">
               Popular Myth:
             </span>
             <p className="font-serif font-bold text-[14px] text-charcoal dark:text-cream leading-snug">
@@ -159,7 +156,7 @@ When answering maternal questions:
 
           {/* Witty Humor Punchline */}
           {activeMyth.humor && (
-            <div className="bg-white/80 dark:bg-stone-900/80 rounded-xl px-3 py-1.5 border border-amber-200/40 dark:border-stone-700 text-[11.5px] text-amber-900 dark:text-amber-200/90 leading-snug flex items-start gap-1.5">
+            <div className="bg-white dark:bg-stone-900 rounded-xl px-3 py-1.5 border border-border/70 dark:border-stone-700 text-[11.5px] text-charcoal/90 dark:text-cream/90 leading-snug flex items-start gap-1.5 shadow-3xs">
               <span className="shrink-0 text-base leading-none">😄</span>
               <span className="italic">{activeMyth.humor}</span>
             </div>
@@ -167,9 +164,9 @@ When answering maternal questions:
 
           {/* Reveal Medical Truth Section */}
           {isMythRevealed ? (
-            <div className="pt-2.5 border-t border-amber-200/60 dark:border-stone-700 animate-in fade-in duration-200 space-y-1.5">
-              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase flex items-center gap-1">
-                <CheckCircle2 size={13} className="shrink-0" />
+            <div className="pt-2.5 border-t border-border/60 dark:border-stone-700 animate-in fade-in duration-200 space-y-1.5">
+              <span className="text-[10px] font-bold text-sage-dark dark:text-sage-light uppercase flex items-center gap-1">
+                <CheckCircle2 size={13} className="shrink-0 text-sage" />
                 Medical Truth:
               </span>
               <p className="text-[12px] text-charcoal/90 dark:text-stone-200 leading-relaxed font-normal">
@@ -177,7 +174,7 @@ When answering maternal questions:
               </p>
               <div className="pt-1 flex items-center justify-between text-[10px] text-medium dark:text-stone-400">
                 <span className="italic truncate">Source: {activeMyth.factCheck}</span>
-                <span className="text-emerald-700 dark:text-emerald-400 font-semibold shrink-0 ml-2">✓ Evidence-Backed</span>
+                <span className="text-sage-dark dark:text-sage-light font-semibold shrink-0 ml-2">✓ Evidence-Backed</span>
               </div>
             </div>
           ) : (
@@ -187,7 +184,7 @@ When answering maternal questions:
                 triggerHaptic('medium');
                 setIsMythRevealed(true);
               }}
-              className="mt-1 w-full py-2 bg-charcoal dark:bg-stone-700 hover:bg-charcoal/90 text-white text-[12px] font-bold rounded-xl shadow-2xs transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
+              className="mt-1 w-full py-2 bg-sage hover:bg-sage-dark text-white text-[12px] font-bold rounded-xl shadow-2xs transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
             >
               <span>Reveal Medical Truth</span>
               <ArrowRight size={13} />
@@ -356,14 +353,14 @@ When answering maternal questions:
             triggerHaptic('light');
             onOpenTool('babynames');
           }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-pink-300 dark:hover:border-pink-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-blush dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-blush-pale dark:bg-stone-800 text-terracotta dark:text-cream flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-blush/40">
               <Baby size={20} />
             </div>
             <div className="min-w-0">
-              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-terracotta transition-colors">
                 AI Baby Names
               </h4>
               <p className="text-[11.5px] text-medium dark:text-stone-400 mt-0.5 truncate">
@@ -371,7 +368,7 @@ When answering maternal questions:
               </p>
             </div>
           </div>
-          <ChevronRight size={18} className="text-medium/50 group-hover:text-pink-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+          <ChevronRight size={18} className="text-medium/50 group-hover:text-charcoal group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
         </button>
 
         <button
@@ -380,10 +377,10 @@ When answering maternal questions:
             triggerHaptic('light');
             onOpenTool('breathing');
           }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-sage-dark dark:hover:border-sage transition-all active:scale-[0.99] cursor-pointer group text-left"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-sage dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-sage-pale dark:bg-sage-dark/30 text-sage-dark dark:text-sage-light flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-sage-pale dark:bg-sage-dark/30 text-sage-dark dark:text-sage-light flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-sage/40">
               <Wind size={20} />
             </div>
             <div className="min-w-0">
@@ -404,14 +401,14 @@ When answering maternal questions:
             triggerHaptic('light');
             onOpenTool('travel');
           }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-teal-400 dark:hover:border-teal-600 transition-all active:scale-[0.99] cursor-pointer group text-left"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-gold dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
           <div className="flex items-center gap-3.5 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 rounded-xl bg-gold-pale dark:bg-stone-800 text-gold-dark dark:text-gold flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-gold/40">
               <Plane size={20} />
             </div>
             <div className="min-w-0">
-              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-gold-dark dark:group-hover:text-gold transition-colors">
                 Travel Guide
               </h4>
               <p className="text-[11.5px] text-medium dark:text-stone-400 mt-0.5 truncate">
@@ -419,7 +416,7 @@ When answering maternal questions:
               </p>
             </div>
           </div>
-          <ChevronRight size={18} className="text-medium/50 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+          <ChevronRight size={18} className="text-medium/50 group-hover:text-gold-dark group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
         </button>
       </div>
     </div>

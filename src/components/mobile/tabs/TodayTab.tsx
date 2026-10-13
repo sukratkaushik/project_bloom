@@ -851,7 +851,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-3 px-0.5">
           <div className="flex items-center gap-1.5">
-            <Activity size={15} className="text-rose-500" />
+            <Activity size={15} className="text-terracotta" />
             <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
               Today's Vitals & Labs
             </h3>
@@ -884,7 +884,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
                 : '118/76'}{' '}
               <span className="text-[10px] font-normal text-medium">mmHg</span>
             </p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Normal Range</span>
+            <span className="text-[9.5px] text-sage-dark font-bold">● Normal Range</span>
           </div>
 
           <div
@@ -898,7 +898,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             <p className="font-bold text-charcoal text-[14.5px] leading-tight">
               11.4 <span className="text-[10px] font-normal text-medium">g/dL</span>
             </p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Adequate</span>
+            <span className="text-[9.5px] text-sage-dark font-bold">● Adequate</span>
           </div>
 
           <div
@@ -912,7 +912,7 @@ export const TodayTab: React.FC<TodayTabProps> = ({
             <p className="font-bold text-charcoal text-[14.5px] leading-tight">
               88 <span className="text-[10px] font-normal text-medium">mg/dL</span>
             </p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Non-Diabetic</span>
+            <span className="text-[9.5px] text-sage-dark font-bold">● Non-Diabetic</span>
           </div>
 
           <div
