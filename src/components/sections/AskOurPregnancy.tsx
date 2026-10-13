@@ -9,6 +9,7 @@ import { functions } from '../../firebase';
 import { isPregnancyRelated } from '../../utils/pregnancyClassifier';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { ContextBanner } from '../ContextBanner';
 
 function getLocalClinicalGuidance(query: string, weekStr: string): string {
   const q = query.toLowerCase();
@@ -141,12 +142,12 @@ export const AskOurPregnancy: React.FC = () => {
   const [input, setInput] = useState('');
   const [attachedFile, setAttachedFile] = useState<File | null>(null);
   const [messages, setMessages] = useState<{ role: 'user' | 'model', text: string }[]>([
-    { role: 'model', text: "Hello! I'm Bloom AI, your personal prenatal companion. I have your gestational details and recent symptom logs ready. How can I support you today?" }
+    { role: 'model', text: "Namaste! 🌸 How can I help you today? You can ask about Indian pregnancy diet, scans, or symptom relief." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingText, setLoadingText] = useState("Consulting guidelines...");
   const [systemContext, setSystemContext] = useState<string>("");
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const gestationalInfo = useMemo(() => {
@@ -167,8 +168,13 @@ export const AskOurPregnancy: React.FC = () => {
   }, [state.dueDate]);
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, isLoading]);
 
   useEffect(() => {
     const gatherContext = async () => {
@@ -190,10 +196,10 @@ export const AskOurPregnancy: React.FC = () => {
         .join(', ') || 'None reported';
 
       const systemInstruction = `
-# SYSTEM INSTRUCTIONS: Bloom AI Prenatal Assistant
+# SYSTEM INSTRUCTIONS: OPIN AI Clinical Maternal Companion
 
-You are "Bloom AI," the warm, knowledgeable, and empathetic AI prenatal assistant for the "Our Pregnancy" application.
-Your goal is to provide supportive, accurate, practical, and safe prenatal health information to expectant parents based on established guidelines (ACOG, WHO, NHS, RCOG).
+You are "OPIN AI," an executive clinical maternal companion for the "Our Pregnancy" application aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
+Your goal is to provide supportive, accurate, practical, and safe prenatal health information to expectant parents based on established guidelines (FOGSI, ACOG, WHO, NHS, RCOG).
 
 ## CRITICAL CAPABILITIES & CONTEXT
 - You have direct access to the user's journey context:
@@ -338,7 +344,7 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
   if (!state.activeJourneyId) {
     return (
       <div className="text-center p-10 text-light italic">
-        Please generate a new plan to use Bloom AI.
+        Please generate a new plan to use Ask OPIN AI.
       </div>
     );
   }
@@ -354,22 +360,38 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
 
   return (
     <Paywall featureName="AskOurPregnancy">
-      <div className="flex flex-col h-[calc(100dvh-185px)] sm:h-[680px] w-full">
-        {/* Subtle Top Status Row: Single clean line */}
-        <div className="mb-2 px-1 flex items-center justify-between text-[12px] shrink-0">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <span className="font-serif font-bold text-charcoal text-[14.5px]">Bloom AI Companion</span>
-          </div>
-          <span className="text-[10.5px] font-medium text-sage-dark bg-sage-pale/70 px-2.5 py-0.5 rounded-full border border-sage/20 whitespace-nowrap">
-            {gestationalInfo.weeks !== 'Unknown' ? `Week ${gestationalInfo.weeks.replace(' weeks', '')}` : 'Active'}
-          </span>
+      <div className="flex flex-col h-[calc(100dvh-170px)] sm:h-[720px] w-full space-y-3">
+        {/* Context Banner */}
+        <div className="shrink-0">
+          <ContextBanner 
+            description="Evidence-based prenatal AI companion grounded in FOGSI & ACOG clinical guidelines. Ask about trimester symptoms, scans, and maternal diet." 
+          />
         </div>
 
         {/* Chat Container */}
-        <div className="flex-1 bg-white border border-border/80 rounded-2xl flex flex-col overflow-hidden shadow-2xs">
+        <div className="flex-1 min-h-0 bg-white border border-border/80 rounded-2xl flex flex-col overflow-hidden shadow-2xs">
+          {/* Unified Card Header matching Smart AI tab */}
+          <div className="px-4 py-3 border-b border-border/60 bg-cream/30 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-sage/15 text-sage-dark flex items-center justify-center shrink-0">
+                <Sparkles size={16} className="stroke-[2.2]" />
+              </div>
+              <div>
+                <h3 className="font-serif font-bold text-charcoal text-[14.5px] leading-tight">
+                  Ask OPIN AI
+                </h3>
+                <span className="text-[10.5px] text-medium font-medium block">
+                  Evidence-based clinical guidance
+                </span>
+              </div>
+            </div>
+            <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full border border-sage/20 shrink-0">
+              {gestationalInfo.weeks !== 'Unknown' ? `Week ${gestationalInfo.weeks.replace(' weeks', '')} • Active` : 'Active'}
+            </span>
+          </div>
+
           {/* Scrollable Message List */}
-          <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5 custom-scrollbar">
+          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5 custom-scrollbar">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'user' ? (
@@ -382,7 +404,7 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                     <div className="flex items-center justify-between pb-1.5 border-b border-border/50 text-[11.5px]">
                       <div className="flex items-center gap-1.5 text-sage-dark font-semibold">
                         <Sparkles size={13} className="text-sage shrink-0" />
-                        <span className="whitespace-nowrap">Bloom AI Clinical Guide</span>
+                        <span className="whitespace-nowrap">OPIN AI Clinical Guide</span>
                       </div>
                       <span className="text-[10px] text-light whitespace-nowrap">Evidence-based</span>
                     </div>
@@ -410,7 +432,6 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
 
           {/* Bottom Controls Dock */}

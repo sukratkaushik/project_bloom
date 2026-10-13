@@ -62,11 +62,12 @@ export const SmartAiTab: React.FC<SmartAiTabProps> = ({ onOpenTool }) => {
   const activeMyth = myths[currentMythIndex];
 
   const quickPrompts = [
-    '🥥 Coconut water',
-    '🥭 Ripe mangoes',
-    '🦵 Leg cramps',
-    '🥬 Iron veg foods',
-    '🍵 Herbal teas',
+    { label: '🥥 Tender Coconut', q: 'Is tender coconut water safe in pregnancy and what are its benefits?' },
+    { label: '🥭 Ripe Mangoes', q: 'Can I eat ripe mangoes during pregnancy? What is the safe portion?' },
+    { label: '🦵 Leg Cramps', q: 'How can I quickly relieve nocturnal leg cramps in pregnancy?' },
+    { label: '🩺 Braxton Hicks', q: 'How do I tell the difference between Braxton Hicks and real labor contractions?' },
+    { label: '🥬 Iron Foods', q: 'What are the best vegetarian iron-rich foods for pregnancy?' },
+    { label: '✈️ Travel & Flying', q: 'Is it safe to travel or fly during this trimester?' },
   ];
 
   const handleSendMessage = async (textToSend?: string) => {
@@ -201,7 +202,7 @@ When answering maternal questions:
       </div>
 
       {/* 3. Interactive AI Maternal Chat Companion */}
-      <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-3xl p-4 sm:p-5 shadow-xs">
+      <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-4 sm:p-5 shadow-xs">
         <div className="flex items-center justify-between pb-2.5 mb-3 border-b border-border/60 dark:border-stone-800">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-sage/15 text-sage-dark dark:bg-sage-dark/30 dark:text-sage-light flex items-center justify-center">
@@ -209,7 +210,7 @@ When answering maternal questions:
             </div>
             <div>
               <h3 className="font-serif font-bold text-charcoal dark:text-cream text-[14.5px] leading-tight">
-                Ask OPIN AI Companion
+                Ask OPIN AI
               </h3>
               <span className="text-[10.5px] text-medium dark:text-stone-400 font-medium">
                 Evidence-based clinical guidance
@@ -222,7 +223,7 @@ When answering maternal questions:
         </div>
 
         {/* Message Bubble Stream */}
-        <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1">
+        <div className="space-y-3 max-h-[260px] overflow-y-auto pr-1 custom-scrollbar">
           {messages.map((m, idx) => (
             <div
               key={idx}
@@ -231,18 +232,29 @@ When answering maternal questions:
               <div
                 className={`max-w-[88%] rounded-2xl p-3.5 text-[12.5px] leading-relaxed shadow-3xs ${
                   m.sender === 'user'
-                    ? 'bg-sage-dark text-white rounded-tr-xs'
-                    : 'bg-cream/70 dark:bg-stone-800 text-charcoal dark:text-cream rounded-tl-xs border border-border/80 dark:border-stone-700'
+                    ? 'bg-sage text-white rounded-tr-xs'
+                    : 'bg-white dark:bg-stone-800 text-charcoal dark:text-cream rounded-tl-xs border border-border/80 dark:border-stone-700 border-l-[3px] border-l-sage space-y-1.5'
                 }`}
               >
                 {m.sender === 'user' ? (
                   <div className="whitespace-pre-wrap">{m.text}</div>
                 ) : (
-                  <div className="prose prose-sm max-w-none text-[12.5px] leading-relaxed space-y-1 text-charcoal/95 dark:text-stone-200">
-                    <Markdown>{m.text}</Markdown>
-                    <div className="mt-2 pt-2 border-t border-border/50 dark:border-stone-700 flex items-center gap-1.5 text-[10px] text-medium dark:text-stone-400">
-                      <ShieldCheck size={11} className="text-sage shrink-0" />
-                      <span>Evidence-based clinical advisory • Verify with OB-GYN</span>
+                  <div>
+                    <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-border/50 dark:border-stone-700 text-[11px]">
+                      <div className="flex items-center gap-1.5 text-sage-dark font-semibold">
+                        <Sparkles size={12} className="text-sage shrink-0" />
+                        <span>OPIN AI Clinical Guide</span>
+                      </div>
+                      <span className="text-[9.5px] text-light whitespace-nowrap">Evidence-based</span>
+                    </div>
+                    <div className="prose prose-sm max-w-none text-[12.5px] leading-relaxed space-y-1 text-charcoal/95 dark:text-stone-200">
+                      <Markdown>{m.text}</Markdown>
+                    </div>
+                    <div className="mt-2 pt-1.5 border-t border-border/50 dark:border-stone-700 flex items-center justify-between text-[10px] text-light">
+                      <span className="flex items-center gap-1 text-sage-dark">
+                        <ShieldCheck size={11} className="text-sage shrink-0" /> 100% Private
+                      </span>
+                      <span>Verify with OB-GYN</span>
                     </div>
                   </div>
                 )}
@@ -252,7 +264,7 @@ When answering maternal questions:
           ))}
           {isLoading && (
             <div className="flex justify-start">
-              <div className="bg-cream dark:bg-stone-800 rounded-2xl px-3.5 py-2 text-[12px] text-charcoal/80 dark:text-stone-300 flex items-center gap-2 border border-border/70 dark:border-stone-700">
+              <div className="bg-white dark:bg-stone-800 rounded-2xl rounded-tl-xs p-3 text-[12px] text-charcoal/80 dark:text-stone-300 flex items-center gap-2 border border-border/70 dark:border-stone-700 border-l-[3px] border-l-sage shadow-2xs">
                 <RefreshCw size={13} className="animate-spin text-sage-dark" />
                 <span>Consulting clinical guidelines...</span>
               </div>
@@ -264,31 +276,31 @@ When answering maternal questions:
         <div className="mt-2.5 pt-2 border-t border-border/60 flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
           {quickPrompts.map((prompt) => (
             <button
-              key={prompt}
+              key={prompt.label}
               type="button"
-              onClick={() => handleSendMessage(prompt)}
-              className="h-7 px-2.5 bg-cream hover:bg-sage-pale/70 rounded-full text-[10.5px] font-bold text-charcoal border border-border/70 whitespace-nowrap shrink-0 cursor-pointer transition-colors"
+              onClick={() => handleSendMessage(prompt.q)}
+              className="px-2.5 py-1 bg-white hover:bg-sage-pale/60 active:scale-95 text-charcoal border border-border/80 rounded-full text-[11px] font-medium whitespace-nowrap shrink-0 transition-all cursor-pointer shadow-3xs"
             >
-              {prompt}
+              {prompt.label}
             </button>
           ))}
         </div>
 
         {/* Chat Input Bar */}
-        <div className="mt-2 flex items-center gap-2">
+        <div className="mt-2 flex items-center gap-1.5 bg-white dark:bg-stone-800 border border-border/90 dark:border-stone-700 focus-within:border-sage focus-within:ring-2 focus-within:ring-sage/20 rounded-2xl px-2 py-1 transition-all shadow-3xs">
           <input
             type="text"
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-            placeholder="Ask about diet, scans, or symptom relief..."
-            className="flex-1 h-9 bg-cream/70 border border-border/80 rounded-xl px-3 text-[12px] text-charcoal placeholder:text-light focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
+            placeholder="Ask about diet, scans, symptoms..."
+            className="flex-1 bg-transparent border-0 focus:outline-none focus:ring-0 text-[12.5px] text-charcoal dark:text-cream placeholder:text-medium/60 py-1 px-1.5 leading-relaxed"
           />
           <button
             type="button"
             onClick={() => handleSendMessage()}
             disabled={!inputText.trim() || isLoading}
-            className="w-9 h-9 rounded-xl bg-sage hover:bg-sage-dark text-white flex items-center justify-center shrink-0 disabled:opacity-40 active:scale-95 transition-all cursor-pointer shadow-xs"
+            className="p-2 bg-sage text-white rounded-xl disabled:opacity-30 disabled:cursor-not-allowed hover:bg-sage-dark active:scale-95 transition-all cursor-pointer shrink-0 shadow-3xs"
             aria-label="Send message"
           >
             <Send size={14} />
