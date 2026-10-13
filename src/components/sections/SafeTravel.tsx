@@ -1097,21 +1097,15 @@ export const SafeTravel: React.FC = () => {
         </div>
       )}
 
-      {/* Hero Banner */}
-      <div className="relative overflow-hidden bg-gradient-to-r from-sage-pale/90 via-cream/80 to-blush-pale/90 dark:from-sage-pale/25 dark:to-blush-pale/25 rounded-[24px] p-5 md:p-6 border border-border/60 dark:border-border/10 shadow-2xs">
-        <div className="relative z-10 space-y-1.5">
-          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-sage/20 dark:bg-sage/10 text-sage-dark dark:text-sage text-[11px] font-bold tracking-[1px] uppercase">
-            <Compass className="w-3.5 h-3.5" /> Maternal Travel Health
-          </div>
-          <h1 className="font-serif text-[22px] md:text-[28px] text-charcoal dark:text-white font-semibold leading-tight">
-            Safe Travel Guide & Checklist
-          </h1>
-          <p className="text-[13px] text-charcoal/80 dark:text-white/80 leading-relaxed font-sans font-medium max-w-[620px]">
+      {/* Context Banner */}
+      <div className="relative overflow-hidden bg-gradient-to-r from-sage-pale/90 via-cream/80 to-blush-pale/90 dark:from-sage-pale/25 dark:to-blush-pale/25 rounded-2xl p-4 md:p-5 border border-border/70 dark:border-border/10 shadow-3xs">
+        <div className="relative z-10 space-y-2">
+          <p className="text-[12.5px] xs:text-[13px] text-charcoal/85 dark:text-white/85 leading-relaxed font-sans font-medium max-w-[620px]">
             Clinically backed safety evaluations for flights, road trips, and babymoons. Tailored to your gestational stage and destination.
           </p>
           
           {currentWeek && (
-            <div className="pt-0.5 flex items-center gap-2 text-[11.5px] font-bold text-sage-dark dark:text-sage">
+            <div className="pt-1 flex items-center gap-2 text-[11.5px] font-semibold text-sage-dark dark:text-sage border-t border-border/40 dark:border-border/10">
               <span className="w-2 h-2 rounded-full bg-sage animate-pulse" />
               Synced to your profile: Week {currentWeek} of 40
             </div>
