@@ -540,6 +540,22 @@ export const PartnerSync: React.FC = () => {
                           </div>
 
                           <div className="flex items-center gap-2 shrink-0">
+                            {/* Task Breakdown Dropdown (placed on left of toggle so all toggles stay right-aligned) */}
+                            {item.tasks && isChecked && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  triggerHaptic('light');
+                                  setExpandedCategory(isExpanded ? null : item.key);
+                                }}
+                                className="p-1 text-medium hover:text-charcoal rounded-lg hover:bg-black/5 transition-colors cursor-pointer"
+                                title="Expand granular tasks"
+                                aria-label="Expand granular tasks"
+                              >
+                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                              </button>
+                            )}
+
                             {/* Sleek Toggle Switch */}
                             <button
                               type="button"
@@ -550,7 +566,7 @@ export const PartnerSync: React.FC = () => {
                                   syncPermissions: { ...perms, [item.key]: !isChecked } as any
                                 });
                               }}
-                              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer ${
+                              className={`w-11 h-6 rounded-full transition-colors relative cursor-pointer shrink-0 ${
                                 isChecked ? 'bg-sage' : 'bg-stone-300'
                               }`}
                             >
@@ -560,21 +576,6 @@ export const PartnerSync: React.FC = () => {
                                 }`}
                               />
                             </button>
-
-                            {/* Task Breakdown Button if applicable */}
-                            {item.tasks && isChecked && (
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  triggerHaptic('light');
-                                  setExpandedCategory(isExpanded ? null : item.key);
-                                }}
-                                className="p-1 text-medium hover:text-charcoal rounded-lg hover:bg-black/5 transition-colors cursor-pointer"
-                                title="Expand granular tasks"
-                              >
-                                {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                              </button>
-                            )}
                           </div>
                         </div>
 
