@@ -211,7 +211,7 @@ export const GuidedBreathingAudio: React.FC = () => {
   });
 
   // High-level details expandable state
-  const [isHlExpanded, setIsHlExpanded] = useState(true);
+  const [isHlExpanded, setIsHlExpanded] = useState(false);
 
   // Sync tab if hash changes
   useEffect(() => {
@@ -725,11 +725,39 @@ export const GuidedBreathingAudio: React.FC = () => {
         description="Evidence-based prenatal pranayama breathwork and ancient Ayurvedic Garbh Sanskar acoustic soundscapes. Clinically designed to stimulate maternal vagal tone, maximize placental oxygen flow, reduce cortisol surges, and foster deep neuro-acoustic bonding with your baby from Week 16 onward." 
       />
 
-      {/* 2. High-Level Clinical & Vedic Fruitfulness Overview Card */}
-      <div className="bg-gradient-to-br from-[#FAF8F5] via-white to-sage-pale/40 border border-border/80 rounded-2xl p-4 sm:p-5 shadow-3xs space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-1.5 min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
+      {/* 2. High-Level Clinical & Vedic Fruitfulness Overview Card (Collapsible) */}
+      <div className="bg-gradient-to-br from-[#FAF8F5] via-white to-sage-pale/40 border border-border/80 rounded-2xl shadow-3xs overflow-hidden transition-all duration-300">
+        <button
+          type="button"
+          onClick={() => {
+            triggerHaptic('light');
+            setIsHlExpanded(!isHlExpanded);
+          }}
+          className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-cream/40 transition-colors cursor-pointer select-none"
+          title={isHlExpanded ? "Collapse overview" : "Expand overview"}
+          aria-expanded={isHlExpanded}
+        >
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="text-sm">✨</span>
+            <span className="font-serif font-bold text-[14px] xs:text-[15px] text-charcoal">
+              What is this ?
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[11.5px] font-semibold text-charcoal/60">
+              {isHlExpanded ? 'Collapse' : 'Learn more'}
+            </span>
+            <div className="p-1 rounded-lg bg-white/80 border border-border/60 text-charcoal shadow-3xs flex items-center justify-center">
+              {isHlExpanded ? <ChevronUp size={15} /> : <ChevronDown size={15} />}
+            </div>
+          </div>
+        </button>
+
+        {/* Collapsible details body */}
+        {isHlExpanded && (
+          <div className="px-4 pb-4 sm:px-5 sm:pb-5 pt-2 space-y-3 border-t border-border/40 animate-in fade-in duration-200">
+            <div className="flex items-center gap-2 flex-wrap pt-0.5">
               <span className="px-2 py-0.5 rounded-full bg-sage/20 text-sage-dark text-[10px] font-bold tracking-wide uppercase">
                 Clinical Science & Vedic Heritage
               </span>
@@ -738,69 +766,56 @@ export const GuidedBreathingAudio: React.FC = () => {
                 100% Offline Synthesizer
               </span>
             </div>
-            <h3 className="text-[15px] sm:text-[16px] font-serif font-bold text-charcoal">
-              What is this & Why is it fruitful for you and your baby?
+
+            <h3 className="text-[14px] sm:text-[15px] font-serif font-bold text-charcoal">
+              Why is it fruitful for you and your baby?
             </h3>
-            <p className="text-[12px] text-charcoal/80 leading-relaxed">
+
+            <p className="text-[12px] text-charcoal/80 leading-relaxed font-sans">
               A clinical sanctuary uniting <strong>diaphragmatic prenatal pranayama</strong> with <strong>Ayurvedic Garbh Sanskar</strong> (acoustic womb nurturing). Synthesized entirely offline directly in your browser or phone via the Web Audio API—zero radiation, zero streaming buffering, and complete privacy.
             </p>
-          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              setIsHlExpanded(!isHlExpanded);
-            }}
-            className="p-1.5 rounded-xl hover:bg-cream/80 text-medium hover:text-charcoal transition-colors cursor-pointer shrink-0 mt-0.5 border border-border/50 bg-white/60"
-            title={isHlExpanded ? "Collapse details" : "Expand details"}
-            aria-label={isHlExpanded ? "Collapse details" : "Expand details"}
-          >
-            {isHlExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-          </button>
-        </div>
-
-        {/* 4 Fruitful Pillars Grid */}
-        {isHlExpanded && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 animate-in fade-in duration-200">
-            <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
-              <div className="flex items-center gap-1.5 text-sage-dark font-bold text-[12px]">
-                <span className="text-base">🫁</span>
-                <span>Placental Oxygen Flow</span>
+            {/* 4 Fruitful Pillars Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+              <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
+                <div className="flex items-center gap-1.5 text-sage-dark font-bold text-[12px]">
+                  <span className="text-base">🫁</span>
+                  <span>Placental Oxygen Flow</span>
+                </div>
+                <p className="text-[11px] text-medium leading-relaxed">
+                  Diaphragmatic exhalation activates parasympathetic vagal tone, dilating uterine arteries to deliver up to 28% more oxygenated blood to your baby.
+                </p>
               </div>
-              <p className="text-[11px] text-medium leading-relaxed">
-                Diaphragmatic exhalation activates parasympathetic vagal tone, dilating uterine arteries to deliver up to 28% more oxygenated blood to your baby.
-              </p>
-            </div>
 
-            <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
-              <div className="flex items-center gap-1.5 text-rose-800 font-bold text-[12px]">
-                <span className="text-base">📉</span>
-                <span>32% Cortisol Reduction</span>
+              <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
+                <div className="flex items-center gap-1.5 text-rose-800 font-bold text-[12px]">
+                  <span className="text-base">📉</span>
+                  <span>32% Cortisol Reduction</span>
+                </div>
+                <p className="text-[11px] text-medium leading-relaxed">
+                  Surging stress hormones readily cross the placenta. Timed breath cadences rapidly clear adrenaline, stabilizing baby's baseline heart rate.
+                </p>
               </div>
-              <p className="text-[11px] text-medium leading-relaxed">
-                Surging stress hormones readily cross the placenta. Timed breath cadences rapidly clear adrenaline, stabilizing baby's baseline heart rate.
-              </p>
-            </div>
 
-            <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
-              <div className="flex items-center gap-1.5 text-amber-800 font-bold text-[12px]">
-                <span className="text-base">🎵</span>
-                <span>Fetal Acoustic Bonding (Wk 16+)</span>
+              <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
+                <div className="flex items-center gap-1.5 text-amber-800 font-bold text-[12px]">
+                  <span className="text-base">🎵</span>
+                  <span>Fetal Acoustic Bonding (Wk 16+)</span>
+                </div>
+                <p className="text-[11px] text-medium leading-relaxed">
+                  Baby’s cochlea actively hears from Week 16. Harmonic 432Hz Tanpura drones and Raag Bhairav vibrations gently stimulate fetal auditory development.
+                </p>
               </div>
-              <p className="text-[11px] text-medium leading-relaxed">
-                Baby’s cochlea actively hears from Week 16. Harmonic 432Hz Tanpura drones and Raag Bhairav vibrations gently stimulate fetal auditory development.
-              </p>
-            </div>
 
-            <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
-              <div className="flex items-center gap-1.5 text-indigo-800 font-bold text-[12px]">
-                <span className="text-base">🌸</span>
-                <span>Natural Labor Readiness</span>
+              <div className="bg-white/90 rounded-xl p-3 border border-border/70 shadow-3xs space-y-1">
+                <div className="flex items-center gap-1.5 text-indigo-800 font-bold text-[12px]">
+                  <span className="text-base">🌸</span>
+                  <span>Natural Labor Readiness</span>
+                </div>
+                <p className="text-[11px] text-medium leading-relaxed">
+                  Builds autonomic muscle memory to soften pelvic floor tissues and breathe calmly through Braxton Hicks practice and active labor surges.
+                </p>
               </div>
-              <p className="text-[11px] text-medium leading-relaxed">
-                Builds autonomic muscle memory to soften pelvic floor tissues and breathe calmly through Braxton Hicks practice and active labor surges.
-              </p>
             </div>
           </div>
         )}
