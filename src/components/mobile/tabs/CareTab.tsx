@@ -10,6 +10,13 @@ import { usePlanner } from '../../../store';
 import { exportCarePlanPdf } from '../../../utils/pdfExport';
 import { DoctorModal } from '../DoctorModal';
 
+import {
+  CLINICAL_MILESTONES,
+  getAuthoritativeNextMilestone,
+  MilestoneCategory,
+  ClinicalMilestone,
+} from '../../../data/clinicalSchedule';
+
 interface CareTabProps {
   onOpenTool: (toolId: string) => void;
   onOpenSchedule: () => void;
@@ -31,8 +38,19 @@ export const CareTab: React.FC<CareTabProps> = ({
   onShowToast,
 }) => {
   const { state, updateState } = usePlanner();
+
+  // Gestational calculations matching Today tab exactly
+  const due = state.dueDate ? new Date(state.dueDate) : new Date(Date.now() + 112 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const diffDays = Math.max(0, Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  const completedDays = Math.max(1, 280 - diffDays);
+  const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
+  const gestationDays = completedDays % 7;
+  const nextMilestone = getAuthoritativeNextMilestone(currentWeek);
+
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedQuestionCategory, setSelectedQuestionCategory] = useState<string>('All');
+  const [milestoneCategoryFilter, setMilestoneCategoryFilter] = useState<'all' | 'scan' | 'lab' | 'vaccine'>('all');
   const [prepQuestions, setPrepQuestions] = useState<QuestionItem[]>([
     { id: 1, text: 'Lower back tightness at Week 24 normal?', category: 'Symptoms', done: false },
     { id: 2, text: 'Schedule for Oral Glucose Test (OGTT)?', category: 'Scans', done: true },
@@ -41,52 +59,6 @@ export const CareTab: React.FC<CareTabProps> = ({
     { id: 5, text: 'Target fetal kick frequency baseline?', category: 'Symptoms', done: false },
   ]);
   const [newQuestionText, setNewQuestionText] = useState('');
-
-  // Clinical Prenatal Scan Roadmap with clean, non-wrapping badges
-  const scanMilestones = [
-    {
-      id: 'dating',
-      title: 'Dating & Viability Scan',
-      period: 'Wk 7–9',
-      status: 'completed',
-      date: '12 Jun • Cloudnine',
-    },
-    {
-      id: 'nt',
-      title: 'NT Scan & Dual Marker',
-      period: 'Wk 11–13',
-      status: 'completed',
-      date: '18 Jul • Cloudnine',
-    },
-    {
-      id: 'tiffa',
-      title: 'Level II TIFFA Anomaly',
-      period: 'Wk 18–20',
-      status: 'completed',
-      date: '28 Aug • Cloudnine',
-    },
-    {
-      id: 'ogtt',
-      title: 'OGTT & Growth Scan',
-      period: 'Wk 24–28',
-      status: 'upcoming',
-      date: 'Wed, 23 Sep • 10:30 AM',
-    },
-    {
-      id: 'doppler',
-      title: 'Fetal Growth & Doppler',
-      period: 'Wk 32',
-      status: 'scheduled',
-      date: 'Planned for Week 32',
-    },
-    {
-      id: 'nst',
-      title: 'Non-Stress Test (NST)',
-      period: 'Wk 36–37',
-      status: 'scheduled',
-      date: 'Planned for Week 36',
-    },
-  ];
 
   const toggleQuestion = (id: number) => {
     triggerHaptic('light');
@@ -142,6 +114,15 @@ export const CareTab: React.FC<CareTabProps> = ({
   const filteredQuestions = prepQuestions.filter(
     (q) => selectedQuestionCategory === 'All' || q.category === selectedQuestionCategory
   );
+
+  const filteredMilestones = CLINICAL_MILESTONES.filter((item) => {
+    if (milestoneCategoryFilter === 'all') return true;
+    return item.category === milestoneCategoryFilter;
+  });
+
+  const scanCount = CLINICAL_MILESTONES.filter((m) => m.category === 'scan').length;
+  const labCount = CLINICAL_MILESTONES.filter((m) => m.category === 'lab').length;
+  const vaccineCount = CLINICAL_MILESTONES.filter((m) => m.category === 'vaccine').length;
 
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
@@ -275,7 +256,7 @@ export const CareTab: React.FC<CareTabProps> = ({
           </div>
           <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
             <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Gestation</span>
-            <span className="font-bold text-sage-dark text-[11px] truncate mt-0.5">Wk 24+0d</span>
+            <span className="font-bold text-sage-dark text-[11px] truncate mt-0.5">Wk {currentWeek}+{gestationDays}d</span>
           </div>
           <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
             <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Allergy</span>
@@ -303,13 +284,13 @@ export const CareTab: React.FC<CareTabProps> = ({
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 text-[10.5px] font-bold text-sage-dark uppercase tracking-wide">
               <Clock size={12} />
-              <span>Next Checkup • In 6 Days</span>
+              <span>Next Checkup • {nextMilestone.daysAway}</span>
             </div>
             <h4 className="font-serif font-bold text-charcoal text-[15px] leading-tight mt-0.5 truncate">
-              Routine Growth Scan & OGTT
+              {nextMilestone.title}
             </h4>
             <p className="text-[11.5px] text-medium mt-0.5 truncate">
-              Wed, 23 Sep • 10:30 AM • OPD Room 204
+              {nextMilestone.date} • {nextMilestone.facility}
             </p>
           </div>
           <button
@@ -326,7 +307,7 @@ export const CareTab: React.FC<CareTabProps> = ({
 
         <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11px]">
           <span className="text-medium truncate">
-            Fast 8 hours prior to the glucose test.
+            {nextMilestone.prep}
           </span>
           <button
             type="button"
@@ -341,34 +322,94 @@ export const CareTab: React.FC<CareTabProps> = ({
         </div>
       </div>
 
-      {/* 3. Interactive Clinical Scan Roadmap with Single-Line Rows */}
+      {/* 3. Consolidated Clinical Roadmap across Scans, Labs & Vaccines */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-3 px-0.5">
           <div className="flex items-center gap-1.5">
             <CalendarCheck size={16} className="text-sage-dark" />
             <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
-              Prenatal Scan Roadmap
+              Consolidated Clinical Roadmap
             </h3>
           </div>
-          <span className="text-[10.5px] font-bold text-medium">
-            FOGSI Standard
+          <span className="text-[10px] font-bold text-medium bg-cream px-2 py-0.5 rounded-full border border-border/60">
+            ACOG & FOGSI
           </span>
         </div>
 
+        {/* Milestone Filter Tabs */}
+        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-2.5 mb-1 -mx-0.5 px-0.5">
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setMilestoneCategoryFilter('all');
+            }}
+            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              milestoneCategoryFilter === 'all'
+                ? 'bg-sage text-white shadow-2xs'
+                : 'bg-cream/80 text-charcoal hover:bg-sage-pale/60 border border-border/60'
+            }`}
+          >
+            All ({CLINICAL_MILESTONES.length})
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setMilestoneCategoryFilter('scan');
+            }}
+            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              milestoneCategoryFilter === 'scan'
+                ? 'bg-sage text-white shadow-2xs'
+                : 'bg-cream/80 text-charcoal hover:bg-sage-pale/60 border border-border/60'
+            }`}
+          >
+            Ultrasounds ({scanCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setMilestoneCategoryFilter('lab');
+            }}
+            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              milestoneCategoryFilter === 'lab'
+                ? 'bg-sage text-white shadow-2xs'
+                : 'bg-cream/80 text-charcoal hover:bg-sage-pale/60 border border-border/60'
+            }`}
+          >
+            Lab Tests ({labCount})
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              setMilestoneCategoryFilter('vaccine');
+            }}
+            className={`px-3 py-1.5 rounded-xl text-[11px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+              milestoneCategoryFilter === 'vaccine'
+                ? 'bg-sage text-white shadow-2xs'
+                : 'bg-cream/80 text-charcoal hover:bg-sage-pale/60 border border-border/60'
+            }`}
+          >
+            Vaccines ({vaccineCount})
+          </button>
+        </div>
+
         <div className="space-y-2">
-          {scanMilestones.map((item) => {
+          {filteredMilestones.map((item) => {
             const isCompleted = item.status === 'completed';
             const isUpcoming = item.status === 'upcoming';
 
             return (
               <div
                 key={item.id}
-                className={`h-14 px-3 rounded-2xl border flex items-center justify-between gap-2.5 transition-all ${
+                className={`min-h-[58px] p-3 rounded-2xl border flex items-center justify-between gap-2.5 transition-all ${
                   isUpcoming
                     ? 'bg-sage-pale/40 border-sage/60 shadow-2xs'
                     : isCompleted
                     ? 'bg-cream/40 border-border/60'
-                    : 'bg-white border-border/40 opacity-70'
+                    : 'bg-white border-border/40 opacity-75'
                 }`}
               >
                 <div className="flex items-center gap-2.5 min-w-0 flex-1">
@@ -382,16 +423,23 @@ export const CareTab: React.FC<CareTabProps> = ({
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1.5">
+                    <div className="flex items-center gap-1.5 flex-wrap">
                       <h4 className="font-bold text-charcoal text-[12.5px] leading-tight truncate">
                         {item.title}
                       </h4>
                       <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border/70 text-medium whitespace-nowrap shrink-0">
                         {item.period}
                       </span>
+                      <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider whitespace-nowrap shrink-0 ${
+                        item.category === 'scan' ? 'bg-purple-50 text-purple-700 border border-purple-200/60' :
+                        item.category === 'lab' ? 'bg-blue-50 text-blue-700 border border-blue-200/60' :
+                        'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
+                      }`}>
+                        {item.categoryLabel}
+                      </span>
                     </div>
                     <p className="text-[11px] text-medium truncate mt-0.5">
-                      {item.date}
+                      {item.date} {item.facility ? `• ${item.facility}` : ''}
                     </p>
                   </div>
                 </div>

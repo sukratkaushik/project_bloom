@@ -162,6 +162,19 @@ export type PlannerState = {
   aiProcessingConsent?: boolean;
   doctor?: DoctorInfo | null;
   partner?: PartnerInfo | null;
+  nextAppointment?: AppointmentInfo | null;
+};
+
+export type AppointmentInfo = {
+  id?: string;
+  title: string;
+  date: string;
+  time?: string;
+  doctor?: string;
+  hospital?: string;
+  location?: string;
+  notes?: string;
+  prep?: string;
 };
 
 export type DoctorInfo = {

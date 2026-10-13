@@ -23,6 +23,7 @@ import {
   CheckCircle2,
   RotateCcw,
   Star,
+  CalendarCheck,
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { ALL_PREGNANCY_TOOLS, getToolById, ToolDefinition } from '../toolsData';
@@ -32,6 +33,7 @@ import {
   FetalScanRecord,
 } from '../../../utils/fetalGrowth';
 import { FetalGrowthReassuranceModal } from '../../FetalGrowthReassuranceModal';
+import { getAuthoritativeNextMilestone } from '../../../data/clinicalSchedule';
 
 interface TodayTabProps {
   onOpenTool: (toolId: string) => void;
@@ -123,51 +125,17 @@ export const TodayTab: React.FC<TodayTabProps> = ({
     trimesterName = 'Trimester 2 • Golden Period';
   }
 
-  // Clinical milestone guidance derived from gestational week
-  const getClinicalCheckup = (week: number) => {
-    if (week <= 13) {
-      return {
-        title: 'NT Scan & Dual Marker Blood Screen',
-        desc: 'Nuchal translucency ultrasound & genetic risk assessment.',
-        badge: 'Recommended Week 11-13',
-        daysAway: 'In 4 Days',
-      };
-    } else if (week <= 22) {
-      return {
-        title: 'Level II TIFFA Anomaly Ultrasound',
-        desc: 'Detailed anatomical scan assessing fetal organs & spine.',
-        badge: 'Recommended Week 18-20',
-        daysAway: 'In 5 Days',
-      };
-    } else if (week <= 28) {
-      return {
-        title: 'OGTT Glucose Screen & Growth Check',
-        desc: 'Gestational diabetes evaluation & maternal hemoglobin test.',
-        badge: 'Recommended Week 24-28',
-        daysAway: 'In 6 Days',
-      };
-    } else if (week <= 34) {
-      return {
-        title: 'Growth Scan & Placental Doppler',
-        desc: 'Amniotic fluid index (AFI) check & fetal presentation check.',
-        badge: 'Recommended Week 32-34',
-        daysAway: 'In 3 Days',
-      };
-    } else {
-      return {
-        title: 'Non-Stress Test (NST) & Group B Strep',
-        desc: 'Bi-weekly cardiotocography check & labor readiness review.',
-        badge: 'Recommended Week 36-40',
-        daysAway: 'In 2 Days',
-      };
-    }
-  };
-
-  const checkup = getClinicalCheckup(currentWeek);
+  // Authoritative clinical milestone guidance derived from gestational week
+  const nextMilestone = getAuthoritativeNextMilestone(currentWeek);
 
   // Dexie live queries for today's logs
   const todayStr = new Date().toISOString().split('T')[0];
   const activeJourneyId = state.activeJourneyId || 'default-journey';
+
+  // Check if there is an active appointment specifically for TODAY
+  const todayAppointment = (state.nextAppointment && state.nextAppointment.date === todayStr)
+    ? state.nextAppointment
+    : null;
 
   const todayWaterLogs = useLiveQuery(
     () => db.hydrationLogs.where({ journeyId: activeJourneyId, date: todayStr }).toArray(),
@@ -784,107 +752,100 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </div>
       </div>
 
-      {/* 3. Hero Upcoming Checkup Card */}
-      <div className="bg-gradient-to-br from-sage-pale/60 via-white to-cream border border-sage/35 rounded-3xl p-4.5 shadow-xs">
-        <div className="flex items-start justify-between gap-2">
-          <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-2xl bg-sage-dark text-white flex items-center justify-center shrink-0 shadow-2xs">
-              <Stethoscope size={20} />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold text-sage-dark uppercase tracking-wider">
-                  Upcoming Checkup
-                </span>
-                <span className="text-[9.5px] font-bold bg-sage/15 text-sage-dark px-2 py-0.2 rounded-full">
-                  {checkup.daysAway}
-                </span>
+      {/* 3. Today's Clinical Schedule - Purely for TODAY */}
+      {todayAppointment ? (
+        <div className="bg-gradient-to-br from-sage-pale/80 via-white to-cream border-2 border-sage rounded-3xl p-4.5 shadow-xs animate-in fade-in">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-10 h-10 rounded-2xl bg-sage-dark text-white flex items-center justify-center shrink-0 shadow-2xs">
+                <CalendarCheck size={20} />
               </div>
-              <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight mt-0.5">
-                {checkup.title}
-              </h3>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold text-white bg-sage px-2 py-0.5 rounded-full uppercase tracking-wider shadow-2xs">
+                    Today's Visit
+                  </span>
+                  <span className="text-[10px] font-bold text-sage-dark bg-sage/15 px-2 py-0.5 rounded-full">
+                    {todayAppointment.time || 'Scheduled Today'}
+                  </span>
+                </div>
+                <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight mt-1">
+                  {todayAppointment.title}
+                </h3>
+              </div>
             </div>
+
+            {state.doctor?.phone ? (
+              <a
+                href={`tel:${state.doctor.phone.replace(/[^\d+]/g, '')}`}
+                onClick={() => triggerHaptic('light')}
+                className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0"
+                title={`Call ${state.doctor.name}`}
+                aria-label="Call Doctor"
+              >
+                <Phone size={15} />
+              </a>
+            ) : null}
           </div>
 
-          {state.doctor?.phone ? (
-            <a
-              href={`tel:${state.doctor.phone.replace(/[^\d+]/g, '')}`}
-              onClick={() => triggerHaptic('light')}
-              className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0"
-              title={`Call ${state.doctor.name}`}
-              aria-label="Call Doctor"
-            >
-              <Phone size={15} />
-            </a>
-          ) : (
+          <p className="text-[12px] text-charcoal/85 mt-2 leading-relaxed">
+            {todayAppointment.notes || todayAppointment.prep || 'Please remember to bring your previous scan file and maternal health record.'}
+          </p>
+
+          <div className="mt-3 pt-2.5 border-t border-border/70 flex items-center justify-between text-[11.5px]">
+            <div className="flex items-center gap-1.5 text-medium truncate">
+              <Clock size={13} className="text-sage-dark shrink-0" />
+              <span className="truncate">{todayAppointment.location || state.doctor?.hospital || 'Hospital OPD Room'}</span>
+            </div>
             <button
               type="button"
               onClick={() => {
                 triggerHaptic('light');
                 if (onSelectTab) onSelectTab('care');
               }}
-              className="w-8 h-8 rounded-full bg-sage-pale text-sage-dark hover:bg-sage hover:text-white flex items-center justify-center border border-sage/30 transition-colors shrink-0 cursor-pointer"
-              title="Doctor / Care Team"
-              aria-label="Doctor / Care Team"
+              className="text-sage-dark font-bold hover:underline cursor-pointer flex items-center gap-1 shrink-0 ml-2"
             >
-              <Phone size={15} />
+              <span>Care Hub</span>
+              <ChevronRight size={12} />
             </button>
-          )}
+          </div>
         </div>
-
-        <p className="text-[12px] text-medium mt-2 leading-relaxed">
-          {checkup.desc}
-        </p>
-
-        <div className="mt-3 pt-2.5 border-t border-border/70 flex flex-col xs:flex-row xs:items-center justify-between gap-2 text-[11.5px]">
-          <div
-            className="flex items-center gap-1.5 text-medium min-w-0 cursor-pointer hover:text-charcoal transition-colors"
-            onClick={() => {
-              if (onSelectTab) {
-                triggerHaptic('light');
-                onSelectTab('care');
-              }
-            }}
-          >
-            <Clock size={13} className="text-sage-dark shrink-0" />
-            <span className="font-medium truncate">
-              {state.doctor?.name
-                ? `${state.doctor.name}${state.doctor.hospital ? ` • ${state.doctor.hospital}` : ''}`
-                : 'No doctor assigned • Tap to add'}
-            </span>
+      ) : (
+        <div className="bg-gradient-to-r from-cream/70 via-white to-sage-pale/40 border border-border/80 rounded-2xl p-3.5 shadow-3xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-sage/15 text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
+              <CalendarCheck size={16} />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5">
+                <span className="font-serif font-bold text-charcoal text-[13.5px]">
+                  Today's Schedule
+                </span>
+                <span className="text-[9.5px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200/80 px-2 py-0.2 rounded-full">
+                  All Clear
+                </span>
+              </div>
+              <p className="text-[11.5px] text-medium truncate mt-0.5">
+                No visits today • Next: <strong className="text-charcoal font-semibold">{nextMilestone.title}</strong> ({nextMilestone.daysAway})
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2 shrink-0 self-end xs:self-auto">
-            {onOpenSchedule && (
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  onOpenSchedule();
-                }}
-                className="text-[11px] font-bold text-medium hover:text-charcoal px-2 py-1 rounded-lg hover:bg-black/5 transition-colors cursor-pointer whitespace-nowrap"
-              >
-                Reschedule
-              </button>
-            )}
+          <div className="flex items-center gap-1.5 shrink-0">
             <button
               type="button"
               onClick={() => {
                 triggerHaptic('light');
-                if (onSelectTab) {
-                  onSelectTab('care');
-                } else {
-                  onOpenTool('medical');
-                }
+                if (onSelectTab) onSelectTab('care');
               }}
-              className="h-8 px-3 bg-sage-dark text-white text-[11px] font-bold rounded-xl shadow-2xs hover:bg-sage transition-all flex items-center gap-1 cursor-pointer whitespace-nowrap shrink-0"
+              className="px-2.5 py-1.5 bg-white border border-border/80 hover:border-sage text-sage-dark text-[11px] font-bold rounded-xl shadow-3xs flex items-center gap-1 shrink-0 cursor-pointer transition-colors"
             >
-              <span>Scan Checklist</span>
-              <ChevronRight size={13} />
+              <span>Care Hub</span>
+              <ChevronRight size={12} />
             </button>
           </div>
         </div>
-      </div>
+      )}
 
       {/* 4. Dynamic Daily Health Rituals from Explore & Customization */}
       <div>
