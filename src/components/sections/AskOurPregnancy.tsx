@@ -168,12 +168,17 @@ export const AskOurPregnancy: React.FC = () => {
   }, [state.dueDate]);
 
   useEffect(() => {
-    if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: 'smooth'
-      });
-    }
+    const scrollToBottom = () => {
+      if (messagesContainerRef.current) {
+        messagesContainerRef.current.scrollTo({
+          top: messagesContainerRef.current.scrollHeight,
+          behavior: 'smooth'
+        });
+      }
+    };
+    scrollToBottom();
+    const timer = setTimeout(scrollToBottom, 60);
+    return () => clearTimeout(timer);
   }, [messages, isLoading]);
 
   useEffect(() => {
@@ -360,9 +365,9 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
 
   return (
     <Paywall featureName="AskOurPregnancy">
-      <div className="flex flex-col h-[calc(100dvh-170px)] sm:h-[720px] w-full space-y-3">
+      <div className="flex flex-col flex-1 min-h-0 h-full sm:h-[720px] w-full space-y-2">
         {/* Context Banner */}
-        <div className="shrink-0">
+        <div className="shrink-0 [&>*]:mb-0">
           <ContextBanner 
             description="Evidence-based prenatal AI companion grounded in FOGSI & ACOG clinical guidelines. Ask about trimester symptoms, scans, and maternal diet." 
           />
@@ -391,7 +396,7 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
           </div>
 
           {/* Scrollable Message List */}
-          <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3.5 custom-scrollbar">
+          <div ref={messagesContainerRef} className="flex-1 min-h-0 overflow-y-auto p-3 sm:p-4 space-y-3.5 custom-scrollbar">
             {messages.map((msg, i) => (
               <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 {msg.role === 'user' ? (
