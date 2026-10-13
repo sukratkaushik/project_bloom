@@ -22,6 +22,8 @@ import {
   RotateCcw,
   Star,
   CalendarCheck,
+  HeartPulse,
+  RefreshCw,
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { ALL_PREGNANCY_TOOLS, getToolById, ToolDefinition } from '../toolsData';
@@ -845,7 +847,112 @@ export const TodayTab: React.FC<TodayTabProps> = ({
         </div>
       )}
 
-      {/* 4. Dynamic Daily Health Rituals from Explore & Customization */}
+      {/* 4. Today's Vitals & Body Snapshot (Health Connect & Manual Log) */}
+      <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
+        <div className="flex items-center justify-between mb-3 px-0.5">
+          <div className="flex items-center gap-1.5">
+            <Activity size={15} className="text-rose-500" />
+            <h3 className="font-serif font-bold text-charcoal text-[14.5px]">
+              Today's Vitals & Labs
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="inline-flex items-center gap-1 text-[11px] font-bold text-sage-dark hover:underline cursor-pointer"
+          >
+            <RefreshCw size={11} />
+            <span>Log Vitals</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2 text-[12px]">
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between cursor-pointer active:scale-[0.99] transition-transform"
+          >
+            <span className="text-medium text-[10px] font-medium block">Blood Pressure</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">
+              {latestBpLog?.systolic && latestBpLog?.diastolic
+                ? `${latestBpLog.systolic}/${latestBpLog.diastolic}`
+                : '118/76'}{' '}
+              <span className="text-[10px] font-normal text-medium">mmHg</span>
+            </p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Normal Range</span>
+          </div>
+
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between cursor-pointer active:scale-[0.99] transition-transform"
+          >
+            <span className="text-medium text-[10px] font-medium block">Hemoglobin (Hb)</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">
+              11.4 <span className="text-[10px] font-normal text-medium">g/dL</span>
+            </p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Adequate</span>
+          </div>
+
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between cursor-pointer active:scale-[0.99] transition-transform"
+          >
+            <span className="text-medium text-[10px] font-medium block">Fasting Sugar</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">
+              88 <span className="text-[10px] font-normal text-medium">mg/dL</span>
+            </p>
+            <span className="text-[9.5px] text-green-700 font-bold">● Non-Diabetic</span>
+          </div>
+
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('kick-counter');
+            }}
+            className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between cursor-pointer active:scale-[0.99] transition-transform"
+          >
+            <span className="text-medium text-[10px] font-medium block">Daily Kicks</span>
+            <p className="font-bold text-charcoal text-[14.5px] leading-tight">
+              {latestKicks > 0 ? latestKicks : 10}{' '}
+              <span className="text-[10px] font-normal text-medium">
+                {latestKicks > 0 ? 'kicks today' : 'kicks / 28m'}
+              </span>
+            </p>
+            <span className="text-[9.5px] text-sage-dark font-bold">● Active Fetus</span>
+          </div>
+        </div>
+
+        {/* Health Connect Quick Strip */}
+        <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between text-[11px]">
+          <div className="flex items-center gap-1.5">
+            <HeartPulse size={13} className="text-sage" />
+            <span className="font-semibold text-charcoal">Google Health Connect</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('vitals');
+            }}
+            className="text-sage font-bold hover:underline cursor-pointer"
+          >
+            Import Vitals →
+          </button>
+        </div>
+      </div>
+
+      {/* 5. Dynamic Daily Health Rituals from Explore & Customization */}
       <div>
         <div className="flex items-center justify-between mb-2.5 px-1">
           <div className="flex items-center gap-1.5">

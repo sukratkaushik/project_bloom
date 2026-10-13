@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
   Stethoscope, Phone, Calendar, Plus, CheckSquare, Square,
-  Activity, Share2, AlertTriangle, ShieldCheck, Clock, FileText,
-  Bell, RefreshCw, MessageCircle, ChevronRight, CheckCircle2,
-  CalendarCheck, MapPin, HeartPulse, Pencil, UserCheck, Download
+  AlertTriangle, ShieldCheck, Clock, FileText,
+  Bell, MessageCircle, ChevronRight, CheckCircle2,
+  CalendarCheck, MapPin, Pencil, UserCheck, Download
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
@@ -104,11 +104,6 @@ export const CareTab: React.FC<CareTabProps> = ({
     } finally {
       setIsExporting(false);
     }
-  };
-
-  const handleShareFhir = () => {
-    triggerHaptic('success');
-    handleExportCarePlan();
   };
 
   const filteredQuestions = prepQuestions.filter(
@@ -449,13 +444,6 @@ export const CareTab: React.FC<CareTabProps> = ({
                       <span className="text-[9px] font-bold px-1.5 py-0.2 rounded-md bg-white border border-border/70 text-medium whitespace-nowrap shrink-0">
                         {item.period}
                       </span>
-                      <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded-md uppercase tracking-wider whitespace-nowrap shrink-0 ${
-                        item.category === 'scan' ? 'bg-purple-50 text-purple-700 border border-purple-200/60' :
-                        item.category === 'lab' ? 'bg-blue-50 text-blue-700 border border-blue-200/60' :
-                        'bg-emerald-50 text-emerald-700 border border-emerald-200/60'
-                      }`}>
-                        {item.categoryLabel}
-                      </span>
                     </div>
                     <p className="text-[11px] text-medium truncate mt-0.5">
                       {item.date} {item.facility ? `• ${item.facility}` : ''}
@@ -596,81 +584,7 @@ export const CareTab: React.FC<CareTabProps> = ({
         </form>
       </div>
 
-      {/* 6. Clinical Vitals & Lab Snapshot (Equal Height 2x2 Grid) */}
-      <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3 px-0.5">
-          <div className="flex items-center gap-1.5">
-            <Activity size={15} className="text-rose-500" />
-            <h3 className="font-serif font-bold text-charcoal text-[14px]">
-              Vitals & Lab Snapshot
-            </h3>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('light');
-                onOpenTool('vitals');
-              }}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-sage-dark hover:underline cursor-pointer"
-            >
-              <RefreshCw size={11} />
-              <span>Log Vitals</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleShareFhir}
-              className="inline-flex items-center gap-1 text-[11px] font-bold text-medium hover:text-charcoal cursor-pointer"
-            >
-              <Share2 size={11} />
-              <span>FHIR</span>
-            </button>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 gap-2 text-[12px]">
-          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
-            <span className="text-medium text-[10px] font-medium block">Blood Pressure</span>
-            <p className="font-bold text-charcoal text-[14.5px] leading-tight">118/76 <span className="text-[10px] font-normal text-medium">mmHg</span></p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Normal Range</span>
-          </div>
-          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
-            <span className="text-medium text-[10px] font-medium block">Hemoglobin (Hb)</span>
-            <p className="font-bold text-charcoal text-[14.5px] leading-tight">11.4 <span className="text-[10px] font-normal text-medium">g/dL</span></p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Adequate</span>
-          </div>
-          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
-            <span className="text-medium text-[10px] font-medium block">Fasting Sugar</span>
-            <p className="font-bold text-charcoal text-[14.5px] leading-tight">88 <span className="text-[10px] font-normal text-medium">mg/dL</span></p>
-            <span className="text-[9.5px] text-green-700 font-bold">● Non-Diabetic</span>
-          </div>
-          <div className="h-20 p-2.5 rounded-2xl bg-cream/70 border border-border/60 flex flex-col justify-between">
-            <span className="text-medium text-[10px] font-medium block">Daily Kicks</span>
-            <p className="font-bold text-charcoal text-[14.5px] leading-tight">10 <span className="text-[10px] font-normal text-medium">kicks / 28m</span></p>
-            <span className="text-[9.5px] text-sage-dark font-bold">● Active Fetus</span>
-          </div>
-        </div>
-
-        {/* Health Connect Quick Strip */}
-        <div className="mt-3 pt-2 border-t border-border/60 flex items-center justify-between text-[11px]">
-          <div className="flex items-center gap-1.5">
-            <HeartPulse size={13} className="text-sage" />
-            <span className="font-semibold text-charcoal">Google Health Connect</span>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('vitals');
-            }}
-            className="text-sage font-bold hover:underline cursor-pointer"
-          >
-            Import Vitals →
-          </button>
-        </div>
-      </div>
-
-      {/* 7. Emergency Hospital Triage */}
+      {/* 6. Emergency Hospital Triage */}
       <div className="bg-critical/5 border border-critical/25 rounded-3xl p-4 shadow-xs">
         <div className="flex items-start gap-3">
           <div className="w-9 h-9 rounded-2xl bg-critical/15 text-critical flex items-center justify-center shrink-0">
