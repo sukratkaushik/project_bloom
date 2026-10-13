@@ -279,48 +279,67 @@ export const CareTab: React.FC<CareTabProps> = ({
       </div>
 
       {/* 2. Next Prenatal Visit Bento Card */}
-      <div className="bg-gradient-to-r from-sage-pale/70 via-white to-cream border border-sage/35 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 text-[10.5px] font-bold text-sage-dark uppercase tracking-wide">
-              <Clock size={12} />
-              <span>Next Checkup • {nextMilestone.daysAway}</span>
-            </div>
-            <h4 className="font-serif font-bold text-charcoal text-[15px] leading-tight mt-0.5 truncate">
-              {nextMilestone.title}
-            </h4>
-            <p className="text-[11.5px] text-medium mt-0.5 truncate">
-              {nextMilestone.date} • {nextMilestone.facility}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenSchedule();
-            }}
-            className="px-3 py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all shrink-0 cursor-pointer"
-          >
-            Reschedule
-          </button>
-        </div>
+      {(() => {
+        const activeAppointment = state.nextAppointment;
+        const isReschedulePending = Boolean(activeAppointment?.notes?.includes('Reschedule requested'));
+        const appointmentTitle = activeAppointment?.title || nextMilestone.title;
+        const appointmentDateFormatted = activeAppointment?.date
+          ? `${new Date(activeAppointment.date + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'short', day: 'numeric', month: 'short' })}${activeAppointment.time ? ` • ${activeAppointment.time}` : ''}`
+          : nextMilestone.date;
+        const appointmentFacility = activeAppointment?.hospital || state.doctor?.hospital || nextMilestone.facility;
 
-        <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11px]">
-          <span className="text-medium truncate">
-            {nextMilestone.prep}
-          </span>
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('light');
-              onOpenTool('medical');
-            }}
-            className="text-sage-dark font-bold hover:underline shrink-0 ml-2 whitespace-nowrap cursor-pointer"
-          >
-            Checklist →
-          </button>
-        </div>
-      </div>
+        return (
+          <div className="bg-gradient-to-r from-sage-pale/70 via-white to-cream border border-sage/35 rounded-3xl p-4 shadow-xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-1.5 text-[10.5px] font-bold text-sage-dark uppercase tracking-wide flex-wrap">
+                  <Clock size={12} />
+                  <span>
+                    {isReschedulePending ? 'Reschedule Requested' : `Next Checkup • ${nextMilestone.daysAway}`}
+                  </span>
+                  {isReschedulePending && (
+                    <span className="text-[9px] font-bold text-amber-800 bg-amber-100 border border-amber-300 px-1.5 py-0.2 rounded-full uppercase tracking-wider">
+                      Pending OPD
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-serif font-bold text-charcoal text-[15px] leading-tight mt-0.5 truncate">
+                  {appointmentTitle}
+                </h4>
+                <p className="text-[11.5px] text-medium mt-0.5 truncate">
+                  {appointmentDateFormatted} • {appointmentFacility}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  onOpenSchedule();
+                }}
+                className="px-3 py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark active:scale-95 transition-all shrink-0 cursor-pointer"
+              >
+                Reschedule
+              </button>
+            </div>
+
+            <div className="mt-3 pt-2.5 border-t border-sage/20 flex items-center justify-between text-[11px]">
+              <span className="text-medium truncate">
+                {activeAppointment?.notes || nextMilestone.prep}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  onOpenTool('medical');
+                }}
+                className="text-sage-dark font-bold hover:underline shrink-0 ml-2 whitespace-nowrap cursor-pointer"
+              >
+                Checklist →
+              </button>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 3. Consolidated Clinical Roadmap across Scans, Labs & Vaccines */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">

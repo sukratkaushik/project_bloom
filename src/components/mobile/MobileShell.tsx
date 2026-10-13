@@ -13,7 +13,9 @@ import { triggerHaptic, initNotificationChannels, registerNotificationActionList
 import { usePlanner } from '../../store';
 import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
+import { RescheduleModal } from './RescheduleModal';
 import { ALL_PREGNANCY_TOOLS } from './toolsData';
+import { getAuthoritativeNextMilestone } from '../../data/clinicalSchedule';
 
 
 // Import existing Section tools
@@ -107,6 +109,14 @@ export const MobileShell: React.FC = () => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
+
+  // Authoritative clinical milestone for reschedule coordination
+  const due = state.dueDate ? new Date(state.dueDate) : new Date(Date.now() + 112 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const diffDays = Math.max(0, Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  const completedDays = Math.max(1, 280 - diffDays);
+  const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
+  const nextMilestone = getAuthoritativeNextMilestone(currentWeek);
 
   const handleTogglePin = (toolId: string) => {
     setPinnedIds((prev) => {
@@ -456,46 +466,13 @@ export const MobileShell: React.FC = () => {
         </div>
       )}
 
-      {/* Schedule Visit Modal */}
-      {showScheduleModal && (
-        <div 
-          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setShowScheduleModal(false)}
-        >
-          <div 
-            className="bg-white rounded-3xl p-5 w-full max-w-sm shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setShowScheduleModal(false)}
-              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
-              aria-label="Close"
-            >
-              <X size={20} />
-            </button>
-            <h3 className="font-serif font-bold text-charcoal text-[17px] mb-2">
-              Schedule Prenatal Visit
-            </h3>
-            <p className="text-[12px] text-medium mb-3">
-              {state.doctor?.name
-                ? `Coordinate your next scan milestone with ${state.doctor.name}${state.doctor.hospital ? ` at ${state.doctor.hospital}` : ''}.`
-                : 'Coordinate your next scan milestone with your obstetrician and hospital OPD.'}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('success');
-                setShowScheduleModal(false);
-                showToast('📅 Prenatal appointment synced to calendar');
-              }}
-              className="w-full py-2.5 bg-sage text-white font-bold text-[13px] rounded-xl shadow-xs hover:bg-sage-dark transition-colors cursor-pointer"
-            >
-              Confirm Appointment
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Interactive Prenatal Reschedule Modal */}
+      <RescheduleModal
+        isOpen={showScheduleModal}
+        onClose={() => setShowScheduleModal(false)}
+        nextMilestone={nextMilestone}
+        onShowToast={showToast}
+      />
 
       {/* Add Rituals Sheet */}
       {showAddRitualsModal && (
