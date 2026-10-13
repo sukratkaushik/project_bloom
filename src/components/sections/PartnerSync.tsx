@@ -25,6 +25,7 @@ import { Paywall } from '../Paywall';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS, POSTPARTUM_TASKS } from '../../data';
 import { PartnerModal } from '../mobile/PartnerModal';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { ContextBanner } from '../ContextBanner';
 
 export const PartnerSync: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -105,7 +106,7 @@ export const PartnerSync: React.FC = () => {
       desc: 'Shared baby names, AI chats & meal scans',
       items: [
         { key: 'babynames', label: 'Baby Names Finder', desc: 'Shortlisted & favorite names' },
-        { key: 'askourpregnancy', label: 'Bloom AI Guidance', desc: 'Obstetric AI chat history' },
+        { key: 'askourpregnancy', label: 'OPIN AI Guidance', desc: 'Obstetric AI chat history' },
         { key: 'foodscanner', label: 'AI Food Guide', desc: 'Scanned meals and nutrient breakdowns' }
       ]
     },
@@ -174,44 +175,43 @@ export const PartnerSync: React.FC = () => {
     <Paywall featureName="PartnerSync">
       <div className="space-y-4 animate-in fade-in duration-200 max-w-lg mx-auto pb-10">
         
-        {/* 1. Sleek Brand Header Hero */}
-        <div className="bg-gradient-to-br from-cream via-cream/50 to-tulsi-light/30 border border-border/80 rounded-3xl p-5 shadow-2xs space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5">
-              <div className="w-10 h-10 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center border border-sage/20 shrink-0">
-                <Users size={20} />
+        {/* Brand Context Banner */}
+        <ContextBanner
+          description={
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-7 h-7 rounded-lg bg-sage/15 text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
+                    <Users size={15} />
+                  </div>
+                  <span className="font-serif text-[15px] font-medium text-charcoal truncate">
+                    Two devices, one shared journey
+                  </span>
+                </div>
+
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10.5px] font-bold uppercase tracking-wider shrink-0 ${
+                  isConnected
+                    ? 'bg-emerald-100 text-emerald-800 border border-emerald-300/60'
+                    : isPending
+                    ? 'bg-amber-100 text-amber-900 border border-amber-300/60'
+                    : 'bg-white/80 text-medium border border-border/70'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : isPending ? 'bg-amber-500 animate-pulse' : 'bg-stone-300'}`} />
+                  <span>{isConnected ? 'Active' : isPending ? 'Connecting' : 'Standby'}</span>
+                </span>
               </div>
-              <div>
-                <h2 className="font-serif text-[22px] font-medium text-charcoal leading-tight">
-                  Partner Sync
-                </h2>
-                <p className="text-[11.5px] text-medium font-sans">
-                  Two devices, one shared journey
-                </p>
+
+              <p className="text-[12px] xs:text-[12.5px] text-charcoal/85 leading-relaxed font-sans">
+                Connect securely with your partner to share baby kicks, doctor appointments, scan memories, and birth plans in real time.
+              </p>
+
+              <div className="flex items-center gap-1.5 pt-1 border-t border-border/40 text-[11px] text-sage-dark font-medium">
+                <ShieldCheck size={13} className="shrink-0 text-sage" />
+                <span>End-to-End Encrypted • Peer-to-peer WebRTC • 100% Private</span>
               </div>
             </div>
-
-            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider ${
-              isConnected
-                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300/60'
-                : isPending
-                ? 'bg-amber-100 text-amber-900 border border-amber-300/60'
-                : 'bg-white/80 text-medium border border-border/70'
-            }`}>
-              <span className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-500 animate-pulse' : isPending ? 'bg-amber-500 animate-pulse' : 'bg-stone-300'}`} />
-              <span>{isConnected ? 'Active' : isPending ? 'Connecting' : 'Standby'}</span>
-            </span>
-          </div>
-
-          <p className="text-[12.5px] text-charcoal/85 leading-relaxed font-sans">
-            Connect securely with your partner to share baby kicks, doctor appointments, scan memories, and birth plans in real time.
-          </p>
-
-          <div className="flex items-center gap-2 pt-1 border-t border-border/50 text-[11px] text-sage-dark font-medium">
-            <ShieldCheck size={14} className="shrink-0 text-sage" />
-            <span>End-to-End Encrypted • Peer-to-peer WebRTC • 100% Private</span>
-          </div>
-        </div>
+          }
+        />
 
         {/* 2. Partner Profile Card */}
         <div className="bg-white border border-border/80 rounded-2xl p-4 shadow-2xs flex items-center justify-between gap-3">
@@ -413,7 +413,7 @@ export const PartnerSync: React.FC = () => {
                     type="text"
                     value={partnerIdInput}
                     onChange={(e) => setPartnerIdInput(e.target.value)}
-                    placeholder="e.g. bloom-p2p-abc123"
+                    placeholder="e.g. opin-p2p-abc123"
                     className="w-full px-4 py-3 bg-white border border-border/80 rounded-xl font-mono text-[14px] text-charcoal text-center tracking-wider focus:outline-none focus:border-sage focus:ring-2 focus:ring-sage/20 transition-all placeholder:text-muted/60"
                   />
 
