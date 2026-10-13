@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Sparkles } from 'lucide-react';
+import { ShieldAlert, Sparkles, Phone } from 'lucide-react';
 import { usePlanner } from '../../store';
 import { triggerHaptic, isNativeApp } from '../../utils/nativeBridge';
 import { auth } from '../../firebase';
@@ -9,6 +9,7 @@ interface MobileTopBarProps {
   onOpenSos: () => void;
   onOpenPricing: () => void;
   onOpenQuickLog?: () => void;
+  onOpenDoctor?: () => void;
 }
 
 export const MobileTopBar: React.FC<MobileTopBarProps> = ({
@@ -16,6 +17,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   onOpenSos,
   onOpenPricing,
   onOpenQuickLog,
+  onOpenDoctor,
 }) => {
   const { state } = usePlanner();
   const isNative = isNativeApp();
@@ -30,6 +32,9 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
 
   const displayName = state.userName || auth.currentUser?.displayName || 'Mother';
   const userInitial = displayName.trim().charAt(0).toUpperCase() || 'A';
+
+  const doctor = state.doctor;
+  const doctorPhone = doctor?.phone ? doctor.phone.replace(/[^\d+]/g, '') : '';
 
   return (
     <header className={`bg-[#FDFBF7] border-b border-border/80 px-2.5 xs:px-3.5 pb-2.5 w-full select-none ${
@@ -62,7 +67,33 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
         </div>
 
         {/* Right Actions */}
-        <div className="flex items-center gap-1 xs:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1.5 xs:gap-2 shrink-0">
+
+          {/* Primary Obstetrician 1-Tap Quick Dial */}
+          {doctorPhone ? (
+            <a
+              href={`tel:${doctorPhone}`}
+              onClick={() => triggerHaptic('light')}
+              className="h-7 w-7 rounded-full bg-sage-pale/90 hover:bg-sage border border-sage/40 text-sage-dark hover:text-white flex items-center justify-center transition-all shadow-2xs shrink-0 active:scale-95 notranslate"
+              title={`Call Dr. ${doctor?.name || 'Obstetrician'}`}
+              aria-label={`Call Dr. ${doctor?.name || 'Obstetrician'}`}
+            >
+              <Phone size={12} className="shrink-0" />
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onOpenDoctor) onOpenDoctor();
+              }}
+              className="h-7 w-7 rounded-full bg-cream hover:bg-sage-pale border border-border/80 text-medium hover:text-sage-dark flex items-center justify-center transition-all shadow-2xs shrink-0 active:scale-95 notranslate"
+              title="Add Doctor's Phone"
+              aria-label="Add Doctor's Phone"
+            >
+              <Phone size={12} className="shrink-0" />
+            </button>
+          )}
 
           {/* 108 SOS Emergency Button */}
           <button

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Stethoscope, Phone, Calendar, Plus, CheckSquare, Square,
-  AlertTriangle, ShieldCheck, Clock, FileText,
+  ShieldCheck, Clock, FileText,
   Bell, MessageCircle, ChevronRight, CheckCircle2,
   CalendarCheck, MapPin, Pencil, UserCheck, Download
 } from 'lucide-react';
@@ -582,40 +582,6 @@ export const CareTab: React.FC<CareTabProps> = ({
             <Plus size={16} />
           </button>
         </form>
-      </div>
-
-      {/* 6. Emergency Hospital Triage */}
-      <div className="bg-critical/5 border border-critical/25 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-start gap-3">
-          <div className="w-9 h-9 rounded-2xl bg-critical/15 text-critical flex items-center justify-center shrink-0">
-            <AlertTriangle size={18} />
-          </div>
-          <div className="flex-1 min-w-0">
-            <h4 className="font-serif font-bold text-critical text-[14px]">
-              24x7 Emergency Care
-            </h4>
-            <p className="text-[11.5px] text-charcoal/80 mt-1 leading-snug">
-              Seek immediate care if experiencing severe headaches, sudden face/hand swelling, bleeding, or no fetal kicks.
-            </p>
-            <div className="mt-2.5 flex items-center gap-2">
-              <a
-                href="tel:108"
-                onClick={() => triggerHaptic('warning')}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-critical text-white text-[11.5px] font-bold rounded-xl shadow-xs hover:opacity-90 active:scale-95 transition-all"
-              >
-                <Phone size={12} />
-                <span>Call 108</span>
-              </a>
-              <a
-                href={cleanPhone ? `tel:${cleanPhone}` : 'tel:+919876543210'}
-                onClick={() => triggerHaptic('light')}
-                className="inline-flex items-center gap-1 px-3 py-1.5 bg-white border border-critical/30 text-critical text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-critical/10 active:scale-95 transition-all"
-              >
-                <span>{doctor?.hospital ? doctor.hospital.split('•')[0].trim() : 'Hospital Triage'}</span>
-              </a>
-            </div>
-          </div>
-        </div>
       </div>
 
       {/* Doctor Management Modal */}

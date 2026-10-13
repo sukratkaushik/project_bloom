@@ -14,6 +14,7 @@ import { usePlanner } from '../../store';
 import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
 import { RescheduleModal } from './RescheduleModal';
+import { DoctorModal } from './DoctorModal';
 import { ALL_PREGNANCY_TOOLS } from './toolsData';
 import { getAuthoritativeNextMilestone } from '../../data/clinicalSchedule';
 
@@ -74,6 +75,7 @@ export const MobileShell: React.FC = () => {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [showNotificationsModal, setShowNotificationsModal] = useState(false);
   const [showQuickLogSheet, setShowQuickLogSheet] = useState(false);
+  const [showDoctorModal, setShowDoctorModal] = useState(false);
 
   useEffect(() => {
     initNotificationChannels();
@@ -195,6 +197,7 @@ export const MobileShell: React.FC = () => {
           onOpenSos={() => setShowSosModal(true)}
           onOpenPricing={() => setShowPricingModal(true)}
           onOpenQuickLog={() => setShowQuickLogSheet(true)}
+          onOpenDoctor={() => setShowDoctorModal(true)}
         />
       </div>
 
@@ -587,6 +590,21 @@ export const MobileShell: React.FC = () => {
       <NotificationSettingsModal
         isOpen={showNotificationsModal}
         onClose={() => setShowNotificationsModal(false)}
+        onShowToast={showToast}
+      />
+      {/* Primary Obstetrician Modal */}
+      <DoctorModal
+        isOpen={showDoctorModal}
+        onClose={() => setShowDoctorModal(false)}
+        initialDoctor={state.doctor}
+        onSave={(doctorData) => {
+          updateState({ doctor: doctorData });
+          showToast('Doctor profile updated');
+        }}
+        onRemove={() => {
+          updateState({ doctor: null });
+          showToast('Doctor profile removed');
+        }}
         onShowToast={showToast}
       />
 
