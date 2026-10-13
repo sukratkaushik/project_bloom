@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import {
   Sparkles, Send, Camera, Baby, Plane, HelpCircle,
-  CheckCircle2, RefreshCw, MessageSquare, Wind, ArrowRight,
-  ShieldCheck, Heart, AlertCircle, Volume2
+  CheckCircle2, RefreshCw, Wind, ArrowRight,
+  ShieldCheck, ChevronRight
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
-import { functions, auth } from '../../../firebase';
+import { functions } from '../../../firebase';
 import { httpsCallable } from 'firebase/functions';
 import { usePlanner } from '../../../store';
 import Markdown from 'react-markdown';
+import { PREGNANCY_MYTHS } from '../../../data/pregnancyMyths';
 
 interface SmartAiTabProps {
   onOpenTool: (toolId: string) => void;
@@ -16,7 +17,6 @@ interface SmartAiTabProps {
 
 export const SmartAiTab: React.FC<SmartAiTabProps> = ({ onOpenTool }) => {
   const { state } = usePlanner();
-  const motherName = state.userName || auth.currentUser?.displayName || '';
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string; time: string }>>([
     {
       sender: 'ai',
@@ -27,39 +27,16 @@ export const SmartAiTab: React.FC<SmartAiTabProps> = ({ onOpenTool }) => {
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Indian Pregnancy Myth Buster dataset
-  const myths = [
-    {
-      myth: 'Drinking saffron milk (kesar doodh) makes baby fair.',
-      truth: 'Saffron is rich in antioxidants and safe in moderation (1-2 strands). Baby skin tone is purely genetic and unaffected by saffron.',
-      factCheck: 'ACOG / FOGSI Genetics Advisory',
-    },
-    {
-      myth: 'Eating papaya or pineapple always causes miscarriage.',
-      truth: 'Only unripe green papaya contains latex that triggers contractions. Fully ripe yellow sweet papaya is safe and rich in Vitamin C and folate.',
-      factCheck: 'WHO Maternal Nutrition Guidelines',
-    },
-    {
-      myth: 'Belly shape indicates baby gender.',
-      truth: 'Belly shape depends strictly on abdominal muscle tone, uterine shape, and fetal position — never baby gender.',
-      factCheck: 'Obstetric Clinical Standard',
-    },
-    {
-      myth: 'Desi ghee in month 9 lubricates the birth canal.',
-      truth: 'Digestive and vaginal tracts are completely separate. Excess ghee causes severe heartburn and excess weight without aiding labor.',
-      factCheck: 'FOGSI Practice Committee',
-    },
-    {
-      myth: 'Pregnant mothers must fast during solar eclipses.',
-      truth: 'Eclipses produce zero harmful radiation. Regular small meals and fluids are essential for fetal glucose stability.',
-      factCheck: 'IMA Maternal Advisory',
-    },
-  ];
+  // Day-of-year rotation so mother automatically gets a fresh myth daily (out of 50)
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24)
+  );
+  const initialMythIndex = dayOfYear % PREGNANCY_MYTHS.length;
 
-  const [currentMythIndex, setCurrentMythIndex] = useState(0);
+  const [currentMythIndex, setCurrentMythIndex] = useState(initialMythIndex);
   const [isMythRevealed, setIsMythRevealed] = useState(false);
 
-  const activeMyth = myths[currentMythIndex];
+  const activeMyth = PREGNANCY_MYTHS[currentMythIndex] || PREGNANCY_MYTHS[0];
 
   const quickPrompts = [
     { label: '🥥 Tender Coconut', q: 'Is tender coconut water safe in pregnancy and what are its benefits?' },
@@ -135,28 +112,91 @@ When answering maternal questions:
   const handleNextMyth = () => {
     triggerHaptic('light');
     setIsMythRevealed(false);
-    setCurrentMythIndex((prev) => (prev + 1) % myths.length);
+    setCurrentMythIndex((prev) => (prev + 1) % PREGNANCY_MYTHS.length);
   };
 
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
-      {/* 1. Maternal Sanctuary Hero Card */}
-      <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-1.5">
-          <span className="text-[9.5px] font-bold uppercase tracking-wider text-sage-dark bg-sage-pale/90 dark:bg-sage-dark/30 dark:text-sage-light px-2.5 py-0.5 rounded-full border border-sage/20">
-            Clinical AI Sanctuary
-          </span>
-          <span className="text-[10.5px] font-semibold text-medium dark:text-stone-400">FOGSI Aligned</span>
+      {/* 1. Pregnancy Myth Buster Card (Top Spotlight with 50+ Humorous & Evidence-Based Myths) */}
+      <div className="bg-white dark:bg-stone-900 border border-amber-200/80 dark:border-amber-900/40 rounded-3xl p-4 sm:p-5 shadow-xs relative overflow-hidden">
+        {/* Subtle decorative background glow */}
+        <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-100/40 dark:bg-amber-900/10 rounded-full blur-2xl pointer-events-none" />
+
+        {/* Header with Counter and Next button */}
+        <div className="flex items-center justify-between mb-2.5 relative z-10">
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full border border-amber-200/70 dark:border-amber-800/60 flex items-center gap-1">
+              <HelpCircle size={12} className="text-amber-600 dark:text-amber-400" />
+              Daily Myth Buster
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-semibold text-medium dark:text-stone-400 bg-stone-100 dark:bg-stone-800 px-2 py-0.5 rounded-full">
+              #{currentMythIndex + 1} of {PREGNANCY_MYTHS.length}
+            </span>
+            <button
+              type="button"
+              onClick={handleNextMyth}
+              className="text-[11px] font-bold text-amber-800 dark:text-amber-300 hover:text-amber-900 dark:hover:text-amber-200 bg-amber-100/80 dark:bg-amber-900/40 px-2.5 py-0.5 rounded-full flex items-center gap-1 active:scale-95 transition-all cursor-pointer"
+              title="Next Myth"
+            >
+              <span>Next</span>
+              <RefreshCw size={10.5} />
+            </button>
+          </div>
         </div>
-        <h2 className="font-serif font-bold text-charcoal dark:text-cream text-[17px] leading-tight mt-0.5 truncate">
-          Namaste{motherName ? `, ${motherName.split(' ')[0]}` : ''} 🌸
-        </h2>
-        <p className="text-[12px] text-medium dark:text-stone-400 mt-1 leading-snug">
-          Week 24: Fetal hearing is fully active. Talk, sing, or practice gentle Garbh Sanskar today.
-        </p>
+
+        {/* The Myth Content */}
+        <div className="p-3.5 bg-amber-50/50 dark:bg-stone-800/80 rounded-2xl border border-amber-200/60 dark:border-stone-700/80 relative z-10 space-y-2">
+          <div>
+            <span className="text-[9.5px] font-bold text-red-600 dark:text-red-400 uppercase tracking-wider block mb-1">
+              Popular Myth:
+            </span>
+            <p className="font-serif font-bold text-[14px] text-charcoal dark:text-cream leading-snug">
+              "{activeMyth.myth}"
+            </p>
+          </div>
+
+          {/* Witty Humor Punchline */}
+          {activeMyth.humor && (
+            <div className="bg-white/80 dark:bg-stone-900/80 rounded-xl px-3 py-1.5 border border-amber-200/40 dark:border-stone-700 text-[11.5px] text-amber-900 dark:text-amber-200/90 leading-snug flex items-start gap-1.5">
+              <span className="shrink-0 text-base leading-none">😄</span>
+              <span className="italic">{activeMyth.humor}</span>
+            </div>
+          )}
+
+          {/* Reveal Medical Truth Section */}
+          {isMythRevealed ? (
+            <div className="pt-2.5 border-t border-amber-200/60 dark:border-stone-700 animate-in fade-in duration-200 space-y-1.5">
+              <span className="text-[10px] font-bold text-emerald-700 dark:text-emerald-400 uppercase flex items-center gap-1">
+                <CheckCircle2 size={13} className="shrink-0" />
+                Medical Truth:
+              </span>
+              <p className="text-[12px] text-charcoal/90 dark:text-stone-200 leading-relaxed font-normal">
+                {activeMyth.truth}
+              </p>
+              <div className="pt-1 flex items-center justify-between text-[10px] text-medium dark:text-stone-400">
+                <span className="italic truncate">Source: {activeMyth.factCheck}</span>
+                <span className="text-emerald-700 dark:text-emerald-400 font-semibold shrink-0 ml-2">✓ Evidence-Backed</span>
+              </div>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('medium');
+                setIsMythRevealed(true);
+              }}
+              className="mt-1 w-full py-2 bg-charcoal dark:bg-stone-700 hover:bg-charcoal/90 text-white text-[12px] font-bold rounded-xl shadow-2xs transition-all active:scale-[0.99] cursor-pointer flex items-center justify-center gap-1.5"
+            >
+              <span>Reveal Medical Truth</span>
+              <ArrowRight size={13} />
+            </button>
+          )}
+        </div>
       </div>
 
-      {/* 2. AI Food & Calorie Scanner Spotlight Card */}
+      {/* 2. Clinical Food Intelligence (AI Food & Calorie Scanner) */}
       <div className="bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0 flex-1">
@@ -308,44 +348,30 @@ When answering maternal questions:
         </div>
       </div>
 
-      {/* 4. 2x2 Bento Suite of AI Tools (Uniform Equal Height Boxes) */}
-      <div className="grid grid-cols-2 gap-2.5">
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('foodscanner');
-          }}
-          className="h-24 bg-white border border-border/80 rounded-2xl p-3 text-left shadow-2xs hover:border-sage transition-all active:scale-[0.98] cursor-pointer group flex flex-col justify-between"
-        >
-          <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Camera size={17} />
-          </div>
-          <div>
-            <h4 className="font-bold text-charcoal text-[13px] leading-tight truncate group-hover:text-sage-dark transition-colors">
-              AI Food Guide
-            </h4>
-            <p className="text-[11px] text-medium truncate mt-0.5">Meal macros & safety</p>
-          </div>
-        </button>
-
+      {/* 4. Full-Width Rectangular Tool Cards (End-to-End, Clean & Clutter-Free) */}
+      <div className="space-y-2.5">
         <button
           type="button"
           onClick={() => {
             triggerHaptic('light');
             onOpenTool('babynames');
           }}
-          className="h-24 bg-white border border-border/80 rounded-2xl p-3 text-left shadow-2xs hover:border-pink-400 transition-all active:scale-[0.98] cursor-pointer group flex flex-col justify-between"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-pink-300 dark:hover:border-pink-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
-          <div className="w-8 h-8 rounded-xl bg-pink-50 text-pink-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Baby size={17} />
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-950/40 text-pink-600 dark:text-pink-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Baby size={20} />
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-pink-600 dark:group-hover:text-pink-400 transition-colors">
+                AI Baby Names
+              </h4>
+              <p className="text-[11.5px] text-medium dark:text-stone-400 mt-0.5 truncate">
+                Vedic, modern & culturally curated names with meanings
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-bold text-charcoal text-[13px] leading-tight truncate group-hover:text-pink-700 transition-colors">
-              Baby Names
-            </h4>
-            <p className="text-[11px] text-medium truncate mt-0.5">Vedic & modern meanings</p>
-          </div>
+          <ChevronRight size={18} className="text-medium/50 group-hover:text-pink-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
         </button>
 
         <button
@@ -354,17 +380,22 @@ When answering maternal questions:
             triggerHaptic('light');
             onOpenTool('breathing');
           }}
-          className="h-24 bg-white border border-border/80 rounded-2xl p-3 text-left shadow-2xs hover:border-sage-dark transition-all active:scale-[0.98] cursor-pointer group flex flex-col justify-between"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-sage-dark dark:hover:border-sage transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
-          <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Wind size={17} />
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-sage-pale dark:bg-sage-dark/30 text-sage-dark dark:text-sage-light flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Wind size={20} />
+            </div>
+            <div className="min-w-0">
+              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-sage-dark dark:group-hover:text-sage-light transition-colors">
+                Garbh Sanskar
+              </h4>
+              <p className="text-[11.5px] text-medium dark:text-stone-400 mt-0.5 truncate">
+                Pranayama breathing techniques, mindful bonding & ragas
+              </p>
+            </div>
           </div>
-          <div>
-            <h4 className="font-bold text-charcoal text-[13px] leading-tight truncate group-hover:text-sage-dark transition-colors">
-              Garbh Sanskar
-            </h4>
-            <p className="text-[11px] text-medium truncate mt-0.5">Pranayama & audio ragas</p>
-          </div>
+          <ChevronRight size={18} className="text-medium/50 group-hover:text-sage-dark group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
         </button>
 
         <button
@@ -373,80 +404,23 @@ When answering maternal questions:
             triggerHaptic('light');
             onOpenTool('travel');
           }}
-          className="h-24 bg-white border border-border/80 rounded-2xl p-3 text-left shadow-2xs hover:border-teal-400 transition-all active:scale-[0.98] cursor-pointer group flex flex-col justify-between"
+          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-teal-400 dark:hover:border-teal-600 transition-all active:scale-[0.99] cursor-pointer group text-left"
         >
-          <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center group-hover:scale-105 transition-transform">
-            <Plane size={17} />
-          </div>
-          <div>
-            <h4 className="font-bold text-charcoal text-[13px] leading-tight truncate group-hover:text-teal-700 transition-colors">
-              Travel Guide
-            </h4>
-            <p className="text-[11px] text-medium truncate mt-0.5">Flying & road rules</p>
-          </div>
-        </button>
-      </div>
-
-      {/* 5. Indian Pregnancy Myth Buster Card */}
-      <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-2 px-0.5">
-          <div className="flex items-center gap-1.5">
-            <HelpCircle size={15} className="text-soft-saffron-dark" />
-            <h3 className="font-serif font-bold text-charcoal text-[14px]">
-              Pregnancy Myth Buster
-            </h3>
-          </div>
-          <span className="text-[9.5px] font-bold text-medium uppercase bg-cream px-2 py-0.2 rounded-full">
-            {currentMythIndex + 1}/{myths.length}
-          </span>
-        </div>
-
-        <div className="p-3 bg-cream/70 rounded-2xl border border-border/60">
-          <span className="text-[9.5px] font-bold text-critical uppercase tracking-wider block mb-0.5">
-            Common Myth:
-          </span>
-          <p className="text-[13px] font-bold text-charcoal leading-snug">
-            "{activeMyth.myth}"
-          </p>
-
-          {isMythRevealed ? (
-            <div className="mt-2.5 pt-2.5 border-t border-border/60 animate-in fade-in duration-200">
-              <span className="text-[10px] font-bold text-green-700 uppercase flex items-center gap-1 mb-0.5">
-                <CheckCircle2 size={13} />
-                Medical Truth:
-              </span>
-              <p className="text-[11.5px] text-charcoal/90 leading-relaxed">
-                {activeMyth.truth}
-              </p>
-              <span className="text-[9.5px] text-medium mt-1 block italic">
-                Source: {activeMyth.factCheck}
-              </span>
+          <div className="flex items-center gap-3.5 min-w-0">
+            <div className="w-10 h-10 rounded-xl bg-teal-50 dark:bg-teal-950/40 text-teal-600 dark:text-teal-400 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Plane size={20} />
             </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('medium');
-                setIsMythRevealed(true);
-              }}
-              className="mt-2.5 w-full py-1.5 bg-sage text-white text-[11.5px] font-bold rounded-xl shadow-2xs hover:bg-sage-dark transition-colors cursor-pointer"
-            >
-              Reveal Medical Truth
-            </button>
-          )}
-        </div>
-
-        <div className="mt-2.5 flex justify-between items-center px-0.5">
-          <span className="text-[10.5px] text-medium">FOGSI Evidence Backed</span>
-          <button
-            type="button"
-            onClick={handleNextMyth}
-            className="text-[11px] font-bold text-sage-dark hover:underline flex items-center gap-1 cursor-pointer"
-          >
-            <span>Next Myth</span>
-            <RefreshCw size={11} />
-          </button>
-        </div>
+            <div className="min-w-0">
+              <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                Travel Guide
+              </h4>
+              <p className="text-[11.5px] text-medium dark:text-stone-400 mt-0.5 truncate">
+                Trimester travel clearance, flying rules & road safety
+              </p>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-medium/50 group-hover:text-teal-600 group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
+        </button>
       </div>
     </div>
   );
