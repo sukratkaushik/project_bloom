@@ -3,7 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, MedicalReport } from '../../../db';
 import {
   ShieldCheck, FileText, Lock, FileUp, CheckCircle2,
-  Download, FolderLock, Sparkles, HelpCircle
+  Download, FolderLock, Sparkles, HelpCircle, Loader2
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
@@ -96,23 +96,23 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
       {/* ABHA Security Banner */}
       <div className="bg-white border border-border/80 rounded-2xl p-4 shadow-3xs">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
             <div className="w-10 h-10 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
               <Lock size={18} />
             </div>
-            <div>
+            <div className="min-w-0">
               <button
                 type="button"
                 onClick={() => {
                   triggerHaptic('light');
                   setIsAbhaModalOpen(true);
                 }}
-                className="group flex items-center gap-1.5 text-left cursor-pointer active:scale-[0.99] transition-transform"
+                className="group inline-flex items-center gap-1.5 text-left cursor-pointer active:scale-[0.99] transition-transform"
                 title="What is ABHA? Tap to learn more"
                 aria-label="What is ABHA? Tap to learn more"
               >
-                <h3 className="font-serif font-bold text-charcoal group-hover:text-sage-dark transition-colors text-[15px] leading-tight">
+                <h3 className="font-serif font-bold text-charcoal group-hover:text-sage-dark transition-colors text-[15px] leading-tight whitespace-nowrap">
                   ABHA Encrypted Records
                 </h3>
                 <span className="w-5 h-5 rounded-full bg-cream group-hover:bg-sage-pale border border-border/80 group-hover:border-sage/40 text-medium group-hover:text-sage-dark flex items-center justify-center transition-all shadow-3xs shrink-0">
@@ -126,11 +126,15 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
             type="button"
             onClick={handleExportAbha}
             disabled={isExporting}
-            className="h-8 px-2.5 rounded-xl bg-cream hover:bg-sage-pale text-charcoal text-[11px] font-bold flex items-center gap-1 border border-border/70 transition-colors cursor-pointer"
-            title="Export Care Plan PDF & ABHA Bundle"
+            className="w-9 h-9 rounded-xl bg-cream hover:bg-sage-pale text-charcoal hover:text-sage-dark flex items-center justify-center border border-border/70 transition-colors cursor-pointer shrink-0 active:scale-95 shadow-3xs"
+            title="Download Medical Records & Care Plan PDF"
+            aria-label="Download Medical Records & Care Plan PDF"
           >
-            <Download size={13} />
-            <span>{isExporting ? 'Exporting...' : 'Export PDF'}</span>
+            {isExporting ? (
+              <Loader2 size={16} className="animate-spin text-sage-dark" />
+            ) : (
+              <Download size={16} />
+            )}
           </button>
         </div>
 
