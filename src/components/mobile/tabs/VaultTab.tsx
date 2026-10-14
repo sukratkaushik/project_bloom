@@ -3,11 +3,12 @@ import { useLiveQuery } from 'dexie-react-hooks';
 import { db, MedicalReport } from '../../../db';
 import {
   ShieldCheck, FileText, Lock, FileUp, CheckCircle2,
-  Download, FolderLock, Sparkles
+  Download, FolderLock, Sparkles, HelpCircle
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
 import { exportCarePlanPdf } from '../../../utils/pdfExport';
+import { AbhaInfoModal } from '../AbhaInfoModal';
 
 interface VaultTabProps {
   onOpenTool: (toolId: string) => void;
@@ -17,6 +18,7 @@ interface VaultTabProps {
 export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) => {
   const { state } = usePlanner();
   const [isExporting, setIsExporting] = useState(false);
+  const [isAbhaModalOpen, setIsAbhaModalOpen] = useState(false);
 
   // Medical Records Filter
   const [recordFilter, setRecordFilter] = useState<'all' | 'ultrasound' | 'lab' | 'prescription'>('all');
@@ -96,14 +98,28 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
       <div className="bg-white border border-border/80 rounded-2xl p-4 shadow-3xs">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="w-10 h-10 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center shrink-0 border border-teal-200/50">
+            <div className="w-10 h-10 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
               <Lock size={18} />
             </div>
             <div>
-              <h3 className="font-serif font-bold text-charcoal text-[15px] leading-tight">
-                ABHA Encrypted Records
-              </h3>
-              <span className="text-[10.5px] text-medium">AES-256 On Device</span>
+              <button
+                type="button"
+                onClick={() => {
+                  triggerHaptic('light');
+                  setIsAbhaModalOpen(true);
+                }}
+                className="group flex items-center gap-1.5 text-left cursor-pointer active:scale-[0.99] transition-transform"
+                title="What is ABHA? Tap to learn more"
+                aria-label="What is ABHA? Tap to learn more"
+              >
+                <h3 className="font-serif font-bold text-charcoal group-hover:text-sage-dark transition-colors text-[15px] leading-tight">
+                  ABHA Encrypted Records
+                </h3>
+                <span className="w-5 h-5 rounded-full bg-cream group-hover:bg-sage-pale border border-border/80 group-hover:border-sage/40 text-medium group-hover:text-sage-dark flex items-center justify-center transition-all shadow-3xs shrink-0">
+                  <HelpCircle size={12} />
+                </span>
+              </button>
+              <span className="text-[10.5px] text-medium block mt-0.5">AES-256 On Device</span>
             </div>
           </div>
           <button
@@ -275,6 +291,12 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
             ))
         )}
       </div>
+
+      {/* ABHA Educational Information Modal */}
+      <AbhaInfoModal
+        isOpen={isAbhaModalOpen}
+        onClose={() => setIsAbhaModalOpen(false)}
+      />
     </div>
   );
 };
