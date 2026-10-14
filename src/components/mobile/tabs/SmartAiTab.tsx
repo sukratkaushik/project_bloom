@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import {
   Sparkles, Send, Camera, Baby, Plane, HelpCircle,
   CheckCircle2, RefreshCw, Wind, ArrowRight,
-  ShieldCheck, ChevronRight
+  ShieldCheck, ChevronRight, Star
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { functions } from '../../../firebase';
@@ -13,10 +13,24 @@ import { PREGNANCY_MYTHS } from '../../../data/pregnancyMyths';
 
 interface SmartAiTabProps {
   onOpenTool: (toolId: string) => void;
+  pinnedIds?: string[];
+  onTogglePin?: (toolId: string) => void;
 }
 
-export const SmartAiTab: React.FC<SmartAiTabProps> = ({ onOpenTool }) => {
+export const SmartAiTab: React.FC<SmartAiTabProps> = ({
+  onOpenTool,
+  pinnedIds = [],
+  onTogglePin,
+}) => {
   const { state } = usePlanner();
+
+  const isPinned = (toolId: string) => {
+    if (!pinnedIds) return false;
+    if (toolId === 'breathing') {
+      return pinnedIds.includes('breathing') || pinnedIds.includes('garbhsanskar');
+    }
+    return pinnedIds.includes(toolId);
+  };
   const [messages, setMessages] = useState<Array<{ sender: 'user' | 'ai'; text: string; time: string }>>([
     {
       sender: 'ai',
@@ -207,17 +221,42 @@ When answering maternal questions:
               Instant meal calories, FOGSI vitamins, and trimester safety analysis.
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              triggerHaptic('medium');
-              onOpenTool('foodscanner');
-            }}
-            className="w-11 h-11 rounded-2xl bg-charcoal text-white flex items-center justify-center shadow-xs hover:bg-charcoal/90 active:scale-95 transition-all shrink-0 cursor-pointer"
-            aria-label="Scan Meal"
-          >
-            <Camera size={20} />
-          </button>
+          <div className="flex items-center gap-1.5 shrink-0">
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('light');
+                  onTogglePin('foodscanner');
+                }}
+                className={`w-10 h-10 flex items-center justify-center rounded-2xl transition-all shrink-0 cursor-pointer active:scale-90 ${
+                  isPinned('foodscanner')
+                    ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 shadow-3xs'
+                    : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60 border border-border/70 bg-cream/40'
+                }`}
+                aria-label={isPinned('foodscanner') ? 'Unpin from Today page' : 'Pin to Today page'}
+                title={isPinned('foodscanner') ? 'Pinned to Today page' : 'Add to Today page'}
+              >
+                <Star
+                  size={18}
+                  className={isPinned('foodscanner') ? 'fill-amber-400 stroke-amber-500' : 'stroke-stone-400'}
+                />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('medium');
+                onOpenTool('foodscanner');
+              }}
+              className="w-10 h-10 rounded-2xl bg-charcoal text-white flex items-center justify-center shadow-xs hover:bg-charcoal/90 active:scale-95 transition-all shrink-0 cursor-pointer"
+              aria-label="Scan Meal"
+              title="Open Food Scanner"
+            >
+              <Camera size={19} />
+            </button>
+          </div>
         </div>
 
         <div className="mt-3 pt-2.5 border-t border-border/60 dark:border-stone-800 flex items-center justify-between text-[11.5px]">
@@ -254,9 +293,33 @@ When answering maternal questions:
               </span>
             </div>
           </div>
-          <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full border border-sage/20">
-            Active
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full border border-sage/20">
+              Active
+            </span>
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('light');
+                  onTogglePin('askourpregnancy');
+                }}
+                className={`w-8 h-8 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer active:scale-90 ${
+                  isPinned('askourpregnancy')
+                    ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 shadow-3xs'
+                    : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60 border border-border/60 bg-cream/40'
+                }`}
+                aria-label={isPinned('askourpregnancy') ? 'Unpin from Today page' : 'Pin to Today page'}
+                title={isPinned('askourpregnancy') ? 'Pinned to Today page' : 'Add to Today page'}
+              >
+                <Star
+                  size={15}
+                  className={isPinned('askourpregnancy') ? 'fill-amber-400 stroke-amber-500' : 'stroke-stone-400'}
+                />
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Message Bubble Stream */}
@@ -347,19 +410,19 @@ When answering maternal questions:
 
       {/* 4. Full-Width Rectangular Tool Cards (End-to-End, Clean & Clutter-Free) */}
       <div className="space-y-2.5">
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('babynames');
-          }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-blush dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
-        >
-          <div className="flex items-center gap-3.5 min-w-0">
+        {/* AI Baby Names */}
+        <div className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-blush dark:hover:border-stone-700 transition-all">
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('babynames');
+            }}
+            className="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer group active:scale-[0.99] transition-transform text-left"
+          >
             <div className="w-10 h-10 rounded-xl bg-blush-pale dark:bg-stone-800 text-terracotta dark:text-cream flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-blush/40">
               <Baby size={20} />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-terracotta transition-colors">
                 AI Baby Names
               </h4>
@@ -367,23 +430,48 @@ When answering maternal questions:
                 Vedic, modern & culturally curated names with meanings
               </p>
             </div>
+            <ChevronRight size={18} className="text-medium/50 group-hover:text-charcoal group-hover:translate-x-0.5 transition-all ml-1 shrink-0" />
           </div>
-          <ChevronRight size={18} className="text-medium/50 group-hover:text-charcoal group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-        </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('breathing');
-          }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-sage dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
-        >
-          <div className="flex items-center gap-3.5 min-w-0">
+          <div className="flex items-center shrink-0 ml-2">
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('medium');
+                  onTogglePin('babynames');
+                }}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer active:scale-90 ${
+                  isPinned('babynames')
+                    ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 shadow-3xs'
+                    : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60 border border-border/60 bg-cream/30'
+                }`}
+                aria-label={isPinned('babynames') ? 'Unpin from Today page' : 'Pin to Today page'}
+                title={isPinned('babynames') ? 'Pinned to Today page' : 'Add to Today page'}
+              >
+                <Star
+                  size={16}
+                  className={isPinned('babynames') ? 'fill-amber-400 stroke-amber-500' : 'stroke-stone-400'}
+                />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Garbh Sanskar */}
+        <div className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-sage dark:hover:border-stone-700 transition-all">
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('breathing');
+            }}
+            className="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer group active:scale-[0.99] transition-transform text-left"
+          >
             <div className="w-10 h-10 rounded-xl bg-sage-pale dark:bg-sage-dark/30 text-sage-dark dark:text-sage-light flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-sage/40">
               <Wind size={20} />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-sage-dark dark:group-hover:text-sage-light transition-colors">
                 Garbh Sanskar
               </h4>
@@ -391,23 +479,48 @@ When answering maternal questions:
                 Pranayama breathing techniques, mindful bonding & ragas
               </p>
             </div>
+            <ChevronRight size={18} className="text-medium/50 group-hover:text-sage-dark group-hover:translate-x-0.5 transition-all ml-1 shrink-0" />
           </div>
-          <ChevronRight size={18} className="text-medium/50 group-hover:text-sage-dark group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-        </button>
 
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic('light');
-            onOpenTool('travel');
-          }}
-          className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-gold dark:hover:border-stone-700 transition-all active:scale-[0.99] cursor-pointer group text-left"
-        >
-          <div className="flex items-center gap-3.5 min-w-0">
+          <div className="flex items-center shrink-0 ml-2">
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('medium');
+                  onTogglePin('breathing');
+                }}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer active:scale-90 ${
+                  isPinned('breathing')
+                    ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 shadow-3xs'
+                    : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60 border border-border/60 bg-cream/30'
+                }`}
+                aria-label={isPinned('breathing') ? 'Unpin from Today page' : 'Pin to Today page'}
+                title={isPinned('breathing') ? 'Pinned to Today page' : 'Add to Today page'}
+              >
+                <Star
+                  size={16}
+                  className={isPinned('breathing') ? 'fill-amber-400 stroke-amber-500' : 'stroke-stone-400'}
+                />
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Travel Guide */}
+        <div className="w-full bg-white dark:bg-stone-900 border border-border/80 dark:border-stone-800 rounded-2xl p-3.5 flex items-center justify-between shadow-2xs hover:border-gold dark:hover:border-stone-700 transition-all">
+          <div
+            onClick={() => {
+              triggerHaptic('light');
+              onOpenTool('travel');
+            }}
+            className="flex items-center gap-3.5 min-w-0 flex-1 cursor-pointer group active:scale-[0.99] transition-transform text-left"
+          >
             <div className="w-10 h-10 rounded-xl bg-gold-pale dark:bg-stone-800 text-gold-dark dark:text-gold flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform border border-gold/40">
               <Plane size={20} />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <h4 className="font-bold text-charcoal dark:text-cream text-[13.5px] leading-tight group-hover:text-gold-dark dark:group-hover:text-gold transition-colors">
                 Travel Guide
               </h4>
@@ -415,9 +528,34 @@ When answering maternal questions:
                 Trimester travel clearance, flying rules & road safety
               </p>
             </div>
+            <ChevronRight size={18} className="text-medium/50 group-hover:text-gold-dark group-hover:translate-x-0.5 transition-all ml-1 shrink-0" />
           </div>
-          <ChevronRight size={18} className="text-medium/50 group-hover:text-gold-dark group-hover:translate-x-0.5 transition-all shrink-0 ml-2" />
-        </button>
+
+          <div className="flex items-center shrink-0 ml-2">
+            {onTogglePin && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerHaptic('medium');
+                  onTogglePin('travel');
+                }}
+                className={`w-9 h-9 flex items-center justify-center rounded-xl transition-all shrink-0 cursor-pointer active:scale-90 ${
+                  isPinned('travel')
+                    ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 border border-amber-200/70 shadow-3xs'
+                    : 'text-stone-300 hover:text-amber-500 hover:bg-amber-50/60 border border-border/60 bg-cream/30'
+                }`}
+                aria-label={isPinned('travel') ? 'Unpin from Today page' : 'Pin to Today page'}
+                title={isPinned('travel') ? 'Pinned to Today page' : 'Add to Today page'}
+              >
+                <Star
+                  size={16}
+                  className={isPinned('travel') ? 'fill-amber-400 stroke-amber-500' : 'stroke-stone-400'}
+                />
+              </button>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

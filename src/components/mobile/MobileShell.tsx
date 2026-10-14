@@ -291,7 +291,11 @@ export const MobileShell: React.FC = () => {
               />
             )}
             {activeTab === 'smart' && (
-              <SmartAiTab onOpenTool={handleOpenTool} />
+              <SmartAiTab
+                onOpenTool={handleOpenTool}
+                pinnedIds={pinnedIds}
+                onTogglePin={handleTogglePin}
+              />
             )}
             {activeTab === 'vault' && (
               <VaultTab
