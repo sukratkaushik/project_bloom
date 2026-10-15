@@ -261,7 +261,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'Read Guide →',
   },
 
-  // Category 5: Labor & Postpartum (4 tools)
+  // Category 5: Labor & Postpartum (3 tools)
   {
     id: 'hospitalbag',
     title: 'Hospital Bag Checklist',

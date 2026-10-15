@@ -148,6 +148,7 @@ export type PlannerState = {
   favoriteNames?: string[];
   favoritePages?: string[];
   userName?: string;
+  userEmail?: string;
   weightUnit?: 'kg' | 'lbs';
   calendarStartDay?: 'sunday' | 'monday';
   createdAt?: number;

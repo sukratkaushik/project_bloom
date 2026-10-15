@@ -4,7 +4,6 @@ import { MED_TASKS, VACC_TASKS } from '../../data';
 import { Task } from '../../types';
 import { TaskList } from '../TaskItem';
 import { ContextBanner } from '../ContextBanner';
-import { Paywall } from '../Paywall';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { Plus } from 'lucide-react';
 
@@ -29,8 +28,7 @@ export const Medical: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filt
   const customTasks = state.customTasks[`medical_${tri}`] || [];
 
   return (
-    <Paywall featureName="MaternalCare">
-      <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300">
         <ContextBanner description="Your personalised appointment schedule and screening timeline." />
 
         {/* Responsive Trimester Switcher */}
@@ -106,7 +104,6 @@ export const Medical: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filt
           </div>
         )}
       </div>
-    </Paywall>
   );
 };
 

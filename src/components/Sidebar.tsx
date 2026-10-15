@@ -21,7 +21,7 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   },
   smart: {
     label: "Smart Tools",
-    items: ['askourpregnancy', 'foodscanner', 'babynames', 'travel']
+    items: ['askourpregnancy', 'foodscanner', 'babynames', 'travel', 'breathing']
   },
   tasks: {
     label: "Planning & Tasks",
@@ -155,6 +155,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
     { id: 'babynames', icon: '🌟', label: 'Name Generator' },
     { id: 'travel', icon: '✈️', label: 'Safe Travel Guide' },
+    { id: 'breathing', icon: '🌬️', label: 'Breathing & Garbh Sanskar' },
     { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },
     { id: 'prep', icon: '📋', label: 'Preparation', progress: getProgress(prepTasks) },
     { id: 'finance', icon: '💰', label: 'Financial', progress: getProgress(FIN_TASKS) },
@@ -332,17 +333,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
             >
               <span className="flex items-center gap-2">
-                <span>✨</span> Upgrade to Premium
+                <span>✨</span> Upgrade to Bloom PRO
               </span>
               <span>➜</span>
             </button>
           ) : planTier === 'standard' ? (
             <div className="w-full py-2.5 px-3.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2 shadow-xs">
-              <span>🩺</span> Standard Plan Active
+              <span>🩺</span> Maternal Care Active
             </div>
           ) : (
             <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
-              <span>👑</span> AI Premium Active
+              <span>👑</span> Bloom PRO Active
             </div>
           )}
 
@@ -478,7 +479,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
           >
             <span className="flex items-center gap-2">
-              <span>✨</span> Upgrade to Premium
+              <span>✨</span> Upgrade to Bloom PRO
             </span>
             <span>➜</span>
           </button>

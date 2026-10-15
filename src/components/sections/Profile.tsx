@@ -426,15 +426,15 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       </span>
                     ) : state.planTier === 'premium' || state.isPremium ? (
                       <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
-                        👑 AI Premium Active
+                        👑 Bloom PRO Active
                       </span>
                     ) : state.planTier === 'standard' ? (
                       <span className="px-2.5 py-1 bg-sage-pale text-sage-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-sage/30">
-                        🩺 Standard Maternal Care Active
+                        🩺 Maternal Care Active
                       </span>
                     ) : (
-                      <span className="px-2.5 py-1 bg-gray-200 text-charcoal font-semibold rounded-full text-[11px] sm:text-[12px]">
-                        Free Starter Plan
+                      <span className="px-2.5 py-1 bg-cream text-charcoal border border-border/80 font-semibold rounded-full text-[11px] sm:text-[12px]">
+                        Free Plan Active
                       </span>
                     )}
                   </div>
@@ -445,7 +445,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       onClick={() => { navigate('/checkout?plan=premium'); }}
                       className="text-[12px] sm:text-[12.5px] font-bold text-sage-dark hover:underline cursor-pointer"
                     >
-                      {state.planTier === 'premium' ? 'Manage Plan →' : 'Upgrade to Premium →'}
+                      {state.planTier === 'premium' || state.isPremium ? 'Manage Plan →' : 'Upgrade to Bloom PRO →'}
                     </button>
                   )}
                 </div>
@@ -454,10 +454,10 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com'
                     ? 'You have perpetual lifetime access to all 24/7 Bloom AI tools, clinical checklists, food safety scanner, and admin controls.'
                     : state.planTier === 'premium' || state.isPremium
-                    ? 'All features unlocked: 24/7 Bloom AI prenatal assistant, smart food safety scanner, EHR medical exports, and partner sync.'
+                    ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
                     : state.planTier === 'standard'
-                    ? 'Maternal care features unlocked: Government schemes, postpartum recovery guide, and partner sync.'
-                    : 'Free starter tier with core milestone checklists. Upgrade anytime for 24/7 AI prenatal guidance and smart scanner.'}
+                    ? 'Maternal care features unlocked: Government schemes, postpartum recovery guide, and clinical checklists. Upgrade anytime for 24/7 AI and food scanner.'
+                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, and postpartum healing. Upgrade to Bloom PRO for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>
 
                 {state.planExpiry && !state.isAdmin && auth.currentUser?.email !== 'sukrat.kaushik@gmail.com' && (

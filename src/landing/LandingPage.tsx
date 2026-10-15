@@ -1131,8 +1131,8 @@ export const LandingPage: React.FC = () => {
                 <div className="w-7 h-7 rounded-lg bg-blush-pale flex items-center justify-center text-blush">
                   <Baby size={15} />
                 </div>
-                <span className="text-[9.5px] font-bold text-sage bg-sage-pale px-1.5 py-0.5 rounded border border-sage/30">
-                  Standard
+                <span className="text-[9.5px] font-semibold text-medium bg-cream px-1.5 py-0.5 rounded border border-border">
+                  Free
                 </span>
               </div>
               <h5 className="font-bold text-[14px] text-charcoal mb-1">Postpartum Care</h5>
@@ -1154,7 +1154,7 @@ export const LandingPage: React.FC = () => {
                 Start free today. Upgrade anytime for clinical AI intelligence.
               </h4>
               <p className="text-[13px] text-medium">
-                Core trackers are free forever. Paid packages start at just ₹199/month.
+                Core trackers are free forever. Paid packages start at just ₹499/month with 50% launch discount.
               </p>
             </div>
           </div>
@@ -1207,7 +1207,7 @@ export const LandingPage: React.FC = () => {
                     🏛️
                   </div>
                   <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider">
-                    Standard Plan
+                    Free Plan
                   </span>
                 </div>
                 <h3 className="font-bold text-[17px] mb-2 text-charcoal">₹5,000–₹18,000+ Schemes & Rights</h3>
@@ -1229,7 +1229,7 @@ export const LandingPage: React.FC = () => {
                     🌐
                   </div>
                   <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border uppercase tracking-wider">
-                    Free & Standard
+                    100% Free
                   </span>
                 </div>
                 <h3 className="font-bold text-[17px] mb-2 text-charcoal">11 Regional Indian Languages</h3>

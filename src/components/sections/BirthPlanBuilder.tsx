@@ -693,7 +693,7 @@ export const BirthPlanBuilder: React.FC = () => {
     }
 
     // Broadcast state for real-time collaboration
-    syncEngine.broadcastState();
+    syncEngine.broadcastState(state);
 
     const summary = generateShareSummary(plan, state, formatDate);
 
@@ -730,7 +730,7 @@ export const BirthPlanBuilder: React.FC = () => {
 
   const handleSavePartner = (partnerData: PartnerInfo) => {
     updateState({ partner: partnerData });
-    syncEngine.broadcastState();
+    syncEngine.broadcastState({ ...state, partner: partnerData });
     setPlan(prev => ({
       ...prev,
       personalDetails: { ...(prev.personalDetails || {}), partnerName: partnerData.name }

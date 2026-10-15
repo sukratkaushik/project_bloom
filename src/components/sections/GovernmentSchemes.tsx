@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Building, ExternalLink, HeartHandshake, MapPin, ShieldCheck, Sparkles, Filter, Scale, Briefcase, Baby, HeartPulse, Clock, FileText } from 'lucide-react';
-import { Paywall } from '../Paywall';
 import { ContextBanner } from '../ContextBanner';
 
 export interface Scheme {
@@ -642,8 +641,7 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
   const stateCount = filteredSchemes.filter(s => s.scope !== 'national').length;
 
   return (
-    <Paywall featureName="GovernmentSchemes">
-      <div className="space-y-4 xs:space-y-5 animate-in fade-in duration-300">
+    <div className="space-y-4 xs:space-y-5 animate-in fade-in duration-300">
         {/* Context Banner */}
         <ContextBanner description="Official Indian Central & State Government benefits for pregnancy, delivery, and newborn care." />
 
@@ -928,6 +926,5 @@ export const GovernmentSchemes: React.FC<GovernmentSchemesProps> = ({ initialSea
           </div>
         </div>
       </div>
-    </Paywall>
   );
 };

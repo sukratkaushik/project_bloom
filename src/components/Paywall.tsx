@@ -9,7 +9,6 @@ import {
   Users, 
   Calendar, 
   HeartHandshake, 
-  Stethoscope, 
   UtensilsCrossed, 
   FileText, 
   CheckCircle2, 
@@ -22,7 +21,7 @@ import { triggerHaptic } from '../utils/nativeBridge';
 
 interface PaywallProps {
   children: React.ReactNode;
-  featureName: 'AskOurPregnancy' | 'FoodScanner' | 'MaternalCare' | 'GovernmentSchemes' | 'Postpartum' | 'PartnerSync' | 'EhrExports';
+  featureName: 'AskOurPregnancy' | 'FoodScanner' | 'PartnerSync' | 'EhrExports';
 }
 
 interface FeatureConfig {
@@ -114,81 +113,6 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
       }
     ],
     includedSummary: 'Includes 24/7 Ask OPIN AI, Doctor EHR Vault & Real-Time Partner Sync'
-  },
-  GovernmentSchemes: {
-    tier: 'standard',
-    badge: 'Bloom Standard • Maternal Welfare',
-    title: 'Claim Your Full Maternity Benefits',
-    subtitle: 'Step-by-step guidance to claim financial assistance under JSY, PMMVY, and state schemes.',
-    icon: FileText,
-    perks: [
-      {
-        icon: Sparkles,
-        title: 'Up to ₹6,000+ Direct DBT Assistance',
-        desc: 'Full eligibility calculators and document checklists for Indian central and state programs.'
-      },
-      {
-        icon: Calendar,
-        title: 'Anganwadi & Hospital Filing Guide',
-        desc: 'Clear guidance for MCP card registration, ASHA worker coordination, and bank DBT setup.'
-      },
-      {
-        icon: ShieldCheck,
-        title: '100% Free & Transparent Process',
-        desc: 'Official direct government routes with zero middleman commissions.'
-      }
-    ],
-    includedSummary: 'Also includes Partner Sync, Postpartum Care & Clinical Maternal Pack'
-  },
-  Postpartum: {
-    tier: 'standard',
-    badge: 'Bloom Standard • Fourth Trimester',
-    title: 'Gentle Postpartum Recovery',
-    subtitle: 'Dedicated physical healing, lactation tracking, and maternal mental wellness screening.',
-    icon: HeartHandshake,
-    perks: [
-      {
-        icon: CheckCircle2,
-        title: 'Physical Recovery Timeline',
-        desc: 'Lochia monitoring, perineal & C-section incision care, and gentle pelvic floor recovery.'
-      },
-      {
-        icon: Sparkles,
-        title: 'Validated EPDS Wellbeing Checks',
-        desc: 'Clinically validated screening for postpartum blues and emotional support resources.'
-      },
-      {
-        icon: Calendar,
-        title: 'Newborn Milestones & Feeds',
-        desc: 'Diaper tallies, feeding logs, and pediatrician vaccination schedule alignment.'
-      }
-    ],
-    includedSummary: 'Also includes Partner Sync, Government Maternity Schemes & Maternal Care Pack'
-  },
-  MaternalCare: {
-    tier: 'standard',
-    badge: 'Bloom Standard • Clinical Pack',
-    title: 'Essential Clinical Checklists',
-    subtitle: 'Trimester-by-trimester medical milestones, lab tests, and doctor discussion guides.',
-    icon: Stethoscope,
-    perks: [
-      {
-        icon: Stethoscope,
-        title: 'Ultrasound & Scan Preparation',
-        desc: 'NT, Anomaly/TIFFA, Doppler, and Growth ultrasound guidelines and questions for your doctor.'
-      },
-      {
-        icon: ShieldCheck,
-        title: 'Critical Clinical Red Flags',
-        desc: 'Early warning checklists for BP elevation, gestational diabetes, and unusual swelling.'
-      },
-      {
-        icon: Calendar,
-        title: 'Doctor Visit Notes & Milestones',
-        desc: 'Keep every obstetrician consultation organized and actionable in one calm place.'
-      }
-    ],
-    includedSummary: 'Also includes Partner Sync, Government Maternity Benefits & Postpartum Care'
   },
   EhrExports: {
     tier: 'premium',

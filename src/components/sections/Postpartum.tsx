@@ -4,7 +4,6 @@ import { POSTPARTUM_TASKS } from '../../data';
 import { Task } from '../../types';
 import { TaskList } from '../TaskItem';
 import { ContextBanner } from '../ContextBanner';
-import { Paywall } from '../Paywall';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { Plus, Minus } from 'lucide-react';
 
@@ -85,8 +84,7 @@ export const Postpartum: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ f
   const customTasks = state.customTasks['postpartum'] || [];
 
   return (
-    <Paywall featureName="Postpartum">
-      <div className="animate-in fade-in duration-300">
+    <div className="animate-in fade-in duration-300">
         <ContextBanner description="The fourth trimester and beyond — what to expect and prepare for after birth." />
 
         {/* Collapsible Educational Guidance Boxes */}
@@ -167,6 +165,5 @@ export const Postpartum: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ f
           <TaskList tasks={[...customTasks, ...POSTPARTUM_TASKS]} filterTasks={filterTasks} />
         </div>
       </div>
-    </Paywall>
   );
 };

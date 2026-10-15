@@ -16,7 +16,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   onSignUpClick,
   isLoggingIn = false
 }) => {
-  const { state, toggleDarkMode } = usePlanner();
+  const { state, updateState, toggleDarkMode } = usePlanner();
   const [isScrolled, setIsScrolled] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
 
