@@ -41,8 +41,8 @@ interface FeatureConfig {
 
 const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   PartnerSync: {
-    tier: 'standard',
-    badge: 'Bloom Standard • Partner Companion',
+    tier: 'premium',
+    badge: 'Bloom PRO • Partner Companion',
     title: 'Sync Your Journey Together',
     subtitle: 'Keep your partner connected to every movement, appointment, and milestone in real time.',
     icon: Users,
@@ -63,11 +63,11 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
         desc: 'Direct peer-to-peer sync with private encryption. Your memories never touch third parties.'
       }
     ],
-    includedSummary: 'Also includes Government Schemes, Postpartum Healing & Maternal Clinical Pack'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Food Safety Scanner & Doctor EHR Vault'
   },
   AskOurPregnancy: {
     tier: 'premium',
-    badge: 'Bloom Premium • 24/7 AI Companion',
+    badge: 'Bloom PRO • 24/7 AI Companion',
     title: 'Warm, Empathetic Maternal Guidance',
     subtitle: 'Ask about symptoms, trimester changes, cravings, or hospital prep anytime, day or night.',
     icon: Bot,
@@ -88,11 +88,11 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
         desc: 'Context-aware responses factoring in your trimester, diet preferences, and medical history.'
       }
     ],
-    includedSummary: 'Includes Food Scanner, EHR Medical Record Vault & all Standard Care features'
+    includedSummary: 'Includes Food Scanner, Doctor EHR Vault & Real-Time Partner Sync'
   },
   FoodScanner: {
     tier: 'premium',
-    badge: 'Bloom Premium • AI Nutrition Scanner',
+    badge: 'Bloom PRO • AI Nutrition Scanner',
     title: 'Nourish Safely, Every Meal',
     subtitle: 'Scan meals, restaurant dishes, and packaged snacks for pregnancy-safe ingredients.',
     icon: UtensilsCrossed,
@@ -113,7 +113,7 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
         desc: 'Safe, satisfying alternatives for street foods, sweets, and spicy cravings.'
       }
     ],
-    includedSummary: 'Includes Bloom AI Companion, EHR Medical Vault & all Standard Care features'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Doctor EHR Vault & Real-Time Partner Sync'
   },
   GovernmentSchemes: {
     tier: 'standard',
@@ -192,7 +192,7 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   },
   EhrExports: {
     tier: 'premium',
-    badge: 'Bloom Premium • Health Vault',
+    badge: 'Bloom PRO • Health Vault',
     title: 'Doctor-Ready Medical Records',
     subtitle: 'Generate comprehensive FHIR R4 clinical exports and hospital admission health summaries.',
     icon: FileText,
@@ -213,17 +213,21 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
         desc: 'Structured digital health records matching national Ayushman Bharat health standards.'
       }
     ],
-    includedSummary: 'Includes Bloom AI Companion, Food Safety Scanner & all Standard Care features'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Food Safety Scanner & Real-Time Partner Sync'
   }
 };
 
 const checkAccess = (tier: 'free' | 'standard' | 'premium' | undefined, feature: string, isAdmin: boolean = false) => {
   if (isAdmin) return true;
-  const premiumFeatures = ['AskOurPregnancy', 'FoodScanner', 'EhrExports'];
-  const standardFeatures = ['MaternalCare', 'GovernmentSchemes', 'Postpartum', 'PartnerSync'];
+  if (tier === 'premium' || tier === 'standard') return true;
 
-  if (tier === 'premium') return true;
-  if (tier === 'standard' && standardFeatures.includes(feature)) return true;
+  // In the 2-Tier model (Free vs Bloom PRO):
+  // MaternalCare, GovernmentSchemes, and Postpartum are 100% FREE for all mothers!
+  // Only Bloom PRO features require a premium subscription:
+  const proFeatures = ['AskOurPregnancy', 'FoodScanner', 'EhrExports', 'PartnerSync'];
+  if (!proFeatures.includes(feature)) {
+    return true; // 100% Free
+  }
   return false;
 };
 
@@ -243,34 +247,41 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const isPremiumFeature = config.tier === 'premium';
   const HeroIcon = config.icon;
 
-  // Pricing calculations
-  const basePricePerMonth = isPremiumFeature ? 499 : 199;
-  const discountAmount = Math.floor(selectedMonths / 3) * (isPremiumFeature ? 100 : 50);
-  const originalTotalPrice = basePricePerMonth * selectedMonths;
-  const finalTotalPrice = originalTotalPrice - discountAmount;
+  // 2-Tier Pricing: Original regular price ₹999/month, 50% OFF promotional offer for initial 3 months (₹499/mo)
+  const originalMonthlyPrice = 999;
+  const promoMonthlyPrice = 499;
+
+  let originalTotalPrice = originalMonthlyPrice * selectedMonths;
+  let finalTotalPrice = promoMonthlyPrice * selectedMonths;
+  if (selectedMonths === 9) {
+    // 9 Months (Full Journey) special: ₹3,999 (~₹444/mo)
+    finalTotalPrice = 3999;
+  }
+  const discountAmount = originalTotalPrice - finalTotalPrice;
   const perMonthPrice = Math.round(finalTotalPrice / selectedMonths);
 
   const durationOptions = [
     {
       months: 1,
       title: '1 Month',
-      subtitle: `₹${basePricePerMonth}/mo`,
-      badge: null,
+      subtitle: `₹${promoMonthlyPrice}/mo`,
+      badge: '50% OFF',
+      tag: null,
       highlight: false
     },
     {
       months: 3,
       title: '3 Months',
-      subtitle: `₹${Math.round((basePricePerMonth * 3 - (isPremiumFeature ? 100 : 50)) / 3)}/mo`,
-      badge: isPremiumFeature ? 'Save ₹100' : 'Save ₹50',
+      subtitle: `₹${promoMonthlyPrice}/mo`,
+      badge: '50% OFF (Launch Offer)',
       tag: 'Most Popular',
       highlight: true
     },
     {
       months: 9,
       title: 'Full Journey',
-      subtitle: `₹${Math.round((basePricePerMonth * 9 - (isPremiumFeature ? 300 : 150)) / 9)}/mo`,
-      badge: isPremiumFeature ? 'Save ₹300' : 'Save ₹150',
+      subtitle: `₹${Math.round(3999 / 9)}/mo`,
+      badge: 'Save ₹4,992 (55% OFF)',
       tag: 'Best Value',
       highlight: false
     }
@@ -443,30 +454,27 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
         {/* Total Price Display */}
         <div className="bg-cream/40 rounded-xl p-4 border border-border/70 flex items-center justify-between">
           <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-bold text-amber-900 bg-amber-100/90 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                🎉 50% OFF Initial Offer
+              </span>
+            </div>
             <div className="flex items-baseline gap-2">
-              <span className="font-serif text-[28px] font-medium text-charcoal">
+              <span className="font-serif text-[28px] font-bold text-charcoal">
                 ₹{finalTotalPrice}
               </span>
-              {discountAmount > 0 && (
-                <span className="text-[14px] line-through text-muted font-normal">
-                  ₹{originalTotalPrice}
-                </span>
-              )}
+              <span className="text-[14px] line-through text-muted font-normal">
+                ₹{originalTotalPrice}
+              </span>
             </div>
             <span className="text-[12px] text-medium block">
-              {selectedMonths} {selectedMonths === 1 ? 'Month' : 'Months'} full access ({`₹${perMonthPrice}/mo`})
+              {selectedMonths} {selectedMonths === 1 ? 'Month' : 'Months'} full access ({`₹${perMonthPrice}/mo`}) • Regular ₹999/mo
             </span>
           </div>
 
-          {discountAmount > 0 ? (
-            <span className="text-[11.5px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
-              Save ₹{discountAmount}
-            </span>
-          ) : (
-            <span className="text-[11.5px] font-medium text-medium bg-white px-2.5 py-1 rounded-full border border-border/60">
-              Standard Rate
-            </span>
-          )}
+          <span className="text-[11.5px] font-semibold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full border border-emerald-200">
+            Save ₹{discountAmount}
+          </span>
         </div>
 
         {/* Primary Upgrade CTA Button */}

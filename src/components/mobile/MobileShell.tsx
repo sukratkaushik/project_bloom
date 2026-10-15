@@ -443,11 +443,19 @@ export const MobileShell: React.FC = () => {
             <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold-dark flex items-center justify-center mb-2">
               <Sparkles size={20} />
             </div>
-            <h3 className="font-serif font-bold text-charcoal text-[19px]">
-              Our Pregnancy PRO
+            <div className="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10.5px] font-bold uppercase tracking-wider mb-1.5 border border-amber-300">
+              50% OFF Introductory Offer
+            </div>
+            <h3 className="font-serif font-bold text-charcoal text-[20px]">
+              Bloom PRO
             </h3>
-            <p className="text-[12.5px] text-medium mt-1 leading-relaxed">
-              Unlimited maternal AI consults, multi-subject food safety vision, and instant FHIR R4 medical exports.
+            <div className="flex items-baseline gap-2 mt-1 mb-1.5">
+              <span className="font-serif text-[28px] font-bold text-charcoal">₹499</span>
+              <span className="text-[13px] text-medium">/ month</span>
+              <span className="text-[14px] line-through text-muted ml-1">₹999/mo</span>
+            </div>
+            <p className="text-[12.5px] text-medium leading-relaxed">
+              Unlimited 24/7 OPIN AI consultations, AI food vision scanner, doctor EHR/FHIR exports, and real-time partner sync.
             </p>
             <div className="mt-4 p-3 bg-sage-pale/60 border border-sage/30 rounded-2xl">
               <span className="text-[11px] font-bold text-sage-dark uppercase block">

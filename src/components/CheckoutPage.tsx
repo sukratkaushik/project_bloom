@@ -95,8 +95,9 @@ export const CheckoutPage: React.FC = () => {
     }
   }, [selectedPlan, months]);
 
-  // Compute pricing
-  const basePrice = selectedPlan === 'premium' ? 499 : 99;
+  // Compute pricing (Bloom PRO 2-Tier Model: Regular ₹999/mo, 50% OFF launch offer at ₹499/mo)
+  const basePrice = 499;
+  const originalMonthly = 999;
   const durationDiscount = Math.floor(months / 3) * 50;
   const rawSubtotal = basePrice * months - durationDiscount;
   const finalPrice = Math.max(0, rawSubtotal - appliedDiscount);
@@ -333,45 +334,25 @@ export const CheckoutPage: React.FC = () => {
               <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[24px] p-6 shadow-sm">
                 <h2 className="font-serif text-[22px] font-semibold mb-4 text-charcoal dark:text-white">Order Summary</h2>
 
-                {/* Plan Toggle */}
-                <div className="flex bg-cream dark:bg-[#0F172A] rounded-xl p-1 border border-border dark:border-white/5 mb-6">
-                  <button
-                    onClick={() => { setSelectedPlan('standard'); setAppliedDiscount(0); setCouponSuccess(''); }}
-                    className={`flex-1 py-2.5 rounded-lg text-[13px] font-bold transition-all ${
-                      selectedPlan === 'standard'
-                        ? 'bg-sage text-white shadow-sm'
-                        : 'text-medium hover:text-sage'
-                    }`}
-                  >
-                    Standard Plan
-                  </button>
-                  <button
-                    onClick={() => { setSelectedPlan('premium'); setAppliedDiscount(0); setCouponSuccess(''); }}
-                    className={`flex-1 py-2.5 rounded-lg text-[13px] font-bold transition-all flex items-center justify-center gap-1.5 ${
-                      selectedPlan === 'premium'
-                        ? 'bg-gold text-charcoal shadow-sm'
-                        : 'text-medium hover:text-gold'
-                    }`}
-                  >
-                    <Sparkles size={14} className={selectedPlan === 'premium' ? 'text-charcoal' : 'text-gold'} />
-                    Premium Plan
-                  </button>
-                </div>
-
                 {/* Plan detail card */}
-                <div className={`p-4 rounded-xl border mb-6 ${
-                  selectedPlan === 'premium'
-                    ? 'bg-gold-pale/25 border-gold/20 text-gold-dark'
-                    : 'bg-sage-pale/35 border-sage/20 text-sage-dark'
-                }`}>
-                  <div className="flex items-center justify-between font-bold text-[15px] mb-1">
-                    <span>{selectedPlan === 'premium' ? 'Premium AI Pack' : 'Standard Maternal Care'}</span>
-                    <span className="font-serif">₹{basePrice}/mo</span>
+                <div className="p-4 rounded-xl border border-sage/30 bg-sage-pale/40 text-sage-dark mb-6">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      🎉 50% OFF Launch Offer
+                    </span>
                   </div>
-                  <p className="text-[12px] opacity-90 leading-relaxed">
-                    {selectedPlan === 'premium'
-                      ? 'Includes Bloom AI chatbot, AI Food Hazard scanner, and clinical EHR data exports.'
-                      : 'Includes Medical vaccine logs, Govt maternity scheme guides, and encrypted Partner Sync.'}
+                  <div className="flex items-center justify-between font-bold text-[16px] mb-1">
+                    <span className="flex items-center gap-1.5 text-charcoal">
+                      <Sparkles size={16} className="text-sage" />
+                      Bloom PRO
+                    </span>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="font-serif text-[18px] text-charcoal">₹{basePrice}/mo</span>
+                      <span className="text-[12.5px] line-through text-muted font-normal">₹999/mo</span>
+                    </div>
+                  </div>
+                  <p className="text-[12px] opacity-90 leading-relaxed text-charcoal/80">
+                    Includes 24/7 Ask OPIN AI chatbot, AI Food Hazard scanner, Doctor EHR exports, and real-time Partner Sync.
                   </p>
                 </div>
 

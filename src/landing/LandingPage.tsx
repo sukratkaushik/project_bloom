@@ -1304,7 +1304,7 @@ export const LandingPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch max-w-[960px] mx-auto">
             {/* Starter Plan */}
             <div className="bg-white border border-border rounded-[28px] p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300 relative group">
               <div>
@@ -1317,7 +1317,7 @@ export const LandingPage: React.FC = () => {
                     <span className="text-[40px] font-serif font-bold text-charcoal">₹0</span>
                     <span className="text-[14px] text-medium">/ {freeMonths} {freeMonths === 1 ? 'month' : 'months'}</span>
                   </div>
-                  <div className="text-[12px] text-medium italic mt-1">Always free for moms</div>
+                  <div className="text-[12px] text-medium italic mt-1">Always free for every mother</div>
                 </div>
 
                 {/* Free Plan Slider */}
@@ -1347,15 +1347,18 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-[14px] text-medium mb-6 leading-relaxed">Essential tracking tools for everyday updates, completely free.</p>
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Essential tracking tools, clinical scan guides & government welfare schemes, completely free.</p>
                 <div className="h-px bg-border mb-6" />
                 <ul className="space-y-3.5">
                   {[
-                    "Basic pregnancy weekly tracker",
-                    "Daily symptom logs & timeline",
-                    "Kick counter & contraction timer",
-                    "Hospital bag checklist",
-                    "Offline-first sync capabilities"
+                    "Weekly pregnancy tracker & baby development",
+                    "Daily kick counter & contraction timer",
+                    "Hydration, nutrition, mood & symptom logs",
+                    "Hospital bag checklist & birth plan builder",
+                    "Trimester scan guides & doctor visit prep",
+                    "Central & State Government schemes (PMMVY, JSY)",
+                    "Postpartum recovery & fourth trimester support",
+                    "Offline-first encrypted local storage"
                   ].map((feat, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
                       <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />
@@ -1373,50 +1376,49 @@ export const LandingPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Standard Plan (Highlight) */}
+            {/* Bloom PRO Plan */}
             <div className="bg-white border-2 border-sage rounded-[28px] p-8 flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 relative group scale-102">
-              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm">
-                Most Popular
+              <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm whitespace-nowrap">
+                Most Popular • 50% OFF
               </div>
               <div>
-                <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">Maternal Care Pack</span>
-                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Standard Plan</h3>
+                <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Clinical Intelligence</span>
+                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Bloom PRO</h3>
 
-                {/* Standard Plan Price Display */}
+                {/* Bloom PRO Price Display */}
                 <div className="flex flex-col mt-4 mb-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{199 * standardMonths - Math.floor(standardMonths / 3) * 50}</span>
-                    <span className="text-[14px] text-medium">/ {standardMonths} {standardMonths === 1 ? 'month' : 'months'}</span>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                      🎉 50% OFF Initial 3 Months
+                    </span>
                   </div>
-                  {standardMonths >= 3 && (
-                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1 animate-pulse">
-                      <span>🏷️ Save ₹{Math.floor(standardMonths / 3) * 50}</span>
-                    </div>
-                  )}
-                  {standardMonths > 1 && (
-                    <div className="text-[12.5px] text-medium mt-0.5">
-                      Equivalent to ₹{Math.round((199 * standardMonths - Math.floor(standardMonths / 3) * 50) / standardMonths)}/mo
-                    </div>
-                  )}
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths}</span>
+                    <span className="text-[16px] line-through text-muted font-normal">₹{999 * premiumMonths}</span>
+                    <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
+                  </div>
+                  <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                    <span>🏷️ You save ₹{500 * premiumMonths} (Regular ₹999/month)</span>
+                  </div>
                 </div>
 
-                {/* Standard Plan Slider */}
+                {/* Bloom PRO Slider */}
                 <div className="my-6">
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
                     <span className="text-[13px] font-semibold bg-sage-pale text-sage px-2.5 py-0.5 rounded-full border border-sage/20">
-                      {standardMonths} {standardMonths === 1 ? 'Month' : 'Months'}
+                      {premiumMonths} {premiumMonths === 1 ? 'Month' : 'Months'}
                     </span>
                   </div>
                   <input
                     type="range"
                     min={1}
                     max={12}
-                    value={standardMonths}
-                    onChange={(e) => setStandardMonths(Number(e.target.value))}
-                    aria-label="Select standard plan duration"
+                    value={premiumMonths}
+                    onChange={(e) => setPremiumMonths(Number(e.target.value))}
+                    aria-label="Select premium plan duration"
                     className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-sage [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sage [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
-                    style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((standardMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((standardMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
+                    style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
                   />
                   <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
                     <span>1m</span>
@@ -1427,15 +1429,17 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                <p className="text-[14px] text-medium mb-6 leading-relaxed">Comprehensive tracking with complete medical guides & postpartum care.</p>
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to 24/7 clinical AI companions, food vision intelligence & doctor EHR exports.</p>
                 <div className="h-px bg-border mb-6" />
                 <ul className="space-y-3.5">
                   {[
                     "Everything in Free starter plan",
-                    "Complete Medical tasks & vaccines tracker",
-                    "Detailed Government Schemes guide",
-                    "Postpartum & Early Parenthood support",
-                    "Encrypted real-time Partner Sync"
+                    "24/7 Ask OPIN AI Obstetrician Companion",
+                    "AI Food & Calorie Vision Scanner (FOGSI safe)",
+                    "Doctor-Ready EHR Vault & FHIR R4 / ABDM Exports",
+                    "Encrypted Real-Time Cross-Device Partner Sync",
+                    "AI Baby Names Generator & Garbh Sanskar Audio",
+                    "Priority clinical updates & continuous support"
                   ].map((feat, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
                       <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />
@@ -1449,84 +1453,7 @@ export const LandingPage: React.FC = () => {
                 onClick={handleStart}
                 className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
               >
-                Upgrade to Standard
-              </button>
-            </div>
-
-            {/* Premium Plan */}
-            <div className="bg-white border border-border rounded-[28px] p-8 flex flex-col justify-between hover:shadow-lg transition-all duration-300 relative group">
-              <div>
-                <span className="text-[12px] font-bold tracking-[1px] uppercase text-gold">AI Ultimate</span>
-                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Premium Plan</h3>
-
-                {/* Premium Plan Price Display */}
-                <div className="flex flex-col mt-4 mb-4">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths - Math.floor(premiumMonths / 3) * 50}</span>
-                    <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
-                  </div>
-                  {premiumMonths >= 3 && (
-                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1 animate-pulse">
-                      <span>🏷️ Save ₹{Math.floor(premiumMonths / 3) * 50}</span>
-                    </div>
-                  )}
-                  {premiumMonths > 1 && (
-                    <div className="text-[12.5px] text-medium mt-0.5">
-                      Equivalent to ₹{Math.round((499 * premiumMonths - Math.floor(premiumMonths / 3) * 50) / premiumMonths)}/mo
-                    </div>
-                  )}
-                </div>
-
-                {/* Premium Plan Slider */}
-                <div className="my-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-[12px] font-bold text-gold uppercase tracking-wider">Duration</label>
-                    <span className="text-[13px] font-semibold bg-gold-pale text-gold px-2.5 py-0.5 rounded-full border border-gold/20">
-                      {premiumMonths} {premiumMonths === 1 ? 'Month' : 'Months'}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    value={premiumMonths}
-                    onChange={(e) => setPremiumMonths(Number(e.target.value))}
-                    aria-label="Select premium plan duration"
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-gold [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-gold [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
-                    style={{ background: `linear-gradient(to right, rgb(244,162,97) 0%, rgb(244,162,97) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
-                  />
-                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
-                    <span>1m</span>
-                    <span>3m</span>
-                    <span>6m</span>
-                    <span>9m</span>
-                    <span>12m</span>
-                  </div>
-                </div>
-
-                <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to advanced AI support tools & clinical report exports.</p>
-                <div className="h-px bg-border mb-6" />
-                <ul className="space-y-3.5">
-                  {[
-                    "Everything in Standard plan",
-                    "Bloom AI prenatal chatbot support 24/7",
-                    "AI-powered Food Safety Scanner",
-                    "FHIR R4 EHR Doctor Report Exports",
-                    "Priority feature request channel"
-                  ].map((feat, i) => (
-                    <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
-                      <CheckCircle2 size={16} className="text-gold mt-0.5 shrink-0" />
-                      <span>{feat}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <button
-                type="button"
-                onClick={handleStart}
-                className="w-full mt-8 py-3.5 rounded-xl bg-charcoal text-cream font-bold text-[14px] hover:opacity-90 transition-all shadow-md active:scale-98"
-              >
-                Go Premium
+                Upgrade to Bloom PRO
               </button>
             </div>
           </div>

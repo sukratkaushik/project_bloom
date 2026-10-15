@@ -295,9 +295,8 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
 ];
 
 export const CATEGORY_CHIPS = [
-  { label: 'All', count: ALL_PREGNANCY_TOOLS.length, key: 'All' },
+  { label: 'All', count: 20, key: 'All' },
   { label: 'Daily Logs', count: 9, key: 'Daily Tracking' },
-  { label: 'Smart AI', count: 5, key: 'Smart AI & Guidance' },
   { label: 'Milestones', count: 4, key: 'Milestones & Prep' },
   { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
   { label: 'Labor Prep', count: 3, key: 'Labor & Postpartum' },

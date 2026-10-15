@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Search, Star, X } from 'lucide-react';
+import { Search, Star, X, Sparkles } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 
 import { ALL_PREGNANCY_TOOLS, CATEGORY_CHIPS, ToolDefinition } from '../toolsData';
@@ -14,7 +14,11 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const tools: ToolDefinition[] = ALL_PREGNANCY_TOOLS;
+  // Strictly physical and clinical tools in Explore.
+  // AI tools reside exclusively on the dedicated Smart AI tab (Zero Duplication).
+  const tools: ToolDefinition[] = useMemo(() => {
+    return ALL_PREGNANCY_TOOLS.filter((tool) => tool.category !== 'Smart AI & Guidance');
+  }, []);
   const categoryChips = CATEGORY_CHIPS;
 
   // Filtered tools by search query and category
@@ -186,6 +190,24 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
             })}
           </div>
         )}
+
+        {/* Calm AI Discovery Banner */}
+        <div className="mt-6 p-4 bg-white border border-border/80 rounded-2xl flex items-center justify-between shadow-2xs">
+          <div className="pr-3">
+            <div className="flex items-center gap-1.5 mb-1">
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sage-pale text-sage-dark uppercase tracking-wider">
+                Smart AI Suite
+              </span>
+            </div>
+            <h4 className="font-serif text-[13.5px] font-bold text-charcoal">Looking for AI Guidance?</h4>
+            <p className="text-[11.5px] text-medium mt-0.5 leading-relaxed">
+              Explore 24/7 OPIN AI, Food Safety Scanner, Baby Names & Garbh Sanskar in the dedicated Smart AI tab below.
+            </p>
+          </div>
+          <div className="w-10 h-10 rounded-xl bg-sage-pale/60 text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
+            <Sparkles size={18} />
+          </div>
+        </div>
       </div>
     </div>
   );
