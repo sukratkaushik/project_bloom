@@ -226,7 +226,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     triggerHaptic('success');
     updateState({ 
       isPremium: true, 
-      planTier: isPremiumFeature ? 'premium' : 'standard' 
+      planTier: 'premium' 
     });
   };
 
