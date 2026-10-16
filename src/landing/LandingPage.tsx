@@ -959,7 +959,7 @@ export const LandingPage: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                        Premium AI
+                        Bloom PRO
                       </span>
                       <h3 className="font-serif text-[20px] md:text-[22px] font-bold text-charcoal leading-tight mt-0.5">
                         AI Food Safety Scanner
@@ -998,7 +998,7 @@ export const LandingPage: React.FC = () => {
                     <FileText size={20} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Premium AI
+                    Bloom PRO
                   </span>
                 </div>
                 <h3 className="font-serif text-[19px] md:text-[20px] font-bold text-charcoal mb-2">
@@ -1022,11 +1022,11 @@ export const LandingPage: React.FC = () => {
             <div className="bg-white border border-border rounded-2xl p-5 md:p-6 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-sage-pale flex items-center justify-center text-sage">
+                  <div className="w-9 h-9 rounded-xl bg-gold-pale flex items-center justify-center text-gold">
                     <Bot size={18} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Premium AI
+                    Bloom PRO
                   </span>
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Ask Bloom 24/7 AI</h4>
@@ -1044,7 +1044,7 @@ export const LandingPage: React.FC = () => {
                     <Stethoscope size={18} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Premium AI
+                    Bloom PRO
                   </span>
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Doctor Clinical PDF & EHR</h4>
@@ -1058,11 +1058,11 @@ export const LandingPage: React.FC = () => {
             <div className="bg-white border border-border rounded-2xl p-5 md:p-6 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-9 h-9 rounded-xl bg-sage-pale flex items-center justify-center text-sage">
+                  <div className="w-9 h-9 rounded-xl bg-gold-pale flex items-center justify-center text-gold">
                     <Cloud size={18} />
                   </div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-sage bg-sage-pale px-2 py-0.5 rounded-full border border-sage/30">
-                    Standard Plan
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
+                    Bloom PRO
                   </span>
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Real-Time Partner Sync</h4>
@@ -1152,7 +1152,7 @@ export const LandingPage: React.FC = () => {
                 Start free today. Upgrade anytime for clinical AI intelligence.
               </h4>
               <p className="text-[13px] text-medium">
-                Core trackers are free forever. Paid packages start at just ₹499/month with 50% launch discount.
+                Core trackers are free forever. Bloom PRO is just ₹499/month with 50% launch discount.
               </p>
             </div>
           </div>
@@ -1248,8 +1248,8 @@ export const LandingPage: React.FC = () => {
                   <div className="w-11 h-11 bg-gold-pale text-gold rounded-xl flex items-center justify-center text-xl shadow-sm">
                     🚨
                   </div>
-                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider">
-                    Standard Plan
+                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border uppercase tracking-wider">
+                    100% Free
                   </span>
                 </div>
                 <h3 className="font-bold text-[17px] mb-2 text-charcoal">1-Tap SOS & Partner Alert</h3>

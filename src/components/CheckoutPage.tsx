@@ -239,7 +239,7 @@ export const CheckoutPage: React.FC = () => {
         amount: amount, 
         currency: "INR",
         name: "Our Pregnancy",
-        description: selectedPlan === 'premium' ? "Premium AI Pack" : "Standard Plan",
+        description: "Bloom PRO Plan",
         image: "https://ourpregnancy.in/logo.png",
         order_id: orderId, 
         handler: async function (response: any) {
@@ -520,7 +520,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-light font-medium">Plan Activated:</span>
                 <span className="font-bold text-charcoal dark:text-white uppercase">
-                  {selectedPlan === 'premium' ? '👑 Premium AI Pack' : '🩺 Standard Plan'}
+                  👑 Bloom PRO
                 </span>
               </div>
               <div className="flex justify-between">
