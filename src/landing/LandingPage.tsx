@@ -42,7 +42,6 @@ export const LandingPage: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [freeMonths, setFreeMonths] = useState(1);
   const [premiumMonths, setPremiumMonths] = useState(1);
 
   React.useEffect(() => {
@@ -1311,39 +1310,12 @@ export const LandingPage: React.FC = () => {
                 <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Free Plan</h3>
 
                 {/* Free Plan Price Display */}
-                <div className="flex flex-col mt-4 mb-4">
-                  <div className="flex items-baseline gap-1">
+                <div className="flex flex-col mt-4 mb-6">
+                  <div className="flex items-baseline gap-2.5">
                     <span className="text-[40px] font-serif font-bold text-charcoal">₹0</span>
-                    <span className="text-[14px] text-medium">/ {freeMonths} {freeMonths === 1 ? 'month' : 'months'}</span>
+                    <span className="text-[13px] font-bold text-sage-dark bg-sage-pale/80 px-2.5 py-0.5 rounded-full border border-sage/25 uppercase tracking-wider">Free Forever</span>
                   </div>
-                  <div className="text-[12px] text-medium italic mt-1">Always free for every mother</div>
-                </div>
-
-                {/* Free Plan Slider */}
-                <div className="my-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-[12px] font-bold text-charcoal uppercase tracking-wider">Duration</label>
-                    <span className="text-[13px] font-semibold bg-gray-100 dark:bg-white/10 text-medium px-2.5 py-0.5 rounded-full">
-                      {freeMonths} {freeMonths === 1 ? 'Month' : 'Months'}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    value={freeMonths}
-                    onChange={(e) => setFreeMonths(Number(e.target.value))}
-                    aria-label="Select free plan duration"
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-medium [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-medium [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
-                    style={{ background: `linear-gradient(to right, rgb(107,122,135) 0%, rgb(107,122,135) ${((freeMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((freeMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
-                  />
-                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
-                    <span>1m</span>
-                    <span>3m</span>
-                    <span>6m</span>
-                    <span>9m</span>
-                    <span>12m</span>
-                  </div>
+                  <div className="text-[12.5px] text-medium italic mt-1.5">Always free for every mother</div>
                 </div>
 
                 <p className="text-[14px] text-medium mb-6 leading-relaxed">Essential tracking tools, clinical scan guides & government welfare schemes, completely free.</p>
