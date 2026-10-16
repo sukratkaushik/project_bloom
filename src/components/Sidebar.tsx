@@ -329,7 +329,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
           {planTier === 'premium' || state.isPremium || state.isAdmin ? (
             <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
-              <span>👑</span> Bloom PRO Active
+              <span>👑</span> Pro Plan Active
             </div>
           ) : (
             <button
@@ -337,7 +337,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
             >
               <span className="flex items-center gap-2">
-                <span>✨</span> Upgrade to Bloom PRO
+                <span>✨</span> Upgrade to Pro Plan
               </span>
               <span>➜</span>
             </button>
@@ -475,7 +475,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
           >
             <span className="flex items-center gap-2">
-              <span>✨</span> Upgrade to Bloom PRO
+              <span>✨</span> Upgrade to Pro Plan
             </span>
             <span>➜</span>
           </button>

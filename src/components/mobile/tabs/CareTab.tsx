@@ -189,7 +189,7 @@ export const CareTab: React.FC<CareTabProps> = ({
 
               {doctor.phone ? (
                 <a
-                  href={`https://wa.me/${cleanPhoneForWa}?text=${encodeURIComponent(`Hello ${doctor.name}, query from Bloom app`)}`}
+                  href={`https://wa.me/${cleanPhoneForWa}?text=${encodeURIComponent(`Hello ${doctor.name}, query from Our Pregnancy app`)}`}
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => triggerHaptic('light')}

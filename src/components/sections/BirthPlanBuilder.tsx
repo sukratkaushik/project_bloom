@@ -514,7 +514,7 @@ const generateShareSummary = (plan: BirthPlan, state: any, formatDate: (ds: stri
     lines.push(``);
   }
 
-  lines.push(`_Collaboratively crafted with love on Our Pregnancy Bloom_ 💕`);
+  lines.push(`_Collaboratively crafted with love on Our Pregnancy_ 💕`);
   return lines.join('\n');
 };
 

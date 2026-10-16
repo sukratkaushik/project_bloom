@@ -1016,7 +1016,7 @@ export const SafeTravel: React.FC = () => {
       : '';
 
     const text = 
-      `🌸 OurPregnancy Bloom — Safe Travel Brief for ${partnerName}\n` +
+      `🌸 Our Pregnancy — Safe Travel Brief for ${partnerName}\n` +
       `📍 Destination: ${destName}\n` +
       `🤰 Stage: ${analysis.stageTitle.split('(')[0].trim()} • Mode: ${travelMethod.toUpperCase()}\n` +
       `🛡️ Assessment: ${analysis.riskLabel}\n\n` +
@@ -1024,7 +1024,7 @@ export const SafeTravel: React.FC = () => {
       medicalLine +
       `🎒 Travel Checklist: ${completedCount}/${totalCount} completed (${progressPercent}% ready)\n` +
       `• ${partnerAssignedCount} items assigned to you!\n\n` +
-      `Created with love on Bloom 💕`;
+      `Created with love on Our Pregnancy 💕`;
 
     if (navigator.share) {
       navigator.share({
@@ -1048,7 +1048,7 @@ export const SafeTravel: React.FC = () => {
     const partnerItems = checklist.filter(i => i.assignedTo === 'partner');
 
     const text = 
-      `🌸 OurPregnancy Bloom — Travel Checklist for ${partnerName}\n` +
+      `🌸 Our Pregnancy — Travel Checklist for ${partnerName}\n` +
       `📍 Destination: ${destinationInfo || 'Upcoming Trip'}\n` +
       `Overall Readiness: ${completedCount}/${totalCount} (${progressPercent}%)\n\n` +
       `👥 ASSIGNED TO ${partnerName.toUpperCase()} (${partnerCompletedCount}/${partnerAssignedCount} Done):\n` +
@@ -1056,7 +1056,7 @@ export const SafeTravel: React.FC = () => {
       `\n\n` +
       `👤 ASSIGNED TO ME (${meItems.filter(i => i.checked).length}/${meItems.length} Done):\n` +
       meItems.map(i => `${i.checked ? '✅' : '☐'} ${i.text}`).join('\n') +
-      `\n\nSynced via Bloom Partner Sync 💕`;
+      `\n\nSynced via Partner Sync 💕`;
 
     if (navigator.share) {
       navigator.share({

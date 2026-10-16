@@ -855,10 +855,10 @@ export const LandingPage: React.FC = () => {
                 },
                 {
                   step: "4",
-                  tag: "⭐ Premium AI",
+                  tag: "⭐ Pro Plan",
                   tagClass: "bg-gold/15 text-gold border-gold/30 font-extrabold",
                   title: "AI Prenatal Care",
-                  desc: "Put a 24/7 Bloom AI clinical companion in your pocket. Scan Indian food safety, decipher medical reports, and export FHIR R4 EHRs for your OB-GYN.",
+                  desc: "Put a 24/7 AI clinical companion in your pocket. Scan Indian food safety, decipher medical reports, and export FHIR R4 EHRs for your OB-GYN.",
                   icon: <Sparkles className="w-6 h-6 text-gold" />
                 }
               ].map((item, i) => (
@@ -886,18 +886,18 @@ export const LandingPage: React.FC = () => {
             <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
               <div className="max-w-2xl">
                 <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-full bg-gold/15 text-gold text-[11px] font-bold uppercase tracking-wider mb-2.5 border border-gold/25">
-                  <Sparkles size={13} className="text-gold" /> Why Upgrade to Premium?
+                  <Sparkles size={13} className="text-gold" /> Why Upgrade to Pro Plan?
                 </div>
                 <h3 className="font-serif text-2xl md:text-[26px] font-bold text-charcoal mb-2.5 leading-snug">
                   Essential care is free. Clinical AI intelligence is your superpower.
                 </h3>
                 <p className="text-medium text-[14px] leading-relaxed mb-4">
-                  While daily kick tracking and government scheme navigators are free forever, Premium gives you an on-demand medical-grade support system whenever concerns arise — day or night.
+                  While daily kick tracking and government scheme navigators are free forever, Pro Plan gives you an on-demand medical-grade support system whenever concerns arise — day or night.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[12.5px] font-semibold text-charcoal">
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
                     <CheckCircle2 size={15} className="text-sage shrink-0" />
-                    <span>24/7 Bloom AI Chat</span>
+                    <span>24/7 AI Clinical Chat</span>
                   </div>
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
                     <CheckCircle2 size={15} className="text-sage shrink-0" />
@@ -959,7 +959,7 @@ export const LandingPage: React.FC = () => {
                     </div>
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                        Bloom PRO
+                        Pro
                       </span>
                       <h3 className="font-serif text-[20px] md:text-[22px] font-bold text-charcoal leading-tight mt-0.5">
                         AI Food Safety Scanner
@@ -998,7 +998,7 @@ export const LandingPage: React.FC = () => {
                     <FileText size={20} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Bloom PRO
+                    Pro
                   </span>
                 </div>
                 <h3 className="font-serif text-[19px] md:text-[20px] font-bold text-charcoal mb-2">
@@ -1018,7 +1018,7 @@ export const LandingPage: React.FC = () => {
 
           {/* Row 2: Three High-Value Supporting Tools (3 columns) */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Card 1: Ask Bloom 24/7 AI */}
+            {/* Card 1: Ask OPIN 24/7 AI */}
             <div className="bg-white border border-border rounded-2xl p-5 md:p-6 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -1026,10 +1026,10 @@ export const LandingPage: React.FC = () => {
                     <Bot size={18} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Bloom PRO
+                    Pro
                   </span>
                 </div>
-                <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Ask Bloom 24/7 AI</h4>
+                <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Ask OPIN 24/7 AI</h4>
                 <p className="text-[13px] text-medium leading-relaxed">
                   Empathetic, instant guidance for 3 AM symptoms. Grounded in ACOG and WHO clinical obstetric guidelines.
                 </p>
@@ -1044,7 +1044,7 @@ export const LandingPage: React.FC = () => {
                     <Stethoscope size={18} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Bloom PRO
+                    Pro
                   </span>
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Doctor Clinical PDF & EHR</h4>
@@ -1062,7 +1062,7 @@ export const LandingPage: React.FC = () => {
                     <Cloud size={18} />
                   </div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-gold bg-gold/15 px-2 py-0.5 rounded-full border border-gold/30">
-                    Bloom PRO
+                    Pro
                   </span>
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Real-Time Partner Sync</h4>
@@ -1152,7 +1152,7 @@ export const LandingPage: React.FC = () => {
                 Start free today. Upgrade anytime for clinical AI intelligence.
               </h4>
               <p className="text-[13px] text-medium">
-                Core trackers are free forever. Bloom PRO is just ₹499/month with 50% launch discount.
+                Core trackers are free forever. Pro Plan is just ₹499/month with 50% launch discount.
               </p>
             </div>
           </div>
@@ -1226,8 +1226,8 @@ export const LandingPage: React.FC = () => {
                   <div className="w-11 h-11 bg-amber-50 text-amber-600 rounded-xl flex items-center justify-center text-xl shadow-sm">
                     🌐
                   </div>
-                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border uppercase tracking-wider">
-                    100% Free
+                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider">
+                    Free Plan
                   </span>
                 </div>
                 <h3 className="font-bold text-[17px] mb-2 text-charcoal">11 Regional Indian Languages</h3>
@@ -1248,8 +1248,8 @@ export const LandingPage: React.FC = () => {
                   <div className="w-11 h-11 bg-gold-pale text-gold rounded-xl flex items-center justify-center text-xl shadow-sm">
                     🚨
                   </div>
-                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-cream text-charcoal/70 border border-border uppercase tracking-wider">
-                    100% Free
+                  <span className="inline-block text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sage-pale text-sage border border-sage/30 uppercase tracking-wider">
+                    Free Plan
                   </span>
                 </div>
                 <h3 className="font-bold text-[17px] mb-2 text-charcoal">1-Tap SOS & Partner Alert</h3>
@@ -1347,16 +1347,16 @@ export const LandingPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Bloom PRO Plan */}
+            {/* Pro Plan */}
             <div className="bg-white border-2 border-sage rounded-[28px] p-8 flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 relative group scale-102">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm whitespace-nowrap">
                 Most Popular • 50% OFF
               </div>
               <div>
                 <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Clinical Intelligence</span>
-                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Bloom PRO</h3>
+                <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Pro Plan</h3>
 
-                {/* Bloom PRO Price Display */}
+                {/* Pro Plan Price Display */}
                 <div className="flex flex-col mt-4 mb-4">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
@@ -1373,7 +1373,7 @@ export const LandingPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Bloom PRO Slider */}
+                {/* Pro Plan Slider */}
                 <div className="my-6">
                   <div className="flex justify-between items-center mb-2">
                     <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
@@ -1387,7 +1387,7 @@ export const LandingPage: React.FC = () => {
                     max={12}
                     value={premiumMonths}
                     onChange={(e) => setPremiumMonths(Number(e.target.value))}
-                    aria-label="Select premium plan duration"
+                    aria-label="Select pro plan duration"
                     className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-sage [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sage [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
                     style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
                   />
@@ -1424,7 +1424,7 @@ export const LandingPage: React.FC = () => {
                 onClick={handleStart}
                 className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
               >
-                Upgrade to Bloom PRO
+                Upgrade to Pro Plan
               </button>
             </div>
           </div>

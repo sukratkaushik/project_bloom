@@ -18,8 +18,8 @@ export default defineConfig(({mode}) => {
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
         manifest: {
-          name: 'Bloom Pregnancy Planner',
-          short_name: 'Bloom',
+          name: 'Our Pregnancy Companion',
+          short_name: 'Our Pregnancy',
           description: 'Your privacy-first pregnancy companion.',
           theme_color: '#F2F4EB',
           background_color: '#F2F4EB',

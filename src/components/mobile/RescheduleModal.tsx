@@ -149,7 +149,7 @@ Thank you so much for your assistance,
 ${patientName}
 ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
 
-(Sent via Our Pregnancy • Bloom App)`;
+(Sent via Our Pregnancy App)`;
 
     return { subject, body, formattedPrefDate };
   };
@@ -236,11 +236,11 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
         time: manualTime,
         hospital: facility,
         doctor: state.doctor?.name,
-        notes: 'Updated manually in Bloom',
+        notes: 'Updated manually in Our Pregnancy',
         prep: nextMilestone.prep,
       },
     });
-    onShowToast('📅 Appointment date updated in Bloom!');
+    onShowToast('📅 Appointment date updated in Our Pregnancy!');
     onClose();
   };
 
@@ -345,7 +345,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
                       </span>
                     </div>
                     <p className="text-[12px] text-medium mt-1 leading-snug">
-                      Choose your preferred dates. Bloom will draft a formal, professional clinic request with your patient UHID, gestation week & notes, ready to email or WhatsApp directly.
+                      Choose your preferred dates. Our Pregnancy will draft a formal, professional clinic request with your patient UHID, gestation week & notes, ready to email or WhatsApp directly.
                     </p>
                     <div className="mt-2.5 flex items-center gap-1 text-[12px] font-bold text-sage-dark">
                       <span>Draft Request to Doctor</span>
@@ -372,7 +372,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
                       Coordinate Directly Myself
                     </h4>
                     <p className="text-[12px] text-medium mt-1 leading-snug">
-                      Call or message the hospital OPD reception directly, or simply update your appointment date manually in your Bloom pregnancy calendar.
+                      Call or message the hospital OPD reception directly, or simply update your appointment date manually in your Our Pregnancy calendar.
                     </p>
                     <div className="mt-2.5 flex items-center gap-1 text-[12px] font-bold text-charcoal/70 group-hover:text-charcoal">
                       <span>Call Clinic or Update Date</span>
@@ -530,7 +530,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
               <div className="p-3 bg-sage-pale/40 border border-sage/30 rounded-2xl flex items-center gap-2 text-sage-dark text-[11.5px] font-medium">
                 <Sparkles size={16} className="shrink-0" />
                 <span>
-                  Bloom prepared this official request for <strong>{doctorEmail}</strong>.
+                  Our Pregnancy prepared this official request for <strong>{doctorEmail}</strong>.
                 </span>
               </div>
 
@@ -582,7 +582,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
           {mode === 'self_service' && (
             <div className="space-y-4">
               <p className="text-[12px] text-medium">
-                You can reach out to your doctor directly, or update the scheduled visit date inside Bloom.
+                You can reach out to your doctor directly, or update the scheduled visit date inside your calendar.
               </p>
 
               {/* Direct Call / WhatsApp */}
@@ -622,10 +622,10 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
                 )}
               </div>
 
-              {/* Update in Bloom Calendar */}
+              {/* Update in Calendar */}
               <div className="pt-2 border-t border-border/60 space-y-3">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-charcoal/70 block">
-                  Update Appointment in Bloom
+                  Update Appointment in Calendar
                 </span>
 
                 <div>
@@ -659,7 +659,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
                   className="w-full h-11 bg-sage hover:bg-sage-dark text-white font-bold text-[13px] rounded-2xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
                 >
                   <Check size={16} />
-                  <span>Update Calendar Date in Bloom</span>
+                  <span>Update Calendar Date</span>
                 </button>
               </div>
             </div>

@@ -426,7 +426,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       </span>
                     ) : state.planTier === 'premium' || state.isPremium ? (
                       <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
-                        👑 Bloom PRO Active
+                        👑 Pro Plan Active
                       </span>
                     ) : (
                       <span className="px-2.5 py-1 bg-cream text-charcoal border border-border/80 font-semibold rounded-full text-[11px] sm:text-[12px]">
@@ -441,17 +441,17 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       onClick={() => { navigate('/checkout?plan=premium'); }}
                       className="text-[12px] sm:text-[12.5px] font-bold text-sage-dark hover:underline cursor-pointer"
                     >
-                      {state.planTier === 'premium' || state.isPremium ? 'Manage Plan →' : 'Upgrade to Bloom PRO →'}
+                      {state.planTier === 'premium' || state.isPremium ? 'Manage Plan →' : 'Upgrade to Pro Plan →'}
                     </button>
                   )}
                 </div>
 
                 <p className="text-[11.5px] sm:text-[12.5px] text-medium leading-relaxed">
                   {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com'
-                    ? 'You have perpetual lifetime access to all 24/7 Bloom AI tools, clinical checklists, food safety scanner, and admin controls.'
+                    ? 'You have perpetual lifetime access to all 24/7 AI clinical tools, clinical checklists, food safety scanner, and admin controls.'
                     : state.planTier === 'premium' || state.isPremium
                     ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
-                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Bloom PRO for 24/7 AI guidance, food scanner, and partner sync.'}
+                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>
 
                 {state.planExpiry && !state.isAdmin && auth.currentUser?.email !== 'sukrat.kaushik@gmail.com' && (
@@ -853,7 +853,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 </label>
               </div>
               <p className="text-medium text-[11.5px] sm:text-xs mt-2 leading-relaxed">
-                Allow Bloom AI chat, food safety scanner, and medical report analysis to process photos and health details using secure third-party AI models.
+                Allow AI clinical chat, food safety scanner, and medical report analysis to process photos and health details using secure third-party AI models.
               </p>
             </div>
 
@@ -1335,7 +1335,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
               </div>
               <div>
                 <h3 className="font-serif text-lg sm:text-xl font-medium text-charcoal">
-                  {auth.currentUser ? 'Log out of Bloom?' : 'Exit Guest Mode?'}
+                  {auth.currentUser ? 'Log out of Our Pregnancy?' : 'Exit Guest Mode?'}
                 </h3>
                 <p className="text-xs text-medium mt-0.5">
                   {auth.currentUser ? 'You will be returned to the sign-in screen.' : 'Return to sign-in screen to log in or create an account.'}

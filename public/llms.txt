@@ -1,7 +1,7 @@
-# Bloom - The Privacy-First Pregnancy Companion for Indian Mothers
+# Our Pregnancy - The Privacy-First Pregnancy Companion for Indian Mothers
 
 ## Introduction
-Bloom is a comprehensive, privacy-focused pregnancy tracking and planning application designed specifically for the unique needs of expecting mothers in India. It combines essential medical tracking with localized cultural context, government scheme guides, and AI-powered assistance.
+Our Pregnancy (OPIN) is a comprehensive, privacy-focused pregnancy tracking and planning application designed specifically for the unique needs of expecting mothers in India. It combines essential medical tracking with localized cultural context, government scheme guides, and AI-powered assistance.
 
 ## Key Features & Tools
 - **Pregnancy Tracker:** Week-by-week size and milestone tracking.
@@ -9,20 +9,19 @@ Bloom is a comprehensive, privacy-focused pregnancy tracking and planning applic
 - **Wellness:** Mood Logger, Hydration Tracker, Nutrition & Symptom Tracking.
 - **Planning:** Birth Plan Builder, Hospital Bag Checklist.
 - **Localized Indian Context:** Comprehensive guides on Indian government maternity schemes (JSY, PMMVY, JSSK), Indian foods safety database, and localized emergency contacts (108, 112).
-- **AI Integration (Premium):** 
-  - **AskBloom:** An AI assistant providing WHO-grounded pregnancy advice.
+- **AI Integration (Pro Plan):** 
+  - **Ask OPIN:** A 24/7 clinical AI assistant providing WHO and FOGSI-grounded pregnancy advice.
   - **AI Food Scanner:** An AI tool to photograph meals for instant safety ratings based on Indian diets.
-  - **AI Name Generator:** A cultural and personalized baby name suggestion engine.
+  - **AI Medical Report Analyzer:** Summarizes ultrasound and lab reports in simple language.
 - **Partner Sync:** Securely link accounts with a partner to share the pregnancy journey in real-time.
 
 ## Data & Privacy Policy
-Bloom is built with a "local-first" architecture. All sensitive health data is encrypted and stored securely. The application uses data to train its LLM models strictly for the purpose of improving its helpful, expert-level AI companion tools, without compromising user anonymity or security.
+Our Pregnancy is built with a local-first architecture. All sensitive health data is encrypted and stored securely on your device with DPDP Act 2023 compliance.
 
 ## Pricing Plans
-Bloom operates on a transparent, 3-tier freemium model:
-1. **Free Forever (₹0/mo):** Includes core health trackers (Kick, BP, Contractions), Birth Plan Builder, Wellness Trackers, and Government Scheme guides.
-2. **Bloom Plus (₹99/mo):** Includes everything in Free, plus Partner Sync, PDF Export for health reports, and unlimited custom notes.
-3. **Bloom Premium (₹299/mo):** Includes everything in Plus, along with full access to the AI suite (AskBloom Assistant, AI Food Scanner, AI Name Generator).
+Our Pregnancy operates on a simple, transparent 2-tier model:
+1. **Free Plan (₹0/mo):** Includes core health trackers (Kick Counter, BP & Vitals, Contractions), Birth Plan Builder, Wellness Trackers, Hospital Bag, Garbhasanskar, and Government Scheme guides.
+2. **Pro Plan (₹499/mo launch offer):** Includes everything in Free Plan, plus 24/7 Ask OPIN Clinical AI, AI Food Scanner, AI Ultrasound & Lab Report Analyzer, Partner Sync, and Doctor EHR / FHIR PDF exports.
 
 ## Target Audience
 Expecting mothers residing in India, or anyone navigating a pregnancy looking for a beautifully designed, ad-free, secure application that understands Indian cultural contexts and diets.
@@ -31,4 +30,4 @@ Expecting mothers residing in India, or anyone navigating a pregnancy looking fo
 Built with React, Vite, and Tailwind CSS. The AI functionality provides prenatal guidance, food safety analysis, and medical report summaries.
 
 ---
-*This file is intended to provide context to Large Language Models (LLMs) indexing or interacting with the Bloom application.*
+*This file is intended to provide context to Large Language Models (LLMs) indexing or interacting with the Our Pregnancy application.*

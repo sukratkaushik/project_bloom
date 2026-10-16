@@ -136,19 +136,19 @@ export const AbhaInfoModal: React.FC<AbhaInfoModalProps> = ({ isOpen, onClose })
                   100% Consent-Driven Privacy
                 </h4>
                 <p className="text-[11.5px] text-medium dark:text-stone-300 mt-0.5 leading-relaxed">
-                  No hospital or doctor can view your medical history without your active OTP or consent. In Bloom, all files are stored with AES-256 encryption on your device.
+                  No hospital or doctor can view your medical history without your active OTP or consent. In Our Pregnancy, all files are stored with AES-256 encryption on your device.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 4. How Bloom Handles It */}
+          {/* 4. How Our Pregnancy Handles It */}
           <div className="p-3 rounded-xl bg-white dark:bg-stone-800 border border-border/80 dark:border-stone-700 text-[11.5px] text-medium dark:text-stone-300 space-y-1">
             <span className="font-bold text-charcoal dark:text-cream block">
-              🌸 Using Bloom without an ABHA ID:
+              🌸 Using Our Pregnancy without an ABHA ID:
             </span>
             <p>
-              If you don't have an ABHA ID, you can still use every feature in Bloom — uploading scan photos/PDFs, viewing AI ultrasound summaries, tracking vitals, and printing the Doctor Care Plan PDF.
+              If you don't have an ABHA ID, you can still use every feature in Our Pregnancy — uploading scan photos/PDFs, viewing AI ultrasound summaries, tracking vitals, and printing the Doctor Care Plan PDF.
             </p>
           </div>
         </div>

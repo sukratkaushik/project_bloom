@@ -332,7 +332,7 @@ export const SetupScreen: React.FC = () => {
             </div>
             <span className="text-[13px] text-charcoal/90 leading-snug">
               <span className="inline-block px-1.5 py-0.5 mr-1.5 text-[10px] font-semibold tracking-wide uppercase bg-sage-pale text-sage rounded">Optional</span>
-              I'd also like to use AI-powered features (Bloom AI chat, food safety scanner, medical report analysis). I understand photos and health details I submit to these features are processed by a third-party AI provider.
+              I'd also like to use AI-powered features (AI clinical chat, food safety scanner, medical report analysis). I understand photos and health details I submit to these features are processed by a third-party AI provider.
             </span>
           </label>
         </div>

@@ -157,9 +157,9 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
         'Meals: Snap food photos or scan packaged barcodes across 3M+ items for pregnancy safety checks (Folate, Iron, Calcium, Listeria & Papain alerts)',
         'Evening: Record blood pressure and resting vitals (especially if tracking pre-eclampsia)',
         'Trimester 3: Kick Counter (fetal movement) and Contraction Timer (5-1-1 labor rule)',
-        'Midnight: 24/7 Bloom AI clinical triage for unusual symptoms or nighttime cramps'
+        'Midnight: 24/7 AI clinical triage for unusual symptoms or nighttime cramps'
       ],
-      tip: 'Tracking is 100% local-first in IndexedDB (BloomDB v3). Your logs stay on your device with optional P2P partner sync.',
+      tip: 'Tracking is 100% local-first in encrypted IndexedDB. Your logs stay on your device with optional P2P partner sync.',
       ctaText: 'Try AI Food Scanner',
       ctaAction: () => {
         triggerHaptic('light');

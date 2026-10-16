@@ -41,7 +41,7 @@ interface FeatureConfig {
 const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   PartnerSync: {
     tier: 'premium',
-    badge: 'Bloom PRO • Partner Companion',
+    badge: 'Pro Plan • Partner Companion',
     title: 'Sync Your Journey Together',
     subtitle: 'Keep your partner connected to every movement, appointment, and milestone in real time.',
     icon: Users,
@@ -66,7 +66,7 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   },
   AskOurPregnancy: {
     tier: 'premium',
-    badge: 'Bloom PRO • 24/7 AI Companion',
+    badge: 'Pro Plan • 24/7 AI Companion',
     title: 'Warm, Empathetic Maternal Guidance',
     subtitle: 'Ask about symptoms, trimester changes, cravings, or hospital prep anytime, day or night.',
     icon: Bot,
@@ -91,7 +91,7 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   },
   FoodScanner: {
     tier: 'premium',
-    badge: 'Bloom PRO • AI Nutrition Scanner',
+    badge: 'Pro Plan • AI Nutrition Scanner',
     title: 'Nourish Safely, Every Meal',
     subtitle: 'Scan meals, restaurant dishes, and packaged snacks for pregnancy-safe ingredients.',
     icon: UtensilsCrossed,
@@ -116,7 +116,7 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
   },
   EhrExports: {
     tier: 'premium',
-    badge: 'Bloom PRO • Health Vault',
+    badge: 'Pro Plan • Health Vault',
     title: 'Doctor-Ready Medical Records',
     subtitle: 'Generate comprehensive FHIR R4 clinical exports and hospital admission health summaries.',
     icon: FileText,
@@ -417,14 +417,14 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
           ) : (
             <LockOpen className="w-4.5 h-4.5" />
           )}
-          <span>Unlock {isPremiumFeature ? 'Bloom Premium' : 'Bloom Standard Care'}</span>
+          <span>Unlock Pro Plan</span>
         </button>
 
         {/* Demo / Tester VIP Pass Card */}
         <div className="p-3.5 bg-gradient-to-br from-tulsi-light/40 via-cream/30 to-white border border-sage/20 rounded-xl text-center space-y-2">
           <div className="flex items-center justify-center gap-1.5 text-sage-dark font-medium text-[12.5px]">
             <Sparkles className="w-3.5 h-3.5 text-sage" />
-            <span>Evaluating or Reviewing Project Bloom?</span>
+            <span>Evaluating or Reviewing Our Pregnancy?</span>
           </div>
           <p className="text-[11.5px] text-medium leading-relaxed">
             Activate the complimentary Beta VIP Pass (OPIN30) for instant preview on this device.

@@ -81,7 +81,7 @@ export const PrivacyPolicy: React.FC = () => {
           <p>We do not sell, rent, or trade your personal or health data. To deliver our services, we route necessary data through trusted third-party service providers solely to perform essential application functions:</p>
           <ul className="list-disc pl-5 space-y-2">
             <li><strong>Cloud hosting and database storage:</strong> Your account information and encrypted tracking logs are stored with a cloud infrastructure provider, not on our own physical servers.</li>
-            <li><strong>AI processing:</strong> When you use AI-powered features (Bloom AI chat assistant, food safety scanner, and medical report analysis), the photos, documents, or health text you submit are sent to a third-party AI service to generate a response. This data is not used to train public AI models.</li>
+            <li><strong>AI processing:</strong> When you use AI-powered features (OPIN AI chat assistant, food safety scanner, and medical report analysis), the photos, documents, or health text you submit are sent to a third-party AI service to generate a response. This data is not used to train public AI models.</li>
             <li><strong>Payment processing:</strong> If you subscribe to a paid plan, your payment transaction is handled by a third-party payment processor. We do not collect or store your payment card details or banking credentials ourselves.</li>
             <li><strong>Email delivery:</strong> Transactional communications (such as welcome emails, account notifications, plan updates, and payment receipts) are transmitted through a cloud email delivery service.</li>
           </ul>

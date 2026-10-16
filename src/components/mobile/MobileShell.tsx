@@ -447,7 +447,7 @@ export const MobileShell: React.FC = () => {
               50% OFF Introductory Offer
             </div>
             <h3 className="font-serif font-bold text-charcoal text-[20px]">
-              Bloom PRO
+              Pro Plan
             </h3>
             <div className="flex items-baseline gap-2 mt-1 mb-1.5">
               <span className="font-serif text-[28px] font-bold text-charcoal">₹499</span>

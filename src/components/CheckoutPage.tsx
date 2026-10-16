@@ -239,7 +239,7 @@ export const CheckoutPage: React.FC = () => {
         amount: amount, 
         currency: "INR",
         name: "Our Pregnancy",
-        description: "Bloom PRO Plan",
+        description: "Pro Plan",
         image: "https://ourpregnancy.in/logo.png",
         order_id: orderId, 
         handler: async function (response: any) {
@@ -344,7 +344,7 @@ export const CheckoutPage: React.FC = () => {
                   <div className="flex items-center justify-between font-bold text-[16px] mb-1">
                     <span className="flex items-center gap-1.5 text-charcoal">
                       <Sparkles size={16} className="text-sage" />
-                      Bloom PRO
+                      Pro Plan
                     </span>
                     <div className="flex items-baseline gap-1.5">
                       <span className="font-serif text-[18px] text-charcoal">₹{basePrice}/mo</span>
@@ -520,7 +520,7 @@ export const CheckoutPage: React.FC = () => {
               <div className="flex justify-between">
                 <span className="text-light font-medium">Plan Activated:</span>
                 <span className="font-bold text-charcoal dark:text-white uppercase">
-                  👑 Bloom PRO
+                  👑 Pro Plan
                 </span>
               </div>
               <div className="flex justify-between">
@@ -553,7 +553,7 @@ export const CheckoutPage: React.FC = () => {
               </button>
               
               <p className="text-[11px] text-light italic flex items-center justify-center gap-1.5">
-                <Heart size={12} className="text-blush fill-blush" /> We hope Bloom helps make your pregnancy journey safer and happier!
+                <Heart size={12} className="text-blush fill-blush" /> We hope Our Pregnancy helps make your pregnancy journey safer and happier!
               </p>
             </div>
           </div>
@@ -589,7 +589,7 @@ export const CheckoutPage: React.FC = () => {
             <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-4 text-left text-[13px] space-y-2.5">
               <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
                 <span className="text-base">🤖</span>
-                <span>24/7 Bloom AI Prenatal Guide</span>
+                <span>24/7 AI Prenatal Guide</span>
               </div>
               <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
                 <span className="text-base">🥗</span>

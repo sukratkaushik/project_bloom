@@ -35,7 +35,7 @@ const CONTEXT_GUIDES: Record<string, { greeting: string, suggestions: string[] }
 };
 
 const DEFAULT_CONTEXT = {
-  greeting: "Hi! I'm Bloom AI ✨ How can I help you with your journey today?",
+  greeting: "Hi! I'm OPIN AI ✨ How can I help you with your journey today?",
   suggestions: ["Food safety", "Kick counting", "BP Tracking"]
 };
 
@@ -61,7 +61,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     if (isAiConsentBlocked(state.aiProcessingConsent)) {
       setMessages(prev => [...prev, {
         role: 'ai',
-        text: "AI features are turned off in your settings. Turn on AI features in your Profile to use Bloom AI."
+        text: "AI features are turned off in your settings. Turn on AI features in your Profile to use OPIN AI."
       }]);
       return;
     }
@@ -111,15 +111,15 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
           {/* Header */}
           <div className="bg-sage text-white p-4 flex justify-between items-center relative overflow-hidden">
             <div className="absolute top-0 right-0 p-1 opacity-20 transform translate-x-2 -translate-y-2">
-              <img src="/logo.png" alt="Bloom Background" className="w-20 h-20 object-contain" />
+              <img src="/logo.png" alt="Our Pregnancy Background" className="w-20 h-20 object-contain" />
             </div>
             <div className="flex items-center gap-3 relative z-10">
               <div className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30">
-                <img src="/logo.png" alt="Bloom Logo" className="w-6 h-6 object-contain" />
+                <img src="/logo.png" alt="Our Pregnancy Logo" className="w-6 h-6 object-contain" />
               </div>
               <div>
                 <h3 className="font-bold text-[15px] flex items-center gap-1.5">
-                  Bloom AI
+                  OPIN AI
                   <Sparkles size={12} className="animate-pulse" />
                 </h3>
                 <div className="flex items-center gap-1.5 opacity-80 text-[10px] font-medium uppercase tracking-wider">
@@ -216,7 +216,7 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
               exit={{ opacity: 0, scale: 0.5, rotate: -90 }}
               transition={{ duration: 0.2 }}
             >
-              <img src="/logo.png" alt="Bloom" className="w-8 h-8 object-contain" />
+              <img src="/logo.png" alt="Our Pregnancy" className="w-8 h-8 object-contain" />
               <span className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full flex items-center justify-center border-2 border-sage">
                 <span className="w-1 h-1 bg-sage rounded-full animate-pulse" />
               </span>
