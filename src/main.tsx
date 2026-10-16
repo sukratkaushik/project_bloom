@@ -37,7 +37,22 @@ if (Capacitor.isNativePlatform()) {
     }).catch(() => {});
   }
 } else {
-  registerSW({ immediate: true });
+  const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      updateSW(true);
+    },
+  });
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      // Reload once so the fresh web bundle takes over
+      if (!sessionStorage.getItem('op_sw_updated')) {
+        sessionStorage.setItem('op_sw_updated', '1');
+        window.location.reload();
+      }
+    });
+  }
 }
 
 const rootElement = document.getElementById('root')!;
