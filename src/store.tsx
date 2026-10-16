@@ -164,6 +164,22 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           }
 
+          if (profile?.dpdpConsent && typeof window !== 'undefined') {
+            try {
+              if (!localStorage.getItem('bloom_dpdp_consent_v1')) {
+                localStorage.setItem('bloom_dpdp_consent_v1', JSON.stringify({
+                  accepted: true,
+                  timestamp: profile.dpdpConsentedAt?.toDate?.()?.toISOString?.() || new Date().toISOString(),
+                  version: '1.0',
+                  locale: 'en',
+                  source: 'cloud_profile'
+                }));
+              }
+            } catch (e) {
+              console.warn('Could not sync cloud consent to local storage', e);
+            }
+          }
+
           if (profile && profile.isSetup && profile.activeJourneyId) {
             // 2. If already setup in cloud, fetch that journey
             const journeyRef = doc(firestoreDb, 'journeys', profile.activeJourneyId);

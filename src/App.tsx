@@ -188,10 +188,17 @@ const AppContent: React.FC = () => {
     currentPath === '/careers' || 
     currentPath === '/team';
 
+  // Only show compliance disclaimer when someone logs in / is authenticated into the website (or inside the app),
+  // NEVER for unauthenticated visitors browsing the public landing page.
+  const shouldShowConsent = 
+    splashFinished && 
+    !isPublicInfoPage && 
+    Boolean(user || isNativeApp() || currentPath.startsWith('/dashboard') || currentPath === '/setup');
+
   return (
     <div key={currentPath} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
       {content}
-      {splashFinished && !isPublicInfoPage && (
+      {shouldShowConsent && (
         <ComplianceConsentModal />
       )}
       <BiometricSecurityOverlay

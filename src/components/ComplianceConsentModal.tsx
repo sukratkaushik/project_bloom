@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { ShieldCheck, AlertTriangle, Lock, HeartPulse, ExternalLink, Check, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 import { getActiveLanguage } from '../utils/translation';
+import { auth, db, doc, setDoc, serverTimestamp } from '../firebase';
 
 export const DPDP_CONSENT_KEY = 'bloom_dpdp_consent_v1';
 
@@ -61,6 +62,20 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     }
   };
 
+  const syncConsentToCloud = () => {
+    if (auth.currentUser) {
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        setDoc(userRef, {
+          dpdpConsent: true,
+          dpdpConsentedAt: serverTimestamp(),
+        }, { merge: true }).catch(() => {});
+      } catch (e) {
+        console.warn('Could not sync consent to Firestore:', e);
+      }
+    }
+  };
+
   const handleAgreeAndContinue = () => {
     try {
       localStorage.setItem(
@@ -75,6 +90,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     } catch (e) {
       console.warn('Could not persist consent in localStorage:', e);
     }
+    syncConsentToCloud();
     setIsOpen(false);
     if (onAccept) onAccept();
     if (onClose) onClose();
@@ -96,6 +112,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
     } catch (e) {
       console.warn('Could not persist consent in localStorage:', e);
     }
+    syncConsentToCloud();
     setIsOpen(false);
     if (onAccept) onAccept();
     if (onClose) onClose();
@@ -198,7 +215,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
               type="checkbox"
               checked={acceptedDisclaimer}
               onChange={(e) => setAcceptedDisclaimer(e.target.checked)}
-              className="mt-1 w-4 h-4 text-sage-dark accent-[#3F5E4D] rounded border-border focus:ring-sage-dark cursor-pointer"
+              className="mt-1 w-4 h-4 text-sage-dark accent-[#3F5E4D] rounded border-border focus:ring-sage-dark cursor-pointer shrink-0"
             />
             <span className="text-xs text-charcoal select-none">
               {lang === 'en'
@@ -213,7 +230,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
               type="checkbox"
               checked={acceptedPrivacy}
               onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-              className="mt-1 w-4 h-4 text-sage-dark accent-[#3F5E4D] rounded border-border focus:ring-sage-dark cursor-pointer"
+              className="mt-1 w-4 h-4 text-sage-dark accent-[#3F5E4D] rounded border-border focus:ring-sage-dark cursor-pointer shrink-0"
             />
             <span className="text-xs text-charcoal select-none">
               {lang === 'en'
@@ -246,7 +263,7 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:p-5 bg-cream/70 border-t border-border/80 flex flex-col sm:flex-row gap-2.5">
+        <div className="p-4 sm:p-5 bg-cream/70 border-t border-border/80 flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
           {isAlreadyAccepted ? (
             <button
               type="button"
@@ -262,26 +279,29 @@ export const ComplianceConsentModal: React.FC<ComplianceConsentModalProps> = ({
             <>
               <button
                 type="button"
+                onClick={handleQuickAcceptAll}
+                className="flex-1 py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 border border-[#3F5E4D]/40 bg-white hover:bg-sage-pale/40 text-[#3F5E4D] shadow-xs active:scale-[0.98] cursor-pointer transition-all whitespace-nowrap"
+              >
+                <Check className="w-4 h-4 stroke-[2.5]" />
+                <span>
+                  {lang === 'hi' ? 'सभी पर सहमति दें' : 'Agree to All'}
+                </span>
+              </button>
+
+              <button
+                type="button"
                 disabled={!acceptedDisclaimer || !acceptedPrivacy}
                 onClick={handleAgreeAndContinue}
-                className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all ${
+                className={`flex-1 py-3 sm:py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all whitespace-nowrap ${
                   acceptedDisclaimer && acceptedPrivacy
                     ? 'bg-[#3F5E4D] hover:bg-[#2F473A] text-white shadow-md active:scale-[0.98] cursor-pointer'
-                    : 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed'
+                    : 'bg-charcoal/10 text-charcoal/40 cursor-not-allowed border border-transparent'
                 }`}
               >
                 <Check className="w-4 h-4 stroke-[2.5]" />
                 <span>
                   {lang === 'hi' ? 'स्वीकार करें और जारी रखें' : 'Accept & Continue'}
                 </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={handleQuickAcceptAll}
-                className="w-full sm:w-auto text-[11px] sm:text-xs text-charcoal/70 hover:text-sage-dark px-3 py-2 text-center underline font-medium cursor-pointer"
-              >
-                {lang === 'hi' ? 'सभी पर सहमति दें' : 'Agree to All'}
               </button>
             </>
           )}

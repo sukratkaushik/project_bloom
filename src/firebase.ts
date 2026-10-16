@@ -41,6 +41,8 @@ export interface UserProfile {
   policyVersion?: string;
   aiProcessingConsent?: boolean;
   aiProcessingConsentedAt?: any;
+  dpdpConsent?: boolean;
+  dpdpConsentedAt?: any;
   createdAt: number;
   updatedAt: number;
 }
