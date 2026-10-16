@@ -42,6 +42,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
 
   const [searchQuery, setSearchQuery] = useState('');
+  const [tierFilter, setTierFilter] = useState<'all' | 'free' | 'pro'>('all');
 
   // Accordion state (for desktop accordion view)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -94,9 +95,62 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     }
   };
 
-  const NavItem = ({ id, icon, label, progress, hideFavorite }: { id: string, icon: string, label: string, progress?: { done: number, total: number }, hideFavorite?: boolean }) => {
+  const ALL_NAV_ITEMS: Array<{
+    id: string;
+    icon: string;
+    label: string;
+    tier: 'free' | 'pro';
+    progress?: { done: number; total: number };
+    hideFavorite?: boolean;
+  }> = [
+    { id: 'tracker', icon: '🌸', label: 'My Journey', tier: 'free', hideFavorite: true },
+    { id: 'kickcounter', icon: '👣', label: 'Kick Counter', tier: 'free' },
+    { id: 'contractions', icon: '⏱', label: 'Contraction Timer', tier: 'free' },
+    { id: 'vitals', icon: '💙', label: 'Health Metrics', tier: 'free' },
+    { id: 'mood', icon: '😊', label: 'Mood Tracker', tier: 'free' },
+    { id: 'hydration', icon: '💧', label: 'Hydration', tier: 'free' },
+    { id: 'nutrition', icon: '🥗', label: 'Nutrition', tier: 'free' },
+    { id: 'symptoms', icon: '📈', label: 'Symptom Log', tier: 'free' },
+    { id: 'partnersync', icon: '🤝', label: 'Partner Sync', tier: 'pro' },
+    { id: 'notes', icon: '📝', label: 'Notes & Journal', tier: 'free' },
+    { id: 'askourpregnancy', icon: '✨', label: 'OPIN AI', tier: 'pro' },
+    { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide', tier: 'pro' },
+    { id: 'babynames', icon: '🌟', label: 'Name Generator', tier: 'free' },
+    { id: 'travel', icon: '✈️', label: 'Safe Travel Guide', tier: 'free' },
+    { id: 'breathing', icon: '🌬️', label: 'Breathing & Garbh Sanskar', tier: 'free' },
+    { id: 'dev', icon: '🌱', label: 'Development', tier: 'free', progress: getProgress(devTasks) },
+    { id: 'prep', icon: '📋', label: 'Preparation', tier: 'free', progress: getProgress(prepTasks) },
+    { id: 'finance', icon: '💰', label: 'Financial', tier: 'free', progress: getProgress(FIN_TASKS) },
+    { id: 'deadlines', icon: '📅', label: 'Deadlines', tier: 'free', progress: getProgress(DEADLINE_TASKS) },
+    { id: 'medical', icon: '🏥', label: 'Medical', tier: 'free', progress: getProgress(medTasks) },
+    { id: 'medical-reports', icon: '📂', label: 'Medical Reports', tier: 'pro' },
+    { id: 'schemes', icon: '🏛', label: 'Government Schemes', tier: 'free' },
+    { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag', tier: 'free' },
+    { id: 'birthplan', icon: '📜', label: 'Birth Plan Builder', tier: 'free' },
+    { id: 'postpartum', icon: '🍃', label: 'Early Parenthood', tier: 'free' },
+    { id: 'profile', icon: '⚙️', label: 'Settings & Profile', tier: 'free', hideFavorite: true },
+    { id: 'feedback', icon: '💬', label: 'Feedback & Support', tier: 'free', hideFavorite: true },
+    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', tier: 'pro' as const, hideFavorite: true }] : []),
+  ];
+
+  const NavItem = ({
+    id,
+    icon,
+    label,
+    tier,
+    progress,
+    hideFavorite
+  }: {
+    id: string;
+    icon: string;
+    label: string;
+    tier?: 'free' | 'pro';
+    progress?: { done: number; total: number };
+    hideFavorite?: boolean;
+  }) => {
     const isActive = activePage === id;
     const isFav = state.favoritePages?.includes(id);
+    const effectiveTier = tier || ALL_NAV_ITEMS.find(i => i.id === id)?.tier || 'free';
 
     return (
       <div className="group relative flex items-center mb-0.5">
@@ -105,33 +159,47 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             setActivePage(id);
             setSearchQuery('');
           }}
-          className={`flex items-center gap-2.5 p-[9px_11px] rounded-[10px] text-[14px] font-semibold md:font-medium cursor-pointer transition-all w-full text-left
+          className={`flex items-center gap-2 p-[8.5px_10px] rounded-[10px] text-[13.5px] font-semibold md:font-medium cursor-pointer transition-all w-full text-left
             ${isActive
               ? 'bg-sage-pale/60 dark:bg-sage/10 text-sage-dark dark:text-sage font-bold border border-sage/20 shadow-xs'
               : 'bg-transparent border border-transparent text-charcoal/80 hover:bg-sage-pale/40 hover:text-sage-dark dark:hover:text-sage dark:hover:bg-sage-pale/5'}
             ${!hideFavorite ? 'pr-8' : ''}`}
         >
-          <span className="text-[16px] w-5 text-center shrink-0" translate="no" aria-hidden="true">{icon}</span>
-          <span className="flex-1 leading-normal whitespace-normal break-words py-0.5">{label}</span>
-          {progress && progress.total > 0 && (
-            <div className="ml-auto w-12 flex flex-col gap-1 items-end">
-              <span className={`text-[11px] font-bold leading-none
+          <span className="text-[15px] w-5 text-center shrink-0" translate="no" aria-hidden="true">{icon}</span>
+          <span className="flex-1 leading-snug whitespace-normal break-words py-0.5">{label}</span>
+
+          {/* Progress (for checklist tasks) */}
+          {progress && progress.total > 0 ? (
+            <div className="ml-auto min-w-[52px] flex flex-col gap-0.5 items-end shrink-0">
+              <span className={`text-[10px] font-bold leading-none flex items-center gap-1
                 ${isActive ? 'text-sage-dark dark:text-sage' : 'text-charcoal/65'}`}>
-                {progress.done}/{progress.total}
+                <span className="text-[8.5px] uppercase font-semibold text-sage-dark/80 dark:text-sage">Free</span>
+                <span className="opacity-40">•</span>
+                <span>{progress.done}/{progress.total}</span>
               </span>
-              <div className="w-full h-1.5 bg-charcoal/10 dark:bg-white/10 rounded-full overflow-hidden">
+              <div className="w-full h-1 bg-charcoal/10 dark:bg-white/10 rounded-full overflow-hidden">
                 <div
                   className={`h-full ${isActive ? 'bg-sage-dark dark:bg-sage' : 'bg-sage-dark/60 dark:bg-sage/60'} transition-all duration-300`}
                   style={{ width: `${Math.round((progress.done / progress.total) * 100)}%` }}
                 />
               </div>
             </div>
+          ) : (
+            /* Tier Badge (Pro vs Free) */
+            <span
+              className={`ml-auto shrink-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded leading-none transition-transform
+                ${effectiveTier === 'pro'
+                  ? 'bg-amber-500/15 text-amber-800 dark:text-amber-300 border border-amber-500/30 shadow-3xs font-extrabold'
+                  : 'bg-sage/10 text-sage-dark dark:text-sage border border-sage/20 font-semibold'}`}
+            >
+              {effectiveTier === 'pro' ? 'PRO' : 'FREE'}
+            </span>
           )}
         </button>
         {!hideFavorite && (
           <button
             onClick={(e) => { e.stopPropagation(); toggleFavoritePage(id); }}
-            className={`absolute right-2 p-1.5 rounded-md transition-opacity
+            className={`absolute right-1.5 p-1 rounded-md transition-opacity
               ${isFav ? 'opacity-100 text-gold' : 'opacity-0 group-hover:opacity-100 text-charcoal/60 hover:text-gold hover:bg-gold/10'}`}
             title={isFav ? "Remove from Favorites" : "Add to Favorites"}
           >
@@ -142,46 +210,50 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     );
   };
 
-  const ALL_NAV_ITEMS = [
-    { id: 'tracker', icon: '🌸', label: 'My Journey', hideFavorite: true },
-    { id: 'kickcounter', icon: '👣', label: 'Kick Counter' },
-    { id: 'contractions', icon: '⏱', label: 'Contraction Timer' },
-    { id: 'vitals', icon: '💙', label: 'Health Metrics' },
-    { id: 'mood', icon: '😊', label: 'Mood Tracker' },
-    { id: 'hydration', icon: '💧', label: 'Hydration' },
-    { id: 'nutrition', icon: '🥗', label: 'Nutrition' },
-    { id: 'symptoms', icon: '📈', label: 'Symptom Log' },
-    { id: 'askourpregnancy', icon: '✨', label: 'OPIN AI' },
-    { id: 'foodscanner', icon: '🤖', label: 'AI Food Guide' },
-    { id: 'babynames', icon: '🌟', label: 'Name Generator' },
-    { id: 'travel', icon: '✈️', label: 'Safe Travel Guide' },
-    { id: 'breathing', icon: '🌬️', label: 'Breathing & Garbh Sanskar' },
-    { id: 'dev', icon: '🌱', label: 'Development', progress: getProgress(devTasks) },
-    { id: 'prep', icon: '📋', label: 'Preparation', progress: getProgress(prepTasks) },
-    { id: 'finance', icon: '💰', label: 'Financial', progress: getProgress(FIN_TASKS) },
-    { id: 'deadlines', icon: '📅', label: 'Deadlines', progress: getProgress(DEADLINE_TASKS) },
-    { id: 'medical', icon: '🏥', label: 'Medical', progress: getProgress(medTasks) },
-    { id: 'medical-reports', icon: '📂', label: 'Medical Reports' },
-    { id: 'schemes', icon: '🏛', label: 'Government Schemes' },
-    { id: 'hospitalbag', icon: '👜', label: 'Hospital Bag' },
-    { id: 'birthplan', icon: '📜', label: 'Birth Plan Builder' },
-    { id: 'postpartum', icon: '🍃', label: 'Early Parenthood' },
-    { id: 'partnersync', icon: '🤝', label: 'Partner Sync' },
-    { id: 'notes', icon: '📝', label: 'Notes & Journal' },
-    { id: 'profile', icon: '⚙️', label: 'Settings & Profile', hideFavorite: true },
-    { id: 'feedback', icon: '💬', label: 'Feedback & Support', hideFavorite: true },
-    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', hideFavorite: true }] : []),
-  ];
-
   const isSearching = searchQuery.trim().length > 0;
-  const filteredNavItems = isSearching
-    ? ALL_NAV_ITEMS.filter(item =>
-      item.label.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-    : [];
+  const filteredNavItems = ALL_NAV_ITEMS.filter(item => {
+    const matchesSearch = !isSearching || item.label.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesTier = tierFilter === 'all' || item.tier === tierFilter;
+    return matchesSearch && matchesTier;
+  });
+
+  const getCategoryVisibleItems = (catId: string) => {
+    return CATEGORIES[catId].items
+      .map(itemId => ALL_NAV_ITEMS.find(i => i.id === itemId))
+      .filter((item): item is NonNullable<typeof item> => {
+        if (!item) return false;
+        if (tierFilter !== 'all' && item.tier !== tierFilter) return false;
+        return true;
+      });
+  };
+
+  const renderTierFilter = () => (
+    <div className="flex items-center gap-1.5 mb-3 px-3">
+      {(['all', 'free', 'pro'] as const).map(tier => {
+        const isSelected = tierFilter === tier;
+        return (
+          <button
+            key={tier}
+            type="button"
+            onClick={() => setTierFilter(tier)}
+            className={`flex-1 py-1.5 px-1.5 text-[11px] font-bold rounded-lg transition-all capitalize cursor-pointer border text-center leading-none
+              ${isSelected
+                ? tier === 'pro'
+                  ? 'bg-amber-500/20 text-amber-900 dark:text-amber-200 border-amber-500/40 shadow-xs'
+                  : tier === 'free'
+                    ? 'bg-sage-pale text-sage-dark dark:bg-sage/20 dark:text-sage border-sage/40 shadow-xs'
+                    : 'bg-charcoal/10 dark:bg-white/10 text-charcoal dark:text-cream border-charcoal/20 shadow-xs'
+                : 'bg-white/60 dark:bg-charcoal/10 text-charcoal/60 dark:text-stone-300 hover:text-charcoal border-border/60 hover:bg-white'}`}
+          >
+            {tier === 'all' ? 'All' : tier === 'free' ? 'Free' : 'Pro'}
+          </button>
+        );
+      })}
+    </div>
+  );
 
   const renderSearchInput = () => (
-    <div className="relative mb-5 px-3">
+    <div className="relative mb-2 px-3">
       <div className="relative flex items-center group">
         <Search className="absolute left-3 w-4 h-4 text-charcoal/55 pointer-events-none transition-colors group-focus-within:text-sage-dark dark:group-focus-within:text-sage" />
         <input
@@ -189,7 +261,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           placeholder="Search features..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-9 pr-8 py-2.5 text-[14px] font-sans font-medium rounded-[10px] border border-border/80 dark:border-border/20 bg-white dark:bg-charcoal/15 text-charcoal placeholder:text-charcoal/45 focus:outline-none focus:border-sage-dark dark:focus:border-sage focus:ring-2 focus:ring-sage/15 transition-all shadow-xs"
+          className="w-full pl-9 pr-8 py-2 text-[13.5px] font-sans font-medium rounded-[10px] border border-border/80 dark:border-border/20 bg-white dark:bg-charcoal/15 text-charcoal placeholder:text-charcoal/45 focus:outline-none focus:border-sage-dark dark:focus:border-sage focus:ring-2 focus:ring-sage/15 transition-all shadow-xs"
         />
         {searchQuery && (
           <button
@@ -249,6 +321,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     return (
       <div className="sticky top-[80px] pt-4 md:pt-8 no-print">
         {renderSearchInput()}
+        {renderTierFilter()}
         <button
           onClick={() => setActiveCategory(null)}
           className="flex items-center gap-1.5 text-[12.5px] font-bold tracking-[1px] uppercase text-sage-dark dark:text-sage hover:text-sage dark:hover:text-sage-light mb-4 cursor-pointer px-3"
@@ -262,6 +335,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
           {categoryInfo.items.map(itemId => {
             const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
             if (!item) return null;
+            if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
             return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
           })}
         </div>
@@ -274,12 +348,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     return (
       <div className="sticky top-[80px] pt-4 md:pt-8 no-print">
         {renderSearchInput()}
+        {renderTierFilter()}
 
         {isSearching ? (
           renderSearchResults()
         ) : (
           <>
-            <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
+            {(tierFilter === 'all' || tierFilter === 'free') && (
+              <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
+            )}
 
             {state.favoritePages && state.favoritePages.length > 0 && (
               <div className="mt-4 mb-2">
@@ -287,11 +364,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
                   ★ Favourites
                 </div>
                 <div className="space-y-0.5">
-                  {state.favoritePages.map(pageId => {
-                    const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
-                    if (!item) return null;
-                    return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
-                  })}
+                  {state.favoritePages
+                    .filter(pageId => {
+                      if (tierFilter === 'all') return true;
+                      const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+                      return item?.tier === tierFilter;
+                    })
+                    .map(pageId => {
+                      const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+                      if (!item) return null;
+                      return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
+                    })}
                 </div>
               </div>
             )}
@@ -299,15 +382,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             <div className="mt-4 mb-2">
               <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 mb-1.5 pl-3 leading-normal whitespace-normal">Features</div>
               <div className="flex flex-col">
-                {Object.keys(CATEGORIES).map(catId => (
-                  <CategoryButton key={catId} id={catId} label={CATEGORIES[catId].label} />
-                ))}
+                {Object.keys(CATEGORIES).map(catId => {
+                  if (getCategoryVisibleItems(catId).length === 0) return null;
+                  return <CategoryButton key={catId} id={catId} label={CATEGORIES[catId].label} />;
+                })}
               </div>
             </div>
 
             <div className="h-px bg-border/50 dark:bg-border/10 my-4" />
-            <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
-            <NavItem id="notes" icon="📝" label="Notes & Journal" />
+            {(tierFilter === 'all' || tierFilter === 'pro') && (
+              <NavItem id="partnersync" icon="🤝" label="Partner Sync" />
+            )}
+            {(tierFilter === 'all' || tierFilter === 'free') && (
+              <NavItem id="notes" icon="📝" label="Notes & Journal" />
+            )}
           </>
         )}
 
@@ -370,12 +458,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   // Desktop Accordion Layout
   const SectionHeader = ({ id, label }: { id: string, label: string }) => {
     const isExpanded = expandedSections[id];
+    const visibleCount = getCategoryVisibleItems(id).length;
+    if (visibleCount === 0) return null;
+
     return (
       <div
         className="flex items-center justify-between cursor-pointer py-1 mt-4 mb-2 pl-3 select-none group"
         onClick={() => setExpandedSections(prev => ({ ...prev, [id]: !prev[id] }))}
       >
-        <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 group-hover:text-sage-dark dark:group-hover:text-sage transition-colors leading-normal whitespace-normal text-left flex-1">{label}</div>
+        <div className="text-[13px] font-bold tracking-[1px] uppercase text-charcoal/60 group-hover:text-sage-dark dark:group-hover:text-sage transition-colors leading-normal whitespace-normal text-left flex-1">
+          {label}
+        </div>
         <div className="text-charcoal/55 group-hover:text-sage-dark dark:group-hover:text-sage flex items-center justify-center w-5 h-5 rounded hover:bg-gray-100 dark:hover:bg-charcoal/20 transition-colors mr-1">
           {isExpanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
         </div>
@@ -386,12 +479,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   return (
     <div className="pt-8 no-print">
       {renderSearchInput()}
+      {renderTierFilter()}
 
       {isSearching ? (
         renderSearchResults()
       ) : (
         <>
-          <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
+          {(tierFilter === 'all' || tierFilter === 'free') && (
+            <NavItem id="tracker" icon="🌸" label="My Journey" hideFavorite />
+          )}
 
           {state.favoritePages && state.favoritePages.length > 0 && (
             <div className="mt-4 mb-2">
@@ -399,68 +495,99 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
                 <Star className="w-3 h-3 fill-gold" /> Favourites
               </div>
               <div className="space-y-0.5">
-                {state.favoritePages.map(pageId => {
-                  const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
-                  if (!item) return null;
-                  return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
-                })}
+                {state.favoritePages
+                  .filter(pageId => {
+                    if (tierFilter === 'all') return true;
+                    const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+                    return item?.tier === tierFilter;
+                  })
+                  .map(pageId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === pageId);
+                    if (!item) return null;
+                    return <NavItem key={`fav-${item.id}`} id={item.id} icon={item.icon} label={item.label} progress={item.progress} hideFavorite />;
+                  })}
               </div>
             </div>
           )}
 
-          <SectionHeader id="daily" label="Daily Logs" />
-          {expandedSections['daily'] && (
-            <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.daily.items.map(itemId => {
-                const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
-                if (!item) return null;
-                return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
-              })}
-            </div>
+          {getCategoryVisibleItems('daily').length > 0 && (
+            <>
+              <SectionHeader id="daily" label="Daily Logs" />
+              {expandedSections['daily'] && (
+                <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {CATEGORIES.daily.items.map(itemId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
+                    return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+                  })}
+                </div>
+              )}
+            </>
           )}
 
-          <SectionHeader id="smart" label="Smart Tools" />
-          {expandedSections['smart'] && (
-            <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.smart.items.map(itemId => {
-                const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
-                if (!item) return null;
-                return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
-              })}
-            </div>
+          {getCategoryVisibleItems('smart').length > 0 && (
+            <>
+              <SectionHeader id="smart" label="Smart Tools" />
+              {expandedSections['smart'] && (
+                <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {CATEGORIES.smart.items.map(itemId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
+                    return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+                  })}
+                </div>
+              )}
+            </>
           )}
 
-          <SectionHeader id="tasks" label="Planning & Tasks" />
-          {expandedSections['tasks'] && (
-            <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.tasks.items.map(itemId => {
-                const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
-                if (!item) return null;
-                return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
-              })}
-            </div>
+          {getCategoryVisibleItems('tasks').length > 0 && (
+            <>
+              <SectionHeader id="tasks" label="Planning & Tasks" />
+              {expandedSections['tasks'] && (
+                <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {CATEGORIES.tasks.items.map(itemId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
+                    return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+                  })}
+                </div>
+              )}
+            </>
           )}
 
-          <SectionHeader id="health" label="Medical & Govt" />
-          {expandedSections['health'] && (
-            <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.health.items.map(itemId => {
-                const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
-                if (!item) return null;
-                return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
-              })}
-            </div>
+          {getCategoryVisibleItems('health').length > 0 && (
+            <>
+              <SectionHeader id="health" label="Medical & Govt" />
+              {expandedSections['health'] && (
+                <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {CATEGORIES.health.items.map(itemId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
+                    return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+                  })}
+                </div>
+              )}
+            </>
           )}
 
-          <SectionHeader id="labor" label="Labor & Postpartum" />
-          {expandedSections['labor'] && (
-            <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
-              {CATEGORIES.labor.items.map(itemId => {
-                const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
-                if (!item) return null;
-                return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
-              })}
-            </div>
+          {getCategoryVisibleItems('labor').length > 0 && (
+            <>
+              <SectionHeader id="labor" label="Labor & Postpartum" />
+              {expandedSections['labor'] && (
+                <div className="space-y-0.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                  {CATEGORIES.labor.items.map(itemId => {
+                    const item = ALL_NAV_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    if (tierFilter !== 'all' && item.tier !== tierFilter) return null;
+                    return <NavItem key={item.id} id={item.id} icon={item.icon} label={item.label} progress={item.progress} />;
+                  })}
+                </div>
+              )}
+            </>
           )}
 
         </>
