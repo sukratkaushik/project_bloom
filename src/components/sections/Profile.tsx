@@ -428,10 +428,6 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
                         👑 Bloom PRO Active
                       </span>
-                    ) : state.planTier === 'standard' ? (
-                      <span className="px-2.5 py-1 bg-sage-pale text-sage-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-sage/30">
-                        🩺 Maternal Care Active
-                      </span>
                     ) : (
                       <span className="px-2.5 py-1 bg-cream text-charcoal border border-border/80 font-semibold rounded-full text-[11px] sm:text-[12px]">
                         Free Plan Active
@@ -455,9 +451,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     ? 'You have perpetual lifetime access to all 24/7 Bloom AI tools, clinical checklists, food safety scanner, and admin controls.'
                     : state.planTier === 'premium' || state.isPremium
                     ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
-                    : state.planTier === 'standard'
-                    ? 'Maternal care features unlocked: Government schemes, postpartum recovery guide, and clinical checklists. Upgrade anytime for 24/7 AI and food scanner.'
-                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, and postpartum healing. Upgrade to Bloom PRO for 24/7 AI guidance, food scanner, and partner sync.'}
+                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Bloom PRO for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>
 
                 {state.planExpiry && !state.isAdmin && auth.currentUser?.email !== 'sukrat.kaushik@gmail.com' && (

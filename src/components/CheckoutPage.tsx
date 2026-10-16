@@ -15,14 +15,14 @@ export const CheckoutPage: React.FC = () => {
     const search = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
     const params = new URLSearchParams(search);
     return {
-      plan: (params.get('plan') || 'premium') as 'standard' | 'premium',
+      plan: 'premium' as const,
       months: parseInt(params.get('months') || '3', 10),
       coupon: params.get('coupon') || '',
     };
   };
 
   const initialParams = getParams();
-  const [selectedPlan, setSelectedPlan] = useState<'standard' | 'premium'>(initialParams.plan);
+  const [selectedPlan, setSelectedPlan] = useState<'premium'>('premium');
   const [months, setMonths] = useState<number>(initialParams.months);
   const [couponCode, setCouponCode] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<number>(0);

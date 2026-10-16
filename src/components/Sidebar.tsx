@@ -327,7 +327,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           </button>
 
-          {planTier === 'free' ? (
+          {planTier === 'premium' || state.isPremium || state.isAdmin ? (
+            <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
+              <span>👑</span> Bloom PRO Active
+            </div>
+          ) : (
             <button
               onClick={() => { navigate('/checkout?plan=premium'); }}
               className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
@@ -337,14 +341,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               </span>
               <span>➜</span>
             </button>
-          ) : planTier === 'standard' ? (
-            <div className="w-full py-2.5 px-3.5 bg-sage-pale/40 dark:bg-sage/10 border border-sage/20 rounded-[10px] font-sans text-[12.5px] font-semibold text-sage flex items-center gap-2 shadow-xs">
-              <span>🩺</span> Maternal Care Active
-            </div>
-          ) : (
-            <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
-              <span>👑</span> Bloom PRO Active
-            </div>
           )}
 
           <button

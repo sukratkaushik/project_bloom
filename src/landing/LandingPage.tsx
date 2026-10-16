@@ -43,7 +43,6 @@ export const LandingPage: React.FC = () => {
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
   const [freeMonths, setFreeMonths] = useState(1);
-  const [standardMonths, setStandardMonths] = useState(1);
   const [premiumMonths, setPremiumMonths] = useState(1);
 
   React.useEffect(() => {
