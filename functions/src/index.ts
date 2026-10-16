@@ -684,17 +684,17 @@ export const sendPlanChangeNotificationEmail = onCall(
       throw new HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
 
-    let userVal = "sukrat.kaushik@ourpregnancy.in";
-    let passVal = "";
+    let userVal = "sukrat.kaushik@gmail.com";
+    let passVal = "nijjonasspwrrjxs";
     try {
-      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
+      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     } catch {
-      userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
+      userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     }
     try {
-      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
+      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
     } catch {
-      passVal = process.env.SMTP_PASS || "";
+      passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
     }
 
     if (!passVal) {
@@ -703,26 +703,19 @@ export const sendPlanChangeNotificationEmail = onCall(
     }
 
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
-    const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate)" : "Standard Plan (Maternal Care)";
+    const tierTitle = "Pro Plan";
     const durationText = durationMonths ? `${durationMonths} month${durationMonths > 1 ? "s" : ""} access` : "lifetime access";
 
-    const standardBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step guidance on PMMVY, JSY, and financial benefits.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery</strong> — Guided recovery logs and daily newborn care checklists.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync</strong> — Real-time synchronization of vitals and appointments.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏥 <strong>Complete Clinical &amp; Vaccine Checklists</strong> — Full clinic schedules and immunization trackers.</li>
+    const proBenefits = `
+      <li style="margin-bottom: 10px; color: #2C3E50;">✨ <strong>24/7 OPIN AI Clinical Companion</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant meal nutrition &amp; ingredient hazard verification.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📂 <strong>AI Medical Report &amp; Ultrasound Analyzer</strong> — Clear explanations of scans, lab ranges &amp; blood tests.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Real-Time Encrypted Partner Sync</strong> — Live sync with your partner via private connection.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor EHR &amp; FHIR R4 Medical Exports</strong> — Obstetric summaries ready for your OB-GYN consultations.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes &amp; Legal Leave Rights</strong> — Step-by-step guidance on PMMVY, JSY, and 26-week salary protections.</li>
     `;
 
-    const premiumBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Check Indian &amp; international foods and ingredients for pregnancy safety.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>FHIR R4 Doctor EHR Medical Exports</strong> — Formatted clinical summaries ready for OB-GYN visits.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — PMMVY, JSY, and financial support.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery Guides</strong></li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync &amp; Collaboration</strong></li>
-    `;
-
-    const benefitItemsHtml = planTier === "premium" ? premiumBenefits : standardBenefits;
+    const benefitItemsHtml = proBenefits;
 
     const emailHtml = `
 <!DOCTYPE html>
@@ -736,7 +729,7 @@ export const sendPlanChangeNotificationEmail = onCall(
 <body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
   <!-- Preheader for inbox preview -->
   <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
-    You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'} (${durationText}).
+    You've been upgraded to Our Pregnancy Pro Plan (${durationText}).
   </div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
     <tr>
@@ -837,7 +830,7 @@ export const sendPlanChangeNotificationEmail = onCall(
       from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
       replyTo: "support@ourpregnancy.in",
       to: targetEmail,
-      subject: `You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
+      subject: `You've been upgraded to Our Pregnancy Pro Plan 🎉`,
       html: emailHtml,
     };
 

@@ -73,17 +73,17 @@ export const CheckoutPage: React.FC = () => {
         if (params.plan === 'premium') {
           const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
           setAppliedDiscount(discount);
-          setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of VIP Premium for FREE.');
+          setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of Pro Plan for FREE.');
         } else {
-          setCouponError('Promo code VIPCARE90 is only valid for Premium plans.');
+          setCouponError('Promo code VIPCARE90 is only valid for Pro plans.');
         }
       } else if (promo === 'BLOOM30') {
         if (params.plan === 'premium') {
           const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
           setAppliedDiscount(discount);
-          setCouponSuccess('Promo code BLOOM30 applied! 3 months of Premium for free.');
+          setCouponSuccess('Promo code BLOOM30 applied! 3 months of Pro Plan for free.');
         } else {
-          setCouponError('Promo code BLOOM30 is only valid for Premium plans.');
+          setCouponError('Promo code BLOOM30 is only valid for Pro plans.');
         }
       } else if (promo === 'BLOOM50') {
         setAppliedDiscount(Math.round(initialRawSubtotal * 0.5));

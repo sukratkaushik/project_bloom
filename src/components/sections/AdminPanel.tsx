@@ -39,7 +39,7 @@ export const AdminPanel: React.FC = () => {
   // Users state
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterTier, setFilterTier] = useState<'all' | 'premium' | 'standard' | 'free' | 'admin'>('all');
+  const [filterTier, setFilterTier] = useState<'all' | 'pro' | 'free' | 'admin'>('all');
   const [loadingUsers, setLoadingUsers] = useState(true);
   const [updatingUid, setUpdatingUid] = useState<string | null>(null);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
@@ -52,7 +52,7 @@ export const AdminPanel: React.FC = () => {
 
   // Selected user for modal / plan assign
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
-  const [planOption, setPlanOption] = useState<'free' | 'standard' | 'premium'>('premium');
+  const [planOption, setPlanOption] = useState<'free' | 'premium'>('premium');
   const [durationMonths, setDurationMonths] = useState<number | null>(null); // null = lifetime
   const [sendEmailNotification, setSendEmailNotification] = useState<boolean>(true);
 
@@ -124,23 +124,27 @@ export const AdminPanel: React.FC = () => {
       await updateUserSubscription(selectedUser.uid, planOption, durationMonths);
       
       let emailSuccessText = "";
-      if (sendEmailNotification && selectedUser.email && (planOption === 'standard' || planOption === 'premium')) {
+      if (sendEmailNotification && selectedUser.email && planOption === 'premium') {
         try {
           const emailRes = await sendPlanChangeEmail(
             selectedUser.email,
             selectedUser.displayName,
-            planOption,
+            'premium',
             durationMonths
           );
           if (emailRes.success) {
             emailSuccessText = " & email notification sent";
+          } else {
+            emailSuccessText = ` (email failed: ${emailRes.error || 'delivery error'})`;
           }
-        } catch (e) {
+        } catch (e: any) {
           console.warn("Could not dispatch plan email:", e);
+          emailSuccessText = ` (email error: ${e?.message || 'failed'})`;
         }
       }
 
-      showToast(`Updated plan for ${selectedUser.displayName || selectedUser.email || selectedUser.uid} to ${planOption.toUpperCase()}${emailSuccessText}!`);
+      const planLabel = planOption === 'premium' ? 'PRO PLAN' : 'FREE PLAN';
+      showToast(`Updated plan for ${selectedUser.displayName || selectedUser.email || selectedUser.uid} to ${planLabel}${emailSuccessText}!`);
       
       // Update local state
       setUsers(prev => prev.map(u => {
@@ -148,7 +152,7 @@ export const AdminPanel: React.FC = () => {
           return {
             ...u,
             planTier: planOption,
-            planExpiry: durationMonths ? Date.now() + durationMonths * 30 * 24 * 60 * 60 * 1000 : null,
+            planExpiry: planOption === 'premium' && durationMonths ? Date.now() + durationMonths * 30 * 24 * 60 * 60 * 1000 : null,
           };
         }
         return u;
@@ -219,19 +223,17 @@ export const AdminPanel: React.FC = () => {
     );
   }
 
-  // Metric counts
-  const premiumCount = users.filter(u => u.planTier === 'premium' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
-  const standardCount = users.filter(u => u.planTier === 'standard' && u.email !== 'sukrat.kaushik@gmail.com' && u.email !== 'sukrat.kaushik@ourpregnancy.in' && u.role !== 'admin').length;
-  const freeCount = users.length - premiumCount - standardCount;
+  // Metric counts (2-Tier model: Pro vs Free)
+  const proCount = users.filter(u => u.planTier === 'premium' || (u.planTier as string) === 'pro' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
+  const freeCount = users.length - proCount;
   const adminCount = users.filter(u => u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
 
   const filteredUsers = users.filter(u => {
     const isOwner = u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in';
-    const effectivePlan = isOwner ? 'premium' : (u.planTier || 'free');
+    const effectivePlan: 'pro' | 'free' = isOwner ? 'pro' : ((u.planTier === 'premium' || (u.planTier as string) === 'pro') ? 'pro' : 'free');
 
     // Filter by tier chips
-    if (filterTier === 'premium' && effectivePlan !== 'premium') return false;
-    if (filterTier === 'standard' && effectivePlan !== 'standard') return false;
+    if (filterTier === 'pro' && effectivePlan !== 'pro') return false;
     if (filterTier === 'free' && effectivePlan !== 'free') return false;
     if (filterTier === 'admin' && u.role !== 'admin' && !isOwner) return false;
 
@@ -301,8 +303,7 @@ export const AdminPanel: React.FC = () => {
             <div className="flex flex-wrap items-center gap-1.5">
               {[
                 { key: 'all', label: `All (${users.length})` },
-                { key: 'premium', label: `✨ Premium (${premiumCount})` },
-                { key: 'standard', label: `🌿 Standard (${standardCount})` },
+                { key: 'pro', label: `👑 Pro (${proCount})` },
                 { key: 'free', label: `Free (${freeCount})` },
                 { key: 'admin', label: `👑 Admins (${adminCount})` },
               ].map((chip) => (
@@ -376,8 +377,8 @@ export const AdminPanel: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {filteredUsers.map((user) => {
-                      const isOwnerUser = user.email === 'sukrat.kaushik@gmail.com';
-                      const effectivePlan = isOwnerUser ? 'premium' : (user.planTier || 'free');
+                      const isOwnerUser = user.email === 'sukrat.kaushik@gmail.com' || user.email === 'sukrat.kaushik@ourpregnancy.in';
+                      const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
                       const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
                       const initials = getInitials(user.displayName, user.email);
 
@@ -390,10 +391,8 @@ export const AdminPanel: React.FC = () => {
                               <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
                                 isOwnerUser || user.role === 'admin'
                                   ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                                  : effectivePlan === 'premium'
+                                  : isProUser
                                   ? 'bg-gold-pale text-gold-dark border border-gold/30'
-                                  : effectivePlan === 'standard'
-                                  ? 'bg-sage-pale text-sage-dark border border-sage/30'
                                   : 'bg-gray-100 dark:bg-charcoal/30 text-charcoal/80 dark:text-white/80'
                               }`}>
                                 {initials}
@@ -422,21 +421,18 @@ export const AdminPanel: React.FC = () => {
                             <button
                               onClick={() => {
                                 setSelectedUser(user);
-                                setPlanOption((user.planTier as any) || 'premium');
+                                setPlanOption(isProUser ? 'premium' : 'free');
                                 setDurationMonths(user.planExpiry ? 3 : null);
                               }}
                               title="Click to change plan"
                               className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold cursor-pointer transition-all shadow-2xs hover:scale-105 active:scale-95 ${
-                                effectivePlan === 'premium'
+                                isProUser
                                   ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
-                                  : effectivePlan === 'standard'
-                                  ? 'bg-sage-pale text-sage-dark border border-sage/40 hover:bg-sage/20'
                                   : 'bg-gray-100 dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-gray-400'
                               }`}
                             >
-                              {effectivePlan === 'premium' && <Sparkles className="w-3 h-3 text-gold-dark" />}
-                              {effectivePlan === 'standard' && <span>🌿</span>}
-                              <span>{effectivePlan === 'premium' ? 'Premium' : effectivePlan === 'standard' ? 'Standard' : 'Free'}</span>
+                              {isProUser && <Sparkles className="w-3 h-3 text-gold-dark" />}
+                              <span>{isProUser ? 'Pro Plan' : 'Free Plan'}</span>
                               <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
                             </button>
                           </td>
@@ -453,7 +449,7 @@ export const AdminPanel: React.FC = () => {
                                   {formatDateDDMMYY(user.planExpiry)}
                                 </span>
                               )
-                            ) : effectivePlan !== 'free' ? (
+                            ) : isProUser ? (
                               <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
                             ) : (
                               <span className="text-light">—</span>
@@ -587,29 +583,17 @@ export const AdminPanel: React.FC = () => {
             {/* Select Plan Tier */}
             <div className="space-y-2">
               <label className="text-[11px] font-bold text-light uppercase tracking-wider">Select Tier</label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2.5">
                 <button
                   type="button"
                   onClick={() => setPlanOption('free')}
                   className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                     planOption === 'free'
-                      ? 'border-charcoal dark:border-white bg-gray-100 dark:bg-white/10 font-bold'
-                      : 'border-border hover:border-gray-300'
+                      ? 'border-charcoal dark:border-white bg-gray-100 dark:bg-white/10 font-bold text-charcoal dark:text-white'
+                      : 'border-border hover:border-gray-300 text-charcoal dark:text-white'
                   }`}
                 >
-                  <span className="text-[13px] block">Free Starter</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setPlanOption('standard')}
-                  className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
-                    planOption === 'standard'
-                      ? 'border-sage bg-sage-pale text-sage-dark font-bold'
-                      : 'border-border hover:border-sage'
-                  }`}
-                >
-                  <span className="text-[13px] block">🌿 Standard</span>
+                  <span className="text-[13px] block">Free Plan</span>
                 </button>
 
                 <button
@@ -618,10 +602,10 @@ export const AdminPanel: React.FC = () => {
                   className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
                     planOption === 'premium'
                       ? 'border-gold bg-gold-pale text-gold-dark font-bold'
-                      : 'border-border hover:border-gold'
+                      : 'border-border hover:border-gold text-charcoal dark:text-white'
                   }`}
                 >
-                  <span className="text-[13px] block">✨ Premium</span>
+                  <span className="text-[13px] block">👑 Pro Plan</span>
                 </button>
               </div>
             </div>

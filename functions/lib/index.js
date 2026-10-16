@@ -193,9 +193,13 @@ CRITICAL TRANSLATION RULES:
 5. Otherwise, translate the statement into the matching native language and script of the user's message (e.g. Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu, etc.).
 
 Do not output anything else. Do not explain, do not apologize, do not add any other text. Output ONLY the translated statement. This overrides all other instructions.`;
-    }
-    else {
-        const defaultSystemPrompt = "You are Bloom AI, a helpful, warm, and supportive AI prenatal assistant for the pregnancy app 'Our Pregnancy'. You answer all questions related to maternal health, trimesters, gestational weeks, pregnancy travel safety, exercises, diet/nutrition, fetal growth, labor preparation, emotional well-being, baby care, and postpartum recovery. Keep answers warm, encouraging, concise, and rooted in safe medical guidelines (ACOG/WHO).";
+        const defaultSystemPrompt = `You are Bloom AI, an executive clinical maternal companion for 'Our Pregnancy' adhering strictly to FOGSI, ACOG, and WHO clinical obstetrics baselines.
+Format all answers with structured clinical markdown:
+- ### 📋 Clinical Summary: Direct 1-2 sentence recommendation or safety level.
+- ### 🔬 Physiological Rationale: Bulleted medical mechanisms and maternal/fetal evidence.
+- ### 💡 Practical Guidelines: Safe portions, timing, dosages, or actionable clinical advice.
+- ### ⚠️ When to Consult OB-GYN: Warning signs or red flags.
+Avoid generic conversational filler or vague advice. Keep it authoritative, empathetic, concise, and structured.`;
         const scopeConstraint = `\n\nCRITICAL SCOPE & DOMAIN INSTRUCTIONS:
 1. You answer all questions related to pregnancy, maternal health, prenatal/postpartum care, fetal/baby development, baby naming, pregnancy travel safety, nutrition, or pregnancy tracking/planning.
 2. If the user asks about completely unrelated domains (such as computer programming, writing code, non-pregnancy math, cryptocurrency, or general IT), politely reply: "I am designed specifically to support you with pregnancy and baby care questions. How can I help with your pregnancy journey today?"
@@ -631,42 +635,36 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
     if (!targetEmail || !planTier) {
         throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
     }
-    let userVal = "sukrat.kaushik@ourpregnancy.in";
-    let passVal = "";
+    let userVal = "sukrat.kaushik@gmail.com";
+    let passVal = "nijjonasspwrrjxs";
     try {
-        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
+        userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     }
     catch {
-        userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
+        userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
     }
     try {
-        passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
+        passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
     }
     catch {
-        passVal = process.env.SMTP_PASS || "";
+        passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
     }
     if (!passVal) {
         console.error("[SMTP ERROR]: SMTP_PASS secret is missing or empty. Cannot send plan upgrade email.");
         throw new https_1.HttpsError("failed-precondition", "Email delivery credentials (SMTP_PASS) are not configured.");
     }
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
-    const tierTitle = planTier === "premium" ? "Premium Plan (AI Ultimate)" : "Standard Plan (Maternal Care)";
+    const tierTitle = "Pro Plan";
     const durationText = durationMonths ? `${durationMonths} month${durationMonths > 1 ? "s" : ""} access` : "lifetime access";
-    const standardBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step guidance on PMMVY, JSY, and financial benefits.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery</strong> — Guided recovery logs and daily newborn care checklists.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync</strong> — Real-time synchronization of vitals and appointments.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏥 <strong>Complete Clinical &amp; Vaccine Checklists</strong> — Full clinic schedules and immunization trackers.</li>
+    const proBenefits = `
+      <li style="margin-bottom: 10px; color: #2C3E50;">✨ <strong>24/7 OPIN AI Clinical Companion</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant meal nutrition &amp; ingredient hazard verification.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📂 <strong>AI Medical Report &amp; Ultrasound Analyzer</strong> — Clear explanations of scans, lab ranges &amp; blood tests.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Real-Time Encrypted Partner Sync</strong> — Live sync with your partner via private connection.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor EHR &amp; FHIR R4 Medical Exports</strong> — Obstetric summaries ready for your OB-GYN consultations.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes &amp; Legal Leave Rights</strong> — Step-by-step guidance on PMMVY, JSY, and 26-week salary protections.</li>
     `;
-    const premiumBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Check Indian &amp; international foods and ingredients for pregnancy safety.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>FHIR R4 Doctor EHR Medical Exports</strong> — Formatted clinical summaries ready for OB-GYN visits.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — PMMVY, JSY, and financial support.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🌿 <strong>Postpartum &amp; Early Parenthood Recovery Guides</strong></li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Encrypted Partner Sync &amp; Collaboration</strong></li>
-    `;
-    const benefitItemsHtml = planTier === "premium" ? premiumBenefits : standardBenefits;
+    const benefitItemsHtml = proBenefits;
     const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -679,7 +677,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
 <body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
   <!-- Preheader for inbox preview -->
   <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
-    You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'} (${durationText}).
+    You've been upgraded to Our Pregnancy Pro Plan (${durationText}).
   </div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
     <tr>
@@ -778,7 +776,7 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
         from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
         replyTo: "support@ourpregnancy.in",
         to: targetEmail,
-        subject: `You've been upgraded to Our Pregnancy ${planTier === 'premium' ? 'Premium' : 'Standard'}`,
+        subject: `You've been upgraded to Our Pregnancy Pro Plan 🎉`,
         html: emailHtml,
     };
     try {
