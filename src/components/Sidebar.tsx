@@ -4,6 +4,7 @@ import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS
 import { Task } from '../types';
 import { auth, signInWithGoogle } from '../firebase';
 import { signOut } from 'firebase/auth';
+import { saveJourney } from '../cloudSync';
 import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 
@@ -629,7 +630,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
                 if (user) {
                   const restored = await restoreJourney(user.uid);
                   if (!restored && state.isSetup) {
-                    const { saveJourney } = await import('../cloudSync');
                     await saveJourney(user.uid, state);
                   }
                 }

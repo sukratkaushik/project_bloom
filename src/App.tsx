@@ -5,15 +5,19 @@
 
 import React, { useEffect, useState } from 'react';
 import { PlannerProvider, usePlanner } from './store';
-import { SetupScreen } from './components/SetupScreen';
-import { Dashboard } from './components/Dashboard';
-import { LandingPage } from './landing/LandingPage';
-import { TeamPage } from './landing/TeamPage';
-import { BlogsPage } from './landing/BlogsPage';
-import { CareersPage } from './landing/CareersPage';
-import { PrivacyPolicy, TermsOfService } from './components/LegalPages';
 import { SplashScreen } from './components/SplashScreen';
-import { CheckoutPage } from './components/CheckoutPage';
+import { EmailVerificationGate } from './components/EmailVerificationGate';
+
+// Lazy-load top-level page routes for ultra-lean initial bundle
+const SetupScreen = React.lazy(() => import('./components/SetupScreen').then(m => ({ default: m.SetupScreen })));
+const Dashboard = React.lazy(() => import('./components/Dashboard').then(m => ({ default: m.Dashboard })));
+const LandingPage = React.lazy(() => import('./landing/LandingPage').then(m => ({ default: m.LandingPage })));
+const TeamPage = React.lazy(() => import('./landing/TeamPage').then(m => ({ default: m.TeamPage })));
+const BlogsPage = React.lazy(() => import('./landing/BlogsPage').then(m => ({ default: m.BlogsPage })));
+const CareersPage = React.lazy(() => import('./landing/CareersPage').then(m => ({ default: m.CareersPage })));
+const PrivacyPolicy = React.lazy(() => import('./components/LegalPages').then(m => ({ default: m.PrivacyPolicy })));
+const TermsOfService = React.lazy(() => import('./components/LegalPages').then(m => ({ default: m.TermsOfService })));
+const CheckoutPage = React.lazy(() => import('./components/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 import { EmailVerificationGate } from './components/EmailVerificationGate';
 import { auth } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
@@ -197,7 +201,9 @@ const AppContent: React.FC = () => {
 
   return (
     <div key={currentPath} className="animate-in fade-in duration-700 ease-in-out h-full w-full relative">
-      {content}
+      <React.Suspense fallback={<SplashScreen />}>
+        {content}
+      </React.Suspense>
       {shouldShowConsent && (
         <ComplianceConsentModal />
       )}

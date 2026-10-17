@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic } from '../../utils/nativeBridge';
-import { exportCarePlanPdf } from '../../utils/pdfExport';
+import { saveJourney } from '../../cloudSync';
 import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
@@ -59,6 +59,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
       setIsExporting(true);
       triggerHaptic('success');
       setToastMessage('📄 Generating Care Plan PDF...');
+      const { exportCarePlanPdf } = await import('../../utils/pdfExport');
       await exportCarePlanPdf(state);
       setToastMessage('✅ Care Plan PDF exported successfully!');
       setTimeout(() => setToastMessage(null), 3500);
@@ -339,7 +340,6 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                         if (googleUser) {
                           const restored = await restoreJourney(googleUser.uid);
                           if (!restored && state.isSetup) {
-                            const { saveJourney } = await import('../../cloudSync');
                             await saveJourney(googleUser.uid, state);
                           }
                           setToastMessage("Signed in with Google! Your data is synced.");

@@ -2,7 +2,7 @@ import { db } from './db';
 import { db as firestoreDb } from './firebase';
 import { collection, doc, setDoc, writeBatch, query, where, getDocs, deleteDoc, Timestamp } from 'firebase/firestore';
 
-export type TrackingType = 'kick' | 'contraction' | 'vitals' | 'mood' | 'hydration' | 'supplement' | 'symptom';
+export type TrackingType = 'kick' | 'contraction' | 'contractionRecord' | 'vitals' | 'mood' | 'hydration' | 'supplement' | 'symptom';
 
 class CloudSync {
   private syncQueue: Map<string, { type: TrackingType, data: any }> = new Map();
@@ -99,6 +99,7 @@ class CloudSync {
         switch (type) {
           case 'kick': await db.kickSessions.put(data); break;
           case 'contraction': await db.contractionSessions.put(data); break;
+          case 'contractionRecord': await db.contractionRecords.put(data); break;
           case 'vitals': await db.vitalsLogs.put(data); break;
           case 'mood': await db.moodLogs.put(data); break;
           case 'hydration': await db.hydrationLogs.put(data); break;

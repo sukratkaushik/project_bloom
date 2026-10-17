@@ -36,6 +36,7 @@ import {
 } from 'lucide-react';
 import { Paywall } from '../Paywall';
 import { ContextBanner } from '../ContextBanner';
+import { ClinicalDisclaimer } from '../ClinicalDisclaimer';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
@@ -858,6 +859,9 @@ export const FoodScanner: React.FC = () => {
         <ContextBanner 
           description="Snap a photo, scan a packaged barcode across 3,000,000+ items worldwide, or describe your meal for instant maternal safety, macro breakdown, and trimester micronutrients." 
         />
+
+        {/* Clinical Safety Disclaimer */}
+        <ClinicalDisclaimer className="mb-4" />
 
         {/* Multimodal Mode Selector Tabs (Sleek Material 3 Segmented Control) */}
         <div className="w-full bg-[#EFECE6] dark:bg-stone-800/90 p-1.5 rounded-2xl border border-stone-200/90 dark:border-stone-700/60 shadow-inner grid grid-cols-3 gap-1.5 mb-5 select-none">

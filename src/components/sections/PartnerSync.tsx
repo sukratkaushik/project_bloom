@@ -157,7 +157,7 @@ export const PartnerSync: React.FC = () => {
 
     let newExcluded;
     if (excluded.includes(taskId)) {
-      newExcluded = excluded.filter(id => id !== taskId);
+      newExcluded = excluded.filter((id: string) => id !== taskId);
     } else {
       newExcluded = [...excluded, taskId];
     }

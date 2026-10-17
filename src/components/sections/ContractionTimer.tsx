@@ -4,6 +4,7 @@ import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { ContextBanner } from '../ContextBanner';
+import { ClinicalDisclaimer } from '../ClinicalDisclaimer';
 import { 
   Timer, 
   Activity, 
@@ -244,6 +245,9 @@ export const ContractionTimer: React.FC = () => {
       <ContextBanner 
         description="5-1-1 Clinical Labor Rule Tracker • Surge interval log to record contraction duration and frequency with clinical precision." 
       />
+
+      {/* Clinical Safety Disclaimer */}
+      <ClinicalDisclaimer />
 
       {/* 1. Main Timer Hero Card */}
       <div className="bg-white border border-border/80 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col items-center relative overflow-hidden">

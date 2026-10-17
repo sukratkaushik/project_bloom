@@ -18,7 +18,7 @@ export default defineConfig(({mode}) => {
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
         manifest: {
-          name: 'Our Pregnancy Companion',
+          name: 'Our Pregnancy',
           short_name: 'Our Pregnancy',
           description: 'Your privacy-first pregnancy companion.',
           theme_color: '#F2F4EB',
@@ -39,6 +39,20 @@ export default defineConfig(({mode}) => {
         }
       })
     ],
+    build: {
+      chunkSizeWarningLimit: 600,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-motion': ['motion/react'],
+            'vendor-firebase': ['firebase/app', 'firebase/auth', 'firebase/firestore', 'firebase/functions'],
+            'vendor-dexie': ['dexie', 'dexie-react-hooks'],
+            'vendor-icons': ['lucide-react'],
+          },
+        },
+      },
+    },
     define: {
       'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY),
       __BUILD_TIME__: JSON.stringify(new Date().toISOString().slice(0, 16).replace('T', ' ')),

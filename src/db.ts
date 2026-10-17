@@ -304,6 +304,7 @@ const setupSyncHooks = (table: Table<any, any>, type: TrackingType) => {
 
 setupSyncHooks(db.kickSessions, 'kick');
 setupSyncHooks(db.contractionSessions, 'contraction');
+setupSyncHooks(db.contractionRecords, 'contractionRecord');
 setupSyncHooks(db.vitalsLogs, 'vitals');
 setupSyncHooks(db.moodLogs, 'mood');
 setupSyncHooks(db.hydrationLogs, 'hydration');

@@ -4,6 +4,7 @@ import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { ContextBanner } from '../ContextBanner';
+import { ClinicalDisclaimer } from '../ClinicalDisclaimer';
 import {
   Heart,
   Scale,
@@ -499,6 +500,9 @@ export const VitalsTracker: React.FC = () => {
       <ContextBanner 
         description="Blood pressure monitoring, gestational weight & wearable sync." 
       />
+
+      {/* Clinical Safety Disclaimer */}
+      <ClinicalDisclaimer />
 
       {/* Main Container */}
       <div className="bg-white border border-border/80 rounded-2xl shadow-xs overflow-hidden">

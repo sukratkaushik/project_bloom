@@ -3,47 +3,48 @@ import { motion, AnimatePresence } from 'motion/react';
 import { usePlanner } from '../store';
 import { fmtShort } from '../utils';
 import { Sidebar } from './Sidebar';
-import { Development } from './sections/Development';
-import { Medical } from './sections/Medical';
-import { Preparation } from './sections/Preparation';
-import { Financial } from './sections/Financial';
-import { Deadlines } from './sections/Deadlines';
-import { Postpartum } from './sections/Postpartum';
-import { Notes } from './sections/Notes';
-import { SymptomLogger } from './sections/SymptomLogger';
-import { FoodScanner } from './sections/FoodScanner';
-import { AskOurPregnancy } from './sections/AskOurPregnancy';
-import { KickCounter } from './sections/KickCounter';
-import { ContractionTimer } from './sections/ContractionTimer';
-import { VitalsTracker } from './sections/VitalsTracker';
-import { MoodTracker } from './sections/MoodTracker';
-import { HydrationTracker } from './sections/HydrationTracker';
-import { NutritionTracker } from './sections/NutritionTracker';
-import { HospitalBag } from './sections/HospitalBag';
-import { BirthPlanBuilder } from './sections/BirthPlanBuilder';
-import { GovernmentSchemes } from './sections/GovernmentSchemes';
-import { BabyNames } from './sections/BabyNames';
-import { SafeTravel } from './sections/SafeTravel';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS, POSTPARTUM_TASKS } from '../data';
 import { Task } from '../types';
-
-import { PregnancyTracker } from './sections/PregnancyTracker';
-import { PartnerSync } from './sections/PartnerSync';
-import { Feedback } from './sections/Feedback';
-import { AdminFeedbacks } from './sections/AdminFeedbacks';
-import { AdminPanel } from './sections/AdminPanel';
-
-import { Profile } from './sections/Profile';
 import { FloatingChatbot } from './FloatingChatbot';
 import { Header } from './Header';
 import { Footer } from './Footer';
-import { MedicalReports } from './sections/MedicalReports';
-import { GuidedBreathingAudio } from './sections/GuidedBreathingAudio';
-import { UserFlowGuide } from './UserFlowGuide';
-
+import { DashboardSkeleton } from './DashboardSkeleton';
 import { navigate } from '../utils/navigation';
 import { isNativeApp } from '../utils/nativeBridge';
-import { MobileShell } from './mobile/MobileShell';
+
+// Dynamically code-split section components (P1 Performance Optimization)
+const PregnancyTracker = React.lazy(() => import('./sections/PregnancyTracker').then(m => ({ default: m.PregnancyTracker })));
+const Development = React.lazy(() => import('./sections/Development').then(m => ({ default: m.Development })));
+const Medical = React.lazy(() => import('./sections/Medical').then(m => ({ default: m.Medical })));
+const MedicalReports = React.lazy(() => import('./sections/MedicalReports').then(m => ({ default: m.MedicalReports })));
+const Preparation = React.lazy(() => import('./sections/Preparation').then(m => ({ default: m.Preparation })));
+const Financial = React.lazy(() => import('./sections/Financial').then(m => ({ default: m.Financial })));
+const Deadlines = React.lazy(() => import('./sections/Deadlines').then(m => ({ default: m.Deadlines })));
+const Postpartum = React.lazy(() => import('./sections/Postpartum').then(m => ({ default: m.Postpartum })));
+const SymptomLogger = React.lazy(() => import('./sections/SymptomLogger').then(m => ({ default: m.SymptomLogger })));
+const FoodScanner = React.lazy(() => import('./sections/FoodScanner').then(m => ({ default: m.FoodScanner })));
+const AskOurPregnancy = React.lazy(() => import('./sections/AskOurPregnancy').then(m => ({ default: m.AskOurPregnancy })));
+const KickCounter = React.lazy(() => import('./sections/KickCounter').then(m => ({ default: m.KickCounter })));
+const ContractionTimer = React.lazy(() => import('./sections/ContractionTimer').then(m => ({ default: m.ContractionTimer })));
+const VitalsTracker = React.lazy(() => import('./sections/VitalsTracker').then(m => ({ default: m.VitalsTracker })));
+const MoodTracker = React.lazy(() => import('./sections/MoodTracker').then(m => ({ default: m.MoodTracker })));
+const HydrationTracker = React.lazy(() => import('./sections/HydrationTracker').then(m => ({ default: m.HydrationTracker })));
+const NutritionTracker = React.lazy(() => import('./sections/NutritionTracker').then(m => ({ default: m.NutritionTracker })));
+const HospitalBag = React.lazy(() => import('./sections/HospitalBag').then(m => ({ default: m.HospitalBag })));
+const BirthPlanBuilder = React.lazy(() => import('./sections/BirthPlanBuilder').then(m => ({ default: m.BirthPlanBuilder })));
+const GovernmentSchemes = React.lazy(() => import('./sections/GovernmentSchemes').then(m => ({ default: m.GovernmentSchemes })));
+const BabyNames = React.lazy(() => import('./sections/BabyNames').then(m => ({ default: m.BabyNames })));
+const SafeTravel = React.lazy(() => import('./sections/SafeTravel').then(m => ({ default: m.SafeTravel })));
+const PartnerSync = React.lazy(() => import('./sections/PartnerSync').then(m => ({ default: m.PartnerSync })));
+const Feedback = React.lazy(() => import('./sections/Feedback').then(m => ({ default: m.Feedback })));
+const AdminFeedbacks = React.lazy(() => import('./sections/AdminFeedbacks').then(m => ({ default: m.AdminFeedbacks })));
+const AdminPanel = React.lazy(() => import('./sections/AdminPanel').then(m => ({ default: m.AdminPanel })));
+const Notes = React.lazy(() => import('./sections/Notes').then(m => ({ default: m.Notes })));
+const Profile = React.lazy(() => import('./sections/Profile').then(m => ({ default: m.Profile })));
+const GuidedBreathingAudio = React.lazy(() => import('./sections/GuidedBreathingAudio').then(m => ({ default: m.GuidedBreathingAudio })));
+const UserFlowGuide = React.lazy(() => import('./UserFlowGuide').then(m => ({ default: m.UserFlowGuide })));
+const LaborReadiness = React.lazy(() => import('./sections/LaborReadiness').then(m => ({ default: m.LaborReadiness })));
+const MobileShell = React.lazy(() => import('./mobile/MobileShell').then(m => ({ default: m.MobileShell })));
 
 const VALID_PAGES = [
   'tracker', 'dev', 'medical', 'medical-reports', 'prep', 'finance', 
@@ -51,7 +52,7 @@ const VALID_PAGES = [
   'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
   'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
   'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
-  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar', 'guide'
+  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar', 'guide', 'readiness'
 ];
 
 const getPageFromPath = (): string => {
@@ -166,7 +167,11 @@ export const Dashboard: React.FC = () => {
   const progressPct = filteredTasks.length ? Math.round((doneCount / filteredTasks.length) * 100) : 0;
 
   if (isMobileViewport) {
-    return <MobileShell />;
+    return (
+      <React.Suspense fallback={<DashboardSkeleton />}>
+        <MobileShell />
+      </React.Suspense>
+    );
   }
 
   return (
@@ -224,36 +229,39 @@ export const Dashboard: React.FC = () => {
                 }}
                 className="fill-mode-both"
               >
-                {activePage === 'tracker' && <PregnancyTracker />}
-                {activePage === 'dev' && <Development filterTasks={filterTasks} />}
-                {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
-                {activePage === 'medical-reports' && <MedicalReports />}
-                {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
-                {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
-                {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
-                {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
-                {activePage === 'symptoms' && <SymptomLogger />}
-                {activePage === 'foodscanner' && <FoodScanner />}
-                {activePage === 'askourpregnancy' && <AskOurPregnancy />}
-                {activePage === 'kickcounter' && <KickCounter />}
-                {activePage === 'contractions' && <ContractionTimer />}
-                {activePage === 'vitals' && <VitalsTracker />}
-                {activePage === 'mood' && <MoodTracker />}
-                {activePage === 'hydration' && <HydrationTracker />}
-                {activePage === 'nutrition' && <NutritionTracker />}
-                {activePage === 'hospitalbag' && <HospitalBag />}
-                {activePage === 'birthplan' && <BirthPlanBuilder />}
-                {activePage === 'schemes' && <GovernmentSchemes />}
-                {activePage === 'babynames' && <BabyNames />}
-                {activePage === 'travel' && <SafeTravel />}
-                {activePage === 'partnersync' && <PartnerSync />}
-                {activePage === 'feedback' && <Feedback />}
-                {activePage === 'admin-feedbacks' && <AdminPanel />}
-                {activePage === 'admin-panel' && <AdminPanel />}
-                {activePage === 'notes' && <Notes />}
-                {activePage === 'profile' && <Profile />}
-                {activePage === 'guide' && <UserFlowGuide onNavigate={setActivePage} />}
-                {(activePage === 'breathing' || activePage === 'garbhsanskar') && <GuidedBreathingAudio />}
+                <React.Suspense fallback={<DashboardSkeleton />}>
+                  {activePage === 'tracker' && <PregnancyTracker />}
+                  {activePage === 'dev' && <Development filterTasks={filterTasks} />}
+                  {activePage === 'medical' && <Medical filterTasks={filterTasks} />}
+                  {activePage === 'medical-reports' && <MedicalReports />}
+                  {activePage === 'prep' && <Preparation filterTasks={filterTasks} />}
+                  {activePage === 'finance' && <Financial filterTasks={filterTasks} />}
+                  {activePage === 'deadlines' && <Deadlines filterTasks={filterTasks} />}
+                  {activePage === 'postpartum' && <Postpartum filterTasks={filterTasks} />}
+                  {activePage === 'symptoms' && <SymptomLogger />}
+                  {activePage === 'foodscanner' && <FoodScanner />}
+                  {activePage === 'askourpregnancy' && <AskOurPregnancy />}
+                  {activePage === 'kickcounter' && <KickCounter />}
+                  {activePage === 'contractions' && <ContractionTimer />}
+                  {activePage === 'vitals' && <VitalsTracker />}
+                  {activePage === 'mood' && <MoodTracker />}
+                  {activePage === 'hydration' && <HydrationTracker />}
+                  {activePage === 'nutrition' && <NutritionTracker />}
+                  {activePage === 'hospitalbag' && <HospitalBag />}
+                  {activePage === 'birthplan' && <BirthPlanBuilder />}
+                  {activePage === 'schemes' && <GovernmentSchemes />}
+                  {activePage === 'babynames' && <BabyNames />}
+                  {activePage === 'travel' && <SafeTravel />}
+                  {activePage === 'partnersync' && <PartnerSync />}
+                  {activePage === 'feedback' && <Feedback />}
+                  {activePage === 'admin-feedbacks' && <AdminPanel />}
+                  {activePage === 'admin-panel' && <AdminPanel />}
+                  {activePage === 'notes' && <Notes />}
+                  {activePage === 'profile' && <Profile />}
+                  {activePage === 'guide' && <UserFlowGuide onNavigate={setActivePage} />}
+                  {(activePage === 'breathing' || activePage === 'garbhsanskar') && <GuidedBreathingAudio />}
+                  {activePage === 'readiness' && <LaborReadiness />}
+                </React.Suspense>
               </motion.div>
             </AnimatePresence>
           </div>

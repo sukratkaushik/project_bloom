@@ -4,6 +4,7 @@ import { db } from '../../db';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { v4 as uuidv4 } from 'uuid';
 import { ContextBanner } from '../ContextBanner';
+import { ClinicalDisclaimer } from '../ClinicalDisclaimer';
 import { 
   Baby, 
   Timer, 
@@ -163,6 +164,9 @@ export const KickCounter: React.FC = () => {
       <ContextBanner 
         description="Cardiff Count-to-10 standard • Track baby's movements and daily vitality patterns." 
       />
+
+      {/* Clinical Safety Disclaimer */}
+      <ClinicalDisclaimer />
 
       {/* Main Interactive Session Card */}
       <div className="bg-white border border-border/80 rounded-2xl shadow-xs p-5 sm:p-7 relative overflow-hidden flex flex-col items-center justify-center">

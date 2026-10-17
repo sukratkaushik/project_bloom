@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
-import { exportCarePlanPdf } from '../../../utils/pdfExport';
 import { DoctorModal } from '../DoctorModal';
 
 import {
@@ -96,6 +95,7 @@ export const CareTab: React.FC<CareTabProps> = ({
       setIsExporting(true);
       triggerHaptic('success');
       onShowToast('📄 Generating Clinical Care Plan PDF...');
+      const { exportCarePlanPdf } = await import('../../../utils/pdfExport');
       await exportCarePlanPdf(state);
       onShowToast('✅ Clinical Care Plan PDF downloaded! Ready to print or share.');
     } catch (err) {

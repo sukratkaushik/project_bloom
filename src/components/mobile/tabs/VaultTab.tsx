@@ -7,7 +7,6 @@ import {
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
-import { exportCarePlanPdf } from '../../../utils/pdfExport';
 import { AbhaInfoModal } from '../AbhaInfoModal';
 
 interface VaultTabProps {
@@ -78,6 +77,7 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
       setIsExporting(true);
       triggerHaptic('success');
       onShowToast('📄 Generating Mother\'s Care Plan PDF...');
+      const { exportCarePlanPdf } = await import('../../../utils/pdfExport');
       await exportCarePlanPdf(state);
       onShowToast('✅ Care Plan PDF downloaded! Ready to print or share.');
     } catch (err) {

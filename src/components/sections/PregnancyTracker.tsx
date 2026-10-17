@@ -71,7 +71,7 @@ const calculateCurrentWeek = (dueDate?: string): number => {
 
 export const PregnancyTracker: React.FC = () => {
   const { state, updateState } = usePlanner();
-  const [selectedWeek, setSelectedWeek] = useState<number>(() => calculateCurrentWeek(state.dueDate));
+  const [selectedWeek, setSelectedWeek] = useState<number>(() => calculateCurrentWeek(state.dueDate ?? undefined));
   const [isEditingDate, setIsEditingDate] = useState(false);
   const [tempDate, setTempDate] = useState(state.dueDate || '');
 

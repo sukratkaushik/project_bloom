@@ -78,7 +78,6 @@ export const saveUserProfile = async (uid: string, profile: Partial<UserProfile>
 export const getAllUsersForAdmin = async (): Promise<UserProfile[]> => {
   // 1. Try server-side Cloud Function first (combines Firebase Auth + Firestore users)
   try {
-    const { httpsCallable } = await import('firebase/functions');
     const fn = httpsCallable(functions, 'getAdminUsersList');
     const res = await fn() as { data: { users: UserProfile[] } };
     if (res?.data?.users && Array.isArray(res.data.users)) {
@@ -101,14 +100,12 @@ export const getAllUsersForAdmin = async (): Promise<UserProfile[]> => {
 };
 
 export const deleteUserByAdminCallable = async (targetUid: string): Promise<{ success: boolean; message?: string }> => {
-  const { httpsCallable } = await import('firebase/functions');
   const fn = httpsCallable(functions, 'deleteUserByAdmin');
   const res = await fn({ targetUid }) as { data: { success: boolean; message?: string } };
   return res.data;
 };
 
 export const deleteMyOwnAccountCallable = async (): Promise<{ success: boolean; message?: string }> => {
-  const { httpsCallable } = await import('firebase/functions');
   const fn = httpsCallable(functions, 'deleteMyOwnAccount');
   const res = await fn() as { data: { success: boolean; message?: string } };
   return res.data;
@@ -156,7 +153,6 @@ export const sendPlanChangeEmail = async (
   durationMonths: number | null
 ) => {
   try {
-    const { httpsCallable } = await import('firebase/functions');
     const fn = httpsCallable(functions, 'sendPlanChangeNotificationEmail');
     const res = await fn({
       targetEmail,
@@ -285,14 +281,12 @@ export const signUpWithEmail = async (email: string, password: string, displayNa
 };
 
 export const sendVerificationOtpCallable = async (email: string, displayName?: string, uid?: string) => {
-  const { httpsCallable } = await import('firebase/functions');
   const fn = httpsCallable(functions, 'sendVerificationOtp');
   const res = await fn({ email, displayName, uid }) as { data: { success: boolean; message?: string; devNotice?: string } };
   return res.data;
 };
 
 export const verifyOtpCallable = async (email: string, otp: string) => {
-  const { httpsCallable } = await import('firebase/functions');
   const fn = httpsCallable(functions, 'verifyOtp');
   const res = await fn({ email, otp }) as { data: { success: boolean; message?: string } };
   return res.data;

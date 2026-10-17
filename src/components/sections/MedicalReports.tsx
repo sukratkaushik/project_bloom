@@ -29,7 +29,6 @@ import { Paywall } from '../Paywall';
 import { ContextBanner } from '../ContextBanner';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
-import { exportCarePlanPdf } from '../../utils/pdfExport';
 
 const formatBytes = (bytes: number, decimals = 2) => {
   if (!bytes) return '0 Bytes';
@@ -75,6 +74,7 @@ export const MedicalReports: React.FC = () => {
   const handleExportCarePlan = async () => {
     try {
       setIsExportingCarePlan(true);
+      const { exportCarePlanPdf } = await import('../../utils/pdfExport');
       await exportCarePlanPdf(state);
     } catch (e) {
       console.error('Failed to export Care Plan PDF:', e);

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OPIN Quality & Test Engineering (SDET) Audit Report — October 17, 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --sage: #4E7C65;
+      --sage-pale: #EDF4EE;
+      --charcoal: #232E35;
+      --medium: #5F6E78;
+      --cream: #FAF8F5;
+      --border: #E2E8F0;
+      --warning-bg: #FEF3C7;
+      --warning-text: #92400E;
+      --pass-bg: #DCFCE7;
+      --pass-text: #166534;
+      --fail-bg: #FEE2E2;
+      --fail-text: #991B1B;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--charcoal);
+      background-color: var(--cream);
+      line-height: 1.6;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      background: #FFFFFF;
+      padding: 56px 64px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    }
+
+    .header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 24px;
+      margin-bottom: 32px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 12px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-radius: 20px;
+      margin-bottom: 12px;
+    }
+
+    .badge-conditional {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+      border: 1px solid #FCD34D;
+    }
+
+    .badge-pass {
+      background-color: var(--pass-bg);
+      color: var(--pass-text);
+    }
+
+    .badge-warn {
+      background-color: var(--warning-bg);
+      color: var(--warning-text);
+    }
+
+    .badge-fail {
+      background-color: var(--fail-bg);
+      color: var(--fail-text);
+    }
+
+    h1 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 10px;
+      line-height: 1.25;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      color: var(--medium);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--sage);
+      margin: 32px 0 16px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      page-break-after: avoid;
+    }
+
+    h3 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin: 20px 0 10px;
+      page-break-after: avoid;
+    }
+
+    p, li {
+      font-size: 14px;
+      color: #334155;
+      margin-bottom: 10px;
+    }
+
+    ul {
+      padding-left: 20px;
+      margin-bottom: 16px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      font-size: 13px;
+      page-break-inside: avoid;
+    }
+
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+
+    th {
+      background-color: #F8FAFC;
+      font-weight: 600;
+      color: var(--charcoal);
+    }
+
+    tr:nth-child(even) {
+      background-color: #FAFAFA;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      background: #F1F5F9;
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: #0F172A;
+    }
+
+    pre {
+      background: #0F172A;
+      color: #F8FAFC;
+      padding: 16px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.5;
+      margin: 16px 0;
+      page-break-inside: avoid;
+    }
+
+    pre code {
+      background: transparent;
+      color: inherit;
+      padding: 0;
+    }
+
+    .print-bar {
+      position: sticky;
+      top: 20px;
+      max-width: 880px;
+      margin: 0 auto 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      z-index: 100;
+    }
+
+    .btn-print {
+      background-color: var(--sage);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(78, 124, 101, 0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+
+    .btn-print:hover {
+      background-color: #3D6250;
+      transform: translateY(-1px);
+    }
+
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+      }
+
+      .container {
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+
+      .print-bar {
+        display: none !important;
+      }
+
+      h2 {
+        page-break-before: auto;
+      }
+
+      pre, table {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="print-bar">
+    <button class="btn-print" onclick="window.print()">
+      🖨️ Print / Save as PDF
+    </button>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <span class="badge badge-conditional">🟡 Conditional Production Readiness (86/100)</span>
+      <h1>Our Pregnancy (OPIN) — Quality & Test Engineering Audit</h1>
+      <div class="meta">
+        <span><strong>Target:</strong> Android (Capacitor) & Web (PWA)</span>
+        <span>•</span>
+        <span><strong>Audit Date:</strong> October 17, 2026</span>
+        <span>•</span>
+        <span><strong>Auditor:</strong> Lead SDET Agent</span>
+      </div>
+    </div>
+
+    <h2>1. Executive Summary & Dimension Scorecard</h2>
+    <p>A multi-dimensional quality and clinical engineering audit was executed against the Our Pregnancy (OPIN) codebase covering static analysis, persistence integrity, core maternal flows, native Android readiness, non-functional resilience, and regulatory compliance (PCPNDT Act 1994 & DPDP Act 2023).</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Dimension</th>
+          <th>Weight</th>
+          <th>Score</th>
+          <th>Status</th>
+          <th>Key Highlights</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>1. Static Analysis & TypeScript</strong></td>
+          <td>15%</td>
+          <td>85%</td>
+          <td><span class="badge badge-warn">🟡 WARNING</span></td>
+          <td><code>tsc --noEmit</code> passed (0 err); 9 strict errors (7 missing <code>@types/react-dom</code>).</td>
+        </tr>
+        <tr>
+          <td><strong>2. Database & Dexie.js Integrity</strong></td>
+          <td>20%</td>
+          <td>90%</td>
+          <td><span class="badge badge-warn">🟡 WARNING</span></td>
+          <td>IndexedDB v4 schema solid; DPDP erasure verified; <code>db.contractionRecords</code> missing cloud hook.</td>
+        </tr>
+        <tr>
+          <td><strong>3. Functional Core Flows</strong></td>
+          <td>20%</td>
+          <td>96%</td>
+          <td><span class="badge badge-pass">🟢 PASS</span></td>
+          <td>Kick counter (Cardiff 10), 5-1-1 contraction timer, BP vitals, 2-tier plan enforcement.</td>
+        </tr>
+        <tr>
+          <td><strong>4. Android Capacitor Readiness</strong></td>
+          <td>15%</td>
+          <td>95%</td>
+          <td><span class="badge badge-pass">🟢 PASS</span></td>
+          <td>7 plugins synced (added <code>@capacitor-firebase/authentication</code>); permissions, safe areas OK.</td>
+        </tr>
+        <tr>
+          <td><strong>5. Non-Functional & Performance</strong></td>
+          <td>15%</td>
+          <td>68%</td>
+          <td><span class="badge badge-fail">🔴 NEEDS WORK</span></td>
+          <td>Monolithic JS bundle (2.76 MB). Static vs dynamic import collisions.</td>
+        </tr>
+        <tr>
+          <td><strong>6. Clinical & Compliance Safety</strong></td>
+          <td>15%</td>
+          <td>86%</td>
+          <td><span class="badge badge-warn">🟡 WARNING</span></td>
+          <td>PCPNDT 100% enforced; login-gated DPDP consent; disclaimers missing on 5 screens.</td>
+        </tr>
+        <tr>
+          <td><strong>COMPOSITE RELEASE SCORE</strong></td>
+          <td><strong>100%</strong></td>
+          <td><strong>86%</strong></td>
+          <td><span class="badge badge-warn">🟡 CONDITIONAL</span></td>
+          <td>Staging Pilot: APPROVED | Public Google Play GA: Hold on P0/P1 items.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>2. Deep-Dive Findings</h2>
+
+    <h3>Dimension 1: Static Analysis & TypeScript</h3>
+    <ul>
+      <li><strong>Standard Mode:</strong> <code>npm run lint</code> (<code>tsc --noEmit</code>) passes with 0 errors.</li>
+      <li><strong>Strict Mode:</strong> 9 errors detected: 7 missing <code>@types/react-dom</code> declarations for <code>createPortal</code> and <code>createRoot</code>, union parameter <code>id</code> in <code>PartnerSync.tsx</code>, and <code>dueDate</code> null vs undefined in <code>PregnancyTracker.tsx</code>.</li>
+    </ul>
+
+    <h3>Dimension 2: Database & Dexie.js Data Integrity</h3>
+    <ul>
+      <li><strong>IndexedDB Architecture:</strong> Clean incremental schema migrations (v1–v4) with compound query indexes for live reactivity.</li>
+      <li><strong>DPDP Right to Erasure:</strong> Account deletion executes <code>dexieDb.tables.map(t => t.clear())</code> and deletes local database files.</li>
+      <li><strong>⚠️ CloudSync Hook Discrepancy:</strong> <code>db.contractionSessions</code> is hooked for cloud sync, but individual <code>db.contractionRecords</code> are not hooked, causing detailed contraction intervals to be lost on cross-device restore.</li>
+    </ul>
+
+    <h3>Dimension 3: Functional Core Flows</h3>
+    <ul>
+      <li><strong>Kick Counter:</strong> Cardiff "Count to 10" protocol with 2-hour prolonged inactivity warning.</li>
+      <li><strong>Contraction Timer:</strong> Accurately computes 5-1-1 rule (frequency ≤ 5m, duration ≥ 60s, pattern ≥ 1h) with direct 108 emergency call prompt. Active timers survive navigation via <code>localStorage</code>.</li>
+      <li><strong>Vitals Tracker:</strong> Standard BP classification (Crisis ≥ 160/110, Stage 2 ≥ 140/90) with appropriate non-diagnostic observational phrasing.</li>
+      <li><strong>2-Tier Architecture:</strong> Clean Free Plan vs Bloom Pro gating.</li>
+    </ul>
+
+    <h3>Dimension 4: Android Capacitor Readiness</h3>
+    <ul>
+      <li><strong>Native Plugins:</strong> 7 core plugins verified and synced via <code>npx cap sync android</code> including native Google Auth bridge (<code>@capacitor-firebase/authentication</code>).</li>
+      <li><strong>Manifest & Security:</strong> <code>allowBackup="false"</code> and <code>usesCleartextTraffic="false"</code> enforced. Health Connect rationale intents configured.</li>
+      <li><strong>Safe Areas:</strong> <code>viewport-fit=cover</code> active in <code>index.html</code>; dynamic safe area padding configured.</li>
+    </ul>
+
+    <h3>Dimension 5: Non-Functional & Performance</h3>
+    <ul>
+      <li><strong>Offline Functionality:</strong> Workbox service worker precaches 33 assets (3.84 MB) with seamless offline IndexedDB fallback.</li>
+      <li><strong>Bundle Size Warning:</strong> Entry bundle is <strong>2.76 MB (2,759 kB)</strong> uncompressed / 748 kB gzip. Vite reports dynamic vs static import collisions on <code>firebase/functions</code>, <code>pdfExport.ts</code>, and <code>cloudSync.ts</code>.</li>
+      <li><strong>Root Cause:</strong> All 34 dashboard tabs in <code>Dashboard.tsx</code> are synchronously imported.</li>
+    </ul>
+
+    <h3>Dimension 6: Clinical & Compliance Safety</h3>
+    <ul>
+      <li><strong>PCPNDT Act 1994 (Zero-Tolerance):</strong> 🟢 <strong>Flawless.</strong> Cloud Functions employ regex interceptor <code>isPCPNDTGenderQuery</code> to reject gender queries before invoking AI models. Report parser redacts fetal gender terms.</li>
+      <li><strong>Universal Medical Disclaimers:</strong> 🟡 Missing mandatory educational disclaimer on 5 tracking screens (Kick Counter, Contraction Timer, Vitals Tracker, Food Scanner, Labor Readiness).</li>
+      <li><strong>DPDP Act 2023:</strong> Granular bilingual consent modal properly gated on login/app entry rather than unauthenticated landing page visitors.</li>
+    </ul>
+
+    <h2>3. Prioritized Action Plan</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Priority</th>
+          <th>Category</th>
+          <th>Action Item</th>
+          <th>Effort</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>P0</strong></td>
+          <td>Compliance</td>
+          <td>Add standardized <code>&lt;ClinicalDisclaimer /&gt;</code> to KickCounter, ContractionTimer, VitalsTracker, FoodScanner, and LaborReadiness.</td>
+          <td>30 min</td>
+        </tr>
+        <tr>
+          <td><strong>P1</strong></td>
+          <td>Performance</td>
+          <td>Code-split the 34 dashboard sections in <code>Dashboard.tsx</code> with <code>React.lazy()</code> + <code>Suspense</code> and resolve colliding imports to reduce initial JS chunk below 350 kB.</td>
+          <td>1.5 hr</td>
+        </tr>
+        <tr>
+          <td><strong>P1</strong></td>
+          <td>Data Integrity</td>
+          <td>Hook <code>db.contractionRecords</code> in <code>db.ts</code> and add restore handler in <code>cloudSync.ts</code>.</td>
+          <td>20 min</td>
+        </tr>
+        <tr>
+          <td><strong>P2</strong></td>
+          <td>TypeScript</td>
+          <td>Install <code>@types/react-dom</code> and resolve the strict mode errors.</td>
+          <td>30 min</td>
+        </tr>
+        <tr>
+          <td><strong>P2</strong></td>
+          <td>Branding</td>
+          <td>Update PWA manifest in <code>vite.config.ts</code> to "Our Pregnancy".</td>
+          <td>5 min</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
