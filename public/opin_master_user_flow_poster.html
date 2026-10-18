@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Our Pregnancy (OPIN) — Master Flow & Feature Architecture (A4 Multi-Page Suite)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Mermaid.js for Vector Flowchart Rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <!-- html2canvas for High-Resolution PNG Export -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --sage: #4E7C65;
+      --sage-dark: #375A48;
+      --sage-pale: #EDF4EE;
+      --charcoal: #232E35;
+      --medium: #5F6E78;
+      --light-gray: #F8FAFC;
+      --cream: #FAF8F5;
+      --white: #FFFFFF;
+      --border: #E2E8F0;
+      --border-dark: #CBD5E1;
+      --gold: #D97706;
+      --gold-bg: #FEF3C7;
+      --rose: #BE185D;
+      --rose-bg: #FCE7F3;
+      --purple: #6D28D9;
+      --purple-bg: #EDE9FE;
+      --blue: #0369A1;
+      --blue-bg: #E0F2FE;
+      --red: #B91C1C;
+      --red-bg: #FEE2E2;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--charcoal);
+      background-color: #E6E2DB;
+      line-height: 1.45;
+      padding: 30px 16px 80px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Fixed Navigation & Global Export Bar */
+    .top-action-bar {
+      position: sticky;
+      top: 16px;
+      max-width: 1040px;
+      margin: 0 auto 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(12px);
+      padding: 12px 24px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      z-index: 1000;
+    }
+
+    .brand-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--sage);
+    }
+
+    .action-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      font-size: 12.5px;
+      font-weight: 600;
+      border-radius: 8px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: none;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background-color: var(--sage);
+      color: white;
+      box-shadow: 0 2px 6px rgba(78, 124, 101, 0.25);
+    }
+    .btn-primary:hover {
+      background-color: var(--sage-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background-color: var(--light-gray);
+      color: var(--charcoal);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover {
+      background-color: #E2E8F0;
+    }
+
+    /* Standard A4 Portrait Container */
+    /* Exact A4 Ratio: 210mm x 297mm (1 : 1.414). At 96DPI screen preview: 794px x 1123px */
+    .a4-page-container {
+      width: 100%;
+      max-width: 860px;
+      min-height: 1140px;
+      margin: 0 auto 36px;
+      background: var(--white);
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+      padding: 36px 42px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Individual Section Header Bar */
+    .a4-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 22px;
+    }
+
+    .section-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--sage);
+      margin-bottom: 4px;
+    }
+
+    .a4-section-header h2 {
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--charcoal);
+      line-height: 1.2;
+    }
+
+    .a4-section-header .subtitle {
+      font-size: 12.5px;
+      color: var(--medium);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    /* Dedicated Download Button for each A4 Sheet */
+    .section-download-btn {
+      background: #F1F5F9;
+      color: var(--charcoal);
+      border: 1px solid #CBD5E1;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .section-download-btn:hover {
+      background: var(--sage);
+      color: white;
+      border-color: var(--sage);
+    }
+
+    /* Page Footer Info */
+    .a4-footer {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      margin-top: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 10.5px;
+      color: var(--medium);
+    }
+    .a4-footer strong {
+      color: var(--charcoal);
+    }
+
+    /* Grid Styles for Page 1 */
+    .stage-cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stage-card-full {
+      grid-column: span 2;
+    }
+    .stage-card {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 13px 15px;
+      display: flex;
+      flex-direction: column;
+    }
+    .stage-badge {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 9.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 2px 7px;
+      border-radius: 4px;
+      margin-bottom: 6px;
+    }
+    .stage-card h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--charcoal);
+      margin-bottom: 4px;
+    }
+    .stage-card p {
+      font-size: 11.5px;
+      color: var(--medium);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .stage-bullets {
+      list-style: none;
+      padding: 0;
+      margin-top: auto;
+      border-top: 1px dashed var(--border);
+      padding-top: 6px;
+    }
+    .stage-bullets li {
+      font-size: 11px;
+      color: #334155;
+      margin-bottom: 3px;
+      display: flex;
+      align-items: flex-start;
+      gap: 6px;
+    }
+    .bullet-icon {
+      color: var(--sage);
+      font-weight: bold;
+      font-size: 10px;
+    }
+
+    /* Badges */
+    .pill-green { background: #DCFCE7; color: #15803D; }
+    .pill-gold { background: #FEF3C7; color: #B45309; }
+    .pill-blue { background: #E0F2FE; color: #0369A1; }
+    .pill-rose { background: #FCE7F3; color: #BE185D; }
+    .pill-purple { background: #EDE9FE; color: #6D28D9; }
+    .pill-dark { background: #334155; color: #F8FAFC; }
+
+    /* Page 2 Mermaid Viewport */
+    .mermaid-a4-viewport {
+      background: #FBFBFD;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 860px;
+      overflow: hidden;
+    }
+    .mermaid-a4-viewport svg {
+      max-width: 100% !important;
+      height: auto !important;
+      max-height: 840px !important;
+    }
+
+    /* Page 3 Partner Layout */
+    .partner-two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .partner-box {
+      border-radius: 10px;
+      padding: 18px 20px;
+      border: 1px solid var(--border);
+    }
+    .partner-box-blue {
+      background: #F0F9FF;
+      border-color: #BAE6FD;
+    }
+    .partner-box-sage {
+      background: #F2F8F4;
+      border-color: #C6E0D2;
+    }
+    .partner-box h4 {
+      font-size: 14.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .partner-box ul {
+      list-style: none;
+      font-size: 12px;
+      color: #334155;
+    }
+    .partner-box li {
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+      line-height: 1.45;
+    }
+
+    .partner-emergency-card {
+      background: #FFF5F5;
+      border: 1.5px solid #FED7D7;
+      border-radius: 10px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .partner-emergency-card .icon-circ {
+      width: 40px;
+      height: 40px;
+      background: #E53E3E;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      font-weight: bold;
+      shrink: 0;
+    }
+
+    /* Page 4 Matrix Table */
+    .a4-matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 11px;
+    }
+    .a4-matrix-table th, .a4-matrix-table td {
+      padding: 7px 10px;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .a4-matrix-table th {
+      background-color: #F8FAFC;
+      font-weight: 700;
+      color: var(--charcoal);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .a4-matrix-table tr:nth-child(even) {
+      background-color: #FCFDFD;
+    }
+    .cell-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    /* Print Formatting Rules */
+    @media print {
+      body {
+        background: #FFFFFF !important;
+        padding: 0 !important;
+      }
+      .no-print, .top-action-bar, .section-download-btn {
+        display: none !important;
+      }
+      .a4-page-container {
+        border: none !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 12mm 14mm !important;
+        min-height: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        page-break-after: always !important;
+        break-after: page !important;
+      }
+      .a4-page-container:last-of-type {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
+      }
+      @page {
+        size: A4 portrait;
+        margin: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Top Actions Bar -->
+  <div class="top-action-bar no-print">
+    <div class="brand-title">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>Our Pregnancy (OPIN) • A4 Multi-Page Suite</span>
+    </div>
+    <div class="action-group">
+      <button class="btn btn-secondary" onclick="downloadAllPagesSequential()">
+        📥 Download All 4 A4 Pages (PNG)
+      </button>
+      <button class="btn btn-primary" onclick="window.print()">
+        🖨️ Print Full 4-Page A4 Booklet
+      </button>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 1 OF 4: The 7-Stage Pregnant Mother's Flow -->
+  <!-- ========================================================================= -->
+  <div class="a4-page-container" id="page-1">
+    <div>
+      <div class="a4-section-header">
+        <div>
+          <span class="section-eyebrow">A4 Sheet 1 of 4 • Maternal Flow</span>
+          <h2>The 7-Stage Pregnant Mother's Flow</h2>
+          <div class="subtitle">Complete chronological progression from Day 0 Onboarding to Labor & Delivery</div>
+        </div>
+        <button class="section-download-btn no-print" onclick="downloadA4Page('page-1', 'OurPregnancy_A4_Page1_Maternal_Flow.png')">
+          📸 Download Page 1 (A4 PNG)
+        </button>
+      </div>
+
+      <div class="stage-cards-grid">
+        <!-- Stage 1 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-green">Stage 1 • Gateway</span>
+          <h3>Privacy Gateway & DPDP Consent</h3>
+          <p>1-tap Google Authentication followed by statutory bilingual DPDP Act 2023 consent.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>DPDP 2023 Consent:</strong> Reassures local-first IndexedDB storage.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Clean Disagree Exit:</strong> Exiting immediately terminates without tracking.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 2 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-gold">Stage 2 • Timeline</span>
+          <h3>Gestational Timeline Calibration</h3>
+          <p>Calculates current week/day, 3 trimester milestones, and initializes 280-day plan.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>LMP or Due Date:</strong> Instant calibration of developmental milestones.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Maternal Context:</strong> First vs subsequent baby, diet, & work schedule.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 3 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-blue">Stage 3 • Hub</span>
+          <h3>Profile & Control Tower</h3>
+          <p>Top-right icon gives complete sovereignty over clinic links, locks, and erasure.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>Doctor & Hospital:</strong> Link OB-GYN phone and triage desk.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Maternal Privacy Shield:</strong> FaceID/Fingerprint biometric app lock.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Section 12 DPDP Purge:</strong> 1-click permanent local & cloud erase.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 4 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-purple">Stage 4 • Tailoring</span>
+          <h3>Explore & Dashboard Pinning</h3>
+          <p>Directory of 20 clinical tools + 5 Smart AI tools; pin tools to personalize Today tab.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>Explore Tab:</strong> 20 non-duplicate tracking & milestone tools.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Phase-Based:</strong> Tailors to T1, T2, or T3 clinical priorities.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Govt Schemes:</strong> PMMVY (₹5k) & JSY (₹1.4k) benefits guide.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 5 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-green">Stage 5 • Daily Care</span>
+          <h3>Morning Knowledge & Care Tracking</h3>
+          <p>Daily evidence-based drops, fetal organogenesis progress, and vitals check.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>Cardiff Kick Counter:</strong> 10-kick countdown timer with alerts.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Vitals Tracker:</strong> BP & weight sparklines with observational grading.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Hydration:</strong> 1-tap 2.5L daily target logger.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 6 -->
+        <div class="stage-card">
+          <span class="stage-badge pill-rose">Stage 6 • Smart AI</span>
+          <h3>Vision Meal Scanner & 24/7 Chat</h3>
+          <p>Vision OCR checks Indian meals for pregnancy risks; 24/7 empathetic advice.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>Food Scanner:</strong> Flags unpasteurized dairy, raw items & herbs.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Ask OPIN AI:</strong> Evidence-based clinical maternal guidance.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Zero Gender Prediction:</strong> Hardcoded PCPNDT refusal filter.</li>
+          </ul>
+        </div>
+
+        <!-- Stage 7 -->
+        <div class="stage-card stage-card-full">
+          <span class="stage-badge pill-gold">Stage 7 • Delivery</span>
+          <h3>The Medical Vault & 5-1-1 Labor Emergency Triage</h3>
+          <p>Offline ultrasound scan vault, FHIR R4 clinical exports, and hospital bag readiness with automated 5-1-1 contraction triage.</p>
+          <ul class="stage-bullets">
+            <li><span class="bullet-icon">✦</span> <strong>Hospital Bag:</strong> Indian packing items (cash deposit, cotton jhablas, salwar kameez, baby blanket).</li>
+            <li><span class="bullet-icon">✦</span> <strong>5-1-1 Labor Rule:</strong> Contractions 5 mins apart, lasting 1 min, for 1 hour $\rightarrow$ triggers 1-tap 108 emergency call banner.</li>
+            <li><span class="bullet-icon">✦</span> <strong>Clinical Export:</strong> 1-tap PDF summary formatted for physical OB-GYN consultations.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="a4-footer">
+      <span><strong>Our Pregnancy (OPIN)</strong> • Sheet 1: Maternal Journey</span>
+      <span>Local-First • Privacy Sovereignty • Clinical FHIR • ourpregnancy.in</span>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 2 OF 4: Visual Architecture Flowchart -->
+  <!-- ========================================================================= -->
+  <div class="a4-page-container" id="page-2">
+    <div>
+      <div class="a4-section-header">
+        <div>
+          <span class="section-eyebrow">A4 Sheet 2 of 4 • System Architecture</span>
+          <h2>End-to-End System Navigation & Hierarchy</h2>
+          <div class="subtitle">Complete technical flow connecting Gateway, Control Tower, Core Tabs, Partner Sync & Labor Triage</div>
+        </div>
+        <button class="section-download-btn no-print" onclick="downloadA4Page('page-2', 'OurPregnancy_A4_Page2_System_Flowchart.png')">
+          📸 Download Page 2 (A4 PNG)
+        </button>
+      </div>
+
+      <div class="mermaid-a4-viewport">
+        <div class="mermaid">
+flowchart TD
+    classDef auth fill:#EDF4EE,stroke:#4E7C65,stroke-width:2px,color:#232E35;
+    classDef setup fill:#FEF3C7,stroke:#D97706,stroke-width:2px,color:#232E35;
+    classDef profile fill:#F1F5F9,stroke:#64748B,stroke-width:2px,color:#232E35;
+    classDef core fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#232E35;
+    classDef ai fill:#FCE7F3,stroke:#BE185D,stroke-width:2px,color:#232E35;
+    classDef vault fill:#EDE9FE,stroke:#6D28D9,stroke-width:2px,color:#232E35;
+    classDef partner fill:#E0F2FE,stroke:#0369A1,stroke-width:2px,color:#232E35;
+    classDef emergency fill:#FEE2E2,stroke:#B91C1C,stroke-width:2px,color:#991B1B;
+
+    subgraph Entry ["1. GATEWAY & GESTATIONAL ANCHOR"]
+        A["📱 Launch & Google Auth"] --> B{"DPDP Act Consent"}
+        B -- "Declined" --> B_Exit["Clean Exit & Sign Out"]
+        B -- "Accepted" --> C["🗓️ Set LMP / Due Date"]
+        C --> D["⚡ Auto-Generate 280-Day Plan"]
+    end
+
+    subgraph Tower ["2. PROFILE CONTROL TOWER (Top-Right)"]
+        D --> E["⚙️ Profile Hub"]
+        E --> E1["🩺 Link OB-GYN & Emergency"]
+        E --> E2["🔒 Maternal Privacy Shield (FaceID)"]
+        E --> E3["🤖 Granular AI Consent Toggle"]
+        E --> E4["🗑️ Section 12 Data Purge"]
+    end
+
+    subgraph Workspace ["3. CORE USER WORKSPACE (5 MOBILE TABS)"]
+        D --> F["⭐ Explore Tab (20 Tools)"]
+        F --> G["☀️ TODAY TAB"]
+        G --> G1["💡 Daily Knowledge Drop"]
+        G --> G2["👶 Fetal Size & Milestones"]
+        
+        F --> H["🩺 CARE TAB"]
+        H --> H1["💧 Hydration & Symptom Log"]
+        H --> H2["❤️ Blood Pressure Tracker"]
+        H --> H3["🦶 Kick Counter (Cardiff 10)"]
+        H --> H4["⏱️ Contraction Timer"]
+
+        F --> I["✨ SMART AI TAB (5 Tools)"]
+        I --> I1["🥗 AI Food & Calorie Guide"]
+        I --> I2["💬 Ask OPIN AI (24/7 Chat)"]
+        I --> I3["🚫 PCPNDT Refusal Guard"]
+
+        F --> J["📂 VAULT TAB"]
+        J --> J1["📑 Scan & Report Archive"]
+        J --> J2["🏥 FHIR R4 & Care Plan PDF"]
+    end
+
+    subgraph CoPilot ["4. PARTNER CO-PILOT"]
+        E1 -. "WebRTC Encrypted Sync" .-> P["📱 PARTNER'S PHONE"]
+        P --> P1["🛡️ Read-Only Permission Filter"]
+        P --> P2["🚗 Cash & Car Route Tasks"]
+        P --> P3["👀 View Kicks & Vitals"]
+    end
+
+    subgraph Triage ["5. EMERGENCY 5-1-1 TRIAGE"]
+        H4 --> K{"5-1-1 Rule Met?"}
+        K -- "Yes" --> L["🚨 RED ALERT: 1-Tap 108 Call"]
+        L -. "Simultaneous Alert" .-> P
+    end
+
+    class A,B,B_Exit,C,D auth;
+    class E,E1,E2,E3,E4 profile;
+    class F,G,G1,G2,H,H1,H2,H3,H4 core;
+    class I,I1,I2,I3 ai;
+    class J,J1,J2 vault;
+    class P,P1,P2,P3 partner;
+    class K,L emergency;
+        </div>
+      </div>
+    </div>
+
+    <div class="a4-footer">
+      <span><strong>Our Pregnancy (OPIN)</strong> • Sheet 2: Technical Flowchart</span>
+      <span>Vector High-DPI Mermaid Chart • ourpregnancy.in</span>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 3 OF 4: The Partner / Spouse Flow -->
+  <!-- ========================================================================= -->
+  <div class="a4-page-container" id="page-3">
+    <div>
+      <div class="a4-section-header">
+        <div>
+          <span class="section-eyebrow">A4 Sheet 3 of 4 • Partner Co-Pilot</span>
+          <h2>The Partner / Spouse Companion Experience</h2>
+          <div class="subtitle">Direct WebRTC P2P Sync, Maternal Privacy Sovereignty & Active Birth Readiness</div>
+        </div>
+        <button class="section-download-btn no-print" onclick="downloadA4Page('page-3', 'OurPregnancy_A4_Page3_Partner_Flow.png')">
+          📸 Download Page 3 (A4 PNG)
+        </button>
+      </div>
+
+      <div class="partner-two-col">
+        <!-- Col 1 -->
+        <div class="partner-box partner-box-sage">
+          <h4>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Mother's Phone (Controller)
+          </h4>
+          <ul>
+            <li><strong>Encrypted P2P WebRTC Pairing:</strong> Connected directly via temporary 6-digit sync code or QR standee without intermediate cloud sniffing.</li>
+            <li><strong>Granular Consent Checkboxes:</strong> The mother explicitly chooses which categories to share:
+              <br>• [x] Hospital Logistics & Assigned Tasks
+              <br>• [x] Fetal Kick Counter Sessions
+              <br>• [x] Contraction Timing & Emergency Alerts
+            </li>
+            <li><strong>Intimacy & Dignity Safeguard:</strong> Her raw emotional journal, personal symptom details, and private notes stay completely confidential unless she toggles them on.</li>
+            <li><strong>Instant Access Revocation:</strong> The mother can sever the partner pairing at any moment with 1 tap in Profile.</li>
+          </ul>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="partner-box partner-box-blue">
+          <h4>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            Partner's Phone (Co-Pilot)
+          </h4>
+          <ul>
+            <li><strong>Dedicated Non-Pregnant View:</strong> Streamlined UI focused on practical support, avoiding redundant maternal tracking forms.</li>
+            <li><strong>Actionable Logistics Checklist:</strong>
+              <br>• <em>"Keep minimum ₹5,000 cash ready in wallet for hospital admission deposits."</em>
+              <br>• <em>"Test-drive route to hospital during peak morning and evening traffic."</em>
+              <br>• <em>"Pack extra power banks, warm wrap, and snacks for labor room."</em>
+            </li>
+            <li><strong>Bonding Through Vitals:</strong> Real-time mirror of baby kick counts and milestone progress keeps the spouse emotionally engaged.</li>
+            <li><strong>Zero Medical Misinformation:</strong> Accesses verified clinical facts without unvetted internet panic.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Emergency Alert Card -->
+      <div class="partner-emergency-card">
+        <div class="icon-circ">🚨</div>
+        <div>
+          <h4 style="font-size: 14px; font-weight: 800; color: #9B2C2C; margin-bottom: 2px;">
+            Simultaneous 5-1-1 Active Labor Alert
+          </h4>
+          <p style="font-size: 12px; color: #742A2A; line-height: 1.45;">
+            When the mother logs contractions that fulfill the clinical 5-1-1 rule (5 mins apart, lasting 60 seconds, for 1 full hour), the partner’s phone sounds a high-priority notification: <strong>"Active labor pattern detected. Start the car and call your obstetrician now."</strong>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="a4-footer">
+      <span><strong>Our Pregnancy (OPIN)</strong> • Sheet 3: Partner Co-Pilot</span>
+      <span>WebRTC P2P Technology • Zero-Cloud Intermediate Storage • ourpregnancy.in</span>
+    </div>
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- PAGE 4 OF 4: Master Feature Reference Matrix -->
+  <!-- ========================================================================= -->
+  <div class="a4-page-container" id="page-4">
+    <div>
+      <div class="a4-section-header">
+        <div>
+          <span class="section-eyebrow">A4 Sheet 4 of 4 • Feature Directory</span>
+          <h2>Master Feature Matrix: All 25 Pregnancy Tools</h2>
+          <div class="subtitle">Exact architectural reference (20 Explore tools + 5 Smart AI tools + Vault & Hub)</div>
+        </div>
+        <button class="section-download-btn no-print" onclick="downloadA4Page('page-4', 'OurPregnancy_A4_Page4_Feature_Matrix.png')">
+          📸 Download Page 4 (A4 PNG)
+        </button>
+      </div>
+
+      <table class="a4-matrix-table">
+        <thead>
+          <tr>
+            <th style="width: 14%;">Zone</th>
+            <th style="width: 20%;">Feature Name</th>
+            <th style="width: 32%;">What Does It Do?</th>
+            <th style="width: 18%;">When She Uses It</th>
+            <th style="width: 16%;">How It Works</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="cell-pill pill-gold">Today Tab</span></td>
+            <td><strong>Daily Knowledge Drop</strong></td>
+            <td>Bite-sized clinical & nutritional science cards.</td>
+            <td>Daily Morning</td>
+            <td>1-min daily reading streak</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-gold">Today Tab</span></td>
+            <td><strong>Baby Milestone</strong></td>
+            <td>Weekly fruit size analogy, weight & organ progress.</td>
+            <td>Weekly Check-in</td>
+            <td>3D developmental view</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #1</span></td>
+            <td><strong>Hydration Tracker</strong></td>
+            <td>Logs water, tender coconut water & fluids (2.5L).</td>
+            <td>Daily Routine</td>
+            <td>+250ml glass buttons</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #2</span></td>
+            <td><strong>Supplements & Diet</strong></td>
+            <td>Daily adherence for Folic acid, Iron & Calcium.</td>
+            <td>Daily Morning/Eve</td>
+            <td>1-tap mark taken checklist</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #3</span></td>
+            <td><strong>Kick Counter (Cardiff)</strong></td>
+            <td>Times fetal movement until 10 kicks; &gt;2h warning.</td>
+            <td>Weeks 28–40</td>
+            <td>Tap lotus per kick felt</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #4</span></td>
+            <td><strong>Vitals & BP Tracker</strong></td>
+            <td>Logs BP and weight; charts clinical sparklines.</td>
+            <td>Weekly / Routine</td>
+            <td>Systolic/Diastolic inputs</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #5</span></td>
+            <td><strong>Symptom Logger</strong></td>
+            <td>Tracks nausea, fatigue, swelling & cramps.</td>
+            <td>As symptoms arise</td>
+            <td>5-sec quick tap logger</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #6</span></td>
+            <td><strong>Mood & Energy</strong></td>
+            <td>Daily emotional check-in & journal diary.</td>
+            <td>Daily Evening</td>
+            <td>Mood rating + notes</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #7</span></td>
+            <td><strong>Bump Journal</strong></td>
+            <td>Private ultrasound reflections and thoughts.</td>
+            <td>Trimesters 1, 2, 3</td>
+            <td>Encrypted text notes</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #8</span></td>
+            <td><strong>Partner Sync (P2P)</strong></td>
+            <td>Direct WebRTC mirror of shared tasks & kicks.</td>
+            <td>Weeks 12 to 40</td>
+            <td>Enter 6-digit sync code</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #9</span></td>
+            <td><strong>Contraction Timer</strong></td>
+            <td>Times contractions & evaluates ACOG 5-1-1 rule.</td>
+            <td>Weeks 37–42 Labor</td>
+            <td>START/END live timer</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #10</span></td>
+            <td><strong>Fetal Development</strong></td>
+            <td>Week-by-week organogenesis timeline.</td>
+            <td>Weekly Check-in</td>
+            <td>Scroll gestational weeks</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #11</span></td>
+            <td><strong>Due Date Deadlines</strong></td>
+            <td>Prenatal scan milestones & OB-GYN checkups.</td>
+            <td>Trimesters 1, 2, 3</td>
+            <td>Interactive scan checklist</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #12</span></td>
+            <td><strong>Nursery & Baby Prep</strong></td>
+            <td>Checklists for baby clothing, crib & gear.</td>
+            <td>Weeks 20–34</td>
+            <td>Tap items to check off</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #13</span></td>
+            <td><strong>Delivery Cost Planner</strong></td>
+            <td>Estimates hospital costs, insurance & savings.</td>
+            <td>Trimester 2 & 3</td>
+            <td>Budget calculator</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #14</span></td>
+            <td><strong>Govt Maternity Schemes</strong></td>
+            <td>PMMVY (₹5k), JSY (₹1.4k) & state aid rules.</td>
+            <td>Weeks 10–24</td>
+            <td>Form guidance & criteria</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #15</span></td>
+            <td><strong>Medical Reports Locker</strong></td>
+            <td>Ultrasound scans & bloodwork AES-256 vault.</td>
+            <td>Post-Clinic Visits</td>
+            <td>Camera photo / PDF upload</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #16</span></td>
+            <td><strong>Vaccines & Schedule</strong></td>
+            <td>Tdap, Tetanus toxoid & OGTT lab schedule.</td>
+            <td>Weeks 16–36</td>
+            <td>Clinical vaccine tracker</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #17</span></td>
+            <td><strong>Postpartum Healing</strong></td>
+            <td>Fourth trimester recovery, pelvic floor & mental care.</td>
+            <td>Weeks 34+ Postpartum</td>
+            <td>Read recovery guides</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #18</span></td>
+            <td><strong>Hospital Bag Checklist</strong></td>
+            <td>Indian packing items for Mama, Baby & Partner.</td>
+            <td>Weeks 32–36</td>
+            <td>Bag category checklists</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #19</span></td>
+            <td><strong>Birth Plan Builder</strong></td>
+            <td>Labor preferences, pain relief choices & music.</td>
+            <td>Weeks 32–36</td>
+            <td>Select preferences</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-green">Explore #20</span></td>
+            <td><strong>Feedback & Support</strong></td>
+            <td>In-app support desk & clinical suggestions.</td>
+            <td>Anytime</td>
+            <td>Direct feedback form</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-rose">Smart AI #1</span></td>
+            <td><strong>Ask OPIN AI</strong></td>
+            <td>24/7 empathetic OB-GYN clinical companion.</td>
+            <td>When anxious / 2 AM</td>
+            <td>Type medical question</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-rose">Smart AI #2</span></td>
+            <td><strong>AI Food & Calorie Guide</strong></td>
+            <td>Vision model checks Indian meals for fetal risks.</td>
+            <td>Before eating meals</td>
+            <td>Snap photo of dish</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-rose">Smart AI #3</span></td>
+            <td><strong>Breathing & Garbh Sanskar</strong></td>
+            <td>Guided pranayama & offline Vedic soundscapes.</td>
+            <td>Daily Meditation</td>
+            <td>1-tap audio player</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-rose">Smart AI #4</span></td>
+            <td><strong>Baby Names Finder</strong></td>
+            <td>Modern & Vedic Indian name meanings with rashi.</td>
+            <td>Trimesters 2 & 3</td>
+            <td>Filter by origin/letter</td>
+          </tr>
+          <tr>
+            <td><span class="cell-pill pill-rose">Smart AI #5</span></td>
+            <td><strong>Safe Travel Guide</strong></td>
+            <td>Flying, road trips & doctor NOC fit-to-fly rules.</td>
+            <td>Before booking travel</td>
+            <td>Check trimester safety</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="a4-footer">
+      <span><strong>Our Pregnancy (OPIN)</strong> • Sheet 4: Feature Matrix</span>
+      <span>20 Explore Tools + 5 Smart AI Tools = 25 Specialized Features • ourpregnancy.in</span>
+    </div>
+  </div>
+
+  <script>
+    // Initialize Mermaid Diagrams
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: 'neutral',
+      flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis'
+      }
+    });
+
+    // Individual High-Resolution A4 Page Download
+    async function downloadA4Page(pageId, fileName) {
+      const pageEl = document.getElementById(pageId);
+      const downloadBtn = pageEl.querySelector('.section-download-btn');
+      const originalText = downloadBtn.innerHTML;
+      downloadBtn.innerHTML = '⏳ Rendering A4...';
+      downloadBtn.disabled = true;
+
+      try {
+        const canvas = await html2canvas(pageEl, {
+          scale: 2.2, // Ultra-sharp 300DPI equivalent
+          useCORS: true,
+          logging: false,
+          backgroundColor: '#FFFFFF',
+          windowWidth: 860
+        });
+
+        const imageUri = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.download = fileName;
+        downloadLink.href = imageUri;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        downloadBtn.innerHTML = '✅ Saved!';
+        setTimeout(() => {
+          downloadBtn.innerHTML = originalText;
+          downloadBtn.disabled = false;
+        }, 2000);
+      } catch (err) {
+        console.error('A4 Image export failed:', err);
+        alert('Could not render image. Please try Print -> Save as PDF instead.');
+        downloadBtn.innerHTML = originalText;
+        downloadBtn.disabled = false;
+      }
+    }
+
+    // Download All 4 A4 Pages Sequentially
+    async function downloadAllPagesSequential() {
+      const pages = [
+        { id: 'page-1', name: 'OurPregnancy_A4_Sheet1_Maternal_Flow.png' },
+        { id: 'page-2', name: 'OurPregnancy_A4_Sheet2_System_Flowchart.png' },
+        { id: 'page-3', name: 'OurPregnancy_A4_Sheet3_Partner_Flow.png' },
+        { id: 'page-4', name: 'OurPregnancy_A4_Sheet4_Feature_Matrix.png' },
+      ];
+
+      for (let i = 0; i < pages.length; i++) {
+        await downloadA4Page(pages[i].id, pages[i].name);
+        // Small pause between downloads so browser doesn't block multi-download
+        await new Promise(res => setTimeout(res, 800));
+      }
+    }
+  </script>
+</body>
+</html>
