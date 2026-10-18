@@ -18,7 +18,6 @@ const CareersPage = React.lazy(() => import('./landing/CareersPage').then(m => (
 const PrivacyPolicy = React.lazy(() => import('./components/LegalPages').then(m => ({ default: m.PrivacyPolicy })));
 const TermsOfService = React.lazy(() => import('./components/LegalPages').then(m => ({ default: m.TermsOfService })));
 const CheckoutPage = React.lazy(() => import('./components/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
-import { EmailVerificationGate } from './components/EmailVerificationGate';
 import { auth } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
 import { normalizeLegacyHash } from './utils/navigation';

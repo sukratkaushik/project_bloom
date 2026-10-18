@@ -930,7 +930,9 @@ export const LandingPage: React.FC = () => {
       {/* Section Divider */}
       <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-4">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
-        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Toolkit</span>
+        <span className="mx-4 px-3.5 py-1 rounded-full bg-sage-pale/80 dark:bg-sage/15 border border-sage/30 dark:border-sage/40 text-sage-dark dark:text-sage font-bold text-[11px] tracking-[2.5px] uppercase shadow-3xs select-none">
+          Toolkit
+        </span>
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
@@ -1434,7 +1436,9 @@ export const LandingPage: React.FC = () => {
       {/* Section Divider */}
       <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
-        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Privacy</span>
+        <span className="mx-4 px-3.5 py-1 rounded-full bg-sage-pale/80 dark:bg-sage/15 border border-sage/30 dark:border-sage/40 text-sage-dark dark:text-sage font-bold text-[11px] tracking-[2.5px] uppercase shadow-3xs select-none">
+          Privacy
+        </span>
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
@@ -1450,7 +1454,9 @@ export const LandingPage: React.FC = () => {
       {/* Section Divider */}
       <div className="max-w-[1200px] mx-auto px-6 flex items-center justify-center py-6">
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
-        <span className="mx-4 text-sage/40 text-[10px] tracking-[4px] uppercase font-bold">Reviews</span>
+        <span className="mx-4 px-3.5 py-1 rounded-full bg-sage-pale/80 dark:bg-sage/15 border border-sage/30 dark:border-sage/40 text-sage-dark dark:text-sage font-bold text-[11px] tracking-[2.5px] uppercase shadow-3xs select-none">
+          Reviews
+        </span>
         <div className="h-[1px] flex-grow bg-gradient-to-r from-transparent via-border to-transparent" />
       </div>
 
