@@ -119,6 +119,16 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     ritualSubtitle: 'Labor contraction monitor',
     actionLabel: 'Start Timer →',
   },
+  {
+    id: 'feedback',
+    title: 'Feedback & Support',
+    desc: 'Share your pregnancy journey suggestions',
+    category: 'Daily Tracking',
+    icon: HelpCircle,
+    color: 'text-charcoal bg-cream',
+    ritualSubtitle: 'Help & feedback',
+    actionLabel: 'Send Feedback →',
+  },
 
   // Category 2: Smart AI & Cultural Guidance (5 tools)
   {
@@ -216,6 +226,26 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     ritualSubtitle: 'Hospital cost calculator',
     actionLabel: 'Plan Budget →',
   },
+  {
+    id: 'hospitalbag',
+    title: 'Hospital Bag Checklist',
+    desc: 'Organized packing for mother, baby & partner',
+    category: 'Milestones & Prep',
+    icon: Briefcase,
+    color: 'text-stone-700 bg-stone-100',
+    ritualSubtitle: 'Packing checklist',
+    actionLabel: 'Pack Bag →',
+  },
+  {
+    id: 'birthplan',
+    title: 'Birth Plan Builder',
+    desc: 'Preferences for labor, support person & pain relief',
+    category: 'Milestones & Prep',
+    icon: FileCheck2,
+    color: 'text-sage-dark bg-sage-pale',
+    ritualSubtitle: 'Labor & delivery choices',
+    actionLabel: 'Build Plan →',
+  },
 
   // Category 4: Medical & Schemes (4 tools)
   {
@@ -260,46 +290,13 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     ritualSubtitle: 'Fourth trimester care',
     actionLabel: 'Read Guide →',
   },
-
-  // Category 5: Labor & Postpartum (3 tools)
-  {
-    id: 'hospitalbag',
-    title: 'Hospital Bag Checklist',
-    desc: 'Organized packing for mother, baby & partner',
-    category: 'Labor & Postpartum',
-    icon: Briefcase,
-    color: 'text-stone-700 bg-stone-100',
-    ritualSubtitle: 'Packing checklist',
-    actionLabel: 'Pack Bag →',
-  },
-  {
-    id: 'birthplan',
-    title: 'Birth Plan Builder',
-    desc: 'Preferences for labor, support person & pain relief',
-    category: 'Labor & Postpartum',
-    icon: FileCheck2,
-    color: 'text-sage-dark bg-sage-pale',
-    ritualSubtitle: 'Labor & delivery choices',
-    actionLabel: 'Build Plan →',
-  },
-  {
-    id: 'feedback',
-    title: 'Feedback & Support',
-    desc: 'Share your pregnancy journey suggestions',
-    category: 'Labor & Postpartum',
-    icon: HelpCircle,
-    color: 'text-charcoal bg-cream',
-    ritualSubtitle: 'Help & feedback',
-    actionLabel: 'Send Feedback →',
-  },
 ];
 
 export const CATEGORY_CHIPS = [
   { label: 'All', count: 20, key: 'All' },
-  { label: 'Daily Logs', count: 9, key: 'Daily Tracking' },
-  { label: 'Milestones', count: 4, key: 'Milestones & Prep' },
+  { label: 'Daily Logs', count: 10, key: 'Daily Tracking' },
+  { label: 'Milestones', count: 6, key: 'Milestones & Prep' },
   { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
-  { label: 'Labor Prep', count: 3, key: 'Labor & Postpartum' },
 ];
 
 export const getToolById = (id: string): ToolDefinition | undefined => {
