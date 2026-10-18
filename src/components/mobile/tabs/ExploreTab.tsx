@@ -66,8 +66,8 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
           )}
         </div>
 
-        {/* Clean Single-Line Category Filter Chips */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pt-2.5 pb-1 no-scrollbar">
+        {/* Category Filter Chips (All 5 categories visible) */}
+        <div className="flex flex-wrap items-center gap-1.5 pt-2 pb-1">
           {categoryChips.map((chip) => {
             const isSelected = selectedCategory === chip.key;
             return (
