@@ -216,17 +216,6 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     ritualSubtitle: 'Hospital cost calculator',
     actionLabel: 'Plan Budget →',
   },
-  {
-    id: 'setup',
-    title: 'Adjust Setup',
-    desc: 'Update expected due date, diet & pregnancy profile',
-    category: 'Milestones & Prep',
-    icon: Calendar,
-    color: 'text-sage-dark bg-sage-pale',
-    badge: 'Setup',
-    ritualSubtitle: 'Gestational timeline',
-    actionLabel: 'Adjust →',
-  },
 
   // Category 4: Medical & Schemes (4 tools)
   {
@@ -306,9 +295,9 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
 ];
 
 export const CATEGORY_CHIPS = [
-  { label: 'All', count: 21, key: 'All' },
+  { label: 'All', count: 20, key: 'All' },
   { label: 'Daily Logs', count: 9, key: 'Daily Tracking' },
-  { label: 'Milestones', count: 5, key: 'Milestones & Prep' },
+  { label: 'Milestones', count: 4, key: 'Milestones & Prep' },
   { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
   { label: 'Labor Prep', count: 3, key: 'Labor & Postpartum' },
 ];

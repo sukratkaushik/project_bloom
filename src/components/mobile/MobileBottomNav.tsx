@@ -12,7 +12,7 @@ interface MobileBottomNavProps {
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onSelectTab }) => {
   const tabs: { id: MobileTabId; label: string; icon: React.FC<{ size: number; className?: string }>; badge?: string }[] = [
     { id: 'today', label: 'Today', icon: Calendar },
-    { id: 'explore', label: 'Explore', icon: Compass, badge: '29' },
+    { id: 'explore', label: 'Explore', icon: Compass },
     { id: 'care', label: 'Care', icon: HeartPulse },
     { id: 'smart', label: 'Smart AI', icon: Sparkles },
     { id: 'vault', label: 'Vault', icon: FolderArchive },

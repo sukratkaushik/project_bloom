@@ -199,9 +199,9 @@ export const ExploreTab: React.FC<ExploreTabProps> = ({ onOpenTool, pinnedIds, o
                 Smart AI Suite
               </span>
             </div>
-            <h4 className="font-serif text-[13.5px] font-bold text-charcoal">Looking for AI Guidance?</h4>
+            <h4 className="font-serif text-[13.5px] font-bold text-charcoal">Looking for AI tools?</h4>
             <p className="text-[11.5px] text-medium mt-0.5 leading-relaxed">
-              Explore 24/7 OPIN AI, Food Safety Scanner, Baby Names & Garbh Sanskar in the dedicated Smart AI tab below.
+              Find all 5 Smart AI tools (Food Scanner, OPIN AI, Baby Names, Garbh Sanskar, Travel) in the Smart AI tab.
             </p>
           </div>
           <div className="w-10 h-10 rounded-xl bg-sage-pale/60 text-sage-dark flex items-center justify-center shrink-0 border border-sage/20">
