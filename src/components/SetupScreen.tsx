@@ -4,6 +4,7 @@ import { auth, db, doc, setDoc, serverTimestamp } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { CustomSelect } from './CustomSelect';
 import { navigate } from '../utils/navigation';
+import { ArrowLeft } from 'lucide-react';
 
 export const CURRENT_POLICY_VERSION = '2026-04';
 
@@ -121,17 +122,32 @@ const CONSIDERATIONS = [
   { id: 'cultural', label: '🌿 Cultural preferences' },
 ];
 
-export const SetupScreen: React.FC = () => {
+export interface SetupScreenProps {
+  isMobileSubview?: boolean;
+  onComplete?: () => void;
+  onCancel?: () => void;
+}
+
+export const SetupScreen: React.FC<SetupScreenProps> = ({
+  isMobileSubview = false,
+  onComplete,
+  onCancel,
+}) => {
   const { generatePlan, resetPlan, state, toggleDarkMode } = usePlanner();
-  const [dueDate, setDueDate] = useState(state.dueDate ? state.dueDate.split('T')[0] : '');
+  const defaultDueDate = () => {
+    if (state.dueDate) return state.dueDate.split('T')[0];
+    const d = new Date(Date.now() + 196 * 24 * 60 * 60 * 1000);
+    return d.toISOString().split('T')[0];
+  };
+  const [dueDate, setDueDate] = useState<string>(defaultDueDate);
   const [pregnancyNum, setPregnancyNum] = useState(state.pregnancyNum || 'first');
   const [workSit, setWorkSit] = useState(state.workSit || 'employed');
   const [partnerSit, setPartnerSit] = useState(state.partnerSit || 'partner');
   const [dietPref, setDietPref] = useState(state.dietPref || 'vegetarian');
   const [flags, setFlags] = useState<Record<string, boolean>>(state.flags || {});
-  const [hasConsented, setHasConsented] = useState(false);
-  const [hasAiConsented, setHasAiConsented] = useState(false);
-  const [showDisclaimer, setShowDisclaimer] = useState(true);
+  const [hasConsented, setHasConsented] = useState(() => Boolean(state.isSetup));
+  const [hasAiConsented, setHasAiConsented] = useState(() => Boolean(state.aiProcessingConsent));
+  const [showDisclaimer, setShowDisclaimer] = useState(() => !state.isSetup);
 
   const selectedDate = dueDate ? new Date(dueDate) : null;
   const todayDate = new Date();
@@ -168,7 +184,7 @@ export const SetupScreen: React.FC = () => {
       }
     }
 
-    generatePlan({
+    await generatePlan({
       dueDate,
       pregnancyNum,
       workSit,
@@ -177,7 +193,22 @@ export const SetupScreen: React.FC = () => {
       flags,
       aiProcessingConsent: hasAiConsented,
     });
-    navigate('/dashboard');
+
+    if (onComplete) {
+      onComplete();
+    } else {
+      navigate('/dashboard');
+    }
+  };
+
+  const handleBackOrCancel = () => {
+    if (onCancel) {
+      onCancel();
+    } else if (state.isSetup) {
+      navigate('/dashboard');
+    } else {
+      handleLogout();
+    }
   };
 
   const handleLogout = async () => {
@@ -193,31 +224,64 @@ export const SetupScreen: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gold-pale via-sage-pale to-blush-pale flex flex-col items-center justify-center p-5 md:p-10 lg:p-12 pb-16 relative overflow-hidden">
-      <div className="absolute -top-[100px] -right-[100px] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,var(--color-blush)_0%,transparent_65%)] opacity-20 pointer-events-none" />
-      <div className="absolute -bottom-[80px] -left-[80px] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,var(--color-sage)_0%,transparent_65%)] opacity-20 pointer-events-none" />
+    <div className={`min-h-screen bg-gradient-to-br from-gold-pale via-sage-pale to-blush-pale flex flex-col items-center justify-center p-3.5 xs:p-5 sm:p-8 md:p-10 pb-16 relative overflow-x-hidden ${isMobileSubview ? 'pt-2 pb-6 min-h-0 bg-none' : ''}`}>
+      {!isMobileSubview && (
+        <>
+          <div className="absolute -top-[100px] -right-[100px] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,var(--color-blush)_0%,transparent_65%)] opacity-20 pointer-events-none" />
+          <div className="absolute -bottom-[80px] -left-[80px] w-[400px] h-[400px] rounded-full bg-[radial-gradient(circle,var(--color-sage)_0%,transparent_65%)] opacity-20 pointer-events-none" />
 
-      <div className="absolute top-6 right-6 z-20">
-        <button
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center"
-          title="Toggle Dark Mode"
-          aria-label="Toggle Dark Mode"
-        >
-          <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
-        </button>
-      </div>
+          <div className="absolute top-4 sm:top-6 right-4 sm:right-6 z-20">
+            <button
+              onClick={toggleDarkMode}
+              className="p-2 rounded-full hover:bg-black/5 dark:hover:bg-white/10 transition-colors text-charcoal flex items-center justify-center"
+              title="Toggle Dark Mode"
+              aria-label="Toggle Dark Mode"
+            >
+              <span className="text-[18px] leading-none">{state.isDarkModeActive ? '🌙' : '☀️'}</span>
+            </button>
+          </div>
+        </>
+      )}
 
-      <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-4 z-10 notranslate">Our Pregnancy</div>
-      <h1 className="font-serif text-[clamp(38px,7vw,68px)] font-light leading-[1.08] text-center text-charcoal mb-3.5 z-10">
-        Your <em className="italic text-blush">Pregnancy</em><br />Planning Companion
-      </h1>
-      <p className="text-[15px] text-medium max-w-[520px] text-center mx-auto mb-10 font-light leading-[1.7] z-10">
-        Tell us a little about your situation and we'll generate a fully personalised plan — every date, task, and decision tailored to you.
-      </p>
+      {/* Back to Dashboard bar when user is already set up */}
+      {state.isSetup && (
+        <div className="w-full max-w-[700px] flex items-center justify-between mb-3 z-10">
+          <button
+            type="button"
+            onClick={handleBackOrCancel}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/90 hover:bg-white text-charcoal font-semibold text-[13px] rounded-xl border border-border/80 shadow-2xs transition-all cursor-pointer active:scale-95"
+          >
+            <ArrowLeft size={15} />
+            <span>Back to Dashboard</span>
+          </button>
+          <span className="text-[12px] font-bold text-sage-dark bg-sage-pale px-2.5 py-0.5 rounded-full border border-sage/30">
+            Adjusting Setup
+          </span>
+        </div>
+      )}
 
-      <div className="bg-white rounded-[22px] p-10 w-full max-w-[700px] shadow-lg z-10 relative">
-        <h2 className="font-serif text-[26px] font-medium mb-7 text-charcoal text-center">Setup</h2>
+      {!isMobileSubview && (
+        <>
+          <div className="font-serif text-[12px] font-medium tracking-[6px] uppercase text-sage mb-2.5 sm:mb-4 z-10 notranslate">Our Pregnancy</div>
+          <h1 className="font-serif text-[clamp(28px,6vw,56px)] font-light leading-[1.12] text-center text-charcoal mb-2.5 sm:mb-3.5 z-10 px-2">
+            {state.isSetup ? (
+              <>Adjust Your <em className="italic text-blush">Pregnancy</em><br />Setup</>
+            ) : (
+              <>Your <em className="italic text-blush">Pregnancy</em><br />Planning Companion</>
+            )}
+          </h1>
+          <p className="text-[13.5px] sm:text-[15px] text-medium max-w-[520px] text-center mx-auto mb-6 sm:mb-9 font-light leading-[1.6] z-10 px-3">
+            {state.isSetup
+              ? "Update your expected due date, diet preferences, and health considerations to recalibrate your personalized schedule."
+              : "Tell us a little about your situation and we'll generate a fully personalised plan — every date, task, and decision tailored to you."}
+          </p>
+        </>
+      )}
+
+      <div className={`bg-white rounded-[22px] p-5 xs:p-7 sm:p-9 md:p-10 w-full max-w-[700px] shadow-lg z-10 relative border border-border/70 ${isMobileSubview ? 'shadow-none border-0 p-3 xs:p-4' : ''}`}>
+        <h2 className="font-serif text-[22px] sm:text-[26px] font-medium mb-5 sm:mb-7 text-charcoal text-center">
+          {state.isSetup ? "Adjust Pregnancy Parameters" : "Setup"}
+        </h2>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-[18px] items-start">
           <div className="flex flex-col gap-1.5 sm:col-span-2 mb-2">
@@ -340,16 +404,16 @@ export const SetupScreen: React.FC = () => {
         <button 
           onClick={handleGenerate}
           disabled={!hasConsented || isYetToBegin}
-          className={`w-full mt-6 p-[17px] border-none rounded-[12px] font-sans text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented && !isYetToBegin ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+          className={`w-full mt-6 p-[15px] sm:p-[17px] border-none rounded-[12px] font-sans text-[14px] sm:text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented && !isYetToBegin ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
         >
-          ✦ Generate My Personalised Plan
+          {state.isSetup ? '✦ Save & Recalibrate Care Plan' : '✦ Generate My Personalised Plan'}
         </button>
 
         <button 
-          onClick={handleLogout}
-          className="w-full mt-4 p-[15px] bg-transparent text-medium border border-border rounded-[12px] font-sans text-[14px] font-medium cursor-pointer transition-all hover:border-critical/30 hover:bg-critical-bg hover:text-critical"
+          onClick={handleBackOrCancel}
+          className="w-full mt-3 p-[13px] sm:p-[14px] bg-transparent text-medium border border-border rounded-[12px] font-sans text-[13.5px] sm:text-[14px] font-medium cursor-pointer transition-all hover:bg-cream hover:text-charcoal"
         >
-          Not right now (Logout)
+          {state.isSetup ? '← Cancel & Return to Dashboard' : 'Not right now (Logout)'}
         </button>
       </div>
 

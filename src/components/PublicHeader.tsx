@@ -42,6 +42,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
     )
   );
   const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);
+  const isLoggedInNeedsSetup = Boolean(!state.isSetup && user && isVerified);
 
   const handleLogin = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -113,6 +114,14 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 {isLoggingIn ? <Loader2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin shrink-0" /> : null}
                 <span className="sm:hidden">Dashboard</span>
                 <span className="hidden sm:inline">Open Dashboard</span>
+              </button>
+            ) : isLoggedInNeedsSetup ? (
+              <button 
+                type="button" 
+                onClick={(e) => { e.preventDefault(); navigate('/setup'); }} 
+                className="bg-sage hover:bg-sage-dark text-white rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-3 py-1.5 sm:px-4 sm:py-2 transition-all shadow-sm flex items-center justify-center gap-1 sm:gap-2 whitespace-nowrap shrink-0 cursor-pointer active:scale-95"
+              >
+                <span>✦ Set Up Pregnancy</span>
               </button>
             ) : (
               <>

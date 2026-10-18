@@ -175,11 +175,11 @@ const AppContent: React.FC = () => {
           }}
         />
       );
-    } else if (currentPath.startsWith('/dashboard') && (state.isSetup || isNativeApp())) {
-      // Setup Done or Native Mobile App -> Dashboard
+    } else if (currentPath.startsWith('/dashboard') && state.isSetup) {
+      // Setup Done -> Dashboard
       content = <Dashboard />;
     } else {
-      // Authenticated + Verified + Needs Setup -> Setup Screen
+      // Authenticated + Verified + Needs Setup (or explicit /setup) -> Setup Screen
       content = <SetupScreen />;
     }
   }

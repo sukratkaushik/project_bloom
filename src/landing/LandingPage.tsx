@@ -82,11 +82,26 @@ export const LandingPage: React.FC = () => {
     )
   );
   const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);
+  const isLoggedInNeedsSetup = Boolean(!state.isSetup && user && isVerified);
 
   const handleStart = async () => {
     try {
       if (isLoggedInAndSetup) {
         navigate('/dashboard');
+        return;
+      }
+
+      if (isLoggedInNeedsSetup) {
+        setIsLoggingIn(true);
+        if (user) {
+          const restored = await restoreJourney(user.uid);
+          if (restored) {
+            navigate('/dashboard');
+            return;
+          }
+        }
+        updateState({ hasStartedOnboarding: true, isSetup: false });
+        navigate('/setup');
         return;
       }
 
@@ -731,10 +746,14 @@ export const LandingPage: React.FC = () => {
               className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isLoggedInAndSetup ? "Go to Dashboard" : "Start Tracking with Google"}
+              {isLoggedInAndSetup 
+                ? "Go to Dashboard" 
+                : isLoggedInNeedsSetup 
+                ? "✦ Complete Your Pregnancy Setup" 
+                : "Start Tracking with Google"}
               {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
             </button>
-            {!isLoggedInAndSetup && (
+            {!user && (
               <button
                 type="button"
                 onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }}
@@ -743,7 +762,7 @@ export const LandingPage: React.FC = () => {
                 Log In / Email Sign In
               </button>
             )}
-            {!isLoggedInAndSetup && (
+            {!user && (
               <button
                 type="button"
                 onClick={() => {
@@ -756,6 +775,11 @@ export const LandingPage: React.FC = () => {
               >
                 <span>Continue as Guest</span> ➜
               </button>
+            )}
+            {isLoggedInNeedsSetup && (
+              <div className="text-[13.5px] text-sage-dark font-medium px-2 py-1 flex items-center gap-1.5">
+                <span>🌸 Signed in as <strong>{user?.displayName || user?.email}</strong>. Ready to set up your plan.</span>
+              </div>
             )}
             <a href="#how-it-works" className="font-medium text-medium px-4 py-4 hover:text-charcoal transition-colors whitespace-nowrap">
               See how it works ↓

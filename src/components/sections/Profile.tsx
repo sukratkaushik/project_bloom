@@ -46,6 +46,12 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
+  const due = state.dueDate ? new Date(state.dueDate) : null;
+  const now = new Date();
+  const diffDays = due ? Math.max(0, Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24))) : 0;
+  const completedDays = Math.max(1, 280 - diffDays);
+  const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
+
   // App Language state
   const [activeLanguage, setActiveLanguage] = useState<string>(() => getActiveLanguage());
   const [showLanguageModal, setShowLanguageModal] = useState(false);
@@ -461,6 +467,75 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 )}
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* Pregnancy Setup & Gestational Parameters (Adjust Setup) */}
+        <section className="bg-white rounded-2xl sm:rounded-[24px] p-4 sm:p-6 shadow-2xs border border-border/80">
+          <div className="flex items-center justify-between mb-4 sm:mb-5">
+            <div className="flex items-center gap-2.5 sm:gap-3">
+              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-sage-pale flex items-center justify-center text-sage shrink-0">
+                <Calendar className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-serif text-xl sm:text-2xl text-charcoal leading-tight">Pregnancy Setup</h3>
+                <p className="text-medium text-xs sm:text-sm mt-0.5">Gestational timeline, due date & clinical parameters</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onClose) onClose();
+                navigate('/setup');
+              }}
+              className="px-3.5 py-1.5 bg-sage hover:bg-sage-dark text-white font-bold text-xs sm:text-sm rounded-xl transition-all shadow-2xs flex items-center gap-1.5 cursor-pointer active:scale-95 shrink-0"
+            >
+              <Pencil size={13} />
+              <span>Adjust Setup</span>
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+            <div className="p-3 bg-cream/40 rounded-xl border border-border/70">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal/60 block">Expected Due Date</span>
+              <span className="text-[13px] sm:text-[14px] font-bold text-charcoal mt-0.5 block truncate">
+                {state.dueDate ? new Date(state.dueDate).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Not set'}
+              </span>
+            </div>
+            <div className="p-3 bg-cream/40 rounded-xl border border-border/70">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal/60 block">Gestational Progress</span>
+              <span className="text-[13px] sm:text-[14px] font-bold text-sage-dark mt-0.5 block truncate">
+                {state.dueDate ? `Week ${currentWeek} of 40` : 'Calibrate due date'}
+              </span>
+            </div>
+            <div className="p-3 bg-cream/40 rounded-xl border border-border/70">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal/60 block">Pregnancy</span>
+              <span className="text-[13px] sm:text-[14px] font-bold text-charcoal mt-0.5 block truncate capitalize">
+                {state.pregnancyNum === 'first' ? 'First Pregnancy' : 'Second or More'}
+              </span>
+            </div>
+            <div className="p-3 bg-cream/40 rounded-xl border border-border/70">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-charcoal/60 block">Diet Preference</span>
+              <span className="text-[13px] sm:text-[14px] font-bold text-charcoal mt-0.5 block truncate capitalize">
+                {state.dietPref || 'Vegetarian'}
+              </span>
+            </div>
+          </div>
+
+          <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between text-[11.5px] text-medium">
+            <span>Need to update your due date or medical considerations?</span>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onClose) onClose();
+                navigate('/setup');
+              }}
+              className="font-bold text-sage-dark hover:underline flex items-center gap-1 cursor-pointer"
+            >
+              <span>Recalibrate Plan →</span>
+            </button>
           </div>
         </section>
 

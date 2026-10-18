@@ -47,6 +47,7 @@ import { Feedback } from '../sections/Feedback';
 import { Profile } from '../sections/Profile';
 import { GuidedBreathingAudio } from '../sections/GuidedBreathingAudio';
 import { UserFlowGuide } from '../UserFlowGuide';
+import { SetupScreen } from '../SetupScreen';
 
 export const MobileShell: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -183,6 +184,7 @@ export const MobileShell: React.FC = () => {
       case 'garbhsanskar': return <GuidedBreathingAudio />;
       case 'feedback': return <Feedback />;
       case 'profile': return <Profile />;
+      case 'setup': return <SetupScreen isMobileSubview onComplete={() => setActiveToolId(null)} onCancel={() => setActiveToolId(null)} />;
       case 'guide': return <UserFlowGuide onNavigate={handleOpenTool} />;
       default: return <KickCounter />;
     }

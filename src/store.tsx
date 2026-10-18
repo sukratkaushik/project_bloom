@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { addDays, addWeeks } from './utils';
 import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserProfile, saveUserProfile } from './firebase';
 import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
-import { cloudSync } from './cloudSync';
+import { cloudSync, saveJourney } from './cloudSync';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -584,7 +584,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       createdAt: Date.now()
     }));
 
-    // Save to Firestore User Profile immediately
+    // Save to Firestore User Profile & Journey immediately
     if (auth.currentUser) {
       saveUserProfile(auth.currentUser.uid, {
         isSetup: true,
@@ -592,6 +592,20 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         email: auth.currentUser.email,
         displayName: auth.currentUser.displayName,
         createdAt: Date.now()
+      });
+      saveJourney(auth.currentUser.uid, {
+        ...setupData,
+        dueDate: dueDate.toISOString(),
+        lmp: lmp.toISOString(),
+        t1End: t1End.toISOString(),
+        t2End: t2End.toISOString(),
+        isSetup: true,
+        activeJourneyId: journeyId,
+        pregnancyNum: setupData.pregnancyNum || 'first',
+        workSit: setupData.workSit || 'employed',
+        partnerSit: setupData.partnerSit || 'partner',
+        dietPref: setupData.dietPref || 'vegetarian',
+        flags: setupData.flags || {},
       });
     }
   };

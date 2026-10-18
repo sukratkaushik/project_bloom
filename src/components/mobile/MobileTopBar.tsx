@@ -3,6 +3,7 @@ import { ShieldAlert, Sparkles, Phone } from 'lucide-react';
 import { usePlanner } from '../../store';
 import { triggerHaptic, isNativeApp } from '../../utils/nativeBridge';
 import { auth } from '../../firebase';
+import { navigate } from '../../utils/navigation';
 
 interface MobileTopBarProps {
   onOpenProfile: () => void;
@@ -124,13 +125,23 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
         </div>
       </div>
 
-      {/* Gestational Timeline Pill Row */}
-      <div className="mt-2 flex items-center justify-between bg-white border border-border/70 rounded-full px-2.5 xs:px-3 py-1 text-[10px] xs:text-[11px] sm:text-[11.5px] text-medium shadow-2xs font-medium gap-1 overflow-hidden">
+      {/* Gestational Timeline Pill Row (Tap to Adjust Setup) */}
+      <div 
+        onClick={() => {
+          triggerHaptic('light');
+          navigate('/setup');
+        }}
+        className="mt-2 flex items-center justify-between bg-white border border-border/70 rounded-full px-2.5 xs:px-3 py-1 text-[10px] xs:text-[11px] sm:text-[11.5px] text-medium shadow-2xs font-medium gap-1 overflow-hidden cursor-pointer active:scale-[0.99] hover:border-sage/60 transition-all"
+        title="Tap to Adjust Pregnancy Setup"
+      >
         <span className="font-semibold text-charcoal shrink-0 whitespace-nowrap">Wk {currentWeek} of 40</span>
         <span className="text-border text-[9px] shrink-0">•</span>
         <span className="shrink-0 whitespace-nowrap">Day {completedDays}</span>
         <span className="text-border text-[9px] shrink-0">•</span>
-        <span className="truncate">Due: <strong className="text-charcoal font-semibold whitespace-nowrap">{dueFormatted}</strong></span>
+        <div className="flex items-center gap-1 min-w-0">
+          <span className="truncate">Due: <strong className="text-charcoal font-semibold whitespace-nowrap">{dueFormatted}</strong></span>
+          <span className="text-[9px] font-bold text-sage bg-sage-pale px-1.5 py-0.2 rounded-full shrink-0 border border-sage/30">Edit</span>
+        </div>
       </div>
     </header>
   );
