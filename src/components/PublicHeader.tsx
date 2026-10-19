@@ -129,16 +129,15 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   <button 
                     type="button" 
                     onClick={handleDashboard} 
-                    className="bg-white border border-border text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                    className="hidden sm:inline-flex bg-white border border-border text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
                   >
-                    <span className="sm:hidden">Dashboard</span>
-                    <span className="hidden sm:inline">Guest Dashboard</span>
+                    Guest Dashboard
                   </button>
                 )}
                 <button 
                   type="button" 
                   onClick={handleLogin} 
-                  className="bg-transparent text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 py-1.5 sm:px-4 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
+                  className="bg-charcoal text-cream sm:bg-transparent sm:text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-3 py-1.5 sm:px-4 sm:py-2 hover:bg-charcoal/90 sm:hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer shadow-sm sm:shadow-none"
                 >
                   Log In
                 </button>
@@ -146,7 +145,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                   <button 
                     type="button" 
                     onClick={handleSignUp} 
-                    className="bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
+                    className="hidden sm:inline-flex bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
                   >
                     Sign Up
                   </button>

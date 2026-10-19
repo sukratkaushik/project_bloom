@@ -1,5 +1,22 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, updateProfile, sendEmailVerification, connectAuthEmulator, signInWithCredential } from 'firebase/auth';
+import { 
+  getAuth, 
+  initializeAuth, 
+  indexedDBLocalPersistence, 
+  browserLocalPersistence, 
+  GoogleAuthProvider, 
+  signInWithPopup, 
+  signInWithRedirect, 
+  getRedirectResult, 
+  signOut, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  sendPasswordResetEmail, 
+  updateProfile, 
+  sendEmailVerification, 
+  connectAuthEmulator, 
+  signInWithCredential 
+} from 'firebase/auth';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, query, orderBy, connectFirestoreEmulator, serverTimestamp } from 'firebase/firestore';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { getFunctions, httpsCallable, connectFunctionsEmulator } from 'firebase/functions';
@@ -8,7 +25,18 @@ const isNativeApp = () => typeof window !== 'undefined' && Boolean((window as an
 
 const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app);
+export const auth = (() => {
+  if (isNativeApp()) {
+    try {
+      return initializeAuth(app, {
+        persistence: [indexedDBLocalPersistence, browserLocalPersistence]
+      });
+    } catch {
+      return getAuth(app);
+    }
+  }
+  return getAuth(app);
+})();
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const functions = getFunctions(app, "asia-south1");
 
@@ -176,17 +204,35 @@ export const signInWithGoogle = async () => {
   if (isNativeApp()) {
     try {
       const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
-      const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false });
-      let idToken = result.credential?.idToken;
-      if (!idToken) {
-        const tokenRes = await FirebaseAuthentication.getIdToken();
-        idToken = tokenRes.token;
-      }
-      if (!idToken) {
+      
+      // Native Google sign-in with 60s safety timeout
+      const result = await Promise.race([
+        FirebaseAuthentication.signInWithGoogle({ 
+          useCredentialManager: false,
+          skipNativeAuth: true 
+        }),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Google Sign-In request timed out. Please try again.')), 60000)
+        )
+      ]);
+
+      const idToken = result.credential?.idToken;
+      const accessToken = result.credential?.accessToken;
+
+      if (!idToken && !accessToken) {
         throw new Error('Google Sign-In did not return an identity token. Please try again.');
       }
-      const credential = GoogleAuthProvider.credential(idToken);
-      const userCredential = await signInWithCredential(auth, credential);
+
+      const credential = GoogleAuthProvider.credential(idToken || null, accessToken || null);
+      
+      // Sign in on web layer with 15s timeout
+      const userCredential = await Promise.race([
+        signInWithCredential(auth, credential),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Authentication service timeout. Please check your network connection.')), 15000)
+        )
+      ]);
+
       return userCredential.user;
     } catch (error: any) {
       const msg = (error?.message || '').toLowerCase();
