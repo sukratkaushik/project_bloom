@@ -71,9 +71,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   };
 
   return (
-    <header className={`fixed top-0 left-0 w-full z-50 bg-[#FDFBF7]/95 backdrop-blur-md transition-all duration-300 border-b border-border/80 ${isScrolled ? 'shadow-[0_12px_32px_rgba(0,0,0,0.08)]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]'} ${
-      isNative ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[env(safe-area-inset-top,0px)]'
-    }`}>
+    <header className={`fixed top-0 left-0 w-full z-50 bg-[#FDFBF7]/95 backdrop-blur-md transition-all duration-300 border-b border-border/80 ${isScrolled ? 'shadow-[0_12px_32px_rgba(0,0,0,0.08)]' : 'shadow-[0_4px_20px_rgba(0,0,0,0.04)]'} pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))]`}>
       {/* w-full to push logo to the far left edge instead of max-w constraints */}
       <div className={`transition-all duration-300 w-full px-4 sm:px-6 md:px-8 ${isScrolled ? 'py-1.5 sm:py-2' : 'py-2 sm:py-3.5'}`}>
         <nav className="w-full flex items-center justify-between">

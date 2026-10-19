@@ -384,9 +384,7 @@ export const MobileShell: React.FC = () => {
       {showProfileModal && (
         <div className="fixed inset-0 z-50 bg-[#FDFBF7] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
           {/* Native Top App Bar */}
-          <div className={`shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between ${
-            isNativeApp() ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[max(0.75rem,env(safe-area-inset-top))]'
-          }`}>
+          <div className="shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))]">
             <button
               type="button"
               onClick={() => {
