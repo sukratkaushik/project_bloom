@@ -5,7 +5,8 @@ const config: CapacitorConfig = {
   appName: 'Our Pregnancy',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    iosScheme: 'capacitor'
   },
   plugins: {
     FirebaseAuthentication: {
@@ -16,6 +17,10 @@ const config: CapacitorConfig = {
       style: 'LIGHT',
       backgroundColor: '#FDFBF7'
     }
+  },
+  ios: {
+    contentInset: 'automatic',
+    preferredContentMode: 'mobile'
   }
 };
 

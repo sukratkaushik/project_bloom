@@ -25,7 +25,19 @@ keystore.properties
 *.apk
 *.aab
 
+# iOS & Xcode
+ios/App/App.xcodeproj/xcuserdata/
+ios/App/App.xcworkspace/xcuserdata/
+ios/App/Pods/
+ios/App/build/
+ios/DerivedData/
+*.xcworkspace/xcuserdata/
+*.xcuserdatad/
+.build/
+.swiftpm/
+
 scratch/
+
 
 
 
