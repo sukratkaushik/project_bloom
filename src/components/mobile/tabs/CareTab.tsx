@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import {
   Calendar, Plus, CheckSquare, Square,
-  ShieldCheck, Clock, FileText,
+  Clock, FileText,
   Bell, ChevronRight, CheckCircle2,
-  CalendarCheck, Download
+  CalendarCheck
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
@@ -82,24 +82,6 @@ export const CareTab: React.FC<CareTabProps> = ({
 
   const doctorShortName = state.doctor?.name ? state.doctor.name.split(',')[0].trim() : 'Obstetrician';
 
-  const [isExporting, setIsExporting] = useState(false);
-
-  const handleExportCarePlan = async () => {
-    try {
-      setIsExporting(true);
-      triggerHaptic('success');
-      onShowToast('📄 Generating Clinical Care Plan PDF...');
-      const { exportCarePlanPdf } = await import('../../../utils/pdfExport');
-      await exportCarePlanPdf(state);
-      onShowToast('✅ Clinical Care Plan PDF downloaded! Ready to print or share.');
-    } catch (err) {
-      console.error('Failed to export Care Plan PDF:', err);
-      onShowToast('❌ Could not generate Care Plan PDF.');
-    } finally {
-      setIsExporting(false);
-    }
-  };
-
   const filteredQuestions = prepQuestions.filter(
     (q) => selectedQuestionCategory === 'All' || q.category === selectedQuestionCategory
   );
@@ -115,62 +97,7 @@ export const CareTab: React.FC<CareTabProps> = ({
 
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
-      {/* 1. Clinical Record Summary & Care Plan Hero Card */}
-      <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        <div className="flex items-center justify-between mb-3 px-0.5">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold shrink-0 border border-sage/20">
-              <ShieldCheck size={18} />
-            </div>
-            <div>
-              <h3 className="font-serif font-bold text-charcoal text-[15px] leading-tight">
-                Clinical Record Summary
-              </h3>
-              <p className="text-[11px] text-medium">
-                Verified maternal parameters & baseline health
-              </p>
-            </div>
-          </div>
-          <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full border border-sage/20 shrink-0">
-            Wk {currentWeek} Active
-          </span>
-        </div>
-
-        {/* Patient Clinical Info Bar with Symmetric Equal-Height Boxes */}
-        <div className="pt-1 grid grid-cols-4 gap-2 text-center">
-          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
-            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">UHID</span>
-            <span className="font-mono font-bold text-charcoal text-[11px] truncate mt-0.5">#98421</span>
-          </div>
-          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
-            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Blood</span>
-            <span className="font-bold text-charcoal text-[11px] truncate mt-0.5">B+ (Rh+)</span>
-          </div>
-          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
-            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Gestation</span>
-            <span className="font-bold text-sage-dark text-[11px] truncate mt-0.5">Wk {currentWeek}+{gestationDays}d</span>
-          </div>
-          <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
-            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Allergy</span>
-            <span className="font-bold text-emerald-700 text-[11px] truncate mt-0.5">NKDA</span>
-          </div>
-        </div>
-
-        {/* 1-Tap Export & Print Doctor Report Button */}
-        <div className="mt-3 pt-2.5 border-t border-border/60">
-          <button
-            type="button"
-            onClick={handleExportCarePlan}
-            disabled={isExporting}
-            className="w-full h-10 rounded-2xl bg-cream hover:bg-sage-pale/60 border border-border/80 text-charcoal hover:text-sage-dark text-[11.5px] font-bold flex items-center justify-center gap-1.5 transition-all shadow-2xs active:scale-[0.99] cursor-pointer"
-          >
-            <Download size={13} className="text-sage-dark" />
-            <span>{isExporting ? 'Generating Report...' : '📄 Export & Print Clinical Care Plan (PDF)'}</span>
-          </button>
-        </div>
-      </div>
-
-      {/* 2. Next Prenatal Visit Bento Card */}
+      {/* 1. Next Prenatal Visit Bento Card */}
       {(() => {
         const activeAppointment = state.nextAppointment;
         const isReschedulePending = Boolean(activeAppointment?.notes?.includes('Reschedule requested'));
@@ -233,7 +160,7 @@ export const CareTab: React.FC<CareTabProps> = ({
         );
       })()}
 
-      {/* 3. Consolidated Clinical Roadmap across Scans, Labs & Vaccines */}
+      {/* 2. Consolidated Clinical Roadmap across Scans, Labs & Vaccines */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-3 px-0.5">
           <div className="flex items-center gap-1.5">
@@ -371,7 +298,7 @@ export const CareTab: React.FC<CareTabProps> = ({
         </div>
       </div>
 
-      {/* 4. Prenatal Reminders Strip */}
+      {/* 3. Prenatal Reminders Strip */}
       <div className="bg-white border border-border/80 rounded-2xl p-3.5 shadow-xs flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
@@ -403,7 +330,7 @@ export const CareTab: React.FC<CareTabProps> = ({
         </button>
       </div>
 
-      {/* 5. Questions for Doctor Checklist */}
+      {/* 4. Questions for Doctor Checklist */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
         <div className="flex items-center justify-between mb-2.5 px-0.5">
           <div className="flex items-center gap-1.5">

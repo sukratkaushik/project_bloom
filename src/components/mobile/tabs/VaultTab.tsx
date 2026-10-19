@@ -19,6 +19,14 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
   const [isExporting, setIsExporting] = useState(false);
   const [isAbhaModalOpen, setIsAbhaModalOpen] = useState(false);
 
+  // Gestational calculations matching Today and Care tabs
+  const due = state.dueDate ? new Date(state.dueDate) : new Date(Date.now() + 112 * 24 * 60 * 60 * 1000);
+  const now = new Date();
+  const diffDays = Math.max(0, Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+  const completedDays = Math.max(1, 280 - diffDays);
+  const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
+  const gestationDays = completedDays % 7;
+
   // Medical Records Filter
   const [recordFilter, setRecordFilter] = useState<'all' | 'ultrasound' | 'lab' | 'prescription'>('all');
 
@@ -153,8 +161,8 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
             <div className="w-10 h-10 rounded-xl bg-sage text-white flex items-center justify-center shrink-0 shadow-2xs">
               <FileText size={20} />
             </div>
-            <div className="min-w-0">
-              <h3 className="font-serif font-bold text-charcoal text-[15px] leading-tight truncate">
+            <div className="min-w-0 flex-1">
+              <h3 className="font-serif font-bold text-charcoal text-[14px] xs:text-[15px] leading-tight">
                 Mother's Overall Health Report
               </h3>
               <span className="text-[11px] text-sage-dark font-medium mt-0.5 block truncate">
@@ -162,9 +170,32 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
               </span>
             </div>
           </div>
+          <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full border border-sage/20 shrink-0">
+            Wk {currentWeek} Active
+          </span>
         </div>
 
-        <p className="text-[11.5px] text-medium mt-2 leading-relaxed">
+        {/* Patient Clinical Parameters Bar */}
+        <div className="mt-3 pt-3 border-t border-sage/20 grid grid-cols-4 gap-2 text-center">
+          <div className="bg-white/80 rounded-xl py-2 px-1 border border-border/50 flex flex-col justify-center shadow-3xs">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">UHID</span>
+            <span className="font-mono font-bold text-charcoal text-[11px] truncate mt-0.5">#98421</span>
+          </div>
+          <div className="bg-white/80 rounded-xl py-2 px-1 border border-border/50 flex flex-col justify-center shadow-3xs">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Blood</span>
+            <span className="font-bold text-charcoal text-[11px] truncate mt-0.5">B+ (Rh+)</span>
+          </div>
+          <div className="bg-white/80 rounded-xl py-2 px-1 border border-border/50 flex flex-col justify-center shadow-3xs">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Gestation</span>
+            <span className="font-bold text-sage-dark text-[11px] truncate mt-0.5">Wk {currentWeek}+{gestationDays}d</span>
+          </div>
+          <div className="bg-white/80 rounded-xl py-2 px-1 border border-border/50 flex flex-col justify-center shadow-3xs">
+            <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">Allergy</span>
+            <span className="font-bold text-emerald-700 text-[11px] truncate mt-0.5">NKDA</span>
+          </div>
+        </div>
+
+        <p className="text-[11.5px] text-medium mt-2.5 leading-relaxed">
           Export and print a complete report including gestational age, maternal vitals history (BP, glucose, weight), medical checklists, emergency contacts, and birth preferences.
         </p>
 
@@ -176,7 +207,7 @@ export const VaultTab: React.FC<VaultTabProps> = ({ onOpenTool, onShowToast }) =
             className="w-full h-11 rounded-xl bg-charcoal hover:bg-black text-white text-[12.5px] font-bold flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xs active:scale-[0.99]"
           >
             <Download size={15} />
-            <span>{isExporting ? 'Generating Report...' : '📄 Export & Print Care Plan (PDF)'}</span>
+            <span>{isExporting ? 'Generating Report...' : '📄 Export & Print Clinical Care Plan (PDF)'}</span>
           </button>
         </div>
       </div>
