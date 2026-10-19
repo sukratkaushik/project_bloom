@@ -21,6 +21,21 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'automatic',
     preferredContentMode: 'mobile'
+  },
+  experimental: {
+    ios: {
+      spm: {
+        packageOptions: {
+          '@capacitor-firebase/authentication': {
+            symlink: true
+          }
+        },
+        swiftToolsVersion: '6.1',
+        packageTraits: {
+          '@capacitor-firebase/authentication': ['Google']
+        }
+      }
+    }
   }
 };
 

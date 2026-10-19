@@ -15,4 +15,5 @@ App/App/config.xml
 # SwiftPM
 .build/
 .swiftpm/
+App/CapApp-SPM/symlinks/
 

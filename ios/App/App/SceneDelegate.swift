@@ -15,6 +15,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        for context in URLContexts {
+            var options: [UIApplication.OpenURLOptionsKey: Any] = [:]
+            if let sourceApp = context.options.sourceApplication {
+                options[.sourceApplication] = sourceApp
+            }
+            if let annotation = context.options.annotation {
+                options[.annotation] = annotation
+            }
+            options[.openInPlace] = context.options.openInPlace
+            _ = ApplicationDelegateProxy.shared.application(UIApplication.shared, open: context.url, options: options)
+        }
         SceneDelegateProxy.shared.scene(scene, openURLContexts: URLContexts)
     }
 
