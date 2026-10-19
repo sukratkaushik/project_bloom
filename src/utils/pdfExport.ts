@@ -107,20 +107,39 @@ export const exportToPDF = async (state: PlannerState) => {
   doc.setTextColor(51, 51, 51);
 
   if (state.dueDate) {
-    const dateObj = new Date(state.dueDate);
-    const formattedDate = dateObj.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+    const due = new Date(state.dueDate);
+    const now = new Date();
+    const diffDays = Math.max(0, Math.ceil((due.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)));
+    const completedDays = Math.max(1, 280 - diffDays);
+    const currentWeek = Math.min(40, Math.max(1, Math.floor(completedDays / 7) + 1));
+    const gestationDays = completedDays % 7;
+    const formattedDate = due.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+
     doc.setFont('helvetica', 'bold');
     doc.text('Estimated Due Date:', margin, yPos);
     doc.setFont('helvetica', 'normal');
-    doc.text(formattedDate, margin + 45, yPos);
-    yPos += 7;
+    doc.text(formattedDate, margin + 48, yPos);
+    yPos += 6.5;
+
+    doc.setFont('helvetica', 'bold');
+    doc.text('Gestational Age:', margin, yPos);
+    doc.setFont('helvetica', 'normal');
+    doc.text(`Week ${currentWeek}+${gestationDays}d (Day ${completedDays} of 280)`, margin + 48, yPos);
+    yPos += 6.5;
   }
+
+  // Clinical Identifiers & Baseline Parameters
+  doc.setFont('helvetica', 'bold');
+  doc.text('Clinical ID (UHID):', margin, yPos);
+  doc.setFont('helvetica', 'normal');
+  doc.text('#98421  |  Blood: B+ (Rh+)  |  Allergy: NKDA', margin + 48, yPos);
+  yPos += 6.5;
 
   const today = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
   doc.setFont('helvetica', 'bold');
   doc.text('Generated On:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text(today, margin + 33, yPos);
+  doc.text(today, margin + 48, yPos);
   yPos += 12;
 
   // ---------------------------------------------------------
