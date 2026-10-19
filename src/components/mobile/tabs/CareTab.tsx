@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import {
-  Stethoscope, Phone, Calendar, Plus, CheckSquare, Square,
+  Calendar, Plus, CheckSquare, Square,
   ShieldCheck, Clock, FileText,
-  Bell, MessageCircle, ChevronRight, CheckCircle2,
-  CalendarCheck, MapPin, Pencil, UserCheck, Download
+  Bell, ChevronRight, CheckCircle2,
+  CalendarCheck, Download
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
 import { usePlanner } from '../../../store';
-import { DoctorModal } from '../DoctorModal';
 
 import {
   CLINICAL_MILESTONES,
@@ -47,7 +46,6 @@ export const CareTab: React.FC<CareTabProps> = ({
   const gestationDays = completedDays % 7;
   const nextMilestone = getAuthoritativeNextMilestone(currentWeek);
 
-  const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [selectedQuestionCategory, setSelectedQuestionCategory] = useState<string>('All');
   const [milestoneCategoryFilter, setMilestoneCategoryFilter] = useState<'all' | 'scan' | 'lab' | 'vaccine'>('all');
   const [prepQuestions, setPrepQuestions] = useState<QuestionItem[]>([
@@ -82,11 +80,7 @@ export const CareTab: React.FC<CareTabProps> = ({
     setNewQuestionText('');
   };
 
-  const doctor = state.doctor;
-  const hasDoctor = Boolean(doctor && doctor.name && doctor.name.trim().length > 0);
-  const cleanPhone = doctor?.phone ? doctor.phone.replace(/[^\d+]/g, '') : '';
-  const cleanPhoneForWa = doctor?.phone ? doctor.phone.replace(/[^\d]/g, '') : '';
-  const doctorShortName = hasDoctor && doctor?.name ? doctor.name.split(',')[0].trim() : 'Obstetrician';
+  const doctorShortName = state.doctor?.name ? state.doctor.name.split(',')[0].trim() : 'Obstetrician';
 
   const [isExporting, setIsExporting] = useState(false);
 
@@ -121,126 +115,29 @@ export const CareTab: React.FC<CareTabProps> = ({
 
   return (
     <div className="space-y-4 pb-32 animate-in fade-in duration-200">
-      {/* 1. OB-GYN Clinical Care Team Hero Card */}
+      {/* 1. Clinical Record Summary & Care Plan Hero Card */}
       <div className="bg-white border border-border/80 rounded-3xl p-4 shadow-xs">
-        {hasDoctor && doctor ? (
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3 min-w-0">
-              <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
-                <Stethoscope size={24} />
-              </div>
-              <div className="min-w-0">
-                <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
-                  Primary Obstetrician
-                </span>
-                <h3 className="font-serif font-bold text-charcoal text-[16px] leading-tight truncate">
-                  {doctor.name}
-                </h3>
-                <p className="text-[11.5px] text-medium mt-0.5 flex items-center gap-1 truncate">
-                  <MapPin size={11} className="text-sage shrink-0" />
-                  <span className="truncate">{doctor.hospital || 'Obstetrics & Gynecology'}</span>
-                </p>
-                {doctor.notes && (
-                  <p className="text-[10.5px] text-sage-dark/90 mt-0.5 font-medium truncate">
-                    {doctor.notes}
-                  </p>
-                )}
-              </div>
+        <div className="flex items-center justify-between mb-3 px-0.5">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold shrink-0 border border-sage/20">
+              <ShieldCheck size={18} />
             </div>
-
-            <div className="flex items-center gap-1.5 shrink-0 ml-2">
-              <button
-                type="button"
-                onClick={() => {
-                  triggerHaptic('light');
-                  setIsDoctorModalOpen(true);
-                }}
-                className="w-8 h-8 rounded-full bg-cream hover:bg-sage-pale text-charcoal hover:text-sage-dark border border-border/70 flex items-center justify-center shadow-2xs active:scale-95 transition-all cursor-pointer"
-                aria-label="Edit Doctor Details"
-                title="Edit Doctor Details"
-              >
-                <Pencil size={13} />
-              </button>
-
-              {doctor.phone ? (
-                <a
-                  href={`tel:${cleanPhone}`}
-                  onClick={() => triggerHaptic('light')}
-                  className="w-8 h-8 rounded-full bg-sage text-white flex items-center justify-center shadow-xs hover:bg-sage-dark active:scale-95 transition-all"
-                  aria-label="Call Doctor"
-                  title={`Call ${doctor.name}`}
-                >
-                  <Phone size={14} />
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setIsDoctorModalOpen(true);
-                  }}
-                  className="w-8 h-8 rounded-full bg-cream text-medium hover:text-charcoal border border-border/80 flex items-center justify-center shadow-2xs active:scale-95 transition-all cursor-pointer"
-                  aria-label="Add Phone Number"
-                  title="Add Phone Number"
-                >
-                  <Phone size={14} />
-                </button>
-              )}
-
-              {doctor.phone ? (
-                <a
-                  href={`https://wa.me/${cleanPhoneForWa}?text=${encodeURIComponent(`Hello ${doctor.name}, query from Our Pregnancy app`)}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => triggerHaptic('light')}
-                  className="w-8 h-8 rounded-full bg-emerald-600 text-white flex items-center justify-center shadow-xs hover:bg-emerald-700 active:scale-95 transition-all"
-                  aria-label="WhatsApp Clinic"
-                  title="WhatsApp OPD"
-                >
-                  <MessageCircle size={14} />
-                </a>
-              ) : null}
-            </div>
-          </div>
-        ) : (
-          <div className="flex items-start gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-sage-pale text-sage-dark flex items-center justify-center font-bold text-lg shrink-0 border border-sage/20">
-              <Stethoscope size={24} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <span className="text-[9.5px] font-bold text-sage-dark uppercase tracking-wider block">
-                  Primary Obstetrician
-                </span>
-                <span className="text-[10px] font-bold text-medium bg-cream px-2 py-0.5 rounded-full border border-border/60">
-                  Not Assigned
-                </span>
-              </div>
-              <h3 className="font-serif font-bold text-charcoal text-[15.5px] leading-tight mt-0.5">
-                Add Your Primary Obstetrician
+            <div>
+              <h3 className="font-serif font-bold text-charcoal text-[15px] leading-tight">
+                Clinical Record Summary
               </h3>
-              <p className="text-[11.5px] text-medium mt-1 leading-snug">
-                Save your OB-GYN, hospital, and emergency contact for 1-tap calls, WhatsApp, and visit prep.
+              <p className="text-[11px] text-medium">
+                Verified maternal parameters & baseline health
               </p>
-              <div className="mt-3">
-                <button
-                  type="button"
-                  onClick={() => {
-                    triggerHaptic('light');
-                    setIsDoctorModalOpen(true);
-                  }}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-sage hover:bg-sage-dark active:scale-95 text-white font-bold text-[12px] rounded-xl shadow-xs transition-all cursor-pointer"
-                >
-                  <Plus size={14} />
-                  <span>Add Primary Obstetrician</span>
-                </button>
-              </div>
             </div>
           </div>
-        )}
+          <span className="text-[10px] font-bold text-sage-dark bg-sage-pale px-2 py-0.5 rounded-full border border-sage/20 shrink-0">
+            Wk {currentWeek} Active
+          </span>
+        </div>
 
         {/* Patient Clinical Info Bar with Symmetric Equal-Height Boxes */}
-        <div className="mt-3.5 pt-3 border-t border-border/60 grid grid-cols-4 gap-2 text-center">
+        <div className="pt-1 grid grid-cols-4 gap-2 text-center">
           <div className="bg-cream/70 rounded-xl py-2 px-1 border border-border/40 flex flex-col justify-center">
             <span className="text-medium text-[9px] font-bold uppercase tracking-wider block">UHID</span>
             <span className="font-mono font-bold text-charcoal text-[11px] truncate mt-0.5">#98421</span>
@@ -583,20 +480,6 @@ export const CareTab: React.FC<CareTabProps> = ({
           </button>
         </form>
       </div>
-
-      {/* Doctor Management Modal */}
-      <DoctorModal
-        isOpen={isDoctorModalOpen}
-        onClose={() => setIsDoctorModalOpen(false)}
-        initialDoctor={state.doctor}
-        onSave={(doctorData) => {
-          updateState({ doctor: doctorData });
-        }}
-        onRemove={() => {
-          updateState({ doctor: null });
-        }}
-        onShowToast={onShowToast}
-      />
     </div>
   );
 };
