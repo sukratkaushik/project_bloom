@@ -26,15 +26,15 @@ const CATEGORIES: Record<string, { label: string, items: string[] }> = {
   },
   tasks: {
     label: "Planning & Tasks",
-    items: ['dev', 'baby-prep-bag', 'cost-schemes']
+    items: ['dev', 'baby-prep-bag', 'birthplan']
   },
   health: {
-    label: "Medical & Clinical",
-    items: ['medical-schedule', 'medical-reports']
+    label: "Medical & Govt",
+    items: ['medical-schedule', 'cost-schemes', 'medical-reports']
   },
   labor: {
     label: "Labor & Postpartum",
-    items: ['birthplan', 'postpartum']
+    items: ['postpartum']
   }
 };
 
@@ -122,7 +122,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'dev', icon: '🌱', label: 'Development', tier: 'free', progress: getProgress(devTasks) },
     { id: 'medical-schedule', icon: '🏥', label: 'Visits & Vaccines', tier: 'free', progress: getProgress(DEADLINE_TASKS) },
     { id: 'baby-prep-bag', icon: '👜', label: 'Hospital Bag & Prep', tier: 'free', progress: getProgress(prepTasks) },
-    { id: 'cost-schemes', icon: '💰', label: 'Costs & Govt Schemes', tier: 'free', progress: getProgress(FIN_TASKS) },
+    { id: 'cost-schemes', icon: '🏛️', label: 'Govt Schemes & Costs', tier: 'free', progress: getProgress(FIN_TASKS) },
     { id: 'prep', icon: '📋', label: 'Preparation', tier: 'free', progress: getProgress(prepTasks) },
     { id: 'finance', icon: '💰', label: 'Financial', tier: 'free', progress: getProgress(FIN_TASKS) },
     { id: 'deadlines', icon: '📅', label: 'Deadlines', tier: 'free', progress: getProgress(DEADLINE_TASKS) },

@@ -185,7 +185,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'View Guide →',
   },
 
-  // Category 3: Planning & Milestones (Consolidated into 5 focused tools)
+  // Category 3: Planning & Milestones (3 focused tools)
   {
     id: 'dev',
     title: 'Fetal Development',
@@ -218,17 +218,6 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'Pack & Prep →',
   },
   {
-    id: 'cost-schemes',
-    title: 'Delivery Cost & Govt Schemes',
-    desc: 'Hospital delivery estimates, insurance & PMMVY ₹5k aid',
-    category: 'Milestones & Prep',
-    icon: DollarSign,
-    color: 'text-emerald-700 bg-emerald-50',
-    badge: 'PMMVY ₹5k',
-    ritualSubtitle: 'Budget & maternity schemes',
-    actionLabel: 'Plan Budget →',
-  },
-  {
     id: 'birthplan',
     title: 'Birth Plan Builder',
     desc: 'Preferences for labor, support person & pain relief',
@@ -239,7 +228,18 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'Build Plan →',
   },
 
-  // Category 4: Medical & Schemes (2 focused tools)
+  // Category 4: Medical & Schemes (3 focused tools)
+  {
+    id: 'cost-schemes',
+    title: 'Govt Schemes & Delivery Costs',
+    desc: 'PMMVY (₹5k), JSY (₹1.4k), state aid & hospital delivery budget',
+    category: 'Medical & Schemes',
+    icon: Building,
+    color: 'text-yellow-700 bg-yellow-50',
+    badge: 'PMMVY ₹5k',
+    ritualSubtitle: 'Govt schemes & budget',
+    actionLabel: 'View Schemes →',
+  },
   {
     id: 'medical-reports',
     title: 'Medical Reports Locker',
@@ -266,8 +266,8 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
 export const CATEGORY_CHIPS = [
   { label: 'All', count: 17, key: 'All' },
   { label: 'Daily Logs', count: 10, key: 'Daily Tracking' },
-  { label: 'Milestones & Prep', count: 5, key: 'Milestones & Prep' },
-  { label: 'Records & Care', count: 2, key: 'Medical & Schemes' },
+  { label: 'Milestones & Prep', count: 4, key: 'Milestones & Prep' },
+  { label: 'Govt & Records', count: 3, key: 'Medical & Schemes' },
 ];
 
 export const getToolById = (id: string): ToolDefinition | undefined => {
