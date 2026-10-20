@@ -185,7 +185,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'View Guide →',
   },
 
-  // Category 3: Planning & Milestones (4 tools)
+  // Category 3: Planning & Milestones (Consolidated into 5 focused tools)
   {
     id: 'dev',
     title: 'Fetal Development',
@@ -197,44 +197,36 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'View Timeline →',
   },
   {
-    id: 'deadlines',
-    title: 'Due Date Deadlines',
-    desc: 'Essential prenatal scan milestones & visits',
+    id: 'medical-schedule',
+    title: 'Visits & Vaccine Schedule',
+    desc: 'OB-GYN checkups, ultrasound scans, Tdap & lab tests',
     category: 'Milestones & Prep',
     icon: Clock,
     color: 'text-amber-700 bg-amber-50',
-    ritualSubtitle: 'Scan schedule & visits',
-    actionLabel: 'View Visits →',
+    badge: 'Clinical',
+    ritualSubtitle: 'Scans & vaccine roadmap',
+    actionLabel: 'View Schedule →',
   },
   {
-    id: 'prep',
-    title: 'Nursery & Baby Prep',
-    desc: 'Essential checklists for baby gear & clothing',
-    category: 'Milestones & Prep',
-    icon: ShoppingBag,
-    color: 'text-blue-600 bg-blue-50',
-    ritualSubtitle: 'Checklists for baby gear',
-    actionLabel: 'View Prep →',
-  },
-  {
-    id: 'finance',
-    title: 'Delivery Cost Planner',
-    desc: 'Hospital delivery estimates, insurance & savings',
-    category: 'Milestones & Prep',
-    icon: DollarSign,
-    color: 'text-emerald-700 bg-emerald-50',
-    ritualSubtitle: 'Hospital cost calculator',
-    actionLabel: 'Plan Budget →',
-  },
-  {
-    id: 'hospitalbag',
-    title: 'Hospital Bag Checklist',
-    desc: 'Organized packing for mother, baby & partner',
+    id: 'baby-prep-bag',
+    title: 'Hospital Bag & Baby Prep',
+    desc: 'Hospital packing checklists & nursery gear by trimester',
     category: 'Milestones & Prep',
     icon: Briefcase,
     color: 'text-stone-700 bg-stone-100',
-    ritualSubtitle: 'Packing checklist',
-    actionLabel: 'Pack Bag →',
+    ritualSubtitle: 'Packing & nursery prep',
+    actionLabel: 'Pack & Prep →',
+  },
+  {
+    id: 'cost-schemes',
+    title: 'Delivery Cost & Govt Schemes',
+    desc: 'Hospital delivery estimates, insurance & PMMVY ₹5k aid',
+    category: 'Milestones & Prep',
+    icon: DollarSign,
+    color: 'text-emerald-700 bg-emerald-50',
+    badge: 'PMMVY ₹5k',
+    ritualSubtitle: 'Budget & maternity schemes',
+    actionLabel: 'Plan Budget →',
   },
   {
     id: 'birthplan',
@@ -247,18 +239,7 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     actionLabel: 'Build Plan →',
   },
 
-  // Category 4: Medical & Schemes (4 tools)
-  {
-    id: 'schemes',
-    title: 'Govt Maternity Schemes',
-    desc: 'PMMVY (₹5k), JSY (₹1.4k), PMSMA & state aid',
-    category: 'Medical & Schemes',
-    icon: Building,
-    color: 'text-yellow-700 bg-yellow-50',
-    badge: 'MoHFW',
-    ritualSubtitle: 'PMMVY & JSY benefits',
-    actionLabel: 'View Schemes →',
-  },
+  // Category 4: Medical & Schemes (2 focused tools)
   {
     id: 'medical-reports',
     title: 'Medical Reports Locker',
@@ -269,16 +250,6 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
     badge: 'ABHA',
     ritualSubtitle: 'AES-256 scan locker',
     actionLabel: 'Open Locker →',
-  },
-  {
-    id: 'medical',
-    title: 'Vaccines & Schedule',
-    desc: 'Tdap, tetanus, glucose tolerance & labs',
-    category: 'Medical & Schemes',
-    icon: Syringe,
-    color: 'text-rose-600 bg-rose-50',
-    ritualSubtitle: 'Tdap, OGTT & vaccines',
-    actionLabel: 'View Schedule →',
   },
   {
     id: 'postpartum',
@@ -293,12 +264,16 @@ export const ALL_PREGNANCY_TOOLS: ToolDefinition[] = [
 ];
 
 export const CATEGORY_CHIPS = [
-  { label: 'All', count: 20, key: 'All' },
+  { label: 'All', count: 17, key: 'All' },
   { label: 'Daily Logs', count: 10, key: 'Daily Tracking' },
-  { label: 'Milestones', count: 6, key: 'Milestones & Prep' },
-  { label: 'Govt & Scans', count: 4, key: 'Medical & Schemes' },
+  { label: 'Milestones & Prep', count: 5, key: 'Milestones & Prep' },
+  { label: 'Records & Care', count: 2, key: 'Medical & Schemes' },
 ];
 
 export const getToolById = (id: string): ToolDefinition | undefined => {
-  return ALL_PREGNANCY_TOOLS.find((t) => t.id === id);
+  const normalizedId = 
+    id === 'deadlines' || id === 'medical' ? 'medical-schedule' :
+    id === 'prep' || id === 'hospitalbag' ? 'baby-prep-bag' :
+    id === 'finance' || id === 'schemes' ? 'cost-schemes' : id;
+  return ALL_PREGNANCY_TOOLS.find((t) => t.id === normalizedId || t.id === id);
 };
