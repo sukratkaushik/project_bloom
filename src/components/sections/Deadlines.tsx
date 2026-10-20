@@ -3,24 +3,26 @@ import { usePlanner } from '../../store';
 import { DEADLINE_TASKS } from '../../data';
 import { Task } from '../../types';
 import { ContextBanner } from '../ContextBanner';
-import { CustomTaskList } from './CustomTaskList';
+import { TaskItem } from '../TaskItem';
 import { addWeeks, fmtDay, fmtMonth } from '../../utils';
-import { Check, Trash2, Users, UserCheck } from 'lucide-react';
+import { Check, Trash2, Users, UserCheck, Plus } from 'lucide-react';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { PartnerModal } from '../mobile/PartnerModal';
 import { syncEngine } from '../../syncEngine';
 
 export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ filterTasks }) => {
-  const { state, updateState, toggleTask, deleteTask, toggleAssign } = usePlanner();
+  const { state, updateState, toggleTask, deleteTask, toggleAssign, addCustomTask } = usePlanner();
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [pendingShareTask, setPendingShareTask] = useState<{ id: string; text: string } | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [newTaskText, setNewTaskText] = useState('');
 
   const today = new Date();
   const baseDueDate = state.dueDate ? new Date(state.dueDate) : addWeeks(new Date(), 40);
 
   const sorted = [...DEADLINE_TASKS].sort((a, b) => (a.weeksBeforeDue || 0) - (b.weeksBeforeDue || 0));
   const filtered = filterTasks(sorted).filter(t => !state.deletedTasks?.[t.id]);
+  const customTasks = (state.customTasks['deadlines'] || []).filter(t => !state.deletedTasks?.[t.id]);
 
   const partnerName = state.partner?.name?.trim() || 'Partner';
   const partnerPhone = state.partner?.phone?.trim() || '';
@@ -39,6 +41,15 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
   const handleDelete = (id: string) => {
     triggerHaptic('warning');
     deleteTask(id);
+  };
+
+  const handleAddTask = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (newTaskText.trim()) {
+      triggerHaptic('light');
+      addCustomTask('deadlines', newTaskText.trim());
+      setNewTaskText('');
+    }
   };
 
   // Mother assigns / unassigns a specific deadline to her partner (or opens PartnerModal if unconfigured)
@@ -86,6 +97,7 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
     // 1. Mark all deadlines as assigned to partner in shared state
     const newAssigned = { ...state.assigned };
     filtered.forEach(t => { newAssigned[t.id] = true; });
+    customTasks.forEach(t => { newAssigned[t.id] = true; });
     const newState = { ...state, assigned: newAssigned };
     updateState({ assigned: newAssigned });
 
@@ -98,7 +110,10 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
     }
   };
 
-  const completedCount = filtered.filter(t => !!state.checked[t.id]).length;
+  const deadlineCompletedCount = filtered.filter(t => !!state.checked[t.id]).length;
+  const customCompletedCount = customTasks.filter(t => !!state.checked[t.id]).length;
+  const completedCount = deadlineCompletedCount + customCompletedCount;
+  const totalTasksCount = filtered.length + customTasks.length;
 
   return (
     <div className="animate-in fade-in duration-300">
@@ -112,7 +127,7 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
             Deadlines
           </h3>
           <span className="text-[11px] font-medium text-light bg-cream/90 px-2 py-0.5 rounded-full border border-border/60 shrink-0">
-            {completedCount}/{filtered.length} done
+            {completedCount}/{totalTasksCount} done
           </span>
         </div>
 
@@ -127,6 +142,37 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
           <span>Sync with Partner</span>
         </button>
       </div>
+
+      {/* Add Custom Task Input (Top Aligned) */}
+      <form onSubmit={handleAddTask} className="flex gap-2 mb-3.5 no-print">
+        <input
+          type="text"
+          value={newTaskText}
+          onChange={(e) => setNewTaskText(e.target.value)}
+          placeholder="Add a custom task..."
+          className="flex-1 py-2.5 px-3.5 border border-border/80 rounded-xl font-sans text-[13px] text-charcoal bg-white focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage/20 transition-all placeholder:text-light/70 shadow-3xs"
+        />
+        <button
+          type="submit"
+          disabled={!newTaskText.trim()}
+          className={`w-10 h-10 bg-sage text-white rounded-xl font-semibold transition-all hover:bg-sage-dark flex items-center justify-center active:scale-95 shadow-3xs shrink-0 cursor-pointer ${
+            !newTaskText.trim() ? 'opacity-70' : 'opacity-100'
+          }`}
+          title="Add custom task"
+          aria-label="Add custom task"
+        >
+          <Plus size={17} strokeWidth={2.4} />
+        </button>
+      </form>
+
+      {/* Custom Tasks (if any) */}
+      {customTasks.length > 0 && (
+        <div className="mb-2">
+          {customTasks.map(t => (
+            <TaskItem key={t.id} task={t} />
+          ))}
+        </div>
+      )}
 
       {/* Deadlines List */}
       <div className="space-y-2">
@@ -235,8 +281,6 @@ export const Deadlines: React.FC<{ filterTasks: (t: Task[]) => Task[] }> = ({ fi
           );
         })}
       </div>
-
-      <CustomTaskList sectionId="deadlines" title="My Custom Deadlines" />
 
       {/* Toast Notification */}
       {toastMessage && (
