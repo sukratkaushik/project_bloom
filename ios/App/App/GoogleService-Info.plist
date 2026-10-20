@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>458217072039-a4tbvie5k4o61adkef8glcrnvac9raog.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.458217072039-a4tbvie5k4o61adkef8glcrnvac9raog</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>458217072039-93pgg76fsh9guth2r66g75aupdabn3fq.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyA0MYOBpI1358O29bp_Pnvs3h3uJbtgHDo</string>
+	<key>GCM_SENDER_ID</key>
+	<string>458217072039</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>in.ourpregnancy.bloom</string>
+	<key>PROJECT_ID</key>
+	<string>projectbloompregnancy</string>
+	<key>STORAGE_BUCKET</key>
+	<string>projectbloompregnancy.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:458217072039:ios:d343a5cf494ba64597c282</string>
+</dict>
+</plist>

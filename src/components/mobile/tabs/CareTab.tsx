@@ -149,7 +149,7 @@ export const CareTab: React.FC<CareTabProps> = ({
                 type="button"
                 onClick={() => {
                   triggerHaptic('light');
-                  onOpenTool('medical');
+                  onOpenTool('medical-schedule');
                 }}
                 className="text-sage-dark font-bold hover:underline shrink-0 ml-2 whitespace-nowrap cursor-pointer"
               >

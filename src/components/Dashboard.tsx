@@ -44,6 +44,9 @@ const Profile = React.lazy(() => import('./sections/Profile').then(m => ({ defau
 const GuidedBreathingAudio = React.lazy(() => import('./sections/GuidedBreathingAudio').then(m => ({ default: m.GuidedBreathingAudio })));
 const UserFlowGuide = React.lazy(() => import('./UserFlowGuide').then(m => ({ default: m.UserFlowGuide })));
 const LaborReadiness = React.lazy(() => import('./sections/LaborReadiness').then(m => ({ default: m.LaborReadiness })));
+const VisitsVaccinesSchedule = React.lazy(() => import('./sections/VisitsVaccinesSchedule').then(m => ({ default: m.VisitsVaccinesSchedule })));
+const HospitalBagBabyPrep = React.lazy(() => import('./sections/HospitalBagBabyPrep').then(m => ({ default: m.HospitalBagBabyPrep })));
+const DeliveryCostSchemes = React.lazy(() => import('./sections/DeliveryCostSchemes').then(m => ({ default: m.DeliveryCostSchemes })));
 const MobileShell = React.lazy(() => import('./mobile/MobileShell').then(m => ({ default: m.MobileShell })));
 
 const VALID_PAGES = [
@@ -52,7 +55,8 @@ const VALID_PAGES = [
   'askourpregnancy', 'kickcounter', 'contractions', 'vitals', 'mood', 
   'hydration', 'nutrition', 'hospitalbag', 'birthplan', 'schemes', 
   'babynames', 'travel', 'partnersync', 'feedback', 'admin-feedbacks', 
-  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar', 'guide', 'readiness'
+  'admin-panel', 'notes', 'profile', 'breathing', 'garbhsanskar', 'guide', 'readiness',
+  'medical-schedule', 'baby-prep-bag', 'cost-schemes'
 ];
 
 const getPageFromPath = (): string => {
@@ -261,6 +265,9 @@ export const Dashboard: React.FC = () => {
                   {activePage === 'guide' && <UserFlowGuide onNavigate={setActivePage} />}
                   {(activePage === 'breathing' || activePage === 'garbhsanskar') && <GuidedBreathingAudio />}
                   {activePage === 'readiness' && <LaborReadiness />}
+                  {activePage === 'medical-schedule' && <VisitsVaccinesSchedule filterTasks={filterTasks} />}
+                  {activePage === 'baby-prep-bag' && <HospitalBagBabyPrep filterTasks={filterTasks} />}
+                  {activePage === 'cost-schemes' && <DeliveryCostSchemes filterTasks={filterTasks} />}
                 </React.Suspense>
               </motion.div>
             </AnimatePresence>

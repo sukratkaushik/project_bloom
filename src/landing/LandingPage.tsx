@@ -111,16 +111,17 @@ export const LandingPage: React.FC = () => {
         triggerWelcomeEmailIfNewCallable();
         setShowEmailModal(false);
 
-        // Check if there is an active journey locally
-        if (state.isSetup && state.activeJourneyId) {
-          navigate('/dashboard');
-          return;
+        // Try to restore from cloud
+        let restored = false;
+        try {
+          restored = await restoreJourney(googleUser.uid);
+        } catch (e) {
+          console.warn("Could not restore journey:", e);
         }
 
-        // Try to restore from cloud
-        const restored = await restoreJourney(googleUser.uid);
-
         if (restored) {
+          navigate('/dashboard');
+        } else if (state.isSetup && state.activeJourneyId) {
           navigate('/dashboard');
         } else {
           updateState({ hasStartedOnboarding: true, isSetup: false });
@@ -153,7 +154,12 @@ export const LandingPage: React.FC = () => {
         setShowEmailModal(false);
 
         // Try to restore user journey from cloud (Firestore)
-        const restored = await restoreJourney(user.uid);
+        let restored = false;
+        try {
+          restored = await restoreJourney(user.uid);
+        } catch (e) {
+          console.warn("Could not restore journey:", e);
+        }
 
         if (restored) {
           navigate('/dashboard');
@@ -746,7 +752,9 @@ export const LandingPage: React.FC = () => {
               className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
             >
               {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isLoggedInAndSetup 
+              {isLoggingIn
+                ? "Connecting to Google..."
+                : isLoggedInAndSetup 
                 ? "Go to Dashboard" 
                 : isLoggedInNeedsSetup 
                 ? "✦ Complete Your Pregnancy Setup" 

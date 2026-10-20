@@ -245,7 +245,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
 
       {/* Back to Dashboard bar when user is already set up */}
       {state.isSetup && (
-        <div className="w-full max-w-[700px] flex items-center justify-between mb-4 z-10 pt-[max(2.75rem,env(safe-area-inset-top))] sm:pt-2">
+        <div className="w-full max-w-[700px] flex items-center justify-between mb-4 z-10 pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))] sm:pt-2">
           <button
             type="button"
             onClick={handleBackOrCancel}

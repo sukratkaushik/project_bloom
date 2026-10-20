@@ -48,6 +48,9 @@ import { Profile } from '../sections/Profile';
 import { GuidedBreathingAudio } from '../sections/GuidedBreathingAudio';
 import { UserFlowGuide } from '../UserFlowGuide';
 import { SetupScreen } from '../SetupScreen';
+import { VisitsVaccinesSchedule } from '../sections/VisitsVaccinesSchedule';
+import { HospitalBagBabyPrep } from '../sections/HospitalBagBabyPrep';
+import { DeliveryCostSchemes } from '../sections/DeliveryCostSchemes';
 
 export const MobileShell: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -171,14 +174,18 @@ export const MobileShell: React.FC = () => {
       case 'babynames': return <BabyNames />;
       case 'travel': return <SafeTravel />;
       case 'dev': return <Development filterTasks={filterTasks} />;
-      case 'prep': return <Preparation filterTasks={filterTasks} />;
-      case 'finance': return <Financial filterTasks={filterTasks} />;
-      case 'deadlines': return <Deadlines filterTasks={filterTasks} />;
-      case 'medical': return <Medical filterTasks={filterTasks} />;
+      case 'medical-schedule': return <VisitsVaccinesSchedule filterTasks={filterTasks} />;
+      case 'baby-prep-bag': return <HospitalBagBabyPrep filterTasks={filterTasks} />;
+      case 'cost-schemes': return <DeliveryCostSchemes filterTasks={filterTasks} />;
+      // Backwards-compatible legacy navigation support
+      case 'prep': return <HospitalBagBabyPrep filterTasks={filterTasks} initialTab="nursery" />;
+      case 'hospitalbag': return <HospitalBagBabyPrep filterTasks={filterTasks} initialTab="bag" />;
+      case 'finance': return <DeliveryCostSchemes filterTasks={filterTasks} initialTab="budget" />;
+      case 'schemes': return <DeliveryCostSchemes filterTasks={filterTasks} initialTab="schemes" />;
+      case 'deadlines': return <VisitsVaccinesSchedule filterTasks={filterTasks} initialTab="scans" />;
+      case 'medical': return <VisitsVaccinesSchedule filterTasks={filterTasks} initialTab="vaccines" />;
       case 'medical-reports': return <MedicalReports />;
-      case 'schemes': return <GovernmentSchemes />;
       case 'postpartum': return <Postpartum filterTasks={filterTasks} />;
-      case 'hospitalbag': return <HospitalBag />;
       case 'birthplan': return <BirthPlanBuilder />;
       case 'breathing':
       case 'garbhsanskar': return <GuidedBreathingAudio />;
@@ -384,9 +391,7 @@ export const MobileShell: React.FC = () => {
       {showProfileModal && (
         <div className="fixed inset-0 z-50 bg-[#FDFBF7] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
           {/* Native Top App Bar */}
-          <div className={`shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between ${
-            isNativeApp() ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[max(0.75rem,env(safe-area-inset-top))]'
-          }`}>
+          <div className="shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))]">
             <button
               type="button"
               onClick={() => {

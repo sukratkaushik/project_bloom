@@ -38,9 +38,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   const doctorPhone = doctor?.phone ? doctor.phone.replace(/[^\d+]/g, '') : '';
 
   return (
-    <header className={`bg-[#FDFBF7] border-b border-border/80 px-2.5 xs:px-3.5 pb-2.5 w-full select-none ${
-      isNative ? 'pt-[max(2.75rem,env(safe-area-inset-top))]' : 'pt-[max(0.65rem,env(safe-area-inset-top))]'
-    }`}>
+    <header className="bg-[#FDFBF7] border-b border-border/80 px-2.5 xs:px-3.5 pb-2.5 w-full select-none pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))]">
       {/* Upper Brand & Action Row */}
       <div className="flex items-center justify-between gap-1.5 xs:gap-2 w-full">
         {/* Brand Identity */}

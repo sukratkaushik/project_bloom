@@ -59,10 +59,14 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   body {
     @apply font-sans bg-cream text-charcoal min-h-screen text-[15px] leading-relaxed;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
   }
 
   h1,

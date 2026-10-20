@@ -92,7 +92,14 @@ const AppContent: React.FC = () => {
     const timer = setTimeout(() => {
       setSplashFinished(true);
     }, 2500);
-    return () => clearTimeout(timer);
+    // Defensive fallback: ensure auth ready state never hangs indefinitely in native WebViews
+    const authTimer = setTimeout(() => {
+      setIsAuthReady(true);
+    }, 3000);
+    return () => {
+      clearTimeout(timer);
+      clearTimeout(authTimer);
+    };
   }, []);
 
   useEffect(() => {

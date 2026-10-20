@@ -5,16 +5,36 @@ const config: CapacitorConfig = {
   appName: 'Our Pregnancy',
   webDir: 'dist',
   server: {
-    androidScheme: 'https'
+    androidScheme: 'https',
+    iosScheme: 'capacitor'
   },
   plugins: {
     FirebaseAuthentication: {
-      skipNativeAuth: false,
+      skipNativeAuth: true,
       providers: ['google.com']
     },
     StatusBar: {
       style: 'LIGHT',
       backgroundColor: '#FDFBF7'
+    }
+  },
+  ios: {
+    contentInset: 'never',
+    preferredContentMode: 'mobile'
+  },
+  experimental: {
+    ios: {
+      spm: {
+        packageOptions: {
+          '@capacitor-firebase/authentication': {
+            symlink: true
+          }
+        },
+        swiftToolsVersion: '6.1',
+        packageTraits: {
+          '@capacitor-firebase/authentication': ['Google']
+        }
+      }
     }
   }
 };
