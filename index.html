@@ -81,7 +81,6 @@
           {
             pageLanguage: 'en',
             includedLanguages: 'en,hi,pa,gu,mr,bn,ta,kn,te,ml,ur,de',
-            layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
             autoDisplay: false
           },
           'google_translate_element'
@@ -101,7 +100,7 @@
                 combo.value = desiredVal;
                 combo.dispatchEvent(new Event('change', { bubbles: true }));
               }
-            } else if (attempts > 20) {
+            } else if (attempts > 40) {
               clearInterval(syncInterval);
             }
           }, 150);

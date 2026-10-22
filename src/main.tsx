@@ -4,6 +4,7 @@ import App from './App.tsx';
 import './index.css';
 import { registerSW } from 'virtual:pwa-register';
 import { Capacitor } from '@capacitor/core';
+import { initTranslationObserver } from './utils/translation';
 // import * as Sentry from "@sentry/react";
 
 // Sentry.init({
@@ -54,6 +55,9 @@ if (Capacitor.isNativePlatform()) {
     });
   }
 }
+
+// Initialize universal in-app translation observer for offline & native iOS/Android support
+initTranslationObserver();
 
 const rootElement = document.getElementById('root')!;
 if (rootElement.hasChildNodes()) {

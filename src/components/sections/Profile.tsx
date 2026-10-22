@@ -57,6 +57,17 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [showLanguageModal, setShowLanguageModal] = useState(false);
   const [isChangingLanguage, setIsChangingLanguage] = useState(false);
 
+  useEffect(() => {
+    const handleLang = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.langCode) {
+        setActiveLanguage(detail.langCode);
+      }
+    };
+    window.addEventListener('app_language_changed', handleLang);
+    return () => window.removeEventListener('app_language_changed', handleLang);
+  }, []);
+
   // PDF Export state
   const [isExporting, setIsExporting] = useState(false);
 
@@ -1548,10 +1559,15 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       triggerHaptic('medium');
                       setIsChangingLanguage(true);
                       setActiveLanguage(lang.code);
-                      setToastMessage(`Setting language to ${lang.name}...`);
+                      setToastMessage(`Setting language to ${lang.native}...`);
                       
-                      // Apply language change and trigger smooth reload for full-page translation
-                      changeLanguage(lang.code, true);
+                      // Apply language change seamlessly in-place without reload
+                      changeLanguage(lang.code, false);
+
+                      setTimeout(() => {
+                        setIsChangingLanguage(false);
+                        setShowLanguageModal(false);
+                      }, 350);
                     }}
                     className={`p-2.5 xs:p-3 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between gap-1 relative ${
                       isSelected
