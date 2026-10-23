@@ -8,70 +8,92 @@ import { getPlatform } from './nativeBridge';
  */
 
 const GEMINI_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
-const GEMINI_MODEL = 'gemini-flash-latest';
+const GEMINI_MODELS = [
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.6-flash',
+  'gemini-flash-lite-latest'
+];
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
 /**
- * Sends a POST request to Google Gemini API.
+ * Sends a POST request to Google Gemini API with automated multi-model fallback cascade.
+ * Tries fast, stable models ('gemini-3.5-flash', 'gemini-3.1-flash-lite') first.
+ * If Google API returns 503 (high demand spike), 429, or times out, immediately tries the next candidate.
  * Uses native CapacitorHttp (NSURLSession) on iOS with strict timeouts to prevent hanging and CORS blocks.
  */
-async function postToGemini(endpoint: string, payload: any): Promise<any> {
-  const TIMEOUT_MS = 15000; // 15 second maximum timeout
+async function postToGemini(payload: any, models: string[] = GEMINI_MODELS): Promise<any> {
+  const MODEL_TIMEOUT_MS = 9000; // 9s max per candidate model
+  let lastError: any = null;
 
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => {
-      reject(new Error('AI request timed out (15s). Please check your internet connection and tap Try Again.'));
-    }, TIMEOUT_MS);
-  });
-
-  const requestPromise = (async () => {
-    if (Capacitor.isNativePlatform()) {
-      try {
-        const response = await CapacitorHttp.post({
-          url: endpoint,
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          data: JSON.stringify(payload),
-          connectTimeout: 12000,
-          readTimeout: 12000,
-          responseType: 'json'
-        });
-
-        if (response.status < 200 || response.status >= 300) {
-          const errDetail = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-          throw new Error(`Gemini API error (${response.status}): ${errDetail}`);
-        }
-
-        return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-      } catch (nativeErr: any) {
-        console.warn("CapacitorHttp native request failed, attempting standard fetch fallback:", nativeErr);
-      }
-    }
-
-    // Standard web fetch with AbortController
-    const controller = new AbortController();
-    const abortTimer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+  for (const model of models) {
+    const endpoint = `${GEMINI_BASE_URL}/${model}:generateContent?key=${GEMINI_API_KEY}`;
+    
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => {
+          reject(new Error(`Model ${model} timed out (${MODEL_TIMEOUT_MS / 1000}s)`));
+        }, MODEL_TIMEOUT_MS);
       });
 
-      if (!response.ok) {
-        const errorBody = await response.text();
-        throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+      const requestPromise = (async () => {
+        if (Capacitor.isNativePlatform()) {
+          try {
+            const response = await CapacitorHttp.post({
+              url: endpoint,
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              data: JSON.stringify(payload),
+              connectTimeout: 8000,
+              readTimeout: 8000,
+              responseType: 'json'
+            });
+
+            if (response.status < 200 || response.status >= 300) {
+              const errDetail = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+              throw new Error(`Gemini API error (${response.status}): ${errDetail}`);
+            }
+
+            return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+          } catch (nativeErr: any) {
+            console.warn(`CapacitorHttp native request for ${model} encountered error, trying web fetch fallback:`, nativeErr);
+          }
+        }
+
+        // Standard web fetch with AbortController
+        const controller = new AbortController();
+        const abortTimer = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS);
+        try {
+          const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: controller.signal
+          });
+
+          if (!response.ok) {
+            const errorBody = await response.text();
+            throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+          }
+
+          return await response.json();
+        } finally {
+          clearTimeout(abortTimer);
+        }
+      })();
+
+      const result = await Promise.race([requestPromise, timeoutPromise]);
+      if (result) {
+        return result;
       }
-
-      return await response.json();
-    } finally {
-      clearTimeout(abortTimer);
+    } catch (err: any) {
+      console.warn(`[Gemini Fallback] Model ${model} failed (${err?.message || err}). Attempting next candidate...`);
+      lastError = err;
     }
-  })();
+  }
 
-  return await Promise.race([requestPromise, timeoutPromise]);
+  throw lastError || new Error('All Gemini AI model endpoints were unavailable. Please try again.');
 }
 
 /**
@@ -152,8 +174,6 @@ export async function callGeminiChat(options: GeminiChatOptions): Promise<{ repl
     };
   }
 
-  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
   let contextualSystem = systemPrompt || `You are OPIN AI, an expert maternal health and prenatal nutritionist assistant aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
 Provide supportive, accurate, evidence-based guidance for pregnant mothers. Never provide definitive diagnostic prescriptions; always encourage consulting a personal gynaecologist.`;
 
@@ -177,7 +197,7 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
     }
   };
 
-  const data = await postToGemini(endpoint, payload);
+  const data = await postToGemini(payload);
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!text) {
@@ -196,8 +216,6 @@ export async function callGeminiVisionFood(params: {
   dishHint?: string;
 }): Promise<GeminiFoodScanResult> {
   const { base64Data, mimeType, dishHint } = params;
-
-  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
 
   const prompt = `You are an expert prenatal nutritionist and clinical vision AI assistant.
 First, determine if the image contains edible food, a meal, dish, snack, beverage, ingredient, or food nutrition label.
@@ -274,7 +292,7 @@ Rules:
     }
   };
 
-  const data = await postToGemini(endpoint, payload);
+  const data = await postToGemini(payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
@@ -343,8 +361,6 @@ Rules:
  * Analyzes any meal name, description, or voice transcript with authentic ICMR-NIN & FOGSI clinical nutrition.
  */
 export async function callGeminiTextNutrition(dishDescription: string): Promise<GeminiFoodScanResult> {
-  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
   const prompt = `You are an expert prenatal clinical nutritionist aligned with ICMR-NIN (Indian Council of Medical Research - National Institute of Nutrition) and FOGSI/ACOG maternal health guidelines.
 The pregnant mother consumed or described this meal/dish:
 "${dishDescription}"
@@ -404,7 +420,7 @@ Rules:
     }
   };
 
-  const data = await postToGemini(endpoint, payload);
+  const data = await postToGemini(payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
@@ -482,8 +498,6 @@ export async function callGeminiMedicalReport(params: {
 }): Promise<MedicalReportAnalysisResult> {
   const { base64Data, fileType, fileName } = params;
 
-  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
-
   const prompt = `You are a clinical AI assistant helping a pregnant mother understand her medical reports, ultrasound records, or doctor's prescriptions.
 A major task is deciphering doctor handwriting or complex medical terms, presenting them in a clear, supportive, and easy-to-understand patient-friendly manner.
 ${fileName ? `File Name: ${fileName}` : ''}
@@ -535,7 +549,7 @@ Rules:
     }
   };
 
-  const data = await postToGemini(endpoint, payload);
+  const data = await postToGemini(payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
