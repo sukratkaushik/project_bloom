@@ -216,6 +216,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
+      maxOutputTokens: 600,
       responseMimeType: 'application/json'
     }
   };
@@ -356,6 +357,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
+      maxOutputTokens: 600,
       responseMimeType: 'application/json'
     }
   };
@@ -497,6 +499,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
+      maxOutputTokens: 600,
       responseMimeType: 'application/json'
     }
   };

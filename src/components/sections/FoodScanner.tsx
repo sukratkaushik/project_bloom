@@ -255,8 +255,8 @@ export const FoodScanner: React.FC = () => {
         setDishHint(cleanFileName);
       }
 
-      // Auto-compress camera image (<= 1024px, JPEG 0.80) to prevent payload errors and speed up AI scan
-      const compressed = await compressImage(file, 1024, 0.8);
+      // Auto-compress camera image (<= 768px, JPEG 0.65) for blazing fast upload & instant AI vision
+      const compressed = await compressImage(file, 768, 0.65);
       setImageFile(compressed.file);
       setImagePreview(compressed.dataUrl);
       const savedPercent = Math.max(
