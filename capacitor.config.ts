@@ -9,6 +9,9 @@ const config: CapacitorConfig = {
     iosScheme: 'capacitor'
   },
   plugins: {
+    CapacitorHttp: {
+      enabled: true
+    },
     FirebaseAuthentication: {
       skipNativeAuth: true,
       providers: ['google.com']

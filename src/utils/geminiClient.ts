@@ -1,3 +1,4 @@
+import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { getPlatform } from './nativeBridge';
 
 /**
@@ -9,6 +10,47 @@ import { getPlatform } from './nativeBridge';
 const GEMINI_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
 const GEMINI_MODEL = 'gemini-flash-latest';
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
+
+/**
+ * Sends a POST request to Google Gemini API.
+ * Uses native CapacitorHttp (NSURLSession) on iOS to completely bypass WKWebView CORS / "Load failed" limits.
+ */
+async function postToGemini(endpoint: string, payload: any): Promise<any> {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      const response = await CapacitorHttp.post({
+        url: endpoint,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        data: payload
+      });
+
+      if (response.status < 200 || response.status >= 300) {
+        const errDetail = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+        throw new Error(`Gemini API error (${response.status}): ${errDetail}`);
+      }
+
+      return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+    } catch (nativeErr: any) {
+      console.warn("CapacitorHttp native request failed, attempting standard fetch fallback:", nativeErr);
+    }
+  }
+
+  // Standard web fetch
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+  }
+
+  return await response.json();
+}
 
 /**
  * Checks if Gemini is supported and configured for the current session.
@@ -113,18 +155,7 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
     }
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await postToGemini(endpoint, payload);
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!text) {
@@ -221,18 +252,7 @@ Rules:
     }
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini Vision API error (${response.status}): ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await postToGemini(endpoint, payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
@@ -362,18 +382,7 @@ Rules:
     }
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini Text Nutrition API error (${response.status}): ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await postToGemini(endpoint, payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
@@ -504,18 +513,7 @@ Rules:
     }
   };
 
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  });
-
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini Medical Vision API error (${response.status}): ${errorBody}`);
-  }
-
-  const data = await response.json();
+  const data = await postToGemini(endpoint, payload);
   const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
 
   if (!rawText) {
