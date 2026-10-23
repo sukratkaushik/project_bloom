@@ -2,9 +2,9 @@ import { Capacitor, CapacitorHttp } from '@capacitor/core';
 import { getPlatform } from './nativeBridge';
 
 /**
- * Gemini Client for iOS
- * Directly leverages Google Generative Language API on iOS native platform
- * to bypass external inference credit limits and provide 1,500 free requests/day.
+ * Gemini Client for Web, iOS, and Android
+ * Directly leverages Google Generative Language API
+ * to provide 1,500 free requests/day with multi-model failover cascade.
  */
 
 const GEMINI_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
@@ -18,12 +18,12 @@ const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models
 
 /**
  * Sends a POST request to Google Gemini API with automated multi-model fallback cascade.
- * Tries fast, stable models ('gemini-3.5-flash', 'gemini-3.1-flash-lite') first.
- * If Google API returns 503 (high demand spike), 429, or times out, immediately tries the next candidate.
- * Uses native CapacitorHttp (NSURLSession) on iOS with strict timeouts to prevent hanging and CORS blocks.
+ * Tries priority models: 'gemini-3.5-flash', 'gemini-3.1-flash-lite', 'gemini-3.6-flash', 'gemini-flash-lite-latest'.
+ * If Google API returns 503 (high demand spike), 429 (rate limit), or times out, immediately tries the next candidate.
+ * Uses standard web fetch with AbortController and 8-second timeout per attempt.
  */
 async function postToGemini(payload: any, models: string[] = GEMINI_MODELS): Promise<any> {
-  const MODEL_TIMEOUT_MS = 9000; // 9s max per candidate model
+  const MODEL_TIMEOUT_MS = 8000; // 8s max per candidate model
   let lastError: any = null;
 
   for (const model of models) {
@@ -61,7 +61,7 @@ async function postToGemini(payload: any, models: string[] = GEMINI_MODELS): Pro
           }
         }
 
-        // Standard web fetch with AbortController
+        // Standard web browser fetch with AbortController and 8s timeout
         const controller = new AbortController();
         const abortTimer = setTimeout(() => controller.abort(), MODEL_TIMEOUT_MS);
         try {
@@ -88,7 +88,7 @@ async function postToGemini(payload: any, models: string[] = GEMINI_MODELS): Pro
         return result;
       }
     } catch (err: any) {
-      console.warn(`[Gemini Fallback] Model ${model} failed (${err?.message || err}). Attempting next candidate...`);
+      console.warn(`[Gemini Cascade] Model ${model} failed (${err?.message || err}). Attempting next candidate...`);
       lastError = err;
     }
   }
@@ -98,10 +98,10 @@ async function postToGemini(payload: any, models: string[] = GEMINI_MODELS): Pro
 
 /**
  * Checks if Gemini is supported and configured for the current session.
- * Strictly restricted to iOS as requested.
+ * Available across Web, iOS, and Android whenever VITE_GEMINI_API_KEY is configured.
  */
 export const isGeminiSupported = (): boolean => {
-  return getPlatform() === 'ios' && Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5);
+  return Boolean(GEMINI_API_KEY && GEMINI_API_KEY.trim().length > 5);
 };
 
 export interface GeminiChatOptions {
@@ -146,14 +146,16 @@ export interface GeminiFoodScanResult {
 /**
  * Compliance check: India PCPNDT Act, 1994 (Prohibition of Sex Selection)
  */
-function isPCPNDTGenderQuery(message: string): boolean {
-  const clean = message.toLowerCase();
+export function isPCPNDTGenderQuery(message?: string): boolean {
+  if (!message || typeof message !== 'string') return false;
+  const clean = message.toLowerCase().trim();
   const genderQueryPatterns = [
     'boy or girl', 'girl or boy', 'boy or a girl', 'girl or a boy',
     'baby boy or baby girl', 'baby girl or baby boy', 'male or female', 'female or male',
     'baby gender', 'fetal gender', 'gender of baby', 'gender of the baby', 'gender of my baby',
     'sex of baby', 'sex of the baby', 'sex of my baby', 'fetal sex', 'determine sex', 'determine gender',
     'predict gender', 'predict sex', 'tell me gender', 'tell me the gender', 'tell me sex',
+    'gender prediction', 'sex prediction', 'gender reveal',
     'ultrasound gender', 'gender from ultrasound', 'sex from ultrasound', 'ultrasound sex',
     'nub theory', 'ramzi theory', 'skull theory', 'heart rate gender',
     'ladka ya ladki', 'ladka hai ya ladki', 'ladki hai ya ladka', 'beta hoga ya beti',
@@ -208,7 +210,8 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
 }
 
 /**
- * Multimodal Food Image Analysis with Gemini Flash
+ * Multimodal Food Image Analysis with Google Gemini Vision
+ * Accurately analyzes meal photos using ICMR-NIN nutritional tables and FOGSI/ACOG standards.
  */
 export async function callGeminiVisionFood(params: {
   base64Data: string;
@@ -217,41 +220,60 @@ export async function callGeminiVisionFood(params: {
 }): Promise<GeminiFoodScanResult> {
   const { base64Data, mimeType, dishHint } = params;
 
-  const prompt = `You are an expert prenatal nutritionist and clinical vision AI assistant.
+  if (dishHint && isPCPNDTGenderQuery(dishHint)) {
+    return {
+      isFood: false,
+      nonFoodDescription: "Under the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994, prenatal sex determination or disclosure of fetal sex or gender is strictly illegal in India. Our Pregnancy complies fully with Indian regulations and cannot assist with fetal sex/gender inquiries.",
+      dishName: 'Prohibited Inquiry (PCPNDT Act, 1994)',
+      identifiedItems: [],
+      macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
+      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
+      safetyLevel: 'AVOID',
+      isSafeForPregnancy: false,
+      hazardWarning: 'Strict Legal Prohibition: Prenatal sex determination is illegal under Indian law.',
+      clinicalRationale: 'In compliance with the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994.',
+      sourceType: 'photo'
+    };
+  }
+
+  const prompt = `You are an expert prenatal clinical nutritionist and computer vision AI aligned with ICMR-NIN (Indian Council of Medical Research - National Institute of Nutrition) nutritional tables and FOGSI / ACOG maternal guidelines.
 First, determine if the image contains edible food, a meal, dish, snack, beverage, ingredient, or food nutrition label.
 ${dishHint ? `The user provided this dish name hint: "${dishHint}". Verify if the image matches this hint.` : ''}
+
+CRITICAL LEGAL REQUIREMENT (PCPNDT ACT, 1994 - INDIA):
+Under Indian Law (The Pre-Conception and Pre-Natal Diagnostic Techniques - Prohibition of Sex Selection Act, 1994), prenatal sex determination and disclosure of fetal sex or gender are strictly illegal. Never attempt to deduce or discuss fetal sex or gender.
 
 Return ONLY a valid JSON object with this exact structure:
 {
   "isFood": true,
   "nonFoodDescription": "",
-  "dishName": "Palak Paneer",
-  "servingDescription": "1 standard bowl (~200g) with spinach gravy and paneer cubes",
-  "identifiedItems": ["Spinach (Palak)", "Cottage Cheese (Paneer)", "Spices & Gravy"],
+  "dishName": "Palak Paneer with Rotis",
+  "servingDescription": "1 standard bowl (~200g) with 2 rotis",
+  "identifiedItems": ["Spinach (Palak)", "Cottage Cheese (Paneer)", "Whole Wheat Roti", "Onions & Tomatoes", "Cooking Spices"],
   "macronutrients": {
-    "calories": 280,
-    "protein_g": 14,
-    "carbs_g": 8,
-    "fats_g": 20,
-    "fiber_g": 4
+    "calories": 420,
+    "protein_g": 17,
+    "carbs_g": 48,
+    "fats_g": 18,
+    "fiber_g": 7
   },
   "pregnancyCriticalMicronutrients": {
-    "folate_mcg": 110,
-    "iron_mg": 3.2,
-    "calcium_mg": 260,
-    "vitaminD_iu": 40
+    "folate_mcg": 120,
+    "iron_mg": 3.5,
+    "calcium_mg": 250,
+    "vitaminD_iu": 20
   },
   "safetyLevel": "SAFE",
   "isSafeForPregnancy": true,
   "hazardWarning": "",
-  "clinicalRationale": "Rich in dietary non-heme iron and folate from spinach; paneer provides bioavailable calcium and complete protein for fetal cellular development.",
-  "trimesterAdvice": "Pair with a squeeze of fresh lemon juice (Vitamin C) to enhance non-heme iron absorption. Ensure paneer is made from pasteurized milk."
+  "clinicalRationale": "Rich in dietary non-heme iron and folate from spinach; paneer provides bioavailable calcium and complete protein for fetal cellular development based on ICMR-NIN maternal guidance.",
+  "trimesterAdvice": "Pair with a squeeze of fresh lemon juice (Vitamin C) to enhance non-heme iron absorption. Ensure paneer is prepared from pasteurized milk."
 }
 
 Rules:
-1. If the image is NOT food (e.g. people, animals, electronics, furniture, clothes, documents):
+1. If the image is NOT food (e.g. people, animals, electronics, furniture, clothes, medicine, non-food objects):
    - Set "isFood": false
-   - In "nonFoodDescription", identify the specific subject clearly and politely.
+   - In "nonFoodDescription", identify the specific subject politely and ask for a meal photo.
    - Set "identifiedItems": []
    - Set "isSafeForPregnancy": false
    - Leave macros and micronutrients at 0
@@ -259,13 +281,14 @@ Rules:
    - Set "isFood": true
    - Set "nonFoodDescription": ""
    - Name the dish in "dishName" accurately.
+   - Estimate serving size in "servingDescription" (e.g. "1 bowl ~200g with 2 rotis").
    - List key ingredients in "identifiedItems".
-   - Estimate realistic macronutrients for the visible portion.
-   - Estimate critical pregnancy micronutrients: folate (mcg), iron (mg), calcium (mg), and optional vitamin D (IU).
+   - Estimate realistic macronutrients (calories, protein_g, carbs_g, fats_g, fiber_g) based on ICMR-NIN nutritional composition for cooked Indian and international foods.
+   - Estimate critical pregnancy micronutrients: Folate (mcg), Elemental Iron (mg), Calcium (mg), and Vitamin D (IU).
    - "safetyLevel": must be "SAFE", "CAUTION", or "AVOID".
    - "isSafeForPregnancy": false if any pregnancy hazards exist (unpasteurized dairy, raw eggs/meat/sprouts, high-mercury fish, excess caffeine, alcohol), else true.
    - "hazardWarning": describe risks if unsafe, or leave empty if safe.
-   - "clinicalRationale": 1-2 sentence evidence-based rationale aligned with FOGSI / ACOG standards.
+   - "clinicalRationale": 1-2 sentence evidence-based rationale aligned with ICMR-NIN and FOGSI / ACOG standards.
    - "trimesterAdvice": 1-2 actionable tips for expectant mothers consuming this meal.`;
 
   const payload = {
@@ -287,7 +310,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: 600,
+      maxOutputTokens: 750,
       responseMimeType: 'application/json'
     }
   };
@@ -310,7 +333,7 @@ Rules:
       dishName: undefined,
       identifiedItems: [],
       macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
-      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0 },
+      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
       safetyLevel: 'AVOID',
       isSafeForPregnancy: false,
       hazardWarning: '',
@@ -319,22 +342,24 @@ Rules:
   }
 
   const macros: FoodMacronutrients = {
-    calories: parsed.macronutrients?.calories || Math.round(
-      (parsed.macronutrients?.protein_g || 0) * 4 +
-      (parsed.macronutrients?.carbs_g || 0) * 4 +
-      (parsed.macronutrients?.fats_g || 0) * 9
-    ) || 280,
-    protein_g: Number(parsed.macronutrients?.protein_g ?? 10),
-    carbs_g: Number(parsed.macronutrients?.carbs_g ?? 30),
-    fats_g: Number(parsed.macronutrients?.fats_g ?? 10),
-    fiber_g: Number(parsed.macronutrients?.fiber_g ?? 3)
+    calories: Number(parsed.macronutrients?.calories) || Math.round(
+      (Number(parsed.macronutrients?.protein_g) || 0) * 4 +
+      (Number(parsed.macronutrients?.carbs_g) || 0) * 4 +
+      (Number(parsed.macronutrients?.fats_g) || 0) * 9
+    ),
+    protein_g: Number(parsed.macronutrients?.protein_g) || 0,
+    carbs_g: Number(parsed.macronutrients?.carbs_g) || 0,
+    fats_g: Number(parsed.macronutrients?.fats_g) || 0,
+    fiber_g: Number(parsed.macronutrients?.fiber_g) || 0
   };
 
   const micros: FoodMicronutrients = {
-    folate_mcg: Number(parsed.pregnancyCriticalMicronutrients?.folate_mcg ?? 45),
-    iron_mg: Number(parsed.pregnancyCriticalMicronutrients?.iron_mg ?? 1.8),
-    calcium_mg: Number(parsed.pregnancyCriticalMicronutrients?.calcium_mg ?? 75),
-    vitaminD_iu: parsed.pregnancyCriticalMicronutrients?.vitaminD_iu ? Number(parsed.pregnancyCriticalMicronutrients.vitaminD_iu) : undefined
+    folate_mcg: Number(parsed.pregnancyCriticalMicronutrients?.folate_mcg) || 0,
+    iron_mg: Number(parsed.pregnancyCriticalMicronutrients?.iron_mg) || 0,
+    calcium_mg: Number(parsed.pregnancyCriticalMicronutrients?.calcium_mg) || 0,
+    vitaminD_iu: parsed.pregnancyCriticalMicronutrients?.vitaminD_iu !== undefined
+      ? Number(parsed.pregnancyCriticalMicronutrients.vitaminD_iu)
+      : undefined
   };
 
   const safetyLevel = (parsed.safetyLevel as 'SAFE' | 'CAUTION' | 'AVOID') ||
@@ -350,20 +375,39 @@ Rules:
     safetyLevel,
     isSafeForPregnancy: parsed.isSafeForPregnancy !== false,
     hazardWarning: parsed.hazardWarning || '',
-    clinicalRationale: parsed.clinicalRationale || 'Evaluated against FOGSI & ACOG maternal nutrition baselines.',
+    clinicalRationale: parsed.clinicalRationale || 'Evaluated against ICMR-NIN & FOGSI maternal nutrition baselines.',
     trimesterAdvice: parsed.trimesterAdvice || 'Ensure balanced portioning and adequate hydration with your healthcare plan.',
     sourceType: 'photo'
   };
 }
 
 /**
- * Real AI Text/Dish Nutrition Analysis with Gemini Flash
- * Analyzes any meal name, description, or voice transcript with authentic ICMR-NIN & FOGSI clinical nutrition.
+ * Authentic AI Text & Dish Nutrition Analysis with Google Gemini
+ * Analyzes search chips, custom meal descriptions, and voice inputs with authentic ICMR-NIN & FOGSI clinical nutrition.
  */
 export async function callGeminiTextNutrition(dishDescription: string): Promise<GeminiFoodScanResult> {
-  const prompt = `You are an expert prenatal clinical nutritionist aligned with ICMR-NIN (Indian Council of Medical Research - National Institute of Nutrition) and FOGSI/ACOG maternal health guidelines.
-The pregnant mother consumed or described this meal/dish:
+  if (isPCPNDTGenderQuery(dishDescription)) {
+    return {
+      isFood: false,
+      nonFoodDescription: "Under the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994, prenatal sex determination or disclosure of fetal sex or gender is strictly illegal in India. Our Pregnancy complies fully with Indian regulations and cannot predict, determine, or reveal fetal gender. Our nutrition tools are dedicated solely to maternal health and safe prenatal nutrition.",
+      dishName: 'Prohibited Inquiry (PCPNDT Act, 1994)',
+      identifiedItems: [],
+      macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
+      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
+      safetyLevel: 'AVOID',
+      isSafeForPregnancy: false,
+      hazardWarning: 'Strict Legal Prohibition: Prenatal sex determination is illegal under Indian law.',
+      clinicalRationale: 'In compliance with the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994.',
+      sourceType: 'text'
+    };
+  }
+
+  const prompt = `You are an expert prenatal clinical nutritionist aligned with ICMR-NIN (Indian Council of Medical Research - National Institute of Nutrition) nutritional tables and FOGSI/ACOG maternal health guidelines.
+The pregnant mother consumed, searched, or described this meal/dish:
 "${dishDescription}"
+
+CRITICAL LEGAL REQUIREMENT (PCPNDT ACT, 1994 - INDIA):
+Under Indian Law (The Pre-Conception and Pre-Natal Diagnostic Techniques - Prohibition of Sex Selection Act, 1994), prenatal sex determination and disclosure of fetal sex or gender are strictly illegal. Never attempt to deduce or discuss fetal sex or gender.
 
 Analyze the authentic recipe, culinary ingredients, portion size, and nutritional composition.
 Return ONLY a valid JSON object with this exact structure:
@@ -371,7 +415,7 @@ Return ONLY a valid JSON object with this exact structure:
   "isFood": true,
   "nonFoodDescription": "",
   "dishName": "Exact Proper Dish Name",
-  "servingDescription": "Standard portion (e.g. 1 bowl ~200g, 2 pieces with chutney)",
+  "servingDescription": "Standard portion (e.g. 1 bowl ~200g with 2 rotis)",
   "identifiedItems": ["Authentic Ingredient 1", "Ingredient 2", "Ingredient 3"],
   "macronutrients": {
     "calories": 320,
@@ -384,27 +428,29 @@ Return ONLY a valid JSON object with this exact structure:
     "folate_mcg": 85,
     "iron_mg": 2.5,
     "calcium_mg": 180,
-    "vitaminD_iu": 0
+    "vitaminD_iu": 20
   },
   "safetyLevel": "SAFE",
   "isSafeForPregnancy": true,
   "hazardWarning": "",
-  "clinicalRationale": "Detailed 1-2 sentence evidence-based rationale citing specific nutrients and benefits.",
+  "clinicalRationale": "Detailed 1-2 sentence evidence-based rationale citing specific ICMR-NIN nutrients and maternal/fetal benefits.",
   "trimesterAdvice": "Actionable prenatal dietary tip for this dish (e.g. pairing with Vitamin C, portion control, cooking thoroughly)."
 }
 
 Rules:
-1. If the input is NOT food (e.g. random non-food words, nonsense, objects):
+1. If the input is NOT food (e.g. random non-food words, nonsense, non-edible objects):
    - Set "isFood": false
    - Set "nonFoodDescription": "Please enter or select an edible dish, food item, or beverage."
    - Set "identifiedItems": []
    - Leave nutrients at 0.
 2. If it IS food:
-   - Identify the authentic traditional and modern culinary ingredients in "identifiedItems".
-   - Calculate realistic macros based on ICMR-NIN tables for standard cooked portions.
-   - Calculate maternal micronutrients: folate (mcg), iron (mg), and calcium (mg).
+   - Identify authentic culinary ingredients in "identifiedItems".
+   - Estimate serving size in "servingDescription" (e.g. "1 bowl ~200g with 2 rotis").
+   - Calculate realistic macros based on ICMR-NIN tables for standard cooked maternal portions.
+   - Calculate critical maternal micronutrients: Folate (mcg), Elemental Iron (mg), Calcium (mg), and Vitamin D (IU).
    - "safetyLevel": must be "SAFE", "CAUTION", or "AVOID".
-   - Flag any real pregnancy hazards (e.g. unpasteurized cheeses, raw papaya/latex, excess caffeine, high mercury fish, raw eggs/meat).`;
+   - Flag any real pregnancy hazards (e.g. unpasteurized cheeses, raw papaya/latex, excess caffeine, high mercury fish, raw eggs/meat).
+   - "clinicalRationale": evidence-based clinical guidance citing ICMR-NIN and FOGSI/ACOG standards.`;
 
   const payload = {
     contents: [
@@ -415,7 +461,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: 600,
+      maxOutputTokens: 750,
       responseMimeType: 'application/json'
     }
   };
@@ -436,7 +482,7 @@ Rules:
       nonFoodDescription: parsed.nonFoodDescription || `"${dishDescription}" was not recognized as a food dish. Please describe an edible meal or snack.`,
       identifiedItems: [],
       macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
-      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0 },
+      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
       safetyLevel: 'AVOID',
       isSafeForPregnancy: false,
       hazardWarning: '',
@@ -445,22 +491,24 @@ Rules:
   }
 
   const macros: FoodMacronutrients = {
-    calories: parsed.macronutrients?.calories || Math.round(
-      (parsed.macronutrients?.protein_g || 0) * 4 +
-      (parsed.macronutrients?.carbs_g || 0) * 4 +
-      (parsed.macronutrients?.fats_g || 0) * 9
-    ) || 280,
-    protein_g: Number(parsed.macronutrients?.protein_g ?? 8),
-    carbs_g: Number(parsed.macronutrients?.carbs_g ?? 35),
-    fats_g: Number(parsed.macronutrients?.fats_g ?? 8),
-    fiber_g: Number(parsed.macronutrients?.fiber_g ?? 3)
+    calories: Number(parsed.macronutrients?.calories) || Math.round(
+      (Number(parsed.macronutrients?.protein_g) || 0) * 4 +
+      (Number(parsed.macronutrients?.carbs_g) || 0) * 4 +
+      (Number(parsed.macronutrients?.fats_g) || 0) * 9
+    ),
+    protein_g: Number(parsed.macronutrients?.protein_g) || 0,
+    carbs_g: Number(parsed.macronutrients?.carbs_g) || 0,
+    fats_g: Number(parsed.macronutrients?.fats_g) || 0,
+    fiber_g: Number(parsed.macronutrients?.fiber_g) || 0
   };
 
   const micros: FoodMicronutrients = {
-    folate_mcg: Number(parsed.pregnancyCriticalMicronutrients?.folate_mcg ?? 45),
-    iron_mg: Number(parsed.pregnancyCriticalMicronutrients?.iron_mg ?? 1.8),
-    calcium_mg: Number(parsed.pregnancyCriticalMicronutrients?.calcium_mg ?? 75),
-    vitaminD_iu: parsed.pregnancyCriticalMicronutrients?.vitaminD_iu ? Number(parsed.pregnancyCriticalMicronutrients.vitaminD_iu) : undefined
+    folate_mcg: Number(parsed.pregnancyCriticalMicronutrients?.folate_mcg) || 0,
+    iron_mg: Number(parsed.pregnancyCriticalMicronutrients?.iron_mg) || 0,
+    calcium_mg: Number(parsed.pregnancyCriticalMicronutrients?.calcium_mg) || 0,
+    vitaminD_iu: parsed.pregnancyCriticalMicronutrients?.vitaminD_iu !== undefined
+      ? Number(parsed.pregnancyCriticalMicronutrients.vitaminD_iu)
+      : undefined
   };
 
   const safetyLevel = (parsed.safetyLevel as 'SAFE' | 'CAUTION' | 'AVOID') ||
