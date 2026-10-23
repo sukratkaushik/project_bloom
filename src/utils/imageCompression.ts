@@ -18,8 +18,8 @@ export interface CompressedImageResult {
 
 export async function compressImage(
   file: File,
-  maxDimension = 1024,
-  quality = 0.8
+  maxDimension = 768,
+  quality = 0.65
 ): Promise<CompressedImageResult> {
   return new Promise((resolve, reject) => {
     if (!file.type.startsWith('image/')) {
@@ -65,14 +65,14 @@ export async function compressImage(
         const dataUrl = canvas.toDataURL(targetMime, quality);
         const base64Data = dataUrl.split(',')[1];
 
-        // Create Blob and File
-        const byteCharacters = atob(base64Data);
-        const byteNumbers = new Array(byteCharacters.length);
-        for (let i = 0; i < byteCharacters.length; i++) {
-          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        // Efficient ArrayBuffer conversion
+        const byteString = atob(base64Data);
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        for (let i = 0; i < byteString.length; i++) {
+          ia[i] = byteString.charCodeAt(i);
         }
-        const byteArray = new Uint8Array(byteNumbers);
-        const blob = new Blob([byteArray], { type: targetMime });
+        const blob = new Blob([ab], { type: targetMime });
         const compressedFile = new File(
           [blob], 
           file.name.replace(/\.[^.]+$/, '.jpg'), 

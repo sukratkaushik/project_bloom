@@ -15,6 +15,7 @@ import { ContextBanner } from '../ContextBanner';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { isGeminiSupported, callGeminiChat } from '../../utils/geminiClient';
 
 const QUICK_THEMES = [
   '☀️ Light & Radiance',
@@ -91,11 +92,24 @@ export const BabyNames: React.FC = () => {
 
       const systemPrompt = `You are a helpful assistant for expecting parents. You suggest beautiful baby names. Always respond with ONLY valid JSON — no markdown, no explanation, no extra text.`;
 
-      const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: prompt, systemPrompt });
-      const result = response.data as { reply: string };
+      let replyString = '';
+      if (isGeminiSupported()) {
+        try {
+          const geminiRes = await callGeminiChat({ message: prompt, systemPrompt });
+          replyString = geminiRes.reply;
+        } catch (geminiErr) {
+          console.warn("Gemini iOS BabyNames failed, falling back to server:", geminiErr);
+        }
+      }
 
-      const cleanText = result.reply.replace(/```json/g, '').replace(/```/g, '').trim();
+      if (!replyString) {
+        const chatWithAI = httpsCallable(functions, 'chatWithAI');
+        const response = await chatWithAI({ message: prompt, systemPrompt });
+        const result = response.data as { reply: string };
+        replyString = result.reply;
+      }
+
+      const cleanText = replyString.replace(/```json/g, '').replace(/```/g, '').trim();
       const parsed = JSON.parse(cleanText);
 
       if (Array.isArray(parsed) && parsed.length > 0) {

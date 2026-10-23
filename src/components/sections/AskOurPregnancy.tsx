@@ -9,6 +9,7 @@ import { functions } from '../../firebase';
 import { isPregnancyRelated } from '../../utils/pregnancyClassifier';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { isGeminiSupported, callGeminiChat } from '../../utils/geminiClient';
 import { ContextBanner } from '../ContextBanner';
 
 function getLocalClinicalGuidance(query: string, weekStr: string): string {
@@ -325,12 +326,30 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
       }
 
       setLoadingText("Consulting guidelines...");
-      const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext, dueDate: state.dueDate });
-      const result = response.data as { reply: string };
+      let replyText = '';
 
-      if (result?.reply) {
-        setMessages(prev => [...prev, { role: 'model', text: result.reply }]);
+      if (isGeminiSupported()) {
+        try {
+          const geminiRes = await callGeminiChat({
+            message: finalPrompt,
+            systemPrompt: systemContext,
+            dueDate: state.dueDate
+          });
+          replyText = geminiRes.reply;
+        } catch (geminiErr) {
+          console.warn("Gemini iOS chat failed, attempting Cloud Function fallback:", geminiErr);
+        }
+      }
+
+      if (!replyText) {
+        const chatWithAI = httpsCallable(functions, 'chatWithAI');
+        const response = await chatWithAI({ message: finalPrompt, systemPrompt: systemContext, dueDate: state.dueDate });
+        const result = response.data as { reply: string };
+        replyText = result?.reply || '';
+      }
+
+      if (replyText) {
+        setMessages(prev => [...prev, { role: 'model', text: replyText }]);
         triggerHaptic('success');
       } else {
         const fallback = getLocalClinicalGuidance(userMsg, gestationalInfo.weeks);

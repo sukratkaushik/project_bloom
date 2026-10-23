@@ -1,6 +1,7 @@
 import React from 'react';
 import { Calendar, Compass, HeartPulse, Sparkles, FolderArchive } from 'lucide-react';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { t, useActiveLanguage } from '../../utils/translation';
 
 export type MobileTabId = 'today' | 'explore' | 'care' | 'smart' | 'vault';
 
@@ -10,6 +11,7 @@ interface MobileBottomNavProps {
 }
 
 export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onSelectTab }) => {
+  const currentLang = useActiveLanguage();
   const tabs: { id: MobileTabId; label: string; icon: React.FC<{ size: number; className?: string }>; badge?: string }[] = [
     { id: 'today', label: 'Today', icon: Calendar },
     { id: 'explore', label: 'Explore', icon: Compass },
@@ -49,7 +51,7 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({ activeTab, onS
                 )}
               </div>
               <span className={`text-[10px] xs:text-[11px] mt-0.5 leading-tight text-center truncate max-w-full px-0.5 ${isActive ? 'font-bold' : 'font-medium'}`}>
-                {tab.label}
+                {t(tab.label, currentLang)}
               </span>
               {isActive && (
                 <div className="w-1.5 h-1.5 rounded-full bg-sage-dark mt-1 animate-in zoom-in-50 duration-150" />

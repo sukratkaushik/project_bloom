@@ -42,6 +42,7 @@ import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { isGeminiSupported, callGeminiVisionFood, callGeminiTextNutrition, isPCPNDTGenderQuery } from '../../utils/geminiClient';
 
 interface Macronutrients {
   calories: number;
@@ -76,112 +77,6 @@ interface ScanResult {
   brandName?: string;
 }
 
-// Offline clinical fallback profiles for verified packaged foods
-
-const SAMPLE_BARCODE_FALLBACKS: Record<string, ScanResult> = {
-  '8901262010046': {
-    isFood: true,
-    dishName: 'Amul Taaza Homogenised Toned Milk',
-    brandName: 'Amul',
-    servingDescription: '1 glass (200ml) pasteurized UHT milk',
-    identifiedItems: ['Standardized Milk', 'Vitamin A', 'Vitamin D'],
-    macronutrients: {
-      calories: 116,
-      protein_g: 6.2,
-      carbs_g: 9.4,
-      fats_g: 6.0,
-      fiber_g: 0.0
-    },
-    pregnancyCriticalMicronutrients: {
-      folate_mcg: 10,
-      iron_mg: 0.2,
-      calcium_mg: 250,
-      vitaminD_iu: 50
-    },
-    safetyLevel: 'SAFE',
-    isSafeForPregnancy: true,
-    hazardWarning: 'Verified pasteurized commercial dairy. 100% free of Listeria monocytogenes bacteria.',
-    clinicalRationale: 'Essential source of bioavailable calcium and phosphorus for fetal skeleton and tooth enamel mineralization.',
-    trimesterAdvice: 'Drink warm with a pinch of turmeric (haldi doodh) before bed to promote restful sleep and relieve nocturnal leg cramps.',
-    sourceType: 'barcode'
-  },
-  '8901030383700': {
-    isFood: true,
-    dishName: 'NutriChoice Digestive Hi-Fibre Biscuits',
-    brandName: 'Britannia',
-    servingDescription: '3 biscuits (45g)',
-    identifiedItems: ['Wheat Flour (Atta)', 'Wheat Bran', 'Edible Vegetable Oil', 'Invert Sugar Syrup'],
-    macronutrients: {
-      calories: 216,
-      protein_g: 3.8,
-      carbs_g: 30.6,
-      fats_g: 8.6,
-      fiber_g: 2.7
-    },
-    pregnancyCriticalMicronutrients: {
-      folate_mcg: 18,
-      iron_mg: 1.8,
-      calcium_mg: 54
-    },
-    safetyLevel: 'CAUTION',
-    isSafeForPregnancy: true,
-    hazardWarning: 'High glycemic carbohydrates and palm oil. Moderate intake recommended if monitoring gestational blood sugar (GDM).',
-    clinicalRationale: 'Wheat bran provides helpful dietary fiber against constipation, but added sugars require portion control.',
-    trimesterAdvice: 'Pair with roasted almonds or a boiled egg to blunt the glucose spike.',
-    sourceType: 'barcode'
-  },
-  '8901725181222': {
-    isFood: true,
-    dishName: 'Classic Curd (Dahi) - Pasteurized',
-    brandName: 'Mother Dairy',
-    servingDescription: '1 bowl (150g)',
-    identifiedItems: ['Pasteurized Toned Milk', 'Active Lactic Culture'],
-    macronutrients: {
-      calories: 93,
-      protein_g: 5.7,
-      carbs_g: 6.8,
-      fats_g: 4.8,
-      fiber_g: 0.0
-    },
-    pregnancyCriticalMicronutrients: {
-      folate_mcg: 18,
-      iron_mg: 0.2,
-      calcium_mg: 210
-    },
-    safetyLevel: 'SAFE',
-    isSafeForPregnancy: true,
-    hazardWarning: 'Pasteurized probiotic cultured dairy. Safe against bacterial foodborne pathogens.',
-    clinicalRationale: 'Lactobacillus cultures reinforce maternal gut and vaginal microflora, helping lower bacterial vaginosis risks.',
-    trimesterAdvice: 'Eat fresh with lunch or as chaas (buttermilk) with roasted cumin.',
-    sourceType: 'barcode'
-  },
-  '8901499024039': {
-    isFood: true,
-    dishName: 'Greek Yogurt Natural - High Protein',
-    brandName: 'Epigamia',
-    servingDescription: '1 cup (100g)',
-    identifiedItems: ['Pasteurized Milk', 'Active Live Cultures'],
-    macronutrients: {
-      calories: 85,
-      protein_g: 7.0,
-      carbs_g: 6.5,
-      fats_g: 3.5,
-      fiber_g: 0.0
-    },
-    pregnancyCriticalMicronutrients: {
-      folate_mcg: 15,
-      iron_mg: 0.2,
-      calcium_mg: 160
-    },
-    safetyLevel: 'SAFE',
-    isSafeForPregnancy: true,
-    hazardWarning: 'Zero added sugar and fully pasteurized. Excellent clean protein choice.',
-    clinicalRationale: 'High branch-chain amino acids assist maternal uterine remodeling and fetal lean tissue formation.',
-    trimesterAdvice: 'Top with chia seeds and pomegranate arils for extra omega-3s and antioxidants.',
-    sourceType: 'barcode'
-  }
-};
-
 export const FoodScanner: React.FC = () => {
   const { state } = usePlanner();
   const [activeTab, setActiveTab] = useState<'camera' | 'barcode' | 'text'>('camera');
@@ -198,6 +93,7 @@ export const FoodScanner: React.FC = () => {
   } | null>(null);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [dishHint, setDishHint] = useState<string>('');
   
   // Portion multiplier state (0.5x, 1x, 1.5x, 2x)
   const [portion, setPortion] = useState<number>(1.0);
@@ -247,8 +143,14 @@ export const FoodScanner: React.FC = () => {
     setIsCompressing(true);
 
     try {
-      // Auto-compress camera image (<= 1024px, JPEG 0.80) to prevent payload errors and speed up AI scan
-      const compressed = await compressImage(file, 1024, 0.8);
+      // Extract dish hint from file name if present (e.g. "palak_paneer.jpg" -> "Palak Paneer")
+      const cleanFileName = file.name.replace(/[-_]/g, ' ').replace(/\.[^/.]+$/, '').trim();
+      if (/palak|paneer|dosa|dal|idli|khichdi|egg|roti|curry|salad|bhurji|biryani|chawal/i.test(cleanFileName)) {
+        setDishHint(cleanFileName);
+      }
+
+      // Auto-compress camera image (<= 768px, JPEG 0.65) for blazing fast upload & instant AI vision
+      const compressed = await compressImage(file, 768, 0.65);
       setImageFile(compressed.file);
       setImagePreview(compressed.dataUrl);
       const savedPercent = Math.max(
@@ -285,6 +187,23 @@ export const FoodScanner: React.FC = () => {
       return;
     }
 
+    if (dishHint && isPCPNDTGenderQuery(dishHint)) {
+      setResult({
+        isFood: false,
+        nonFoodDescription: "Under the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994, prenatal sex determination or disclosure of fetal sex or gender is strictly illegal in India. Our Pregnancy complies fully with Indian regulations and cannot assist with fetal sex/gender inquiries.",
+        dishName: 'Prohibited Inquiry (PCPNDT Act, 1994)',
+        identifiedItems: [],
+        macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
+        pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
+        safetyLevel: 'AVOID',
+        isSafeForPregnancy: false,
+        hazardWarning: 'Strict Legal Prohibition: Prenatal sex determination is illegal under Indian law.',
+        clinicalRationale: 'In compliance with the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994.',
+        sourceType: 'photo'
+      });
+      return;
+    }
+
     setIsAnalyzing(true);
     setError(null);
 
@@ -292,8 +211,20 @@ export const FoodScanner: React.FC = () => {
       const base64Data = imagePreview.split(',')[1];
       const mimeType = imageFile.type;
 
+      if (isGeminiSupported()) {
+        try {
+          const geminiResult = await callGeminiVisionFood({ base64Data, mimeType, dishHint });
+          setResult(geminiResult as ScanResult);
+          return;
+        } catch (geminiErr: any) {
+          console.error("Gemini live vision failed:", geminiErr);
+          setError(`AI Vision could not analyze this photo: ${geminiErr?.message || "Please check your internet connection and try again."}`);
+          return;
+        }
+      }
+
       const analyzeFood = httpsCallable(functions, 'analyzeFood');
-      const response = await analyzeFood({ base64Data, mimeType });
+      const response = await analyzeFood({ base64Data, mimeType, dishHint });
       const rawData = response.data as any;
 
       if (rawData.isFood === false || (!rawData.identifiedItems || rawData.identifiedItems.length === 0)) {
@@ -302,7 +233,7 @@ export const FoodScanner: React.FC = () => {
           nonFoodDescription: rawData.nonFoodDescription || "This image does not appear to contain a meal, food dish, or snack. Please upload a clear photo of your food.",
           identifiedItems: [],
           macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
-          pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0 },
+          pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
           isSafeForPregnancy: true,
           hazardWarning: '',
           sourceType: 'photo'
@@ -310,42 +241,40 @@ export const FoodScanner: React.FC = () => {
       } else {
         const parsedResult: ScanResult = {
           isFood: true,
-          dishName: rawData.dishName || rawData.identifiedItems[0] || 'Scanned Meal',
+          dishName: rawData.dishName || dishHint || rawData.identifiedItems[0] || 'Scanned Meal',
           servingDescription: rawData.servingDescription || 'Standard portion estimated from image',
           identifiedItems: rawData.identifiedItems || [],
           macronutrients: {
-            calories: rawData.macronutrients?.calories || Math.round(
-              (rawData.macronutrients?.protein_g || 0) * 4 + 
-              (rawData.macronutrients?.carbs_g || 0) * 4 + 
-              (rawData.macronutrients?.fats_g || 0) * 9
-            ) || 280,
-            protein_g: rawData.macronutrients?.protein_g || 8,
-            carbs_g: rawData.macronutrients?.carbs_g || 35,
-            fats_g: rawData.macronutrients?.fats_g || 9,
-            fiber_g: rawData.macronutrients?.fiber_g || 3
+            calories: Number(rawData.macronutrients?.calories) || Math.round(
+              (Number(rawData.macronutrients?.protein_g) || 0) * 4 + 
+              (Number(rawData.macronutrients?.carbs_g) || 0) * 4 + 
+              (Number(rawData.macronutrients?.fats_g) || 0) * 9
+            ),
+            protein_g: Number(rawData.macronutrients?.protein_g) || 0,
+            carbs_g: Number(rawData.macronutrients?.carbs_g) || 0,
+            fats_g: Number(rawData.macronutrients?.fats_g) || 0,
+            fiber_g: Number(rawData.macronutrients?.fiber_g) || 0
           },
           pregnancyCriticalMicronutrients: {
-            folate_mcg: rawData.pregnancyCriticalMicronutrients?.folate_mcg || 45,
-            iron_mg: rawData.pregnancyCriticalMicronutrients?.iron_mg || 1.8,
-            calcium_mg: rawData.pregnancyCriticalMicronutrients?.calcium_mg || 75
+            folate_mcg: Number(rawData.pregnancyCriticalMicronutrients?.folate_mcg) || 0,
+            iron_mg: Number(rawData.pregnancyCriticalMicronutrients?.iron_mg) || 0,
+            calcium_mg: Number(rawData.pregnancyCriticalMicronutrients?.calcium_mg) || 0,
+            vitaminD_iu: rawData.pregnancyCriticalMicronutrients?.vitaminD_iu !== undefined
+              ? Number(rawData.pregnancyCriticalMicronutrients.vitaminD_iu)
+              : undefined
           },
-          safetyLevel: rawData.isSafeForPregnancy ? 'SAFE' : 'AVOID',
+          safetyLevel: (rawData.safetyLevel as 'SAFE' | 'CAUTION' | 'AVOID') || (rawData.isSafeForPregnancy ? 'SAFE' : 'AVOID'),
           isSafeForPregnancy: rawData.isSafeForPregnancy ?? true,
           hazardWarning: rawData.hazardWarning || '',
-          clinicalRationale: rawData.clinicalRationale || 'Evaluated against FOGSI & ACOG maternal nutrition baselines.',
+          clinicalRationale: rawData.clinicalRationale || 'Evaluated against ICMR-NIN & FOGSI maternal nutrition baselines.',
           trimesterAdvice: rawData.trimesterAdvice || 'Ensure adequate hydration and balanced portioning with your healthcare plan.',
           sourceType: 'photo'
         };
         setResult(parsedResult);
       }
     } catch (err: any) {
-      console.error("Error analyzing image:", err);
-      const rawMsg = err?.message || "";
-      if (rawMsg.includes("Unknown error") || rawMsg.includes("internal") || rawMsg.includes("unavailable") || rawMsg.includes("busy")) {
-        setError("AI Vision server is temporarily busy or reconnecting.");
-      } else {
-        setError(rawMsg || "Failed to analyze image. Please try again or describe the dish below.");
-      }
+      console.error("Live vision AI call failed:", err);
+      setError(`AI Vision analysis failed: ${err?.message || "Please check your internet connection and try again."}`);
     } finally {
       setIsAnalyzing(false);
     }
@@ -583,16 +512,9 @@ export const FoodScanner: React.FC = () => {
     setError(null);
     setResult(null);
 
-    // Instant local response for sample barcodes
-    if (SAMPLE_BARCODE_FALLBACKS[code]) {
-      setResult(SAMPLE_BARCODE_FALLBACKS[code]);
-      setIsSearchingBarcode(false);
-      return;
-    }
-
     try {
       const response = await fetch(`https://world.openfoodfacts.org/api/v2/product/${encodeURIComponent(code)}.json`, {
-        signal: AbortSignal.timeout(5000)
+        signal: AbortSignal.timeout(8000)
       });
       if (!response.ok) {
         throw new Error(`Database server responded with status: ${response.status}`);
@@ -682,83 +604,93 @@ export const FoodScanner: React.FC = () => {
       setResult(barcodeResult);
     } catch (err: any) {
       console.error("Barcode lookup error:", err);
-      if (SAMPLE_BARCODE_FALLBACKS[code]) {
-        setResult(SAMPLE_BARCODE_FALLBACKS[code]);
-        return;
-      }
-      setError(err?.message || "Failed to lookup barcode. Check your connection or try another item.");
+      setError(err?.message || `Barcode "${code}" could not be retrieved. You can describe your meal or snap a photo for AI analysis.`);
     } finally {
       setIsSearchingBarcode(false);
     }
   };
 
-  // Text / Voice quick-log parser
-  const handleTextAnalyze = () => {
-    const text = textDescription.trim().toLowerCase();
+  // Real clinical maternal nutrition calculator for any dish using Gemini AI
+  const calculateDishNutrition = async (dishInput: string) => {
+    const text = dishInput.trim();
     if (!text) {
       setError("Please describe the food dish or snack you consumed.");
+      return;
+    }
+
+    if (isPCPNDTGenderQuery(text)) {
+      setResult({
+        isFood: false,
+        nonFoodDescription: "Under the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994, prenatal sex determination or disclosure of fetal sex or gender is strictly illegal in India. Our Pregnancy complies fully with Indian regulations and cannot predict, determine, or reveal fetal gender. Our nutrition tools are dedicated solely to maternal health and safe prenatal nutrition.",
+        dishName: 'Prohibited Inquiry (PCPNDT Act, 1994)',
+        identifiedItems: [],
+        macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
+        pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0, vitaminD_iu: 0 },
+        safetyLevel: 'AVOID',
+        isSafeForPregnancy: false,
+        hazardWarning: 'Strict Legal Prohibition: Prenatal sex determination is illegal under Indian law.',
+        clinicalRationale: 'In compliance with the Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994.',
+        sourceType: 'text'
+      });
       return;
     }
 
     setError(null);
     setIsAnalyzing(true);
 
-    setTimeout(() => {
-      let isContractionRisk = text.includes('raw papaya') || text.includes('kaccha papaya') || text.includes('unpasteurised') || text.includes('raw egg') || text.includes('sushi');
-      let isCaution = text.includes('tea') || text.includes('chai') || text.includes('coffee') || text.includes('samosa') || text.includes('pickle') || text.includes('papad') || text.includes('sweet');
-
-      let cal = 320;
-      let prot = 11;
-      let carb = 42;
-      let fat = 10;
-      let fib = 4.5;
-      let fol = 75;
-      let ir = 2.5;
-      let calcu = 120;
-
-      if (text.includes('egg') || text.includes('omelette')) {
-        prot += 12;
-        fat += 8;
-        cal += 140;
-      }
-      if (text.includes('paneer') || text.includes('milk') || text.includes('dahi') || text.includes('curd')) {
-        calcu += 240;
-        prot += 8;
-      }
-      if (text.includes('dal') || text.includes('chana') || text.includes('spinach') || text.includes('palak')) {
-        fol += 110;
-        ir += 2.2;
-        fib += 3.5;
+    try {
+      if (isGeminiSupported()) {
+        const geminiResult = await callGeminiTextNutrition(text);
+        setResult(geminiResult as ScanResult);
+        return;
       }
 
-      setResult({
-        isFood: true,
-        dishName: textDescription.slice(0, 48),
-        servingDescription: 'Self-reported portion',
-        identifiedItems: text.split(/,|\sand\s|\s\+\s/).map(s => s.trim()).filter(Boolean),
-        macronutrients: {
-          calories: cal,
-          protein_g: prot,
-          carbs_g: carb,
-          fats_g: fat,
-          fiber_g: fib
-        },
-        pregnancyCriticalMicronutrients: {
-          folate_mcg: fol,
-          iron_mg: ir,
-          calcium_mg: calcu
-        },
-        safetyLevel: isContractionRisk ? 'AVOID' : (isCaution ? 'CAUTION' : 'SAFE'),
-        isSafeForPregnancy: !isContractionRisk,
-        hazardWarning: isContractionRisk 
-          ? 'Potentially high-risk maternal ingredient detected. Consult your obstetrician before consuming.'
-          : (isCaution ? 'Safe in moderation. Watch portions of caffeine, sodium, or refined sweets.' : 'Healthy, balanced pregnancy nutrition choice.'),
-        clinicalRationale: 'Calculated using maternal nutritional food tables and FOGSI clinical recommendations.',
-        trimesterAdvice: 'Stay well-hydrated and log symptoms if you experience any mild heartburn.',
-        sourceType: 'text'
-      });
+      // Web / Android: Call server cloud function
+      const analyzeFood = httpsCallable(functions, 'analyzeFood');
+      const response = await analyzeFood({ dishHint: text, mimeType: 'text/plain', base64Data: '' });
+      const rawData = response.data as any;
+      if (rawData) {
+        setResult({
+          isFood: rawData.isFood !== false,
+          nonFoodDescription: rawData.nonFoodDescription || undefined,
+          dishName: rawData.dishName || text,
+          servingDescription: rawData.servingDescription || 'Standard portion estimated',
+          identifiedItems: rawData.identifiedItems || [text],
+          macronutrients: {
+            calories: Number(rawData.macronutrients?.calories) || 0,
+            protein_g: Number(rawData.macronutrients?.protein_g) || 0,
+            carbs_g: Number(rawData.macronutrients?.carbs_g) || 0,
+            fats_g: Number(rawData.macronutrients?.fats_g) || 0,
+            fiber_g: Number(rawData.macronutrients?.fiber_g) || 0
+          },
+          pregnancyCriticalMicronutrients: {
+            folate_mcg: Number(rawData.pregnancyCriticalMicronutrients?.folate_mcg) || 0,
+            iron_mg: Number(rawData.pregnancyCriticalMicronutrients?.iron_mg) || 0,
+            calcium_mg: Number(rawData.pregnancyCriticalMicronutrients?.calcium_mg) || 0,
+            vitaminD_iu: rawData.pregnancyCriticalMicronutrients?.vitaminD_iu !== undefined
+              ? Number(rawData.pregnancyCriticalMicronutrients.vitaminD_iu)
+              : undefined
+          },
+          safetyLevel: (rawData.safetyLevel as 'SAFE' | 'CAUTION' | 'AVOID') || (rawData.isSafeForPregnancy ? 'SAFE' : 'AVOID'),
+          isSafeForPregnancy: rawData.isSafeForPregnancy ?? true,
+          hazardWarning: rawData.hazardWarning || '',
+          clinicalRationale: rawData.clinicalRationale || 'Calculated using ICMR-NIN nutritional composition and FOGSI guidelines.',
+          trimesterAdvice: rawData.trimesterAdvice || 'Ensure balanced portioning and drink adequate water.',
+          sourceType: 'text'
+        });
+      } else {
+        throw new Error("No data returned from nutrition engine");
+      }
+    } catch (err: any) {
+      console.error("Dish nutrition analysis error:", err);
+      setError(`Could not analyze "${dishInput}". Please check your internet connection and try again.`);
+    } finally {
       setIsAnalyzing(false);
-    }, 600);
+    }
+  };
+
+  const handleTextAnalyze = () => {
+    calculateDishNutrition(textDescription);
   };
 
   // Web Speech API for voice dictation
@@ -850,6 +782,9 @@ export const FoodScanner: React.FC = () => {
   const currentFolate = Math.round((result?.pregnancyCriticalMicronutrients?.folate_mcg || 0) * portion);
   const currentIron = Math.round((result?.pregnancyCriticalMicronutrients?.iron_mg || 0) * portion * 10) / 10;
   const currentCalcium = Math.round((result?.pregnancyCriticalMicronutrients?.calcium_mg || 0) * portion);
+  const currentVitaminD = result?.pregnancyCriticalMicronutrients?.vitaminD_iu !== undefined
+    ? Math.round(result.pregnancyCriticalMicronutrients.vitaminD_iu * portion)
+    : undefined;
 
   return (
     <Paywall featureName="FoodScanner">
@@ -1039,12 +974,61 @@ export const FoodScanner: React.FC = () => {
                         setCompressionInfo(null);
                         setResult(null);
                         setError(null);
+                        setDishHint('');
                       }}
                       className="absolute top-3 right-3 bg-white/95 backdrop-blur-md text-charcoal text-[12.5px] font-semibold px-3.5 py-1.5 rounded-full shadow-sm hover:bg-white transition-all flex items-center gap-1.5"
                     >
                       <RotateCcw size={13} /> Change Image
                     </button>
                   </div>
+
+                  {/* Meal Clarification & Quick-Pick Chips */}
+                  {!result && (
+                    <div className="bg-sand/40 border border-sand-dark/20 rounded-2xl p-4 transition-all">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[12px] font-semibold text-charcoal flex items-center gap-1.5">
+                          <Sparkles size={13} className="text-sage-dark" />
+                          <span>Meal Name (optional — auto-calibrates Indian maternal nutrients):</span>
+                        </label>
+                        {dishHint && (
+                          <button
+                            type="button"
+                            onClick={() => setDishHint('')}
+                            className="text-[11px] text-terracotta hover:underline font-medium"
+                          >
+                            Clear
+                          </button>
+                        )}
+                      </div>
+                      <input
+                        type="text"
+                        value={dishHint}
+                        onChange={(e) => setDishHint(e.target.value)}
+                        placeholder="e.g. Palak Paneer, Dal Roti, Khichdi, Idli..."
+                        className="w-full px-3.5 py-2.5 text-[13.5px] bg-white border border-border/70 rounded-xl focus:outline-none focus:ring-1.5 focus:ring-sage text-charcoal placeholder:text-muted/60 mb-2.5 shadow-xs"
+                      />
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-[11px] text-muted font-medium mr-1">Quick pick:</span>
+                        {['Palak Paneer', 'Dal Roti', 'Paneer Bhurji', 'Khichdi', 'Idli & Sambar', 'Boiled Eggs'].map((dish) => (
+                          <button
+                            key={dish}
+                            type="button"
+                            onClick={() => {
+                              triggerHaptic('light');
+                              setDishHint(dish);
+                            }}
+                            className={`text-[11.5px] px-2.5 py-1 rounded-full transition-all font-medium border ${
+                              dishHint.toLowerCase() === dish.toLowerCase()
+                                ? 'bg-sage-dark text-white border-sage-dark shadow-xs'
+                                : 'bg-white text-charcoal/80 border-border hover:border-sage hover:bg-sage/10'
+                            }`}
+                          >
+                            {dish}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {!result && (
                     <button
@@ -1310,6 +1294,33 @@ export const FoodScanner: React.FC = () => {
                   <span>Describe Meal Instead (Instant)</span>
                 </button>
               </div>
+
+              {/* Instant 1-tap dish resolution */}
+              <div className="pt-2 border-t border-critical/15">
+                <p className="text-[11.5px] font-semibold text-charcoal/80 mb-2">
+                  Or select your dish below for instant nutritional calculation:
+                </p>
+                <div className="flex flex-wrap gap-1.5">
+                  {[
+                    'Palak Paneer',
+                    'Dal Roti',
+                    'Dosa & Chutney',
+                    'Khichdi',
+                    'Boiled Eggs & Toast',
+                    'Paneer Bhurji',
+                    'Fruit Salad & Nuts'
+                  ].map((dish) => (
+                    <button
+                      key={dish}
+                      type="button"
+                      onClick={() => calculateDishNutrition(dish)}
+                      className="px-2.5 py-1 bg-white hover:bg-sage-pale border border-border/80 hover:border-sage text-charcoal hover:text-sage-dark text-[11.5px] font-semibold rounded-lg transition-all shadow-3xs cursor-pointer active:scale-95"
+                    >
+                      + {dish}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
@@ -1547,6 +1558,27 @@ export const FoodScanner: React.FC = () => {
                     </div>
                   </div>
                 </div>
+
+                {/* Vitamin D Row */}
+                {currentVitaminD !== undefined && currentVitaminD > 0 && (
+                  <div className="bg-white dark:bg-stone-900/90 p-3 rounded-xl border border-sage/20 flex items-center justify-between gap-3 shadow-3xs">
+                    <div className="min-w-0">
+                      <div className="text-[12.5px] font-bold text-charcoal dark:text-cream flex items-center gap-1.5">
+                        <span>Vitamin D</span>
+                        <span className="text-[10px] font-semibold text-yellow-700 bg-yellow-50 px-1.5 py-0.2 rounded">Immunity & Bone Support</span>
+                      </div>
+                      <div className="text-[11px] text-medium mt-0.5">Target: 600 IU/day</div>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <div className="text-[16px] font-extrabold text-sage-dark dark:text-sage-light">
+                        {currentVitaminD} <span className="text-[12px] font-normal text-medium">IU</span>
+                      </div>
+                      <div className="text-[10.5px] font-semibold text-charcoal/60 dark:text-stone-300">
+                        ~{Math.min(100, Math.round((currentVitaminD / 600) * 100))}% RDA
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {result.trimesterAdvice && (

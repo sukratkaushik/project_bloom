@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
+import { isGeminiSupported, callGeminiMedicalReport } from '../../utils/geminiClient';
 import { Paywall } from '../Paywall';
 import { ContextBanner } from '../ContextBanner';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
@@ -237,14 +238,25 @@ export const MedicalReports: React.FC = () => {
       const fileType = report.fileType;
       const fileName = report.fileName;
 
-      const analyzeMedicalReport = httpsCallable(functions, 'analyzeMedicalReport');
-      const response = await analyzeMedicalReport({ base64Data, fileType, fileName });
+      let data: { summary: string; prescriptions: string[]; warnings: string[] } | null = null;
 
-      const data = response.data as {
-        summary: string;
-        prescriptions: string[];
-        warnings: string[];
-      };
+      if (isGeminiSupported() && fileType.startsWith('image/')) {
+        try {
+          data = await callGeminiMedicalReport({ base64Data, fileType, fileName });
+        } catch (geminiErr) {
+          console.warn("Gemini iOS Medical Report analysis failed, falling back to server:", geminiErr);
+        }
+      }
+
+      if (!data) {
+        const analyzeMedicalReport = httpsCallable(functions, 'analyzeMedicalReport');
+        const response = await analyzeMedicalReport({ base64Data, fileType, fileName });
+        data = response.data as {
+          summary: string;
+          prescriptions: string[];
+          warnings: string[];
+        };
+      }
 
       const updated = {
         ...report,

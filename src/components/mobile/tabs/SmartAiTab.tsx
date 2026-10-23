@@ -5,6 +5,7 @@ import {
   ShieldCheck, ChevronRight, Star
 } from 'lucide-react';
 import { triggerHaptic } from '../../../utils/nativeBridge';
+import { isGeminiSupported, callGeminiChat } from '../../../utils/geminiClient';
 import { functions } from '../../../firebase';
 import { httpsCallable } from 'firebase/functions';
 import { usePlanner } from '../../../store';
@@ -74,25 +75,45 @@ export const SmartAiTab: React.FC<SmartAiTabProps> = ({
     setIsLoading(true);
 
     try {
-      const chatCallable = httpsCallable(functions, 'chatWithAI');
-      const response = await chatCallable({
-        message: userMsg,
-        dueDate: state.dueDate,
-        systemPrompt: `You are OPIN AI, an executive clinical maternal companion aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
+      const smartSystemPrompt = `You are OPIN AI, an executive clinical maternal companion aligned with FOGSI (Federation of Obstetric and Gynaecological Societies of India) and ACOG guidelines.
 When answering maternal questions:
 1. Provide a direct, definitive Clinical Summary first.
 2. Outline key maternal/fetal physiological benefits or risks using clean bullet points.
 3. Specify evidence-based daily portions, safe timing, and clinical precautions.
 4. Keep the tone professional, authoritative yet empathetic, avoiding vague generalities.
-5. End with a 1-line verification advisory.`,
-      });
-      const result = response.data as { reply: string };
+5. End with a 1-line verification advisory.`;
+
+      let replyContent = '';
+
+      if (isGeminiSupported()) {
+        try {
+          const geminiRes = await callGeminiChat({
+            message: userMsg,
+            dueDate: state.dueDate,
+            systemPrompt: smartSystemPrompt
+          });
+          replyContent = geminiRes.reply;
+        } catch (geminiErr) {
+          console.warn("Gemini iOS SmartAiTab failed, falling back to server:", geminiErr);
+        }
+      }
+
+      if (!replyContent) {
+        const chatCallable = httpsCallable(functions, 'chatWithAI');
+        const response = await chatCallable({
+          message: userMsg,
+          dueDate: state.dueDate,
+          systemPrompt: smartSystemPrompt,
+        });
+        const result = response.data as { reply: string };
+        replyContent = result.reply;
+      }
 
       setMessages((prev) => [
         ...prev,
         {
           sender: 'ai',
-          text: result.reply || 'Thank you for your question. Always verify with your doctor during your routine prenatal scans.',
+          text: replyContent || 'Thank you for your question. Always verify with your doctor during your routine prenatal scans.',
           time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         },
       ]);

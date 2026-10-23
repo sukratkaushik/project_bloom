@@ -1,5 +1,8 @@
+import { useState, useEffect } from 'react';
+import { TRANSLATION_DICTIONARY, SupportedLanguageCode } from './translationsData';
+
 export interface SupportedLanguage {
-  code: string;
+  code: SupportedLanguageCode;
   label: string;
   native: string;
   name: string;
@@ -22,6 +25,13 @@ export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
 
 const STORAGE_KEY = 'bloom_selected_language';
 
+// Tracks the original English text for DOM text nodes so switching languages is 100% lossless
+const originalTextMap = new WeakMap<Text, string>();
+const originalPlaceholderMap = new WeakMap<Element, string>();
+
+let isTranslating = false;
+let mutationObserver: MutationObserver | null = null;
+
 /**
  * Reads the currently active language code from:
  * 1. localStorage
@@ -29,29 +39,24 @@ const STORAGE_KEY = 'bloom_selected_language';
  * 3. HTML lang attribute
  * Defaults to 'en'
  */
-export function getActiveLanguage(): string {
+export function getActiveLanguage(): SupportedLanguageCode {
   try {
-    // 1. Check localStorage first
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved && SUPPORTED_LANGUAGES.some(l => l.code === saved)) {
-      return saved;
+      return saved as SupportedLanguageCode;
     }
-  } catch (e) {
-    // localStorage might be unavailable in restricted webview contexts
-  }
+  } catch (e) {}
 
-  // 2. Check HTML lang attribute
   try {
     const htmlLang = document.documentElement.lang;
     if (htmlLang && htmlLang !== 'en' && htmlLang.length <= 5) {
       const cleanLang = htmlLang.split('-')[0].toLowerCase();
       if (SUPPORTED_LANGUAGES.some(l => l.code === cleanLang)) {
-        return cleanLang;
+        return cleanLang as SupportedLanguageCode;
       }
     }
   } catch (e) {}
 
-  // 3. Check googtrans cookie
   try {
     const match = document.cookie.match(/googtrans=([^;]+)/);
     if (match) {
@@ -61,7 +66,7 @@ export function getActiveLanguage(): string {
       if (code) {
         const cleanCode = code.toLowerCase();
         if (SUPPORTED_LANGUAGES.some(l => l.code === cleanCode)) {
-          return cleanCode;
+          return cleanCode as SupportedLanguageCode;
         }
       }
     }
@@ -71,22 +76,226 @@ export function getActiveLanguage(): string {
 }
 
 /**
- * Triggers Google Translate translation to the requested language code.
- * Handles DOM select manipulation, cookie persistence, and optional clean reload
- * to ensure all React component text nodes are 100% translated.
+ * Returns translated text for a given string in the active or specified language.
+ * Falls back to the original English string if no translation exists.
  */
-export function changeLanguage(langCode: string, reload: boolean = true): boolean {
+export function t(text: string, langCode?: SupportedLanguageCode): string {
+  if (!text) return '';
+  const lang = langCode || getActiveLanguage();
+  if (lang === 'en') return text;
+
+  const trimmed = text.trim();
+  const entry = TRANSLATION_DICTIONARY[trimmed];
+  if (entry && entry[lang]) {
+    const translated = entry[lang]!;
+    if (text === trimmed) return translated;
+    return text.replace(trimmed, translated);
+  }
+
+  return text;
+}
+
+/**
+ * Translates a single text node to the target language.
+ */
+function translateTextNode(node: Text, targetLang: SupportedLanguageCode) {
+  if (!node.nodeValue) return;
+
+  const currentVal = node.nodeValue;
+  const trimmed = currentVal.trim();
+  if (!trimmed || trimmed.length < 2) return;
+
+  // Retrieve original English text, or store it if not yet tracked
+  let original = originalTextMap.get(node);
+  if (!original) {
+    if (TRANSLATION_DICTIONARY[trimmed]) {
+      original = trimmed;
+      originalTextMap.set(node, original);
+    } else {
+      // Check for partial sub-string matches
+      for (const enKey in TRANSLATION_DICTIONARY) {
+        if (trimmed === enKey || trimmed.includes(enKey)) {
+          original = trimmed;
+          originalTextMap.set(node, original);
+          break;
+        }
+      }
+    }
+  }
+
+  if (!original) return;
+
+  if (targetLang === 'en') {
+    if (currentVal !== original) {
+      node.nodeValue = original;
+    }
+    return;
+  }
+
+  const exactTrans = TRANSLATION_DICTIONARY[original]?.[targetLang];
+  if (exactTrans) {
+    const nextVal = currentVal.replace(original, exactTrans);
+    if (nextVal !== currentVal) {
+      node.nodeValue = nextVal;
+    }
+    return;
+  }
+
+  // Handle case where trimmed original is in dictionary
+  const trimmedOriginal = original.trim();
+  const trimmedTrans = TRANSLATION_DICTIONARY[trimmedOriginal]?.[targetLang];
+  if (trimmedTrans) {
+    const nextVal = currentVal.replace(trimmedOriginal, trimmedTrans);
+    if (nextVal !== currentVal) {
+      node.nodeValue = nextVal;
+    }
+  }
+}
+
+/**
+ * Translates element attributes like placeholders and titles
+ */
+function translateElementAttributes(el: Element, targetLang: SupportedLanguageCode) {
+  if (el.hasAttribute('placeholder')) {
+    const current = el.getAttribute('placeholder') || '';
+    let original = originalPlaceholderMap.get(el);
+    if (!original) {
+      original = current;
+      originalPlaceholderMap.set(el, original);
+    }
+    if (targetLang === 'en') {
+      if (current !== original) el.setAttribute('placeholder', original);
+    } else {
+      const trans = TRANSLATION_DICTIONARY[original]?.[targetLang];
+      if (trans && current !== trans) {
+        el.setAttribute('placeholder', trans);
+      }
+    }
+  }
+}
+
+/**
+ * Traverses a DOM tree and translates all text nodes to the target language.
+ */
+export function translateDomTree(root: Node, targetLang: SupportedLanguageCode) {
+  if (typeof document === 'undefined' || !root) return;
+
+  isTranslating = true;
   try {
-    localStorage.setItem(STORAGE_KEY, langCode);
+    if (root.nodeType === Node.TEXT_NODE) {
+      translateTextNode(root as Text, targetLang);
+      return;
+    }
+
+    if (root.nodeType === Node.ELEMENT_NODE) {
+      translateElementAttributes(root as Element, targetLang);
+    }
+
+    const walker = document.createTreeWalker(
+      root,
+      NodeFilter.SHOW_TEXT,
+      {
+        acceptNode(node: Node) {
+          const parent = node.parentElement;
+          if (!parent) return NodeFilter.FILTER_REJECT;
+
+          const tag = parent.tagName;
+          if (
+            tag === 'SCRIPT' ||
+            tag === 'STYLE' ||
+            tag === 'NOSCRIPT' ||
+            tag === 'SVG' ||
+            tag === 'CODE' ||
+            tag === 'TEXTAREA'
+          ) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          // Protect brand identity
+          if (parent.classList.contains('brand-protected')) {
+            return NodeFilter.FILTER_REJECT;
+          }
+
+          const val = node.nodeValue?.trim();
+          if (!val || val.length < 2) {
+            return NodeFilter.FILTER_SKIP;
+          }
+
+          return NodeFilter.FILTER_ACCEPT;
+        }
+      }
+    );
+
+    let currentNode = walker.nextNode();
+    while (currentNode) {
+      translateTextNode(currentNode as Text, targetLang);
+      currentNode = walker.nextNode();
+    }
+  } finally {
+    isTranslating = false;
+  }
+}
+
+/**
+ * Initializes a MutationObserver that automatically translates new DOM nodes as they render.
+ */
+export function initTranslationObserver() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  const currentLang = getActiveLanguage();
+  if (currentLang !== 'en') {
+    translateDomTree(document.body, currentLang);
+  }
+
+  if (mutationObserver) {
+    mutationObserver.disconnect();
+  }
+
+  mutationObserver = new MutationObserver((mutations) => {
+    if (isTranslating) return;
+
+    const lang = getActiveLanguage();
+    if (lang === 'en') return;
+
+    for (const mutation of mutations) {
+      if (mutation.type === 'childList') {
+        mutation.addedNodes.forEach((node) => {
+          if (node.nodeType === Node.ELEMENT_NODE) {
+            translateDomTree(node, lang);
+          } else if (node.nodeType === Node.TEXT_NODE) {
+            translateTextNode(node as Text, lang);
+          }
+        });
+      }
+    }
+  });
+
+  mutationObserver.observe(document.body, {
+    childList: true,
+    subtree: true
+  });
+}
+
+/**
+ * Triggers language translation to the requested language code across the app.
+ * - Updates localStorage and HTML lang
+ * - Immediately updates the DOM without requiring a disruptive full-page reload
+ * - Synchronizes Google Translate .goog-te-combo if present as a fallback
+ * - Dispatches 'app_language_changed' event for React subscribers
+ */
+export function changeLanguage(langCode: string, reload: boolean = false): boolean {
+  const code = (SUPPORTED_LANGUAGES.some(l => l.code === langCode) ? langCode : 'en') as SupportedLanguageCode;
+
+  try {
+    localStorage.setItem(STORAGE_KEY, code);
   } catch (e) {}
 
-  // Set googtrans cookie for all possible domain scopes
-  const cookieValue = langCode === 'en' ? '/en/en' : `/en/${langCode}`;
-  
-  // 1. Root path cookie
+  document.documentElement.lang = code;
+  document.documentElement.setAttribute('data-lang', code);
+
+  // Set googtrans cookie for fallback web compatibility
+  const cookieValue = code === 'en' ? '/en/en' : `/en/${code}`;
   document.cookie = `googtrans=${cookieValue}; path=/; SameSite=Lax;`;
-  
-  // 2. Specific domain cookie if hostname is non-empty and not localhost
   const hostname = window.location.hostname;
   if (hostname && !hostname.includes('localhost') && hostname.includes('.')) {
     document.cookie = `googtrans=${cookieValue}; path=/; domain=${hostname}; SameSite=Lax;`;
@@ -96,22 +305,55 @@ export function changeLanguage(langCode: string, reload: boolean = true): boolea
     }
   }
 
-  // 3. Try to change the Google Translate select dropdown directly
-  const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-  if (select) {
-    select.value = langCode === 'en' ? '' : langCode;
-    select.dispatchEvent(new Event('change', { bubbles: true }));
-    
-    // Also dispatch on window for custom listeners
-    window.dispatchEvent(new CustomEvent('app_language_changed', { detail: { langCode } }));
+  // 1. Immediately translate current DOM in-place
+  if (typeof document !== 'undefined') {
+    translateDomTree(document.body, code);
   }
 
-  // 4. Reload if requested to ensure complete translation of all deeply-nested DOM/React components
+  // 2. Synchronize Google Translate select dropdown if present
+  try {
+    const select = document.querySelector<HTMLSelectElement>('.goog-te-combo');
+    if (select) {
+      const desiredVal = code === 'en' ? '' : code;
+      if (select.value !== desiredVal) {
+        select.value = desiredVal;
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    }
+  } catch (e) {}
+
+  // 3. Dispatch global custom event for React components
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent('app_language_changed', { detail: { langCode: code } }));
+  }
+
+  // 4. Reload only if explicitly asked by caller
   if (reload) {
     setTimeout(() => {
       window.location.reload();
-    }, 250);
+    }, 200);
   }
 
   return true;
+}
+
+/**
+ * React hook to subscribe to the active app language in real-time.
+ */
+export function useActiveLanguage(): SupportedLanguageCode {
+  const [lang, setLang] = useState<SupportedLanguageCode>(getActiveLanguage);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.langCode) {
+        setLang(detail.langCode as SupportedLanguageCode);
+      }
+    };
+
+    window.addEventListener('app_language_changed', handler);
+    return () => window.removeEventListener('app_language_changed', handler);
+  }, []);
+
+  return lang;
 }
