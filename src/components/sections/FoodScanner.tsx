@@ -42,6 +42,7 @@ import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
 import { triggerHaptic } from '../../utils/nativeBridge';
+import { isGeminiSupported, callGeminiVisionFood } from '../../utils/geminiClient';
 
 interface Macronutrients {
   calories: number;
@@ -298,6 +299,17 @@ export const FoodScanner: React.FC = () => {
     try {
       const base64Data = imagePreview.split(',')[1];
       const mimeType = imageFile.type;
+
+      // On iOS, directly use Google Gemini Vision (generous free tier, 1500 req/day)
+      if (isGeminiSupported()) {
+        try {
+          const geminiResult = await callGeminiVisionFood({ base64Data, mimeType, dishHint });
+          setResult(geminiResult as ScanResult);
+          return;
+        } catch (geminiErr) {
+          console.warn("Gemini iOS direct vision failed, attempting Cloud Function fallback:", geminiErr);
+        }
+      }
 
       const analyzeFood = httpsCallable(functions, 'analyzeFood');
       const response = await analyzeFood({ base64Data, mimeType, dishHint });

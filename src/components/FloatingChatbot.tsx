@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../firebase';
+import { isGeminiSupported, callGeminiChat } from '../utils/geminiClient';
 import { isPregnancyRelated } from '../utils/pregnancyClassifier';
 import { AiConsentPrompt, isAiConsentBlocked } from './AiConsentPrompt';
 
@@ -80,15 +81,29 @@ export const FloatingChatbot: React.FC<FloatingChatbotProps> = ({ activePage }) 
     setMessages(prev => [...prev, { role: 'ai', text: "Thinking..." }]);
 
     try {
-      // 2. Call the secure Firebase Cloud Function instead of HF directly
-      const chatWithAI = httpsCallable(functions, 'chatWithAI');
-      const response = await chatWithAI({ message: textToSend, dueDate: state.dueDate });
-      const result = response.data as { reply: string };
+      let replyText = '';
+
+      if (isGeminiSupported()) {
+        try {
+          const geminiRes = await callGeminiChat({ message: textToSend, dueDate: state.dueDate });
+          replyText = geminiRes.reply;
+        } catch (geminiErr) {
+          console.warn("Gemini iOS chatbot failed, falling back to server:", geminiErr);
+        }
+      }
+
+      if (!replyText) {
+        // Call the secure Firebase Cloud Function instead of HF directly
+        const chatWithAI = httpsCallable(functions, 'chatWithAI');
+        const response = await chatWithAI({ message: textToSend, dueDate: state.dueDate });
+        const result = response.data as { reply: string };
+        replyText = result.reply;
+      }
 
       // Replace the "Thinking..." message with the actual response
       setMessages(prev => {
         const newMessages = [...prev];
-        newMessages[newMessages.length - 1] = { role: 'ai', text: result.reply };
+        newMessages[newMessages.length - 1] = { role: 'ai', text: replyText };
         return newMessages;
       });
 
