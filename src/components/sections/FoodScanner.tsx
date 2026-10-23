@@ -42,7 +42,7 @@ import { functions } from '../../firebase';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
 import { triggerHaptic } from '../../utils/nativeBridge';
-import { isGeminiSupported, callGeminiVisionFood } from '../../utils/geminiClient';
+import { isGeminiSupported, callGeminiVisionFood, callGeminiTextNutrition } from '../../utils/geminiClient';
 
 interface Macronutrients {
   calories: number;
@@ -306,8 +306,10 @@ export const FoodScanner: React.FC = () => {
           const geminiResult = await callGeminiVisionFood({ base64Data, mimeType, dishHint });
           setResult(geminiResult as ScanResult);
           return;
-        } catch (geminiErr) {
-          console.warn("Gemini iOS direct vision failed, attempting Cloud Function fallback:", geminiErr);
+        } catch (geminiErr: any) {
+          console.error("Gemini iOS direct vision failed:", geminiErr);
+          setError(`AI Vision could not analyze this photo: ${geminiErr?.message || "Please check your internet connection and try again."}`);
+          return;
         }
       }
 
@@ -358,9 +360,8 @@ export const FoodScanner: React.FC = () => {
         setResult(parsedResult);
       }
     } catch (err: any) {
-      console.warn("Live vision AI call failed or timed out, activating instant clinical nutrition engine:", err);
-      // Instant clinical nutrition fallback — user never gets stranded!
-      calculateDishNutrition(dishHint || 'Wholesome Maternal Meal');
+      console.error("Live vision AI call failed:", err);
+      setError("AI Vision analysis could not connect. Please check your internet connection and try again, or enter your meal name below.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -707,9 +708,9 @@ export const FoodScanner: React.FC = () => {
     }
   };
 
-  // Quick clinical maternal nutrition calculator for any Indian dish or self-reported meal
-  const calculateDishNutrition = (dishInput: string) => {
-    const text = dishInput.trim().toLowerCase();
+  // Real clinical maternal nutrition calculator for any dish using Gemini AI
+  const calculateDishNutrition = async (dishInput: string) => {
+    const text = dishInput.trim();
     if (!text) {
       setError("Please describe the food dish or snack you consumed.");
       return;
@@ -718,72 +719,28 @@ export const FoodScanner: React.FC = () => {
     setError(null);
     setIsAnalyzing(true);
 
-    setTimeout(() => {
-      let isContractionRisk = text.includes('raw papaya') || text.includes('kaccha papaya') || text.includes('unpasteurised') || text.includes('raw egg') || text.includes('sushi');
-      let isCaution = text.includes('tea') || text.includes('chai') || text.includes('coffee') || text.includes('samosa') || text.includes('pickle') || text.includes('papad') || text.includes('sweet');
-
-      let cal = 320;
-      let prot = 11;
-      let carb = 42;
-      let fat = 10;
-      let fib = 4.5;
-      let fol = 75;
-      let ir = 2.5;
-      let calcu = 120;
-
-      if (text.includes('egg') || text.includes('omelette')) {
-        prot += 12;
-        fat += 8;
-        cal += 140;
-      }
-      if (text.includes('paneer') || text.includes('milk') || text.includes('dahi') || text.includes('curd')) {
-        calcu += 240;
-        prot += 8;
-      }
-      if (text.includes('dal') || text.includes('chana') || text.includes('spinach') || text.includes('palak')) {
-        fol += 110;
-        ir += 2.2;
-        fib += 3.5;
-      }
-      if (text.includes('palak paneer') || (text.includes('palak') && text.includes('paneer'))) {
-        cal = 340;
-        prot = 18;
-        carb = 16;
-        fat = 24;
-        fib = 6;
-        fol = 185;
-        ir = 4.2;
-        calcu = 380;
+    try {
+      if (isGeminiSupported()) {
+        const geminiResult = await callGeminiTextNutrition(text);
+        setResult(geminiResult as ScanResult);
+        return;
       }
 
-      setResult({
-        isFood: true,
-        dishName: dishInput.slice(0, 48),
-        servingDescription: 'Standard maternal portion estimated',
-        identifiedItems: text.split(/,|\sand\s|\s\+\s/).map(s => s.trim()).filter(Boolean),
-        macronutrients: {
-          calories: cal,
-          protein_g: prot,
-          carbs_g: carb,
-          fats_g: fat,
-          fiber_g: fib
-        },
-        pregnancyCriticalMicronutrients: {
-          folate_mcg: fol,
-          iron_mg: ir,
-          calcium_mg: calcu
-        },
-        safetyLevel: isContractionRisk ? 'AVOID' : (isCaution ? 'CAUTION' : 'SAFE'),
-        isSafeForPregnancy: !isContractionRisk,
-        hazardWarning: isContractionRisk 
-          ? 'Potentially high-risk maternal ingredient detected. Consult your obstetrician before consuming.'
-          : (isCaution ? 'Safe in moderation. Watch portions of caffeine, sodium, or refined sweets.' : 'Healthy, balanced pregnancy nutrition choice.'),
-        clinicalRationale: 'Calculated using maternal nutritional food tables and FOGSI clinical recommendations.',
-        trimesterAdvice: 'Stay well-hydrated and log symptoms if you experience any mild heartburn.',
-        sourceType: imagePreview ? 'photo' : 'text'
-      });
+      // Web / Android: Call server cloud function
+      const analyzeFood = httpsCallable(functions, 'analyzeFood');
+      const response = await analyzeFood({ dishHint: text, mimeType: 'text/plain', base64Data: '' });
+      const rawData = response.data as any;
+      if (rawData) {
+        setResult(rawData as ScanResult);
+      } else {
+        throw new Error("No data returned from nutrition engine");
+      }
+    } catch (err: any) {
+      console.error("Dish nutrition analysis error:", err);
+      setError(`Could not analyze "${dishInput}". Please check your internet connection and try again.`);
+    } finally {
       setIsAnalyzing(false);
-    }, 400);
+    }
   };
 
   const handleTextAnalyze = () => {

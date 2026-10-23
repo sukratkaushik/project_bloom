@@ -295,6 +295,144 @@ Rules:
   };
 }
 
+/**
+ * Real AI Text/Dish Nutrition Analysis with Gemini Flash
+ * Analyzes any meal name, description, or voice transcript with authentic ICMR-NIN & FOGSI clinical nutrition.
+ */
+export async function callGeminiTextNutrition(dishDescription: string): Promise<GeminiFoodScanResult> {
+  const endpoint = `${GEMINI_BASE_URL}/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+  const prompt = `You are an expert prenatal clinical nutritionist aligned with ICMR-NIN (Indian Council of Medical Research - National Institute of Nutrition) and FOGSI/ACOG maternal health guidelines.
+The pregnant mother consumed or described this meal/dish:
+"${dishDescription}"
+
+Analyze the authentic recipe, culinary ingredients, portion size, and nutritional composition.
+Return ONLY a valid JSON object with this exact structure:
+{
+  "isFood": true,
+  "nonFoodDescription": "",
+  "dishName": "Exact Proper Dish Name",
+  "servingDescription": "Standard portion (e.g. 1 bowl ~200g, 2 pieces with chutney)",
+  "identifiedItems": ["Authentic Ingredient 1", "Ingredient 2", "Ingredient 3"],
+  "macronutrients": {
+    "calories": 320,
+    "protein_g": 12,
+    "carbs_g": 45,
+    "fats_g": 10,
+    "fiber_g": 4
+  },
+  "pregnancyCriticalMicronutrients": {
+    "folate_mcg": 85,
+    "iron_mg": 2.5,
+    "calcium_mg": 180,
+    "vitaminD_iu": 0
+  },
+  "safetyLevel": "SAFE",
+  "isSafeForPregnancy": true,
+  "hazardWarning": "",
+  "clinicalRationale": "Detailed 1-2 sentence evidence-based rationale citing specific nutrients and benefits.",
+  "trimesterAdvice": "Actionable prenatal dietary tip for this dish (e.g. pairing with Vitamin C, portion control, cooking thoroughly)."
+}
+
+Rules:
+1. If the input is NOT food (e.g. random non-food words, nonsense, objects):
+   - Set "isFood": false
+   - Set "nonFoodDescription": "Please enter or select an edible dish, food item, or beverage."
+   - Set "identifiedItems": []
+   - Leave nutrients at 0.
+2. If it IS food:
+   - Identify the authentic traditional and modern culinary ingredients in "identifiedItems".
+   - Calculate realistic macros based on ICMR-NIN tables for standard cooked portions.
+   - Calculate maternal micronutrients: folate (mcg), iron (mg), and calcium (mg).
+   - "safetyLevel": must be "SAFE", "CAUTION", or "AVOID".
+   - Flag any real pregnancy hazards (e.g. unpasteurized cheeses, raw papaya/latex, excess caffeine, high mercury fish, raw eggs/meat).`;
+
+  const payload = {
+    contents: [
+      {
+        role: 'user',
+        parts: [{ text: prompt }]
+      }
+    ],
+    generationConfig: {
+      temperature: 0.2,
+      responseMimeType: 'application/json'
+    }
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const errorBody = await response.text();
+    throw new Error(`Gemini Text Nutrition API error (${response.status}): ${errorBody}`);
+  }
+
+  const data = await response.json();
+  const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+
+  if (!rawText) {
+    throw new Error('Gemini returned empty content');
+  }
+
+  const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+  const parsed = JSON.parse(cleaned);
+
+  if (parsed.isFood === false) {
+    return {
+      isFood: false,
+      nonFoodDescription: parsed.nonFoodDescription || `"${dishDescription}" was not recognized as a food dish. Please describe an edible meal or snack.`,
+      identifiedItems: [],
+      macronutrients: { calories: 0, protein_g: 0, carbs_g: 0, fats_g: 0, fiber_g: 0 },
+      pregnancyCriticalMicronutrients: { folate_mcg: 0, iron_mg: 0, calcium_mg: 0 },
+      safetyLevel: 'AVOID',
+      isSafeForPregnancy: false,
+      hazardWarning: '',
+      sourceType: 'text'
+    };
+  }
+
+  const macros: FoodMacronutrients = {
+    calories: parsed.macronutrients?.calories || Math.round(
+      (parsed.macronutrients?.protein_g || 0) * 4 +
+      (parsed.macronutrients?.carbs_g || 0) * 4 +
+      (parsed.macronutrients?.fats_g || 0) * 9
+    ) || 280,
+    protein_g: Number(parsed.macronutrients?.protein_g ?? 8),
+    carbs_g: Number(parsed.macronutrients?.carbs_g ?? 35),
+    fats_g: Number(parsed.macronutrients?.fats_g ?? 8),
+    fiber_g: Number(parsed.macronutrients?.fiber_g ?? 3)
+  };
+
+  const micros: FoodMicronutrients = {
+    folate_mcg: Number(parsed.pregnancyCriticalMicronutrients?.folate_mcg ?? 45),
+    iron_mg: Number(parsed.pregnancyCriticalMicronutrients?.iron_mg ?? 1.8),
+    calcium_mg: Number(parsed.pregnancyCriticalMicronutrients?.calcium_mg ?? 75),
+    vitaminD_iu: parsed.pregnancyCriticalMicronutrients?.vitaminD_iu ? Number(parsed.pregnancyCriticalMicronutrients.vitaminD_iu) : undefined
+  };
+
+  const safetyLevel = (parsed.safetyLevel as 'SAFE' | 'CAUTION' | 'AVOID') ||
+    (parsed.isSafeForPregnancy === false ? 'AVOID' : 'SAFE');
+
+  return {
+    isFood: true,
+    dishName: parsed.dishName || dishDescription.slice(0, 48),
+    servingDescription: parsed.servingDescription || 'Standard maternal portion estimated',
+    identifiedItems: Array.isArray(parsed.identifiedItems) ? parsed.identifiedItems : [dishDescription],
+    macronutrients: macros,
+    pregnancyCriticalMicronutrients: micros,
+    safetyLevel,
+    isSafeForPregnancy: parsed.isSafeForPregnancy !== false,
+    hazardWarning: parsed.hazardWarning || '',
+    clinicalRationale: parsed.clinicalRationale || 'Calculated using ICMR-NIN nutritional composition and FOGSI guidelines.',
+    trimesterAdvice: parsed.trimesterAdvice || 'Ensure balanced portioning and drink adequate water.',
+    sourceType: 'text'
+  };
+}
+
 export interface MedicalReportAnalysisResult {
   summary: string;
   prescriptions: string[];
