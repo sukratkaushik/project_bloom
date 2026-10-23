@@ -13,43 +13,65 @@ const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models
 
 /**
  * Sends a POST request to Google Gemini API.
- * Uses native CapacitorHttp (NSURLSession) on iOS to completely bypass WKWebView CORS / "Load failed" limits.
+ * Uses native CapacitorHttp (NSURLSession) on iOS with strict timeouts to prevent hanging and CORS blocks.
  */
 async function postToGemini(endpoint: string, payload: any): Promise<any> {
-  if (Capacitor.isNativePlatform()) {
-    try {
-      const response = await CapacitorHttp.post({
-        url: endpoint,
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        data: payload
-      });
+  const TIMEOUT_MS = 15000; // 15 second maximum timeout
 
-      if (response.status < 200 || response.status >= 300) {
-        const errDetail = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
-        throw new Error(`Gemini API error (${response.status}): ${errDetail}`);
-      }
-
-      return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
-    } catch (nativeErr: any) {
-      console.warn("CapacitorHttp native request failed, attempting standard fetch fallback:", nativeErr);
-    }
-  }
-
-  // Standard web fetch
-  const response = await fetch(endpoint, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('AI request timed out (15s). Please check your internet connection and tap Try Again.'));
+    }, TIMEOUT_MS);
   });
 
-  if (!response.ok) {
-    const errorBody = await response.text();
-    throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
-  }
+  const requestPromise = (async () => {
+    if (Capacitor.isNativePlatform()) {
+      try {
+        const response = await CapacitorHttp.post({
+          url: endpoint,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          data: JSON.stringify(payload),
+          connectTimeout: 12000,
+          readTimeout: 12000,
+          responseType: 'json'
+        });
 
-  return await response.json();
+        if (response.status < 200 || response.status >= 300) {
+          const errDetail = typeof response.data === 'string' ? response.data : JSON.stringify(response.data);
+          throw new Error(`Gemini API error (${response.status}): ${errDetail}`);
+        }
+
+        return typeof response.data === 'string' ? JSON.parse(response.data) : response.data;
+      } catch (nativeErr: any) {
+        console.warn("CapacitorHttp native request failed, attempting standard fetch fallback:", nativeErr);
+      }
+    }
+
+    // Standard web fetch with AbortController
+    const controller = new AbortController();
+    const abortTimer = setTimeout(() => controller.abort(), TIMEOUT_MS);
+    try {
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: controller.signal
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.text();
+        throw new Error(`Gemini API error (${response.status}): ${errorBody}`);
+      }
+
+      return await response.json();
+    } finally {
+      clearTimeout(abortTimer);
+    }
+  })();
+
+  return await Promise.race([requestPromise, timeoutPromise]);
 }
 
 /**
