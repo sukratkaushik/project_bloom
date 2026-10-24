@@ -81,9 +81,18 @@ const defaultState: PlannerState = {
 const getInitialState = (): PlannerState => {
   try {
     const savedUi = localStorage.getItem('bloom_planner_ui');
+    const isDark = savedUi ? JSON.parse(savedUi).isDarkModeActive || false : false;
+    const saved = localStorage.getItem('bloom_planner');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      return { 
+        ...defaultState, 
+        ...parsed, 
+        isDarkModeActive: isDark 
+      };
+    }
     if (savedUi) {
-      const parsed = JSON.parse(savedUi);
-      return { ...defaultState, isDarkModeActive: parsed.isDarkModeActive || false };
+      return { ...defaultState, isDarkModeActive: isDark };
     }
   } catch (e) {
     // Ignore error
@@ -312,6 +321,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           email: auth.currentUser.email,
           displayName: auth.currentUser.displayName,
           createdAt: state.createdAt || Date.now()
+        }).catch(err => {
+          console.warn('Auto-sync saveUserProfile error:', err);
         });
       }
     }, 1000); // 1-second debounce to prevent lag during typing
@@ -540,8 +551,38 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
 
     const journeyId = state.activeJourneyId || uuidv4();
 
-    // Execute Dexie Schema: Create User and Journey (Local fallback)
+    const updatedState: PlannerState = {
+      ...state,
+      ...setupData,
+      dueDate: dueDate.toISOString(),
+      lmp: lmp.toISOString(),
+      t1End: t1End.toISOString(),
+      t2End: t2End.toISOString(),
+      isSetup: true,
+      hasStartedOnboarding: true,
+      activeJourneyId: journeyId,
+      createdAt: state.createdAt || Date.now()
+    };
+
+    // 1. Immediately persist synchronously to localStorage for zero-latency UI consistency
     try {
+      localStorage.setItem('bloom_planner', JSON.stringify(updatedState));
+      localStorage.setItem('bloom_planner_ui', JSON.stringify({ isDarkModeActive: updatedState.isDarkModeActive }));
+    } catch (e) {
+      console.warn('Error saving plan to localStorage', e);
+    }
+
+    // 2. Immediately update React state
+    setState(updatedState);
+
+    // 3. Persist to Dexie DB immediately (both appState and active journey)
+    try {
+      await db.appState.put({
+        id: 'global',
+        stateJSON: JSON.stringify(updatedState),
+        updatedAt: Date.now(),
+      });
+
       const userId = auth.currentUser ? auth.currentUser.uid : 'local-user-1';
       const userCount = await db.users.where('id').equals(userId).count();
       if (userCount === 0) {
@@ -572,19 +613,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
       console.error('Failed to initialize Dexie DB', err);
     }
 
-    setState((prev) => ({
-      ...prev,
-      ...setupData,
-      dueDate: dueDate.toISOString(),
-      lmp: lmp.toISOString(),
-      t1End: t1End.toISOString(),
-      t2End: t2End.toISOString(),
-      isSetup: true,
-      activeJourneyId: journeyId,
-      createdAt: Date.now()
-    }));
-
-    // Save to Firestore User Profile & Journey immediately
+    // 4. Save to Firestore User Profile & Journey in background with resilient catch handlers
     if (auth.currentUser) {
       saveUserProfile(auth.currentUser.uid, {
         isSetup: true,
@@ -592,20 +621,15 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
         email: auth.currentUser.email,
         displayName: auth.currentUser.displayName,
         createdAt: Date.now()
+      }).catch(err => {
+        console.warn('Background sync saveUserProfile error:', err);
       });
+
       saveJourney(auth.currentUser.uid, {
-        ...setupData,
-        dueDate: dueDate.toISOString(),
-        lmp: lmp.toISOString(),
-        t1End: t1End.toISOString(),
-        t2End: t2End.toISOString(),
-        isSetup: true,
-        activeJourneyId: journeyId,
-        pregnancyNum: setupData.pregnancyNum || 'first',
-        workSit: setupData.workSit || 'employed',
-        partnerSit: setupData.partnerSit || 'partner',
-        dietPref: setupData.dietPref || 'vegetarian',
-        flags: setupData.flags || {},
+        ...updatedState,
+        uid: auth.currentUser.uid,
+      }).catch(err => {
+        console.warn('Background sync saveJourney error:', err);
       });
     }
   };

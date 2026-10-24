@@ -187,7 +187,13 @@ const AppContent: React.FC = () => {
       content = <Dashboard />;
     } else {
       // Authenticated + Verified + Needs Setup (or explicit /setup) -> Setup Screen
-      content = <SetupScreen />;
+      content = (
+        <SetupScreen
+          onComplete={() => {
+            navigate('/dashboard');
+          }}
+        />
+      );
     }
   }
 
