@@ -29,6 +29,13 @@
             {
               "client_id": "458217072039-0if9hl8mhtjpg63ucjbckin6j6hcsmcd.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "458217072039-a4tbvie5k4o61adkef8glcrnvac9raog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "in.ourpregnancy.bloom"
+              }
             }
           ]
         }
@@ -59,6 +66,14 @@
           }
         },
         {
+          "client_id": "458217072039-ail33io65qj84d7j3suckg73p91tn9m9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.ourpregnancy.bloom",
+            "certificate_hash": "3b7644439f48b25d5ead8bab6aa749c96848a5b0"
+          }
+        },
+        {
           "client_id": "458217072039-0if9hl8mhtjpg63ucjbckin6j6hcsmcd.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -74,6 +89,13 @@
             {
               "client_id": "458217072039-0if9hl8mhtjpg63ucjbckin6j6hcsmcd.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "458217072039-a4tbvie5k4o61adkef8glcrnvac9raog.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "in.ourpregnancy.bloom"
+              }
             }
           ]
         }

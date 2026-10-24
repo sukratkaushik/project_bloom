@@ -4,7 +4,7 @@ import { auth, db, doc, setDoc, serverTimestamp } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { CustomSelect } from './CustomSelect';
 import { navigate } from '../utils/navigation';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 
 export const CURRENT_POLICY_VERSION = '2026-04';
 
@@ -148,6 +148,7 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
   const [hasConsented, setHasConsented] = useState(() => Boolean(state.isSetup));
   const [hasAiConsented, setHasAiConsented] = useState(() => Boolean(state.aiProcessingConsent));
   const [showDisclaimer, setShowDisclaimer] = useState(() => !state.isSetup);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const selectedDate = dueDate ? new Date(dueDate) : null;
   const todayDate = new Date();
@@ -163,41 +164,61 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
   };
 
   const handleGenerate = async () => {
+    if (isSubmitting) return;
+
     if (!dueDate) {
       alert('Please enter your due date.');
       return;
     }
 
-    if (auth.currentUser && hasConsented) {
+    setIsSubmitting(true);
+
+    try {
+      // 1. Immediately store consent locally for zero latency
       try {
+        localStorage.setItem('bloom_consent', JSON.stringify({
+          policyVersion: CURRENT_POLICY_VERSION,
+          aiConsent: hasAiConsented,
+          consentedAt: Date.now(),
+        }));
+      } catch (e) {}
+
+      // 2. Sync consent to Firestore in background without blocking the user
+      if (auth.currentUser && hasConsented) {
         const userRef = doc(db, 'users', auth.currentUser.uid);
-        await setDoc(userRef, {
+        setDoc(userRef, {
           uid: auth.currentUser.uid,
           consentGiven: true,
           consentedAt: serverTimestamp(),
           policyVersion: CURRENT_POLICY_VERSION,
           aiProcessingConsent: hasAiConsented,
           aiProcessingConsentedAt: hasAiConsented ? serverTimestamp() : null,
-        }, { merge: true });
-      } catch (err) {
-        console.error('Failed to record user consent:', err);
+        }, { merge: true }).catch((err) => {
+          console.warn('Background consent sync error:', err);
+        });
       }
-    }
 
-    await generatePlan({
-      dueDate,
-      pregnancyNum,
-      workSit,
-      partnerSit,
-      dietPref,
-      flags,
-      aiProcessingConsent: hasAiConsented,
-    });
+      // 3. Generate plan locally & synchronize state
+      await generatePlan({
+        dueDate,
+        pregnancyNum,
+        workSit,
+        partnerSit,
+        dietPref,
+        flags,
+        aiProcessingConsent: hasAiConsented,
+      });
 
-    if (onComplete) {
-      onComplete();
-    } else {
-      navigate('/dashboard');
+      // 4. Smooth transition to Dashboard
+      if (onComplete) {
+        onComplete();
+      } else {
+        navigate('/dashboard');
+      }
+    } catch (err) {
+      console.error('Failed to generate plan:', err);
+      alert('Could not complete setup. Please check your connection and try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -402,11 +423,25 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
         </div>
 
         <button 
+          type="button"
           onClick={handleGenerate}
-          disabled={!hasConsented || isYetToBegin}
-          className={`w-full mt-6 p-[15px] sm:p-[17px] border-none rounded-[12px] font-sans text-[14px] sm:text-[15px] font-semibold tracking-[0.4px] transition-all ${hasConsented && !isYetToBegin ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]' : 'bg-gray-200 text-gray-400 cursor-not-allowed'}`}
+          disabled={!hasConsented || isYetToBegin || isSubmitting}
+          className={`w-full mt-6 p-[15px] sm:p-[17px] border-none rounded-[12px] font-sans text-[14px] sm:text-[15px] font-semibold tracking-[0.4px] transition-all flex items-center justify-center gap-2 select-none ${
+            hasConsented && !isYetToBegin && !isSubmitting
+              ? 'bg-gradient-to-br from-sage to-sage-light text-white cursor-pointer hover:-translate-y-[2px] active:scale-[0.99] hover:shadow-[0_8px_24px_rgba(107,146,120,0.4)]'
+              : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+          }`}
         >
-          {state.isSetup ? '✦ Save & Recalibrate Care Plan' : '✦ Generate My Personalised Plan'}
+          {isSubmitting ? (
+            <>
+              <Loader2 className="w-5 h-5 animate-spin" />
+              <span>Personalising Your Care Plan...</span>
+            </>
+          ) : state.isSetup ? (
+            '✦ Save & Recalibrate Care Plan'
+          ) : (
+            '✦ Generate My Personalised Plan'
+          )}
         </button>
 
         <button 

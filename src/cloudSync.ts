@@ -125,12 +125,14 @@ export const saveJourney = async (uid: string, state: any) => {
     await setDoc(journeyRef, {
       ...state,
       userId: uid,
+      uid: uid,
       updatedAt: Date.now()
     }, { merge: true });
 
     // Ensure user profile points to this active journey
     const userRef = doc(firestoreDb, 'users', uid);
     await setDoc(userRef, {
+      uid: uid,
       isSetup: true,
       activeJourneyId: journeyId,
       updatedAt: Date.now()
