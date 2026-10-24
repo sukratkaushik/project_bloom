@@ -38,6 +38,8 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
 	<string>Our Pregnancy requires camera access to scan prenatal food ingredients and take photos of medical prescriptions and lab reports.</string>
 	<key>NSFaceIDUsageDescription</key>
