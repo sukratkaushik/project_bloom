@@ -20,7 +20,7 @@ const TermsOfService = React.lazy(() => import('./components/LegalPages').then(m
 const CheckoutPage = React.lazy(() => import('./components/CheckoutPage').then(m => ({ default: m.CheckoutPage })));
 import { auth } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
-import { normalizeLegacyHash } from './utils/navigation';
+import { navigate, normalizeLegacyHash } from './utils/navigation';
 import { initStatusBar, registerBackButtonHandler, isNativeApp } from './utils/nativeBridge';
 import { ComplianceConsentModal } from './components/ComplianceConsentModal';
 import { App as CapApp } from '@capacitor/app';

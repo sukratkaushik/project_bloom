@@ -145,7 +145,17 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
   const [partnerSit, setPartnerSit] = useState(state.partnerSit || 'partner');
   const [dietPref, setDietPref] = useState(state.dietPref || 'vegetarian');
   const [flags, setFlags] = useState<Record<string, boolean>>(state.flags || {});
-  const [hasConsented, setHasConsented] = useState(() => Boolean(state.isSetup));
+  const [hasConsented, setHasConsented] = useState(() => {
+    try {
+      return Boolean(
+        state.isSetup ||
+        localStorage.getItem('bloom_dpdp_consent_v1') ||
+        localStorage.getItem('bloom_consent')
+      );
+    } catch {
+      return Boolean(state.isSetup);
+    }
+  });
   const [hasAiConsented, setHasAiConsented] = useState(() => Boolean(state.aiProcessingConsent));
   const [showDisclaimer, setShowDisclaimer] = useState(() => !state.isSetup);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -210,14 +220,19 @@ export const SetupScreen: React.FC<SetupScreenProps> = ({
       });
 
       // 4. Smooth transition to Dashboard
-      if (onComplete) {
-        onComplete();
-      } else {
+      try {
+        if (onComplete) {
+          onComplete();
+        } else {
+          navigate('/dashboard');
+        }
+      } catch (navErr) {
+        console.warn('Navigation transition warning:', navErr);
         navigate('/dashboard');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Failed to generate plan:', err);
-      alert('Could not complete setup. Please check your connection and try again.');
+      alert(`Could not complete setup: ${err?.message || String(err)}`);
       setIsSubmitting(false);
     }
   };
