@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { usePlanner } from '../../store';
-import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable, signInWithGoogle, logout } from '../../firebase';
+import { auth, db, doc, setDoc, serverTimestamp, deleteMyOwnAccountCallable, signInWithGoogle, signInWithApple, logout } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import { db as dexieDb } from '../../db';
 import { 
@@ -12,7 +12,8 @@ import {
   Languages, X, Download
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
-import { triggerHaptic } from '../../utils/nativeBridge';
+import { triggerHaptic, getPlatform } from '../../utils/nativeBridge';
+import { AppleIcon } from '../common/AppleIcon';
 import { saveJourney } from '../../cloudSync';
 import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
@@ -40,6 +41,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [userName, setUserName] = useState(state.userName || '');
   const [isNameSaved, setIsNameSaved] = useState(false);
   const [isSigningInGoogle, setIsSigningInGoogle] = useState(false);
+  const [isSigningInApple, setIsSigningInApple] = useState(false);
   const [showDisclaimer, setShowDisclaimer] = useState(false);
   const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
@@ -345,9 +347,41 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   </div>
                 </div>
                 <p className="text-[12px] text-charcoal/80 leading-relaxed">
-                  You are currently using guest mode. Sign in with Google to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
+                  You are currently using guest mode. Sign in to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
                 </p>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        setIsSigningInApple(true);
+                        const appleUser = await signInWithApple();
+                        if (appleUser) {
+                          const restored = await restoreJourney(appleUser.uid);
+                          if (!restored && state.isSetup) {
+                            await saveJourney(appleUser.uid, state);
+                          }
+                          setToastMessage("Signed in with Apple! Your data is synced.");
+                          setTimeout(() => setToastMessage(null), 3500);
+                        }
+                      } catch (err: any) {
+                        console.error("Profile Apple Sign-In error:", err);
+                        alert(`Apple Sign-In: ${err?.message || 'Please try again.'}`);
+                      } finally {
+                        setIsSigningInApple(false);
+                      }
+                    }}
+                    disabled={isSigningInApple || isSigningInGoogle}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-black text-white rounded-xl font-bold text-[13px] hover:bg-neutral-800 transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                  >
+                    {isSigningInApple ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <AppleIcon className="w-4 h-4 text-white" />
+                    )}
+                    <span>Sign in with Apple</span>
+                  </button>
+
                   <button
                     type="button"
                     onClick={async () => {
@@ -369,15 +403,15 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                         setIsSigningInGoogle(false);
                       }
                     }}
-                    disabled={isSigningInGoogle}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-sage text-white rounded-xl font-bold text-[13px] hover:bg-sage-dark transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
+                    disabled={isSigningInGoogle || isSigningInApple}
+                    className="w-full sm:w-auto px-4 py-2.5 bg-white border border-border text-charcoal rounded-xl font-bold text-[13px] hover:bg-cream transition-all shadow-sm flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 active:scale-95"
                   >
                     {isSigningInGoogle ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
-                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 brightness-200" />
+                      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
                     )}
-                    <span>Sign in with Google to Sync</span>
+                    <span>Sign in with Google</span>
                   </button>
 
                   <button
@@ -441,6 +475,10 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-purple-300">
                         👑 Admin / App Owner (Lifetime Access)
                       </span>
+                    ) : getPlatform() === 'ios' ? (
+                      <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
+                        👑 Pro Plan Active (iOS Edition)
+                      </span>
                     ) : state.planTier === 'premium' || state.isPremium ? (
                       <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
                         👑 Pro Plan Active
@@ -452,7 +490,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     )}
                   </div>
 
-                  {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com') && (
+                  {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || getPlatform() === 'ios') && (
                     <button
                       type="button"
                       onClick={() => { navigate('/checkout?plan=premium'); }}
@@ -466,7 +504,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 <p className="text-[11.5px] sm:text-[12.5px] text-medium leading-relaxed">
                   {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com'
                     ? 'You have perpetual lifetime access to all 24/7 AI clinical tools, clinical checklists, food safety scanner, and admin controls.'
-                    : state.planTier === 'premium' || state.isPremium
+                    : getPlatform() === 'ios' || state.planTier === 'premium' || state.isPremium
                     ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
                     : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>

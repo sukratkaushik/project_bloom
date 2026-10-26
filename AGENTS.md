@@ -12,4 +12,6 @@ These instructions define how the AI shouldn behave while updating the Bloom pro
 6. **APK Distribution & Sync**: Whenever compiling a new Android APK, always place/replace the latest APK file in:
    - Project root: `/Users/D067208/gitclones/Project_Bloom/OurPregnancy.apk`
    - Synced Google Drive: `/Users/D067208/Library/CloudStorage/GoogleDrive-sukrat.kaushik@gmail.com/My Drive/Trial Projects/OurPregnancy.apk`
+7. **Brand Name Rule (Strict)**: Never use the word "Bloom" in any public-facing visibility (UI text, store listings, marketing copy, descriptions, or assets). "Bloom" is strictly an internal project code name; the public brand name is exclusively **"Our Pregnancy"** (or **OPIN**).
+
 

@@ -6,6 +6,7 @@ import { addDays, addWeeks } from './utils';
 import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserProfile, saveUserProfile } from './firebase';
 import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { cloudSync, saveJourney } from './cloudSync';
+import { getPlatform } from './utils/nativeBridge';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -118,6 +119,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ...prev,
             ...parsed,
             activeJourneyId,
+            ...(getPlatform() === 'ios' ? { isPremium: true, planTier: 'premium' as const } : {}),
             notes: { ...prev.notes, ...(parsed.notes || {}) },
             customNoteTopics: parsed.customNoteTopics || prev.customNoteTopics || [],
             isDarkModeActive: prev.isDarkModeActive
@@ -132,6 +134,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...prev,
               ...parsed,
               activeJourneyId,
+              ...(getPlatform() === 'ios' ? { isPremium: true, planTier: 'premium' as const } : {}),
               isDarkModeActive: prev.isDarkModeActive
             }));
           }
@@ -150,7 +153,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         // Skip unverified accounts
-        const isVerified = user.emailVerified || user.email === 'sukrat.kaushik@gmail.com' || user.providerData.some(p => p.providerId === 'google.com');
+        const isVerified = user.emailVerified || user.email === 'sukrat.kaushik@gmail.com' || user.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'apple.com');
         if (!isVerified) {
           return;
         }
@@ -162,7 +165,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           let planTier: 'free' | 'standard' | 'premium' = 'free';
           let isPremium = false;
 
-          if (isUserAdmin) {
+          // Apple App Store Compliance: All features are free and unlocked on iOS
+          if (getPlatform() === 'ios') {
+            planTier = 'premium';
+            isPremium = true;
+          } else if (isUserAdmin) {
             planTier = 'premium';
             isPremium = true;
           } else if (profile?.planTier) {

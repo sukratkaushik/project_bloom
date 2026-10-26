@@ -21,7 +21,7 @@ const CheckoutPage = React.lazy(() => import('./components/CheckoutPage').then(m
 import { auth } from './firebase';
 import { onAuthStateChanged, applyActionCode } from 'firebase/auth';
 import { navigate, normalizeLegacyHash } from './utils/navigation';
-import { initStatusBar, registerBackButtonHandler, isNativeApp } from './utils/nativeBridge';
+import { initStatusBar, registerBackButtonHandler, isNativeApp, getPlatform } from './utils/nativeBridge';
 import { ComplianceConsentModal } from './components/ComplianceConsentModal';
 import { App as CapApp } from '@capacitor/app';
 import { isBiometricLockEnabled, BIOMETRIC_GRACE_PERIOD_MS } from './utils/biometricService';
@@ -146,7 +146,7 @@ const AppContent: React.FC = () => {
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
       user.email === 'sukrat.kaushik@ourpregnancy.in' ||
-      user.providerData.some((p) => p.providerId === 'google.com')
+      user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );
 
@@ -163,7 +163,7 @@ const AppContent: React.FC = () => {
   } else if (currentPath === '/terms') {
     content = <TermsOfService />;
   } else if (currentPath.startsWith('/checkout') || currentPath.startsWith('/payment')) {
-    content = <CheckoutPage />;
+    content = getPlatform() === 'ios' ? <LandingPage /> : <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
   } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {

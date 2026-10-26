@@ -1,7 +1,12 @@
 import React from 'react';
 import { navigate } from '../utils/navigation';
+import { getPlatform } from '../utils/nativeBridge';
 
 export const PromoBanner: React.FC = () => {
+  // iOS App Store Compliance (Guideline 3.1.1): Hide checkout promo banners on iOS
+  if (getPlatform() === 'ios') {
+    return null;
+  }
   const promoText = "🎁 Special Offer: Get 30 Days of Premium Subscription for FREE! Use code OPIN30 at checkout. Click to claim! ⚡";
   const repeatedText = Array(8).fill(promoText).join("   •   ");
 

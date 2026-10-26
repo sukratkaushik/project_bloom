@@ -152,18 +152,18 @@ export const TRANSLATION_DICTIONARY: Record<string, Partial<Record<SupportedLang
     ur: 'پروفائل اور اکاؤنٹ',
     de: 'Profil & Konto'
   },
-  'Manage your Bloom account and pregnancy milestones': {
-    hi: 'अपने Bloom खाते और गर्भावस्था के मील के पत्थर प्रबंधित करें',
-    mr: 'तुमचे Bloom खाते आणि गर्भधारणा टप्पे व्यवस्थापित करा',
-    ta: 'உங்கள் Bloom கணக்கு மற்றும் கர்ப்ப மைல்கற்களை நிர்வகிக்கவும்',
-    te: 'మీ Bloom ఖాతా మరియు గర్భధారణ మైలురాళ్లను నిర్వహించండి',
-    bn: 'আপনার Bloom অ্যাকাউন্ট এবং গর্ভাবস্থার মাইলফলক পরিচালনা করুন',
-    gu: 'તમારું Bloom એકાઉન્ટ અને ગર્ભાવસ્થાના લક્ષ્યો મેનેજ કરો',
-    kn: 'ನಿಮ್ಮ Bloom ಖಾತೆ ಮತ್ತು ಗರ್ಭಧಾರಣೆಯ ಮೈಲಿಗಲ್ಲುಗಳನ್ನು ನಿರ್ವಹಿಸಿ',
-    pa: 'ਆਪਣੇ Bloom ਖਾਤੇ ਅਤੇ ਗਰਭ ਅਵਸਥਾ ਦੇ ਮੀਲ ਪੱਥਰਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ',
-    ml: 'നിങ്ങളുടെ Bloom അക്കൗണ്ടും ഗർഭകാല നാഴികക്കല്ലുകളും കൈകാര്യം ചെയ്യുക',
-    ur: 'اپنے Bloom اکاؤنٹ اور حمل کے سنگ میل کا انتظام کریں',
-    de: 'Verwalten Sie Ihr Bloom-Konto und Ihre Schwangerschaftsmeilensteine'
+  'Manage your Our Pregnancy account and pregnancy milestones': {
+    hi: 'अपने Our Pregnancy खाते और गर्भावस्था के मील के पत्थर प्रबंधित करें',
+    mr: 'तुमचे Our Pregnancy खाते आणि गर्भधारणा टप्पे व्यवस्थापित करा',
+    ta: 'உங்கள் Our Pregnancy கணக்கு மற்றும் கர்ப்ப மைல்கற்களை நிர்வகிக்கவும்',
+    te: 'మీ Our Pregnancy ఖాతా మరియు గర్భధారణ మైలురాళ్లను నిర్వహించండి',
+    bn: 'আপনার Our Pregnancy অ্যাকাউন্ট এবং গর্ভাবস্থার মাইলফলক পরিচালনা করুন',
+    gu: 'તમારું Our Pregnancy એકાઉન્ટ અને ગર્ભાવસ્થાના લક્ષ્યો મેનેજ કરો',
+    kn: 'ನಿಮ್ಮ Our Pregnancy ಖాతా ಮತ್ತು ಗರ್ಭಧಾರಣೆಯ ಮೈಲಿಗಲ್ಲುಗಳನ್ನು ನಿರ್ವಹಿಸಿ',
+    pa: 'ਆਪਣੇ Our Pregnancy ਖਾਤੇ ਅਤੇ ਗਰਭ ਅਵਸਥਾ ਦੇ ਮੀਲ ਪੱਥਰਾਂ ਦਾ ਪ੍ਰਬੰਧਨ ਕਰੋ',
+    ml: 'നിങ്ങളുടെ Our Pregnancy അക്കൗണ്ടും ഗർഭകാല നാഴികക്കല്ലുകളും കൈകാര്യം ചെയ്യുക',
+    ur: 'اپنے Our Pregnancy اکاؤنٹ اور حمل کے سنگ میل کا انتظام کریں',
+    de: 'Verwalten Sie Ihr Our Pregnancy-Konto und Ihre Schwangerschaftsmeilensteine'
   },
   'Health Data & Sync': {
     hi: 'स्वास्थ्य डेटा और सिंक',

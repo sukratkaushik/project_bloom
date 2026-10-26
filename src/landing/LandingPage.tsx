@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { usePlanner } from '../store';
 import { navigate } from '../utils/navigation';
-import { auth, signInWithGoogle, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
+import { auth, signInWithGoogle, signInWithApple, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
 import {
   ShieldCheck,
   WifiOff,
@@ -34,7 +34,8 @@ import {
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { PublicHeader } from '../components/PublicHeader';
-import { isNativeApp } from '../utils/nativeBridge';
+import { isNativeApp, getPlatform } from '../utils/nativeBridge';
+import { AppleIcon } from '../components/common/AppleIcon';
 
 export const LandingPage: React.FC = () => {
   const isNative = isNativeApp();
@@ -78,7 +79,7 @@ export const LandingPage: React.FC = () => {
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
       user.email === 'sukrat.kaushik@ourpregnancy.in' ||
-      user.providerData.some((p) => p.providerId === 'google.com')
+      user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );
   const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);
@@ -179,6 +180,46 @@ export const LandingPage: React.FC = () => {
           alert("Network request failed. Please check your internet connection and try again.");
         } else {
           alert(`Failed to log in with Google: ${error?.message || "Please try again."}`);
+        }
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
+  };
+
+  const handleAppleSignIn = async () => {
+    try {
+      setIsLoggingIn(true);
+      const user = await signInWithApple();
+      if (user) {
+        triggerWelcomeEmailIfNewCallable();
+        setShowEmailModal(false);
+
+        // Try to restore user journey from cloud (Firestore)
+        let restored = false;
+        try {
+          restored = await restoreJourney(user.uid);
+        } catch (e) {
+          console.warn("Could not restore journey:", e);
+        }
+
+        if (restored) {
+          navigate('/dashboard');
+        } else if (state.isSetup && state.activeJourneyId) {
+          navigate('/dashboard');
+        } else {
+          updateState({ hasStartedOnboarding: true, isSetup: false });
+          navigate('/setup');
+        }
+      }
+    } catch (error: any) {
+      const msg = String(error?.message || '').toLowerCase();
+      if (error?.code !== 'auth/popup-closed-by-user' && !msg.includes('cancel') && !msg.includes('1001')) {
+        console.error("Apple Login failed", error);
+        if (error?.code === 'auth/network-request-failed') {
+          alert("Network request failed. Please check your internet connection and try again.");
+        } else {
+          alert(`Failed to log in with Apple: ${error?.message || "Please try again."}`);
         }
       }
     } finally {
@@ -683,15 +724,27 @@ export const LandingPage: React.FC = () => {
                     <div className="flex-grow border-t border-border"></div>
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleGoogleSignIn}
-                    disabled={isLoggingIn}
-                    className="w-full mt-1.5 bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
-                  >
-                    {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                    Continue with Google
-                  </button>
+                  <div className="space-y-2 mt-1.5">
+                    <button
+                      type="button"
+                      onClick={handleAppleSignIn}
+                      disabled={isLoggingIn}
+                      className="w-full bg-black text-white rounded-[10px] font-bold py-2.5 hover:bg-neutral-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
+                    >
+                      {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppleIcon className="w-4 h-4 text-white" />}
+                      Continue with Apple
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleGoogleSignIn}
+                      disabled={isLoggingIn}
+                      className="w-full bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
+                    >
+                      {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
+                      Continue with Google
+                    </button>
+                  </div>
 
                   <div className="text-center pt-2">
                     <button
@@ -745,22 +798,45 @@ export const LandingPage: React.FC = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto flex-wrap">
-            <button
-              type="button"
-              onClick={handleStart}
-              disabled={isLoggingIn}
-              className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
-            >
-              {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-              {isLoggingIn
-                ? "Connecting to Google..."
-                : isLoggedInAndSetup 
-                ? "Go to Dashboard" 
-                : isLoggedInNeedsSetup 
-                ? "✦ Complete Your Pregnancy Setup" 
-                : "Start Tracking with Google"}
-              {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-            </button>
+            {getPlatform() === 'ios' && !user ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleAppleSignIn}
+                  disabled={isLoggingIn}
+                  className="group relative inline-flex items-center justify-center gap-2 bg-black text-white rounded-full font-semibold px-7 py-4 text-[16px] transition-all hover:bg-neutral-800 hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-70 cursor-pointer shadow-md"
+                >
+                  {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : <AppleIcon className="w-5 h-5 text-white" />}
+                  <span>Continue with Apple</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleGoogleSignIn}
+                  disabled={isLoggingIn}
+                  className="group relative inline-flex items-center justify-center gap-2 bg-white border border-border text-charcoal rounded-full font-semibold px-7 py-4 text-[16px] transition-all hover:bg-cream hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-70 cursor-pointer shadow-sm"
+                >
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                  <span>Continue with Google</span>
+                </button>
+              </>
+            ) : (
+              <button
+                type="button"
+                onClick={handleStart}
+                disabled={isLoggingIn}
+                className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
+              >
+                {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                {isLoggingIn
+                  ? "Connecting..."
+                  : isLoggedInAndSetup 
+                  ? "Go to Dashboard" 
+                  : isLoggedInNeedsSetup 
+                  ? "✦ Complete Your Pregnancy Setup" 
+                  : "Start Tracking with Google"}
+                {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+              </button>
+            )}
             {!user && (
               <button
                 type="button"
@@ -1384,55 +1460,74 @@ export const LandingPage: React.FC = () => {
             {/* Pro Plan */}
             <div className="bg-white border-2 border-sage rounded-[28px] p-8 flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 relative group scale-102">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm whitespace-nowrap">
-                Most Popular • 50% OFF
+                {getPlatform() === 'ios' ? '✨ Full Access Included' : 'Most Popular • 50% OFF'}
               </div>
               <div>
                 <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Clinical Intelligence</span>
                 <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Pro Plan</h3>
 
                 {/* Pro Plan Price Display */}
-                <div className="flex flex-col mt-4 mb-4">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      🎉 50% OFF Initial 3 Months
-                    </span>
+                {getPlatform() === 'ios' ? (
+                  <div className="flex flex-col mt-4 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10.5px] font-bold text-sage-dark bg-sage-pale border border-sage/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        🎉 iOS Launch Edition
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[40px] font-serif font-bold text-charcoal">₹0</span>
+                      <span className="text-[14px] text-sage-dark font-semibold">/ All features free</span>
+                    </div>
+                    <div className="text-[12px] font-bold text-sage-dark mt-1">
+                      <span>Every clinical tool & AI feature unlocked on iPhone</span>
+                    </div>
                   </div>
-                  <div className="flex items-baseline gap-2">
-                    <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths}</span>
-                    <span className="text-[16px] line-through text-muted font-normal">₹{999 * premiumMonths}</span>
-                    <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
+                ) : (
+                  <div className="flex flex-col mt-4 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                        🎉 50% OFF Initial 3 Months
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths}</span>
+                      <span className="text-[16px] line-through text-muted font-normal">₹{999 * premiumMonths}</span>
+                      <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
+                    </div>
+                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
+                      <span>🏷️ You save ₹{500 * premiumMonths} (Regular ₹999/month)</span>
+                    </div>
                   </div>
-                  <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
-                    <span>🏷️ You save ₹{500 * premiumMonths} (Regular ₹999/month)</span>
-                  </div>
-                </div>
+                )}
 
-                {/* Pro Plan Slider */}
-                <div className="my-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
-                    <span className="text-[13px] font-semibold bg-sage-pale text-sage px-2.5 py-0.5 rounded-full border border-sage/20">
-                      {premiumMonths} {premiumMonths === 1 ? 'Month' : 'Months'}
-                    </span>
+                {/* Pro Plan Slider (hidden on iOS) */}
+                {getPlatform() !== 'ios' && (
+                  <div className="my-6">
+                    <div className="flex justify-between items-center mb-2">
+                      <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
+                      <span className="text-[13px] font-semibold bg-sage-pale text-sage px-2.5 py-0.5 rounded-full border border-sage/20">
+                        {premiumMonths} {premiumMonths === 1 ? 'Month' : 'Months'}
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={1}
+                      max={12}
+                      value={premiumMonths}
+                      onChange={(e) => setPremiumMonths(Number(e.target.value))}
+                      aria-label="Select pro plan duration"
+                      className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-sage [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sage [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
+                      style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
+                    />
+                    <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
+                      <span>1m</span>
+                      <span>3m</span>
+                      <span>6m</span>
+                      <span>9m</span>
+                      <span>12m</span>
+                    </div>
                   </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    value={premiumMonths}
-                    onChange={(e) => setPremiumMonths(Number(e.target.value))}
-                    aria-label="Select pro plan duration"
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream accent-sage [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-sage [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-grab"
-                    style={{ background: `linear-gradient(to right, rgb(138,182,163) 0%, rgb(138,182,163) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) ${((premiumMonths - 1) / 11) * 100}%, var(--color-cream, #fdfbf7) 100%)` }}
-                  />
-                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold">
-                    <span>1m</span>
-                    <span>3m</span>
-                    <span>6m</span>
-                    <span>9m</span>
-                    <span>12m</span>
-                  </div>
-                </div>
+                )}
 
                 <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to 24/7 clinical AI companions, food vision intelligence & doctor EHR exports.</p>
                 <div className="h-px bg-border mb-6" />
@@ -1458,7 +1553,7 @@ export const LandingPage: React.FC = () => {
                 onClick={handleStart}
                 className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
               >
-                Upgrade to Pro Plan
+                {getPlatform() === 'ios' ? 'Start Tracking with Full Access' : 'Upgrade to Pro Plan'}
               </button>
             </div>
           </div>

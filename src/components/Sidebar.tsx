@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { DEV_TASKS, MED_TASKS, PREP_TASKS, FIN_TASKS, DEADLINE_TASKS, VACC_TASKS } from '../data';
 import { Task } from '../types';
-import { auth, signInWithGoogle } from '../firebase';
+import { auth, signInWithGoogle, signInWithApple } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { saveJourney } from '../cloudSync';
 import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
+import { getPlatform } from '../utils/nativeBridge';
+import { AppleIcon } from './common/AppleIcon';
 
 type SidebarProps = {
   activePage: string;
@@ -419,9 +421,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           </button>
 
-          {planTier === 'premium' || state.isPremium || state.isAdmin ? (
+          {planTier === 'premium' || state.isPremium || state.isAdmin || getPlatform() === 'ios' ? (
             <div className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/20 rounded-[10px] font-sans text-[12.5px] font-bold text-yellow-700 dark:text-gold flex items-center gap-2 shadow-xs">
-              <span>👑</span> Pro Plan Active
+              <span>👑</span> {getPlatform() === 'ios' ? 'Pro Plan Active (iOS Edition)' : 'Pro Plan Active'}
             </div>
           ) : (
             <button
@@ -600,7 +602,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       {/* Utilities Group (Export PDF & Logout) */}
       <div className="h-px bg-border my-4" />
       <div className="space-y-2">
-        {planTier === 'free' && (
+        {planTier === 'free' && getPlatform() !== 'ios' && (
           <button
             onClick={() => { navigate('/checkout?plan=premium'); }}
             className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
@@ -625,26 +627,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         </button>
 
         {!auth.currentUser ? (
-          <button
-            type="button"
-            onClick={async () => {
-              try {
-                const user = await signInWithGoogle();
-                if (user) {
-                  const restored = await restoreJourney(user.uid);
-                  if (!restored && state.isSetup) {
-                    await saveJourney(user.uid, state);
+          <div className="space-y-1.5 pt-1">
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const user = await signInWithApple();
+                  if (user) {
+                    const restored = await restoreJourney(user.uid);
+                    if (!restored && state.isSetup) {
+                      await saveJourney(user.uid, state);
+                    }
                   }
+                } catch (e) {
+                  console.error("Apple Sign-in failed", e);
                 }
-              } catch (e) {
-                console.error("Sign-in failed", e);
-              }
-            }}
-            className="w-full py-2.5 px-3.5 bg-sage text-white rounded-[10px] font-sans text-[13px] font-bold hover:bg-sage-dark transition-all flex items-center gap-2.5 cursor-pointer text-left shadow-xs"
-          >
-            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4 bg-white rounded-full p-0.5 shrink-0" />
-            <span>Sign in with Google</span>
-          </button>
+              }}
+              className="w-full py-2 px-3 bg-black text-white rounded-[10px] font-sans text-[12.5px] font-bold hover:bg-neutral-800 transition-all flex items-center gap-2 cursor-pointer text-left shadow-xs"
+            >
+              <AppleIcon className="w-4 h-4 shrink-0 text-white" />
+              <span>Sign in with Apple</span>
+            </button>
+            <button
+              type="button"
+              onClick={async () => {
+                try {
+                  const user = await signInWithGoogle();
+                  if (user) {
+                    const restored = await restoreJourney(user.uid);
+                    if (!restored && state.isSetup) {
+                      await saveJourney(user.uid, state);
+                    }
+                  }
+                } catch (e) {
+                  console.error("Google Sign-in failed", e);
+                }
+              }}
+              className="w-full py-2 px-3 bg-white border border-border text-charcoal rounded-[10px] font-sans text-[12.5px] font-bold hover:bg-cream transition-all flex items-center gap-2 cursor-pointer text-left shadow-xs"
+            >
+              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-3.5 h-3.5 bg-white rounded-full p-0.5 shrink-0" />
+              <span>Sign in with Google</span>
+            </button>
+          </div>
         ) : (
           <button
             type="button"

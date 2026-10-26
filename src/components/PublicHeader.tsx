@@ -38,7 +38,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
       user.emailVerified ||
       user.email === 'sukrat.kaushik@gmail.com' ||
       user.email === 'sukrat.kaushik@ourpregnancy.in' ||
-      user.providerData.some((p) => p.providerId === 'google.com')
+      user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );
   const isLoggedInAndSetup = Boolean(state.isSetup && user && isVerified);

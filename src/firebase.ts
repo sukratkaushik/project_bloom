@@ -5,6 +5,7 @@ import {
   indexedDBLocalPersistence, 
   browserLocalPersistence, 
   GoogleAuthProvider, 
+  OAuthProvider,
   signInWithPopup, 
   signInWithRedirect, 
   getRedirectResult, 
@@ -199,6 +200,75 @@ export const sendPlanChangeEmail = async (
 export const analyticsPromise = isSupported().then(yes => yes ? getAnalytics(app) : null);
 
 export const googleProvider = new GoogleAuthProvider();
+
+export const appleProvider = new OAuthProvider('apple.com');
+appleProvider.addScope('email');
+appleProvider.addScope('name');
+
+export const signInWithApple = async () => {
+  if (isNativeApp()) {
+    try {
+      const { FirebaseAuthentication } = await import('@capacitor-firebase/authentication');
+      
+      const result = await Promise.race([
+        FirebaseAuthentication.signInWithApple({ 
+          skipNativeAuth: true 
+        }),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Apple Sign-In request timed out. Please try again.')), 60000)
+        )
+      ]);
+
+      const idToken = result.credential?.idToken;
+      const rawNonce = result.credential?.nonce;
+
+      if (!idToken) {
+        throw new Error('Apple Sign-In did not return an identity token. Please try again.');
+      }
+
+      const credential = appleProvider.credential({
+        idToken,
+        rawNonce
+      });
+      
+      const userCredential = await Promise.race([
+        signInWithCredential(auth, credential),
+        new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('Authentication service timeout. Please check your network connection.')), 15000)
+        )
+      ]);
+
+      return userCredential.user;
+    } catch (error: any) {
+      const msg = (error?.message || '').toLowerCase();
+      if (
+        msg.includes('cancel') ||
+        msg.includes('canceled') ||
+        msg.includes('cancelled') ||
+        msg.includes('1001') ||
+        error?.code === 'auth/popup-closed-by-user'
+      ) {
+        return null;
+      }
+      console.error("Error signing in with Apple natively:", error);
+      throw error;
+    }
+  }
+
+  try {
+    const result = await signInWithPopup(auth, appleProvider);
+    return result.user;
+  } catch (error: any) {
+    if (error?.code === 'auth/popup-blocked' || error?.code === 'auth/cancelled-popup-request') {
+      await signInWithRedirect(auth, appleProvider);
+      return null;
+    }
+    if (error?.code !== 'auth/popup-closed-by-user') {
+      console.error("Error signing in with Apple", error);
+    }
+    throw error;
+  }
+};
 
 export const signInWithGoogle = async () => {
   if (isNativeApp()) {

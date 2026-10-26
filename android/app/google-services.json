@@ -50,11 +50,27 @@
       },
       "oauth_client": [
         {
+          "client_id": "458217072039-5pjqeg8skluh05bqc2bu66o2uv0hvibm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.ourpregnancy.bloom",
+            "certificate_hash": "183f9831c0aee2f92e1d7ecd7b018602389c2159"
+          }
+        },
+        {
           "client_id": "458217072039-93pgg76fsh9guth2r66g75aupdabn3fq.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "in.ourpregnancy.bloom",
             "certificate_hash": "7d8f45fe6eb8a9d5176ea9e9306b0d860c7b688f"
+          }
+        },
+        {
+          "client_id": "458217072039-9917aknvmdjr2chgq0alkj4m4e5t8gtb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.ourpregnancy.bloom",
+            "certificate_hash": "d1284975f9f87398747cccd35b2d753eec351a47"
           }
         },
         {
@@ -71,6 +87,14 @@
           "android_info": {
             "package_name": "in.ourpregnancy.bloom",
             "certificate_hash": "3b7644439f48b25d5ead8bab6aa749c96848a5b0"
+          }
+        },
+        {
+          "client_id": "458217072039-javn230fmj4051js2fh5ru5hioeq70aj.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "in.ourpregnancy.bloom",
+            "certificate_hash": "02664890744f491db04956321197e1c97bbaebd8"
           }
         },
         {

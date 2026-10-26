@@ -17,7 +17,7 @@ import {
   LockOpen
 } from 'lucide-react';
 import { navigate } from '../utils/navigation';
-import { triggerHaptic } from '../utils/nativeBridge';
+import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
 
 interface PaywallProps {
   children: React.ReactNode;
@@ -159,6 +159,12 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const { state, updateState } = usePlanner();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedMonths, setSelectedMonths] = useState<number>(3); // 3 months default for best value
+
+  // iOS App Store Compliance (Guideline 3.1.1):
+  // All features are completely free and unlocked on iOS.
+  if (getPlatform() === 'ios') {
+    return <>{children}</>;
+  }
 
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
   const hasAccess = checkAccess(planTier, featureName, state.isAdmin);
