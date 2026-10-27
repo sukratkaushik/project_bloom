@@ -217,9 +217,7 @@ export const FoodScanner: React.FC = () => {
           setResult(geminiResult as ScanResult);
           return;
         } catch (geminiErr: any) {
-          console.error("Gemini live vision failed:", geminiErr);
-          setError(`AI Vision could not analyze this photo: ${geminiErr?.message || "Please check your internet connection and try again."}`);
-          return;
+          console.warn("Gemini direct vision failed, attempting Cloud Function fallback:", geminiErr);
         }
       }
 

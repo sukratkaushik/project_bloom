@@ -210,6 +210,88 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
 }
 
 /**
+ * Resilient JSON parser that gracefully handles markdown wrappers, leading/trailing noise,
+ * and attempts auto-repair for truncated strings or brackets when LLMs hit output ceilings.
+ */
+export function safeParseGeminiJson(rawText: string): any {
+  if (!rawText || !rawText.trim()) {
+    throw new Error('AI returned empty response.');
+  }
+
+  // 1. Strip markdown code fences if present
+  let cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
+
+  // 2. Direct fast-path parse
+  try {
+    return JSON.parse(cleaned);
+  } catch (err: any) {
+    // 3. Extract JSON object substring { ... }
+    const firstBrace = cleaned.indexOf('{');
+    const lastBrace = cleaned.lastIndexOf('}');
+    if (firstBrace !== -1 && lastBrace > firstBrace) {
+      try {
+        return JSON.parse(cleaned.substring(firstBrace, lastBrace + 1));
+      } catch {
+        // Proceed to repair
+      }
+    }
+
+    // 4. Attempt repair if string or closing braces were truncated
+    let repaired = firstBrace !== -1 ? cleaned.substring(firstBrace) : cleaned;
+
+    // Check for unclosed string quote
+    let inString = false;
+    let escaped = false;
+    for (let i = 0; i < repaired.length; i++) {
+      const char = repaired[i];
+      if (char === '\\' && inString) {
+        escaped = !escaped;
+      } else if (char === '"' && !escaped) {
+        inString = !inString;
+      } else {
+        escaped = false;
+      }
+    }
+    if (inString) {
+      repaired += '"'; // close unterminated string
+    }
+
+    // Balance open braces/brackets
+    const stack: string[] = [];
+    inString = false;
+    escaped = false;
+    for (let i = 0; i < repaired.length; i++) {
+      const char = repaired[i];
+      if (char === '\\' && inString) {
+        escaped = !escaped;
+      } else if (char === '"' && !escaped) {
+        inString = !inString;
+      } else if (!inString) {
+        if (char === '{') stack.push('}');
+        else if (char === '[') stack.push(']');
+        else if (char === '}' || char === ']') {
+          if (stack.length > 0 && stack[stack.length - 1] === char) {
+            stack.pop();
+          }
+        }
+      } else {
+        escaped = false;
+      }
+    }
+    while (stack.length > 0) {
+      repaired += stack.pop();
+    }
+
+    try {
+      return JSON.parse(repaired);
+    } catch (finalErr: any) {
+      console.error("JSON repair failed on raw output:", cleaned);
+      throw new Error(`JSON Parse error: ${err?.message || 'Invalid AI formatting'}`);
+    }
+  }
+}
+
+/**
  * Multimodal Food Image Analysis with Google Gemini Vision
  * Accurately analyzes meal photos using ICMR-NIN nutritional tables and FOGSI/ACOG standards.
  */
@@ -310,7 +392,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: 750,
+      maxOutputTokens: 2048,
       responseMimeType: 'application/json'
     }
   };
@@ -322,9 +404,7 @@ Rules:
     throw new Error('Gemini Vision returned empty content');
   }
 
-  // Clean code fences if any
-  const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-  const parsed = JSON.parse(cleaned);
+  const parsed = safeParseGeminiJson(rawText);
 
   if (parsed.isFood === false) {
     return {
@@ -461,7 +541,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: 750,
+      maxOutputTokens: 2048,
       responseMimeType: 'application/json'
     }
   };
@@ -473,8 +553,7 @@ Rules:
     throw new Error('Gemini returned empty content');
   }
 
-  const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-  const parsed = JSON.parse(cleaned);
+  const parsed = safeParseGeminiJson(rawText);
 
   if (parsed.isFood === false) {
     return {
@@ -592,7 +671,7 @@ Rules:
     ],
     generationConfig: {
       temperature: 0.2,
-      maxOutputTokens: 600,
+      maxOutputTokens: 2048,
       responseMimeType: 'application/json'
     }
   };
@@ -604,8 +683,7 @@ Rules:
     throw new Error('Gemini Medical Vision returned empty content');
   }
 
-  const cleaned = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/, '').trim();
-  const parsed = JSON.parse(cleaned);
+  const parsed = safeParseGeminiJson(rawText);
 
   return {
     summary: parsed.summary || 'Report analyzed successfully. Please review with your doctor.',
