@@ -43,6 +43,7 @@ import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { compressImage } from '../../utils/imageCompression';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { isGeminiSupported, callGeminiVisionFood, callGeminiTextNutrition, isPCPNDTGenderQuery } from '../../utils/geminiClient';
+import { checkAndIncrementFairUse } from '../../utils/fairUseLimiter';
 
 interface Macronutrients {
   calories: number;
@@ -184,6 +185,12 @@ export const FoodScanner: React.FC = () => {
 
     if (isAiConsentBlocked(state.aiProcessingConsent)) {
       setError("Turn on AI features in your Profile to use this.");
+      return;
+    }
+
+    const fairUse = checkAndIncrementFairUse('food_scan');
+    if (!fairUse.allowed) {
+      setError(`Daily AI food analysis limit reached (${fairUse.limit}/${fairUse.limit}). Resets at midnight for fair personal care.`);
       return;
     }
 

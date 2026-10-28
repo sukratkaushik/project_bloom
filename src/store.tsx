@@ -7,6 +7,8 @@ import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserPr
 import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { cloudSync, saveJourney } from './cloudSync';
 import { getPlatform } from './utils/nativeBridge';
+import { getLocalMonetizationConfig, loadMonetizationConfigFromCloud } from './utils/monetizationConfig';
+import { initRevenueCat, checkRevenueCatSubscription } from './utils/revenueCatService';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -112,6 +114,9 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const loadState = async () => {
       try {
         const record = await db.appState.get('global');
+        const iosConfig = getLocalMonetizationConfig();
+        const shouldBypassIos = getPlatform() === 'ios' && !iosConfig.isIosPaywallActive;
+
         if (record) {
           const parsed = JSON.parse(record.stateJSON);
           const activeJourneyId = parsed.activeJourneyId || (parsed.isSetup ? 'journey-local-default' : undefined);
@@ -119,7 +124,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ...prev,
             ...parsed,
             activeJourneyId,
-            ...(getPlatform() === 'ios' ? { isPremium: true, planTier: 'premium' as const } : {}),
+            ...(shouldBypassIos ? { isPremium: true, planTier: 'premium' as const } : {}),
             notes: { ...prev.notes, ...(parsed.notes || {}) },
             customNoteTopics: parsed.customNoteTopics || prev.customNoteTopics || [],
             isDarkModeActive: prev.isDarkModeActive
@@ -134,7 +139,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...prev,
               ...parsed,
               activeJourneyId,
-              ...(getPlatform() === 'ios' ? { isPremium: true, planTier: 'premium' as const } : {}),
+              ...(shouldBypassIos ? { isPremium: true, planTier: 'premium' as const } : {}),
               isDarkModeActive: prev.isDarkModeActive
             }));
           }
@@ -165,11 +170,10 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           let planTier: 'free' | 'standard' | 'premium' = 'free';
           let isPremium = false;
 
-          // Apple App Store Compliance: All features are free and unlocked on iOS
-          if (getPlatform() === 'ios') {
-            planTier = 'premium';
-            isPremium = true;
-          } else if (isUserAdmin) {
+          const iosSettings = getLocalMonetizationConfig();
+          const shouldBypassIos = getPlatform() === 'ios' && !iosSettings.isIosPaywallActive;
+
+          if (shouldBypassIos || isUserAdmin) {
             planTier = 'premium';
             isPremium = true;
           } else if (profile?.planTier) {
@@ -178,6 +182,18 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               planTier = profile.planTier;
               isPremium = (planTier === 'premium');
             }
+          }
+
+          // If on iOS and not yet verified as premium, check RevenueCat entitlements
+          if (getPlatform() === 'ios' && !isPremium) {
+            initRevenueCat(user.uid).then(async (ok) => {
+              if (ok) {
+                const sub = await checkRevenueCatSubscription();
+                if (sub.isActive) {
+                  setState(prev => ({ ...prev, isPremium: true, planTier: 'premium' }));
+                }
+              }
+            }).catch(e => console.warn('RevenueCat check error:', e));
           }
 
           if (profile?.dpdpConsent && typeof window !== 'undefined') {

@@ -23,6 +23,13 @@ import {
   Trash2,
   AlertTriangle
 } from 'lucide-react';
+import { 
+  getLocalMonetizationConfig, 
+  saveLocalMonetizationConfig, 
+  syncMonetizationConfigToCloud, 
+  loadMonetizationConfigFromCloud, 
+  IosMonetizationConfig 
+} from '../../utils/monetizationConfig';
 
 interface FeedbackItem {
   id: string;
@@ -34,7 +41,7 @@ interface FeedbackItem {
 
 export const AdminPanel: React.FC = () => {
   const { state } = usePlanner();
-  const [activeTab, setActiveTab] = useState<'users' | 'feedbacks'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'feedbacks' | 'monetization'>('users');
   
   // Users state
   const [users, setUsers] = useState<UserProfile[]>([]);
@@ -49,6 +56,10 @@ export const AdminPanel: React.FC = () => {
   // Feedbacks state
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loadingFeedbacks, setLoadingFeedbacks] = useState(true);
+
+  // Monetization state
+  const [monetizationConfig, setMonetizationConfig] = useState<IosMonetizationConfig>(() => getLocalMonetizationConfig());
+  const [isSavingMonetization, setIsSavingMonetization] = useState(false);
 
   // Selected user for modal / plan assign
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -114,8 +125,23 @@ export const AdminPanel: React.FC = () => {
     if (isAdmin) {
       fetchUsers();
       fetchFeedbacks();
+      loadMonetizationConfigFromCloud().then(cfg => {
+        if (cfg) setMonetizationConfig(cfg);
+      }).catch(e => console.warn('Could not load monetization config:', e));
     }
   }, [isAdmin]);
+
+  const handleSaveMonetization = async () => {
+    setIsSavingMonetization(true);
+    try {
+      await syncMonetizationConfigToCloud(monetizationConfig);
+      showToast('iOS Pricing & Monetization settings updated and live!');
+    } catch (err: any) {
+      showToast(`Saved locally: ${err?.message || 'Updated'}`);
+    } finally {
+      setIsSavingMonetization(false);
+    }
+  };
 
   const handleApplyPlan = async () => {
     if (!selectedUser) return;
@@ -283,6 +309,17 @@ export const AdminPanel: React.FC = () => {
           >
             <MessageSquare className="w-3.5 h-3.5" />
             <span>Feedbacks ({feedbacks.length})</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('monetization')}
+            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+              activeTab === 'monetization'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+                : 'text-medium hover:text-charcoal'
+            }`}
+          >
+            <Crown className="w-3.5 h-3.5 text-amber-500" />
+            <span>iOS Pricing & Monetization</span>
           </button>
         </div>
       </div>
@@ -558,6 +595,209 @@ export const AdminPanel: React.FC = () => {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 3: IOS PRICING & MONETIZATION */}
+      {activeTab === 'monetization' && (
+        <div className="space-y-6">
+          {/* Card 1: iOS In-App Paywall Status */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-amber-500" />
+                  <span>iOS In-App Subscription Paywall</span>
+                </h3>
+                <p className="text-[13px] text-medium mt-1">
+                  Enforces Apple In-App Purchase ($2.99/mo) for Pro features (AI Food Scanner, Report OCR, Ask AI, Partner Sync).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                  monetizationConfig.isIosPaywallActive 
+                    ? 'bg-amber-100 text-amber-800 border border-amber-300' 
+                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                }`}>
+                  {monetizationConfig.isIosPaywallActive ? 'Active Paywall ($2.99/mo)' : 'Free Launch Mode'}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setMonetizationConfig(prev => ({ ...prev, isIosPaywallActive: !prev.isIosPaywallActive }))}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    monetizationConfig.isIosPaywallActive ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      monetizationConfig.isIosPaywallActive ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 text-[12.5px] text-amber-950 flex items-start gap-2.5">
+              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <strong>Apple App Store Compliance:</strong> When enabled, iOS users will see the official Apple Paywall with In-App Purchase and &quot;Restore Purchases&quot; button. If disabled, all iOS users enjoy free access.
+              </div>
+            </div>
+          </div>
+
+          {/* Card 2: Pricing & Promotion Settings */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
+            <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-amber-500" />
+              <span>Pricing & Launch Promotion</span>
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Promotional Price ($/mo)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.99"
+                  value={monetizationConfig.introPriceUsd}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, introPriceUsd: parseFloat(e.target.value) || 2.99 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Default: $2.99</span>
+              </div>
+
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Regular Price ($/mo)
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="1.99"
+                  value={monetizationConfig.regularPriceUsd}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, regularPriceUsd: parseFloat(e.target.value) || 9.99 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Strikethrough: $9.99</span>
+              </div>
+
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Discount Badge (%)
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="99"
+                  value={monetizationConfig.discountPercentage}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, discountPercentage: parseInt(e.target.value, 10) || 70 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Displayed on paywall badge</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Card 3: Fair Use Daily Limits (Abuse Protection) */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
+            <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
+              <Shield className="w-5 h-5 text-emerald-600" />
+              <span>Fair Use Protection (Anti-Abuse Daily Limits)</span>
+            </h3>
+            <p className="text-[13px] text-medium">
+              Protects your Gemini API budget from bots and scrapers. Normal mothers scan 2-5 times/day and will never hit these caps.
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Max Food Scans / Day
+                </label>
+                <input
+                  type="number"
+                  min="5"
+                  max="200"
+                  value={monetizationConfig.dailyFoodScanLimit}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyFoodScanLimit: parseInt(e.target.value, 10) || 25 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Recommended: 25 / day</span>
+              </div>
+
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Max AI Chat / Day
+                </label>
+                <input
+                  type="number"
+                  min="10"
+                  max="500"
+                  value={monetizationConfig.dailyAiChatLimit}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyAiChatLimit: parseInt(e.target.value, 10) || 60 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Recommended: 60 / day</span>
+              </div>
+
+              <div>
+                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
+                  Max Reports / Day
+                </label>
+                <input
+                  type="number"
+                  min="2"
+                  max="100"
+                  value={monetizationConfig.dailyReportLimit}
+                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyReportLimit: parseInt(e.target.value, 10) || 10 }))}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                />
+                <span className="text-[11px] text-light mt-1 block">Recommended: 10 / day</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Unit Economics Calculator */}
+          <div className="bg-gradient-to-br from-emerald-50 via-cream to-white border border-emerald-200/80 rounded-2xl p-5 shadow-2xs space-y-2">
+            <h4 className="font-semibold text-emerald-900 text-[14px] flex items-center gap-2">
+              <CheckCircle className="w-4 h-4 text-emerald-600" />
+              <span>Unit Economics & Profit Margin</span>
+            </h4>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center pt-1">
+              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[11px] text-light uppercase font-bold block">User Price</span>
+                <span className="text-[17px] font-bold text-charcoal font-sans">${monetizationConfig.introPriceUsd.toFixed(2)}/mo</span>
+              </div>
+              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[11px] text-light uppercase font-bold block">Apple Share (15%)</span>
+                <span className="text-[17px] font-bold text-rose-700 font-sans">-${(monetizationConfig.introPriceUsd * 0.15).toFixed(2)}</span>
+              </div>
+              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[11px] text-light uppercase font-bold block">Avg Gemini Cost</span>
+                <span className="text-[17px] font-bold text-amber-700 font-sans">~$0.04</span>
+              </div>
+              <div className="p-2.5 bg-white rounded-xl border border-emerald-200">
+                <span className="text-[11px] text-emerald-800 uppercase font-bold block">Your Profit</span>
+                <span className="text-[17px] font-bold text-emerald-700 font-sans">+${(monetizationConfig.introPriceUsd * 0.85 - 0.04).toFixed(2)}/mo</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Save Button */}
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleSaveMonetization}
+              disabled={isSavingMonetization}
+              className="px-6 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-bold rounded-xl flex items-center gap-2 text-[14px] shadow-sm cursor-pointer disabled:opacity-50"
+            >
+              {isSavingMonetization ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 text-amber-400" />}
+              <span>Save & Apply Monetization Settings</span>
+            </button>
+          </div>
         </div>
       )}
 

@@ -10,6 +10,7 @@ import { isPregnancyRelated } from '../../utils/pregnancyClassifier';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
 import { triggerHaptic } from '../../utils/nativeBridge';
 import { isGeminiSupported, callGeminiChat } from '../../utils/geminiClient';
+import { checkAndIncrementFairUse } from '../../utils/fairUseLimiter';
 import { ContextBanner } from '../ContextBanner';
 
 function getLocalClinicalGuidance(query: string, weekStr: string): string {
@@ -278,6 +279,15 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
       setMessages(prev => [...prev, {
         role: 'model',
         text: "AI processing is currently turned off in your settings. Turn on AI features in your Profile to use this."
+      }]);
+      return;
+    }
+
+    const fairUse = checkAndIncrementFairUse('ai_chat');
+    if (!fairUse.allowed) {
+      setMessages(prev => [...prev, {
+        role: 'model',
+        text: `Daily AI consultation limit reached (${fairUse.limit}/${fairUse.limit}). Your quota resets tonight at midnight to ensure continuous high service quality.`
       }]);
       return;
     }

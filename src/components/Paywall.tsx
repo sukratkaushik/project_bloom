@@ -18,6 +18,9 @@ import {
 } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
+import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
+import { purchaseProSubscription, restoreApplePurchases } from '../utils/revenueCatService';
+import { RotateCcw } from 'lucide-react';
 
 interface PaywallProps {
   children: React.ReactNode;
@@ -160,11 +163,11 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedMonths, setSelectedMonths] = useState<number>(3); // 3 months default for best value
 
-  // iOS App Store Compliance (Guideline 3.1.1):
-  // All features are completely free and unlocked on iOS.
-  if (getPlatform() === 'ios') {
-    return <>{children}</>;
-  }
+  const [iosNotice, setIosNotice] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
+  const [isRestoringIos, setIsRestoringIos] = useState(false);
+
+  const iosConfig = getLocalMonetizationConfig();
+  const isIos = getPlatform() === 'ios';
 
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
   const hasAccess = checkAccess(planTier, featureName, state.isAdmin);
@@ -172,6 +175,53 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   if (hasAccess) {
     return <>{children}</>;
   }
+
+  // If on iOS and admin disabled the paywall, allow free access:
+  if (isIos && !iosConfig.isIosPaywallActive) {
+    return <>{children}</>;
+  }
+
+  const handleIosPurchase = async () => {
+    setIsProcessing(true);
+    setIosNotice(null);
+    triggerHaptic('medium');
+
+    try {
+      const res = await purchaseProSubscription();
+      if (res.success) {
+        updateState({ isPremium: true, planTier: 'premium' });
+        setIosNotice({ type: 'success', message: 'Welcome to Pro! All features unlocked.' });
+        triggerHaptic('heavy');
+      } else if (res.error && !res.error.toLowerCase().includes('cancel')) {
+        setIosNotice({ type: 'error', message: res.error });
+      }
+    } catch (err: any) {
+      setIosNotice({ type: 'error', message: err?.message || 'Transaction could not be completed.' });
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleIosRestore = async () => {
+    setIsRestoringIos(true);
+    setIosNotice(null);
+    triggerHaptic('light');
+
+    try {
+      const res = await restoreApplePurchases();
+      if (res.isActive) {
+        updateState({ isPremium: true, planTier: 'premium' });
+        setIosNotice({ type: 'success', message: 'Your subscription was successfully restored!' });
+        triggerHaptic('heavy');
+      } else {
+        setIosNotice({ type: 'error', message: 'No active Pro subscription found for this Apple ID.' });
+      }
+    } catch (err: any) {
+      setIosNotice({ type: 'error', message: err?.message || 'Could not restore purchases.' });
+    } finally {
+      setIsRestoringIos(false);
+    }
+  };
 
   const config = FEATURE_CONFIGS[featureName];
   const isPremiumFeature = config.tier === 'premium';
@@ -235,6 +285,140 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
       planTier: 'premium' 
     });
   };
+
+  if (isIos) {
+    return (
+      <div className="animate-in fade-in duration-300 pb-10 space-y-5 max-w-xl mx-auto">
+        <div className="bg-white border border-border/80 rounded-2xl shadow-2xs overflow-hidden">
+          {/* Header */}
+          <div className="p-5 sm:p-6 border-b border-border/60 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-900 text-white">
+            <div className="flex items-center justify-between gap-2 mb-3">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold tracking-wide uppercase bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                <span>Special Launch Offer • Save {iosConfig.discountPercentage}%</span>
+              </span>
+              <span className="text-[11px] font-medium text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full">
+                Apple In-App Purchase
+              </span>
+            </div>
+
+            <div className="flex items-start gap-3.5">
+              <div className="w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 bg-amber-400/20 text-amber-300 border border-amber-400/30">
+                <HeroIcon className="w-6 h-6" />
+              </div>
+              <div>
+                <h2 className="font-serif text-[22px] sm:text-[24px] font-bold text-white leading-snug">
+                  {config.title}
+                </h2>
+                <p className="text-[13px] text-white/80 mt-1 leading-relaxed">
+                  {config.subtitle}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Perks */}
+          <div className="p-5 sm:p-6 space-y-3 bg-white">
+            <span className="text-[11px] uppercase tracking-wider font-bold text-medium block">
+              What's included in Pro
+            </span>
+
+            <div className="space-y-2.5">
+              {config.perks.map((perk, idx) => {
+                const PerkIcon = perk.icon;
+                return (
+                  <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-neutral-50/70 border border-border/70">
+                    <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-amber-100/70 text-amber-800">
+                      <PerkIcon className="w-4 h-4" />
+                    </div>
+                    <div className="min-w-0 space-y-0.5">
+                      <h4 className="text-[13px] font-semibold text-charcoal leading-snug">{perk.title}</h4>
+                      <p className="text-[12px] text-medium leading-relaxed">{perk.desc}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <p className="text-[11.5px] text-medium/80 italic pt-1 text-center sm:text-left">
+              ✨ {config.includedSummary}
+            </p>
+          </div>
+        </div>
+
+        {/* Pricing Card */}
+        <div className="bg-white border border-border/80 rounded-2xl shadow-2xs p-5 sm:p-6 space-y-4">
+          {iosNotice && (
+            <div className={`p-3 rounded-xl text-[13px] text-center font-medium ${
+              iosNotice.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'
+            }`}>
+              {iosNotice.message}
+            </div>
+          )}
+
+          <div className="p-4 rounded-2xl bg-amber-50/60 border-2 border-amber-400/60 flex items-center justify-between">
+            <div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-amber-900 bg-amber-200/60 px-2 py-0.5 rounded">
+                Monthly Pro Pass
+              </span>
+              <div className="flex items-baseline gap-2 mt-1">
+                <span className="text-2xl font-bold text-charcoal font-sans">${iosConfig.introPriceUsd.toFixed(2)}</span>
+                <span className="text-[13px] text-light line-through font-medium">${iosConfig.regularPriceUsd.toFixed(2)}</span>
+                <span className="text-[12px] text-medium font-medium">/ month</span>
+              </div>
+              <p className="text-[11px] text-medium mt-0.5">Renews monthly • Cancel anytime</p>
+            </div>
+            <span className="bg-neutral-900 text-amber-300 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
+              Save {iosConfig.discountPercentage}%
+            </span>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleIosPurchase}
+            disabled={isProcessing || isRestoringIos}
+            className="w-full py-3.5 rounded-2xl font-bold text-[15px] bg-black hover:bg-neutral-800 active:scale-[0.99] text-white flex items-center justify-center gap-2 shadow-lg transition-all cursor-pointer disabled:opacity-60"
+          >
+            {isProcessing ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Connecting with Apple...</span>
+              </>
+            ) : (
+              <>
+                <Sparkles className="w-4 h-4 text-amber-300" />
+                <span>Subscribe for ${iosConfig.introPriceUsd.toFixed(2)} / month</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleIosRestore}
+            disabled={isProcessing || isRestoringIos}
+            className="w-full py-1 text-center text-[12px] font-semibold text-medium hover:text-charcoal transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            {isRestoringIos ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RotateCcw className="w-3.5 h-3.5" />}
+            <span>Restore Existing Purchases</span>
+          </button>
+
+          <div className="border-t border-border pt-3 text-[11px] text-light space-y-1.5 text-center leading-relaxed">
+            <p>
+              Subscription automatically renews for ${iosConfig.introPriceUsd.toFixed(2)}/month unless canceled at least 24 hours before the end of the current billing cycle in your Apple ID Account Settings.
+            </p>
+            <div className="flex items-center justify-center gap-3 text-medium pt-1">
+              <a href="https://ourpregnancy.in/terms" target="_blank" rel="noreferrer" className="underline hover:text-charcoal">
+                Terms of Use (EULA)
+              </a>
+              <span>•</span>
+              <a href="https://ourpregnancy.in/privacy" target="_blank" rel="noreferrer" className="underline hover:text-charcoal">
+                Privacy Policy
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="animate-in fade-in duration-300 pb-10 space-y-5 max-w-xl mx-auto">

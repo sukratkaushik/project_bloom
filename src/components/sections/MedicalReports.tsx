@@ -26,6 +26,7 @@ import {
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { isGeminiSupported, callGeminiMedicalReport } from '../../utils/geminiClient';
+import { checkAndIncrementFairUse } from '../../utils/fairUseLimiter';
 import { Paywall } from '../Paywall';
 import { ContextBanner } from '../ContextBanner';
 import { AiConsentPrompt, isAiConsentBlocked } from '../AiConsentPrompt';
@@ -226,6 +227,15 @@ export const MedicalReports: React.FC = () => {
       setAnalysisErrorMap(prev => ({
         ...prev,
         [report.id]: "Turn on AI features in your Profile to use this."
+      }));
+      return;
+    }
+
+    const fairUse = checkAndIncrementFairUse('medical_report');
+    if (!fairUse.allowed) {
+      setAnalysisErrorMap(prev => ({
+        ...prev,
+        [report.id]: `Daily medical report analysis quota reached (${fairUse.limit}/${fairUse.limit}). Resets at midnight.`
       }));
       return;
     }
