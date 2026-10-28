@@ -1,9 +1,10 @@
 import React from 'react';
-import { ShieldAlert, Sparkles, Phone } from 'lucide-react';
+import { ShieldAlert, Sparkles, Phone, Crown } from 'lucide-react';
 import { usePlanner } from '../../store';
 import { triggerHaptic, isNativeApp } from '../../utils/nativeBridge';
 import { auth } from '../../firebase';
 import { navigate } from '../../utils/navigation';
+import { isSuperAdminEmail } from '../../utils/adminConfig';
 
 interface MobileTopBarProps {
   onOpenProfile: () => void;
@@ -11,6 +12,7 @@ interface MobileTopBarProps {
   onOpenPricing: () => void;
   onOpenQuickLog?: () => void;
   onOpenDoctor?: () => void;
+  onOpenAdmin?: () => void;
 }
 
 export const MobileTopBar: React.FC<MobileTopBarProps> = ({
@@ -19,6 +21,7 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
   onOpenPricing,
   onOpenQuickLog,
   onOpenDoctor,
+  onOpenAdmin,
 }) => {
   const { state } = usePlanner();
   const isNative = isNativeApp();
@@ -107,6 +110,23 @@ export const MobileTopBar: React.FC<MobileTopBarProps> = ({
             <ShieldAlert size={11} className="text-rose-600 shrink-0" />
             <span className="leading-none text-[9.5px] sm:text-[11px]">108</span>
           </button>
+
+          {/* Admin Suite Trigger (Super Admins only) */}
+          {(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)) && (
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                if (onOpenAdmin) onOpenAdmin();
+              }}
+              className="h-7 px-2 flex items-center gap-1 bg-purple-100 hover:bg-purple-200 border border-purple-300 text-purple-800 rounded-full text-[10.5px] font-bold shadow-2xs shrink-0 active:scale-95 cursor-pointer notranslate"
+              title="Admin Suite"
+              aria-label="Open Admin Suite"
+            >
+              <Crown size={12} className="text-purple-700 shrink-0" />
+              <span>Admin</span>
+            </button>
+          )}
 
           {/* Profile Avatar Trigger */}
           <button

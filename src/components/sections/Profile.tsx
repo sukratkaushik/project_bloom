@@ -34,9 +34,10 @@ import {
 interface ProfileProps {
   isMobileModal?: boolean;
   onClose?: () => void;
+  onOpenAdmin?: () => void;
 }
 
-export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose }) => {
+export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose, onOpenAdmin }) => {
   const { state, updateState, restoreJourney, resetPlan } = usePlanner();
   
   const [userName, setUserName] = useState(state.userName || '');
@@ -514,6 +515,27 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   <div className="text-[11px] text-light pt-1 border-t border-border/50">
                     Expires on: <strong>{new Date(state.planExpiry).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</strong>
                   </div>
+                )}
+
+                {(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      triggerHaptic('light');
+                      if (onOpenAdmin) {
+                        onOpenAdmin();
+                      } else {
+                        navigate('/dashboard/admin-panel');
+                      }
+                    }}
+                    className="mt-3 w-full py-2.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 text-white rounded-xl font-bold text-[13px] flex items-center justify-between shadow-sm hover:opacity-95 active:scale-[0.98] transition-all cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      <span>👑</span>
+                      <span>Open Admin Suite & Pricing Controls</span>
+                    </span>
+                    <ChevronRight size={16} />
+                  </button>
                 )}
               </div>
             </div>

@@ -51,6 +51,7 @@ import { SetupScreen } from '../SetupScreen';
 import { VisitsVaccinesSchedule } from '../sections/VisitsVaccinesSchedule';
 import { HospitalBagBabyPrep } from '../sections/HospitalBagBabyPrep';
 import { DeliveryCostSchemes } from '../sections/DeliveryCostSchemes';
+import { AdminPanel } from '../sections/AdminPanel';
 
 export const MobileShell: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -73,6 +74,7 @@ export const MobileShell: React.FC = () => {
 
   // Modals
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [showSosModal, setShowSosModal] = useState(false);
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showAddRitualsModal, setShowAddRitualsModal] = useState(false);
@@ -190,7 +192,8 @@ export const MobileShell: React.FC = () => {
       case 'breathing':
       case 'garbhsanskar': return <GuidedBreathingAudio />;
       case 'feedback': return <Feedback />;
-      case 'profile': return <Profile />;
+      case 'profile': return <Profile onOpenAdmin={() => { setActiveToolId('admin-panel'); }} />;
+      case 'admin-panel': return <AdminPanel />;
       case 'setup': return <SetupScreen isMobileSubview onComplete={() => setActiveToolId(null)} onCancel={() => setActiveToolId(null)} />;
       case 'guide': return <UserFlowGuide onNavigate={handleOpenTool} />;
       default: return <KickCounter />;
@@ -207,6 +210,7 @@ export const MobileShell: React.FC = () => {
           onOpenPricing={() => setShowPricingModal(true)}
           onOpenQuickLog={() => setShowQuickLogSheet(true)}
           onOpenDoctor={() => setShowDoctorModal(true)}
+          onOpenAdmin={() => setShowAdminModal(true)}
         />
       </div>
 
@@ -424,7 +428,56 @@ export const MobileShell: React.FC = () => {
             className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-4 pb-28 max-w-lg mx-auto w-full custom-scrollbar"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <Profile isMobileModal={true} onClose={() => setShowProfileModal(false)} />
+            <Profile 
+              isMobileModal={true} 
+              onClose={() => setShowProfileModal(false)}
+              onOpenAdmin={() => {
+                setShowProfileModal(false);
+                setShowAdminModal(true);
+              }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Admin Suite Modal (Full-Screen Native View) */}
+      {showAdminModal && (
+        <div className="fixed inset-0 z-50 bg-[#FDFBF7] flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
+          {/* Native Top App Bar */}
+          <div className="shrink-0 bg-[#FDFBF7] border-b border-border/80 px-4 py-3 flex items-center justify-between pt-[max(0.5rem,calc(env(safe-area-inset-top,0px)+0.25rem))]">
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowAdminModal(false);
+              }}
+              className="flex items-center gap-1.5 text-[13.5px] font-bold text-charcoal hover:text-sage-dark active:scale-95 transition-all p-1 -ml-1 cursor-pointer"
+              aria-label="Back"
+            >
+              <ArrowLeft size={18} />
+              <span>Back</span>
+            </button>
+            <h2 className="font-serif font-bold text-charcoal text-[16px] tracking-tight text-center">
+              👑 Admin Suite
+            </h2>
+            <button
+              type="button"
+              onClick={() => {
+                triggerHaptic('light');
+                setShowAdminModal(false);
+              }}
+              className="text-[13px] font-bold text-sage-dark hover:underline active:scale-95 transition-transform p-1 cursor-pointer"
+            >
+              Done
+            </button>
+          </div>
+
+          {/* Full-width Scrollable Content Container */}
+          <div 
+            className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-4 pb-28 max-w-3xl mx-auto w-full custom-scrollbar"
+            style={{ WebkitOverflowScrolling: 'touch' }}
+          >
+            <AdminPanel />
           </div>
         </div>
       )}
