@@ -276,51 +276,68 @@ export const AdminPanel: React.FC = () => {
 
   return (
     <div className="animate-in fade-in duration-300 max-w-5xl space-y-5">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-border">
-        <div>
-          <h1 className="font-serif text-[clamp(24px,3.5vw,32px)] text-charcoal dark:text-white font-semibold tracking-tight whitespace-nowrap">
-            Admin Suite
-          </h1>
-          <p className="text-medium text-[13.5px] mt-1">
-            Manage user subscriptions, grant instant tier access, and review community feedbacks.
-          </p>
+      {/* Header & Sleek Single-Line Tab Switcher */}
+      <div className="flex flex-col gap-3 pb-3 border-b border-border/80">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h1 className="font-serif text-[22px] sm:text-[28px] text-charcoal dark:text-white font-bold tracking-tight">
+              Admin Suite
+            </h1>
+            <p className="text-medium text-xs sm:text-[13px] mt-0.5">
+              Manage user subscriptions, tier access, and monetization limits.
+            </p>
+          </div>
         </div>
 
-        {/* Tab Switcher */}
-        <div className="flex bg-gray-100 dark:bg-charcoal/40 p-1 rounded-xl border border-border shrink-0 self-start sm:self-auto">
+        {/* Modern Segmented Tab Switcher (Strictly Single-Line, zero text-wrapping) */}
+        <div className="flex bg-[#F2EDE5] dark:bg-charcoal/50 p-1 rounded-xl border border-border/70 w-full overflow-x-auto no-scrollbar gap-1">
           <button
+            type="button"
             onClick={() => setActiveTab('users')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 min-w-[100px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'users'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
                 : 'text-medium hover:text-charcoal'
             }`}
           >
-            <Users className="w-3.5 h-3.5" />
-            <span>Users & Plans ({users.length})</span>
+            <Users className="w-3.5 h-3.5 shrink-0" />
+            <span>Users</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              activeTab === 'users' ? 'bg-sage-pale text-sage-dark' : 'bg-black/5 text-medium'
+            }`}>
+              {users.length}
+            </span>
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab('feedbacks')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 min-w-[100px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'feedbacks'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
                 : 'text-medium hover:text-charcoal'
             }`}
           >
-            <MessageSquare className="w-3.5 h-3.5" />
-            <span>Feedbacks ({feedbacks.length})</span>
+            <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+            <span>Feedback</span>
+            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
+              activeTab === 'feedbacks' ? 'bg-sage-pale text-sage-dark' : 'bg-black/5 text-medium'
+            }`}>
+              {feedbacks.length}
+            </span>
           </button>
+
           <button
+            type="button"
             onClick={() => setActiveTab('monetization')}
-            className={`flex items-center gap-2 px-3.5 py-1.5 text-[13px] font-bold rounded-lg transition-all cursor-pointer ${
+            className={`flex-1 min-w-[130px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
               activeTab === 'monetization'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
                 : 'text-medium hover:text-charcoal'
             }`}
           >
-            <Crown className="w-3.5 h-3.5 text-amber-500" />
-            <span>Mobile Monetization (iOS & Android)</span>
+            <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span>Pricing & Limits</span>
           </button>
         </div>
       </div>
@@ -335,212 +352,341 @@ export const AdminPanel: React.FC = () => {
 
       {/* TAB 1: USERS & PLANS */}
       {activeTab === 'users' && (
-        <div className="space-y-4">
-          {/* Quick Filter Chips & Refresh */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5">
-            <div className="flex flex-wrap items-center gap-1.5">
-              {[
-                { key: 'all', label: `All (${users.length})` },
-                { key: 'pro', label: `👑 Pro (${proCount})` },
-                { key: 'free', label: `Free (${freeCount})` },
-                { key: 'admin', label: `👑 Admins (${adminCount})` },
-              ].map((chip) => (
+        <div className="space-y-3.5">
+          {/* Integrated Search Bar + Refresh Icon Button */}
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-light pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search user by email or name..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-9 pr-8 py-2 bg-white dark:bg-[#1E293B] border border-border/80 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-sage shadow-2xs"
+              />
+              {searchQuery && (
                 <button
-                  key={chip.key}
-                  onClick={() => setFilterTier(chip.key as any)}
-                  className={`px-3 py-1 text-[12px] font-bold rounded-full transition-all cursor-pointer ${
-                    filterTier === chip.key
-                      ? 'bg-charcoal text-white dark:bg-white dark:text-charcoal shadow-xs'
-                      : 'bg-white dark:bg-[#1E293B] text-medium hover:text-charcoal dark:hover:text-white border border-border'
-                  }`}
+                  type="button"
+                  onClick={() => setSearchQuery('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-light hover:text-charcoal text-xs cursor-pointer"
                 >
-                  {chip.label}
+                  ✕
                 </button>
-              ))}
+              )}
             </div>
 
             <button
+              type="button"
               onClick={fetchUsers}
               disabled={loadingUsers}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] hover:bg-gray-50 border border-border rounded-xl text-charcoal dark:text-white cursor-pointer transition-all disabled:opacity-50"
+              title="Refresh users database"
+              className="p-2.5 bg-white dark:bg-[#1E293B] hover:bg-cream border border-border/80 rounded-xl text-charcoal dark:text-white cursor-pointer transition-all shadow-2xs shrink-0 disabled:opacity-50 active:scale-95"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
-              <span>Refresh</span>
+              <RefreshCw className={`w-4 h-4 ${loadingUsers ? 'animate-spin text-sage' : ''}`} />
             </button>
           </div>
 
-          {/* Search Box */}
-          <div className="relative w-full">
-            <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-light pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search user by email or name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-10 py-2.5 bg-white dark:bg-[#1E293B] border border-border rounded-xl text-sm focus:outline-none focus:border-sage shadow-xs"
-            />
-            {searchQuery && (
+          {/* Quick Filter Chips (Single-Line Horizontal Scroll) */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+            {[
+              { key: 'all', label: 'All', count: users.length },
+              { key: 'pro', label: 'Pro', icon: '✨', count: proCount },
+              { key: 'free', label: 'Free', count: freeCount },
+              { key: 'admin', label: 'Admins', icon: '👑', count: adminCount },
+            ].map((chip) => (
               <button
-                onClick={() => setSearchQuery('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-light hover:text-charcoal text-sm cursor-pointer"
+                key={chip.key}
+                type="button"
+                onClick={() => setFilterTier(chip.key as any)}
+                className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
+                  filterTier === chip.key
+                    ? 'bg-charcoal text-white dark:bg-white dark:text-charcoal shadow-2xs'
+                    : 'bg-white dark:bg-[#1E293B] text-medium hover:text-charcoal border border-border/80'
+                }`}
               >
-                ✕
+                {chip.icon && <span>{chip.icon}</span>}
+                <span>{chip.label}</span>
+                <span className="opacity-70 text-[10.5px]">({chip.count})</span>
               </button>
-            )}
+            ))}
           </div>
 
-          {/* Users Table */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-border shadow-xs overflow-hidden">
+          {/* Users List Container */}
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-border/80 shadow-2xs overflow-hidden">
             {loadingUsers ? (
-              <div className="p-12 text-center text-medium flex flex-col items-center gap-2">
+              <div className="p-10 text-center text-medium flex flex-col items-center gap-2">
                 <RefreshCw className="w-5 h-5 animate-spin text-sage" />
-                <span>Loading users database...</span>
+                <span className="text-xs">Loading users database...</span>
               </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="p-12 text-center text-medium">
+              <div className="p-10 text-center text-medium text-xs">
                 No users found {searchQuery ? `matching "${searchQuery}"` : 'in this category'}.
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-[13px] border-collapse">
-                  <thead>
-                    <tr className="border-b border-border bg-gray-50/70 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
-                      <th className="py-3 px-4">User</th>
-                      <th className="py-3 px-4">Plan</th>
-                      <th className="py-3 px-4">Expiry</th>
-                      <th className="py-3 px-4">Joined</th>
-                      <th className="py-3 px-4 text-center">Admin</th>
-                      <th className="py-3 px-4 text-center">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border">
-                    {filteredUsers.map((user) => {
-                      const isOwnerUser = isSuperAdminEmail(user.email);
-                      const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
-                      const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
-                      const initials = getInitials(user.displayName, user.email);
+              <>
+                {/* 1. MOBILE RESPONSIVE CARDS (strictly single-line, zero clipping, beautiful touch targets) */}
+                <div className="md:hidden divide-y divide-border/60">
+                  {filteredUsers.map((user) => {
+                    const isOwnerUser = isSuperAdminEmail(user.email);
+                    const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
+                    const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
+                    const initials = getInitials(user.displayName, user.email);
 
-                      return (
-                        <tr key={user.uid} className="hover:bg-cream/50 dark:hover:bg-white/5 transition-colors group">
-                          {/* User Details */}
-                          <td className="py-3 px-4">
-                            <div className="flex items-center gap-2.5">
-                              {/* Avatar monogram */}
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                                isOwnerUser || user.role === 'admin'
-                                  ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                                  : isProUser
-                                  ? 'bg-gold-pale text-gold-dark border border-gold/30'
-                                  : 'bg-gray-100 dark:bg-charcoal/30 text-charcoal/80 dark:text-white/80'
-                              }`}>
-                                {initials}
-                              </div>
+                    return (
+                      <div key={user.uid} className="p-3 flex items-center justify-between gap-2.5 hover:bg-cream/40 transition-colors">
+                        {/* Avatar & User Details */}
+                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                            isOwnerUser || user.role === 'admin'
+                              ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                              : isProUser
+                              ? 'bg-gold-pale text-gold-dark border border-gold/40'
+                              : 'bg-gray-100 text-charcoal/80 border border-border/70'
+                          }`}>
+                            {initials}
+                          </div>
 
-                              <div className="flex flex-col min-w-0">
-                                <div className="flex items-center gap-1.5 flex-wrap">
-                                  <span className="font-bold text-charcoal dark:text-white truncate max-w-[150px] sm:max-w-[200px]" title={user.displayName || ''}>
-                                    {user.displayName || 'Unnamed User'}
-                                  </span>
-                                  {user.emailVerified === false && (
-                                    <span className="text-[9px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.2 rounded font-semibold shrink-0">
-                                      Unverified
-                                    </span>
-                                  )}
-                                </div>
-                                <span className="text-light text-[11.5px] truncate max-w-[160px] sm:max-w-[200px]" title={user.email || user.uid}>
-                                  {user.email || user.uid}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-1.5">
+                              <span className="font-bold text-charcoal dark:text-white text-[12.5px] truncate">
+                                {user.displayName || 'Unnamed User'}
+                              </span>
+                              {isOwnerUser && (
+                                <span className="text-[9px] bg-purple-100 text-purple-700 px-1 rounded font-bold shrink-0">
+                                  Owner
                                 </span>
-                              </div>
+                              )}
+                              {user.emailVerified === false && (
+                                <span className="text-[9px] bg-amber-100 text-amber-800 px-1 rounded font-medium shrink-0">
+                                  Unverified
+                                </span>
+                              )}
                             </div>
-                          </td>
+                            <div className="text-[11px] text-light truncate flex items-center gap-1 mt-0.5">
+                              <span className="truncate">{user.email || user.uid}</span>
+                              {isOwnerUser ? (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-sage-dark font-medium shrink-0">Lifetime</span>
+                                </>
+                              ) : user.planExpiry ? (
+                                <>
+                                  <span>•</span>
+                                  <span className={`shrink-0 ${isExpired ? 'text-critical font-medium' : ''}`}>
+                                    {isExpired ? 'Expired' : formatDateDDMMYY(user.planExpiry)}
+                                  </span>
+                                </>
+                              ) : isProUser ? (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-sage-dark font-medium shrink-0">Lifetime</span>
+                                </>
+                              ) : null}
+                            </div>
+                          </div>
+                        </div>
 
-                          {/* Plan Tier Pill (Interactive Clickable Badge) */}
-                          <td className="py-3 px-4">
+                        {/* Right: Single-Line Plan Pill + Quick Actions */}
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedUser(user);
+                              setPlanOption(isProUser ? 'premium' : 'free');
+                              setDurationMonths(user.planExpiry ? 3 : null);
+                            }}
+                            className={`whitespace-nowrap px-2.5 py-1 rounded-full text-[11.5px] font-bold cursor-pointer transition-all flex items-center gap-1 shadow-3xs active:scale-95 ${
+                              isProUser
+                                ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
+                                : 'bg-gray-100 text-charcoal/80 border border-border/80 hover:bg-gray-200/60'
+                            }`}
+                          >
+                            <span>{isProUser ? '✨ Pro' : 'Free'}</span>
+                            <ChevronDown size={11} className="opacity-60" />
+                          </button>
+
+                          {/* Admin toggle icon */}
+                          {!isOwnerUser && (
                             <button
-                              onClick={() => {
-                                setSelectedUser(user);
-                                setPlanOption(isProUser ? 'premium' : 'free');
-                                setDurationMonths(user.planExpiry ? 3 : null);
-                              }}
-                              title="Click to change plan"
-                              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[12px] font-bold cursor-pointer transition-all shadow-2xs hover:scale-105 active:scale-95 ${
-                                isProUser
-                                  ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
-                                  : 'bg-gray-100 dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-gray-400'
+                              type="button"
+                              onClick={() => handleToggleAdminRole(user)}
+                              disabled={updatingUid === user.uid}
+                              title={user.role === 'admin' ? "Revoke Admin" : "Grant Admin"}
+                              className={`p-1.5 rounded-lg text-xs cursor-pointer transition-all ${
+                                user.role === 'admin'
+                                  ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                                  : 'text-gray-300 hover:text-purple-600'
                               }`}
                             >
-                              {isProUser && <Sparkles className="w-3 h-3 text-gold-dark" />}
-                              <span>{isProUser ? 'Pro Plan' : 'Free Plan'}</span>
-                              <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
+                              👑
                             </button>
-                          </td>
+                          )}
 
-                          {/* Expiry */}
-                          <td className="py-3 px-4 text-medium text-[12px] whitespace-nowrap">
-                            {isOwnerUser ? (
-                              <span className="text-sage-dark dark:text-sage font-semibold">Lifetime (Owner)</span>
-                            ) : user.planExpiry ? (
-                              isExpired ? (
-                                <span className="text-critical font-semibold">Expired</span>
-                              ) : (
-                                <span className="font-medium text-charcoal/80 dark:text-white/80">
-                                  {formatDateDDMMYY(user.planExpiry)}
-                                </span>
-                              )
-                            ) : isProUser ? (
-                              <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
-                            ) : (
-                              <span className="text-light">—</span>
-                            )}
-                          </td>
+                          {/* Delete button */}
+                          {!isOwnerUser && !isSuperAdminEmail(user.email) && (
+                            <button
+                              type="button"
+                              onClick={() => setUserToDelete(user)}
+                              title="Delete user"
+                              className="p-1.5 rounded-lg text-gray-300 hover:text-red-600 transition-colors cursor-pointer"
+                            >
+                              <Trash2 size={13} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
 
-                          {/* Joined Date */}
-                          <td className="py-3 px-4 text-light text-[12px] whitespace-nowrap">
-                            {formatDateDDMMYY(user.createdAt)}
-                          </td>
+                {/* 2. DESKTOP EXPANSIVE TABLE (spacious, clean single-line pills, wide headers) */}
+                <div className="hidden md:block overflow-x-auto">
+                  <table className="w-full text-left text-[13px] border-collapse">
+                    <thead>
+                      <tr className="border-b border-border bg-gray-50/70 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
+                        <th className="py-3 px-4">User</th>
+                        <th className="py-3 px-4">Plan</th>
+                        <th className="py-3 px-4">Expiry</th>
+                        <th className="py-3 px-4">Joined</th>
+                        <th className="py-3 px-4 text-center">Admin</th>
+                        <th className="py-3 px-4 text-center">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-border">
+                      {filteredUsers.map((user) => {
+                        const isOwnerUser = isSuperAdminEmail(user.email);
+                        const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
+                        const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
+                        const initials = getInitials(user.displayName, user.email);
 
-                          {/* Admin Role Toggle Icon */}
-                          <td className="py-3 px-4 text-center">
-                            {isOwnerUser ? (
-                              <span title="Primary Owner" className="text-purple-600 text-[16px] cursor-default">
-                                👑
-                              </span>
-                            ) : (
+                        return (
+                          <tr key={user.uid} className="hover:bg-cream/40 dark:hover:bg-white/5 transition-colors group">
+                            {/* User Details */}
+                            <td className="py-3 px-4">
+                              <div className="flex items-center gap-2.5">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
+                                  isOwnerUser || user.role === 'admin'
+                                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
+                                    : isProUser
+                                    ? 'bg-gold-pale text-gold-dark border border-gold/30'
+                                    : 'bg-gray-100 dark:bg-charcoal/30 text-charcoal/80 dark:text-white/80'
+                                }`}>
+                                  {initials}
+                                </div>
+
+                                <div className="flex flex-col min-w-0">
+                                  <div className="flex items-center gap-1.5 flex-wrap">
+                                    <span className="font-bold text-charcoal dark:text-white truncate max-w-[200px]" title={user.displayName || ''}>
+                                      {user.displayName || 'Unnamed User'}
+                                    </span>
+                                    {isOwnerUser && (
+                                      <span className="text-[9px] bg-purple-100 text-purple-700 px-1 rounded font-bold shrink-0">
+                                        Owner
+                                      </span>
+                                    )}
+                                    {user.emailVerified === false && (
+                                      <span className="text-[9px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.2 rounded font-semibold shrink-0">
+                                        Unverified
+                                      </span>
+                                    )}
+                                  </div>
+                                  <span className="text-light text-[11.5px] truncate max-w-[220px]" title={user.email || user.uid}>
+                                    {user.email || user.uid}
+                                  </span>
+                                </div>
+                              </div>
+                            </td>
+
+                            {/* Plan Tier Pill (Strictly Single-Line) */}
+                            <td className="py-3 px-4">
                               <button
-                                onClick={() => handleToggleAdminRole(user)}
-                                disabled={updatingUid === user.uid}
-                                title={user.role === 'admin' ? "Admin active (Click to revoke)" : "Click to grant Admin privileges"}
-                                className={`p-1.5 rounded-lg text-[14px] cursor-pointer transition-all ${
-                                  user.role === 'admin'
-                                    ? 'bg-purple-100 text-purple-700 border border-purple-300 shadow-2xs hover:bg-purple-200'
-                                    : 'opacity-30 hover:opacity-100 hover:bg-purple-50 text-purple-700'
+                                type="button"
+                                onClick={() => {
+                                  setSelectedUser(user);
+                                  setPlanOption(isProUser ? 'premium' : 'free');
+                                  setDurationMonths(user.planExpiry ? 3 : null);
+                                }}
+                                title="Click to change plan"
+                                className={`whitespace-nowrap inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-all shadow-3xs hover:scale-105 active:scale-95 ${
+                                  isProUser
+                                    ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
+                                    : 'bg-gray-100 dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-gray-400'
                                 }`}
                               >
-                                👑
+                                <span>{isProUser ? '✨ Pro' : 'Free'}</span>
+                                <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
                               </button>
-                            )}
-                          </td>
+                            </td>
 
-                          {/* Actions Column: Delete User */}
-                          <td className="py-3 px-4 text-center">
-                            {isOwnerUser || isSuperAdminEmail(user.email) ? (
-                              <span className="text-[11px] text-light italic">—</span>
-                            ) : (
-                              <button
-                                onClick={() => setUserToDelete(user)}
-                                title="Delete user and all data"
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all cursor-pointer"
-                              >
-                                <Trash2 size={16} />
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
+                            {/* Expiry */}
+                            <td className="py-3 px-4 text-medium text-xs whitespace-nowrap">
+                              {isOwnerUser ? (
+                                <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
+                              ) : user.planExpiry ? (
+                                isExpired ? (
+                                  <span className="text-critical font-semibold">Expired</span>
+                                ) : (
+                                  <span className="font-medium text-charcoal/80 dark:text-white/80">
+                                    {formatDateDDMMYY(user.planExpiry)}
+                                  </span>
+                                )
+                              ) : isProUser ? (
+                                <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
+                              ) : (
+                                <span className="text-light">—</span>
+                              )}
+                            </td>
+
+                            {/* Joined Date */}
+                            <td className="py-3 px-4 text-light text-xs whitespace-nowrap">
+                              {formatDateDDMMYY(user.createdAt)}
+                            </td>
+
+                            {/* Admin Role Toggle Icon */}
+                            <td className="py-3 px-4 text-center">
+                              {isOwnerUser ? (
+                                <span title="Primary Owner" className="text-purple-600 text-sm cursor-default">
+                                  👑
+                                </span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => handleToggleAdminRole(user)}
+                                  disabled={updatingUid === user.uid}
+                                  title={user.role === 'admin' ? "Admin active (Click to revoke)" : "Click to grant Admin privileges"}
+                                  className={`p-1.5 rounded-lg text-xs cursor-pointer transition-all ${
+                                    user.role === 'admin'
+                                      ? 'bg-purple-100 text-purple-700 border border-purple-300 shadow-3xs hover:bg-purple-200'
+                                      : 'opacity-25 hover:opacity-100 hover:bg-purple-50 text-purple-700'
+                                  }`}
+                                >
+                                  👑
+                                </button>
+                              )}
+                            </td>
+
+                            {/* Actions Column: Delete User */}
+                            <td className="py-3 px-4 text-center">
+                              {isOwnerUser || isSuperAdminEmail(user.email) ? (
+                                <span className="text-xs text-light italic">—</span>
+                              ) : (
+                                <button
+                                  type="button"
+                                  onClick={() => setUserToDelete(user)}
+                                  title="Delete user and all data"
+                                  className="p-1.5 rounded-lg text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all cursor-pointer"
+                                >
+                                  <Trash2 size={15} />
+                                </button>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </>
             )}
           </div>
         </div>
