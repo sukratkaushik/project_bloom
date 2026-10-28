@@ -60,7 +60,7 @@ export const PrivacyPolicy: React.FC = () => {
           <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">1. Information We Collect</h2>
           <p>We collect information you provide directly to us when you use the Our Pregnancy app, including:</p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Account Information:</strong> Name, email address, and authentication details via Google Sign-In.</li>
+            <li><strong>Account Information:</strong> Name, email address, and authentication details via Sign in with Apple, Google Sign-In, or Email authentication.</li>
             <li><strong>Pregnancy Data:</strong> Due dates, calculation methods, and journey preferences.</li>
             <li><strong>Health & Wellness Data:</strong> Symptoms, vitals (blood pressure, weight), mood logs, and hydration tracking.</li>
             <li><strong>Tasks & Planning:</strong> Custom tasks, hospital bag items, and birth plan preferences.</li>
@@ -86,11 +86,14 @@ export const PrivacyPolicy: React.FC = () => {
             <li><strong>Email delivery:</strong> Transactional communications (such as welcome emails, account notifications, plan updates, and payment receipts) are transmitted through a cloud email delivery service.</li>
           </ul>
 
-          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Your Data Rights</h2>
-          <p>You have the following rights regarding your personal data:</p>
+          <h2 className="text-xl font-semibold text-charcoal mt-8 mb-4">5. Your Data Rights & International Compliance</h2>
+          <p>You have comprehensive rights regarding your personal and maternal health data under GDPR (EU/UK), CCPA (US), UAE PDPL, and DPDP Act (India):</p>
           <ul className="list-disc pl-5 space-y-2">
-            <li><strong>Right to access and update:</strong> You may review and correct your data directly within the app.</li>
-            <li><strong>Right to withdraw consent & erasure:</strong> You can choose to delete specific health logs or delete your entire account, which permanently erases your data from our systems.</li>
+            <li><strong>Right to access and update:</strong> You may review and correct your data directly within the app at any time.</li>
+            <li><strong>Right to erasure ("Right to be Forgotten"):</strong> Under GDPR Article 17 and DPDP Act Sec 12, you can permanently delete your entire account, cloud backups, and local health logs instantly via <em>Profile &gt; Delete My Account</em>.</li>
+            <li><strong>European Union (GDPR) & UK Rights:</strong> Users residing in the EEA or UK enjoy full rights of access (Art. 15), rectification (Art. 16), erasure (Art. 17), restriction of processing (Art. 18), and data portability (Art. 20). Consent for AI processing can be toggled on or off at any time.</li>
+            <li><strong>HealthKit Privacy (Apple Guideline 5.1.2):</strong> Data read from or written to Apple HealthKit is strictly utilized to render your personal pregnancy vitals on your device. We never disclose, transmit, or sell HealthKit data to third parties, data brokers, or advertising platforms.</li>
+            <li><strong>United States & International Users:</strong> We do not sell, rent, or monetize your personal or sensitive health data (complying with CCPA / CPRA).</li>
             <li><strong>Right to nominee:</strong> You have the right to nominate someone to exercise these rights on your behalf.</li>
           </ul>
 
