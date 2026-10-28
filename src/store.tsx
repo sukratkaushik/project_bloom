@@ -9,6 +9,7 @@ import { cloudSync, saveJourney } from './cloudSync';
 import { getPlatform } from './utils/nativeBridge';
 import { getLocalMonetizationConfig, loadMonetizationConfigFromCloud } from './utils/monetizationConfig';
 import { initRevenueCat, checkRevenueCatSubscription } from './utils/revenueCatService';
+import { isSuperAdminEmail } from './utils/adminConfig';
 
 type PlannerContextType = {
   state: PlannerState;
@@ -158,14 +159,14 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
       if (user) {
         // Skip unverified accounts
-        const isVerified = user.emailVerified || user.email === 'sukrat.kaushik@gmail.com' || user.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'apple.com');
+        const isVerified = user.emailVerified || isSuperAdminEmail(user.email) || user.providerData.some(p => p.providerId === 'google.com' || p.providerId === 'apple.com');
         if (!isVerified) {
           return;
         }
         try {
           // 1. Check for cloud user profile first
           const profile = await getUserProfile(user.uid);
-          const isUserAdmin = user.email === 'sukrat.kaushik@gmail.com' || profile?.role === 'admin';
+          const isUserAdmin = isSuperAdminEmail(user.email) || profile?.role === 'admin';
           
           let planTier: 'free' | 'standard' | 'premium' = 'free';
           let isPremium = false;

@@ -30,6 +30,7 @@ import {
   loadMonetizationConfigFromCloud, 
   IosMonetizationConfig 
 } from '../../utils/monetizationConfig';
+import { isSuperAdminEmail } from '../../utils/adminConfig';
 
 interface FeedbackItem {
   id: string;
@@ -67,7 +68,7 @@ export const AdminPanel: React.FC = () => {
   const [durationMonths, setDurationMonths] = useState<number | null>(null); // null = lifetime
   const [sendEmailNotification, setSendEmailNotification] = useState<boolean>(true);
 
-  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
+  const isAdmin = state.isAdmin || isSuperAdminEmail(auth.currentUser?.email);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -193,7 +194,7 @@ export const AdminPanel: React.FC = () => {
   };
 
   const handleToggleAdminRole = async (targetUser: UserProfile) => {
-    const isOwner = targetUser.email === 'sukrat.kaushik@gmail.com' || targetUser.email === 'sukrat.kaushik@ourpregnancy.in';
+    const isOwner = isSuperAdminEmail(targetUser.email);
     if (isOwner) return;
 
     const newRole = targetUser.role === 'admin' ? 'user' : 'admin';
@@ -213,7 +214,7 @@ export const AdminPanel: React.FC = () => {
     }
   };
 
-  const isSelectedUserOwner = selectedUser?.email === 'sukrat.kaushik@gmail.com' || selectedUser?.email === 'sukrat.kaushik@ourpregnancy.in';
+  const isSelectedUserOwner = isSuperAdminEmail(selectedUser?.email);
 
   const getInitials = (name?: string | null, email?: string | null) => {
     if (name && name.trim()) {
@@ -250,12 +251,12 @@ export const AdminPanel: React.FC = () => {
   }
 
   // Metric counts (2-Tier model: Pro vs Free)
-  const proCount = users.filter(u => u.planTier === 'premium' || (u.planTier as string) === 'pro' || u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
+  const proCount = users.filter(u => u.planTier === 'premium' || (u.planTier as string) === 'pro' || u.role === 'admin' || isSuperAdminEmail(u.email)).length;
   const freeCount = users.length - proCount;
-  const adminCount = users.filter(u => u.role === 'admin' || u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in').length;
+  const adminCount = users.filter(u => u.role === 'admin' || isSuperAdminEmail(u.email)).length;
 
   const filteredUsers = users.filter(u => {
-    const isOwner = u.email === 'sukrat.kaushik@gmail.com' || u.email === 'sukrat.kaushik@ourpregnancy.in';
+    const isOwner = isSuperAdminEmail(u.email);
     const effectivePlan: 'pro' | 'free' = isOwner ? 'pro' : ((u.planTier === 'premium' || (u.planTier as string) === 'pro') ? 'pro' : 'free');
 
     // Filter by tier chips
@@ -414,7 +415,7 @@ export const AdminPanel: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-border">
                     {filteredUsers.map((user) => {
-                      const isOwnerUser = user.email === 'sukrat.kaushik@gmail.com' || user.email === 'sukrat.kaushik@ourpregnancy.in';
+                      const isOwnerUser = isSuperAdminEmail(user.email);
                       const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
                       const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
                       const initials = getInitials(user.displayName, user.email);
@@ -522,7 +523,7 @@ export const AdminPanel: React.FC = () => {
 
                           {/* Actions Column: Delete User */}
                           <td className="py-3 px-4 text-center">
-                            {isOwnerUser || user.email === 'sukrat.kaushik@gmail.com' ? (
+                            {isOwnerUser || isSuperAdminEmail(user.email) ? (
                               <span className="text-[11px] text-light italic">—</span>
                             ) : (
                               <button

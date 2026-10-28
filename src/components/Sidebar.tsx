@@ -9,6 +9,7 @@ import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
 import { getPlatform } from '../utils/nativeBridge';
 import { AppleIcon } from './common/AppleIcon';
+import { isSuperAdminEmail } from '../utils/adminConfig';
 
 type SidebarProps = {
   activePage: string;
@@ -136,7 +137,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
     { id: 'postpartum', icon: '🍃', label: 'Early Parenthood', tier: 'free' },
     { id: 'profile', icon: '⚙️', label: 'Settings & Profile', tier: 'free', hideFavorite: true },
     { id: 'feedback', icon: '💬', label: 'Feedback & Support', tier: 'free', hideFavorite: true },
-    ...(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in' ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', tier: 'pro' as const, hideFavorite: true }] : []),
+    ...(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email) ? [{ id: 'admin-panel', icon: '👑', label: 'Admin Suite', tier: 'pro' as const, hideFavorite: true }] : []),
   ];
 
   const NavItem = ({

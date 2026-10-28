@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { usePlanner } from '../store';
+import { isSuperAdminEmail } from '../utils/adminConfig';
 import { navigate } from '../utils/navigation';
 import { auth, signInWithGoogle, signInWithApple, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
 import {
@@ -77,8 +78,7 @@ export const LandingPage: React.FC = () => {
   const isVerified = Boolean(
     user && (
       user.emailVerified ||
-      user.email === 'sukrat.kaushik@gmail.com' ||
-      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
+      isSuperAdminEmail(user.email) ||
       user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );

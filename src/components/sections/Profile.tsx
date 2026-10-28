@@ -14,6 +14,7 @@ import {
 import { navigate } from '../../utils/navigation';
 import { triggerHaptic, getPlatform } from '../../utils/nativeBridge';
 import { AppleIcon } from '../common/AppleIcon';
+import { isSuperAdminEmail } from '../../utils/adminConfig';
 import { saveJourney } from '../../cloudSync';
 import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../utils/translation';
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
@@ -471,7 +472,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
               <div className="p-3.5 sm:p-4 bg-cream/40 border border-border/80 rounded-2xl space-y-2.5">
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="flex items-center gap-2">
-                    {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' ? (
+                    {state.isAdmin || isSuperAdminEmail(auth.currentUser?.email) ? (
                       <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-purple-300">
                         👑 Admin / App Owner (Lifetime Access)
                       </span>
@@ -490,7 +491,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     )}
                   </div>
 
-                  {!(state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || getPlatform() === 'ios') && (
+                  {!(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email) || getPlatform() === 'ios') && (
                     <button
                       type="button"
                       onClick={() => { navigate('/checkout?plan=premium'); }}
@@ -502,14 +503,14 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 </div>
 
                 <p className="text-[11.5px] sm:text-[12.5px] text-medium leading-relaxed">
-                  {state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com'
+                  {state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)
                     ? 'You have perpetual lifetime access to all 24/7 AI clinical tools, clinical checklists, food safety scanner, and admin controls.'
                     : getPlatform() === 'ios' || state.planTier === 'premium' || state.isPremium
                     ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
                     : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>
 
-                {state.planExpiry && !state.isAdmin && auth.currentUser?.email !== 'sukrat.kaushik@gmail.com' && (
+                {state.planExpiry && !state.isAdmin && !isSuperAdminEmail(auth.currentUser?.email) && (
                   <div className="text-[11px] text-light pt-1 border-t border-border/50">
                     Expires on: <strong>{new Date(state.planExpiry).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit', year: '2-digit' })}</strong>
                   </div>

@@ -5,6 +5,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { PlannerProvider, usePlanner } from './store';
+import { isSuperAdminEmail } from './utils/adminConfig';
 import { SplashScreen } from './components/SplashScreen';
 import { EmailVerificationGate } from './components/EmailVerificationGate';
 
@@ -144,8 +145,7 @@ const AppContent: React.FC = () => {
   const isVerifiedUser = Boolean(
     user && (
       user.emailVerified ||
-      user.email === 'sukrat.kaushik@gmail.com' ||
-      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
+      isSuperAdminEmail(user.email) ||
       user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );

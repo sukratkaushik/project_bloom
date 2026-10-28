@@ -2,6 +2,7 @@ import React from 'react';
 import { usePlanner } from '../store';
 import { auth } from '../firebase';
 import { navigate } from '../utils/navigation';
+import { isSuperAdminEmail } from '../utils/adminConfig';
 
 interface FooterProps {
   onToast?: (msg: string) => void;
@@ -32,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ onToast, className = '' }) => {
     }
   };
 
-  const isAdmin = state.isAdmin || auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
+  const isAdmin = state.isAdmin || isSuperAdminEmail(auth.currentUser?.email);
 
   return (
     <footer className={`bg-white border md:border-border/90 z-40 shadow-xs no-print md:rounded-[16px] md:mb-5 w-full shrink-0 ${className}`}>

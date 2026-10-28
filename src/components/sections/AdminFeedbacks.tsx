@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db, auth } from '../../firebase';
 import { collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { isSuperAdminEmail } from '../../utils/adminConfig';
 
 interface FeedbackItem {
   id: string;
@@ -14,7 +15,7 @@ export const AdminFeedbacks: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<FeedbackItem[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const isMasterAdmin = auth.currentUser?.email === 'sukrat.kaushik@gmail.com' || auth.currentUser?.email === 'sukrat.kaushik@ourpregnancy.in';
+  const isMasterAdmin = isSuperAdminEmail(auth.currentUser?.email);
 
   useEffect(() => {
     const fetchFeedbacks = async () => {

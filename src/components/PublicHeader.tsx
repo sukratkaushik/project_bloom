@@ -4,6 +4,7 @@ import { navigate } from '../utils/navigation';
 import { auth } from '../firebase';
 import { Loader2 } from 'lucide-react';
 import { isNativeApp } from '../utils/nativeBridge';
+import { isSuperAdminEmail } from '../utils/adminConfig';
 
 interface PublicHeaderProps {
   onLoginClick?: () => void;
@@ -36,8 +37,7 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
   const isVerified = Boolean(
     user && (
       user.emailVerified ||
-      user.email === 'sukrat.kaushik@gmail.com' ||
-      user.email === 'sukrat.kaushik@ourpregnancy.in' ||
+      isSuperAdminEmail(user.email) ||
       user.providerData.some((p) => p.providerId === 'google.com' || p.providerId === 'apple.com')
     )
   );
