@@ -136,7 +136,7 @@ export const AdminPanel: React.FC = () => {
     setIsSavingMonetization(true);
     try {
       await syncMonetizationConfigToCloud(monetizationConfig);
-      showToast('iOS Pricing & Monetization settings updated and live!');
+      showToast('Mobile Monetization (iOS & Android) settings updated and live!');
     } catch (err: any) {
       showToast(`Saved locally: ${err?.message || 'Updated'}`);
     } finally {
@@ -320,7 +320,7 @@ export const AdminPanel: React.FC = () => {
             }`}
           >
             <Crown className="w-3.5 h-3.5 text-amber-500" />
-            <span>iOS Pricing & Monetization</span>
+            <span>Mobile Monetization (iOS & Android)</span>
           </button>
         </div>
       </div>
@@ -599,19 +599,20 @@ export const AdminPanel: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: IOS PRICING & MONETIZATION */}
+      {/* TAB 3: MOBILE MONETIZATION (IOS & ANDROID) */}
       {activeTab === 'monetization' && (
         <div className="space-y-6">
-          {/* Card 1: iOS In-App Paywall Status */}
-          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-4">
+          {/* Card 1: Mobile In-App Paywall Master Toggles (iOS & Android) */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-5">
+            {/* iOS Toggle */}
+            <div className="flex items-center justify-between flex-wrap gap-4 pb-5 border-b border-border/70">
               <div>
                 <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
                   <Crown className="w-5 h-5 text-amber-500" />
-                  <span>iOS In-App Subscription Paywall</span>
+                  <span>iOS App Store Subscription Paywall</span>
                 </h3>
                 <p className="text-[13px] text-medium mt-1">
-                  Enforces Apple In-App Purchase ($2.99/mo) for Pro features (AI Food Scanner, Report OCR, Ask AI, Partner Sync).
+                  Enforces Apple StoreKit 2 In-App Purchase (${monetizationConfig.introPriceUsd.toFixed(2)}/mo) for Pro features (AI Food Scanner, Report OCR, Ask AI, Partner Sync).
                 </p>
               </div>
 
@@ -621,7 +622,7 @@ export const AdminPanel: React.FC = () => {
                     ? 'bg-amber-100 text-amber-800 border border-amber-300' 
                     : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
                 }`}>
-                  {monetizationConfig.isIosPaywallActive ? 'Active Paywall ($2.99/mo)' : 'Free Launch Mode'}
+                  {monetizationConfig.isIosPaywallActive ? `Active Paywall ($${monetizationConfig.introPriceUsd.toFixed(2)}/mo)` : 'Free Launch Mode'}
                 </span>
 
                 <button
@@ -640,10 +641,47 @@ export const AdminPanel: React.FC = () => {
               </div>
             </div>
 
+            {/* Android Toggle */}
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
+                  <Crown className="w-5 h-5 text-emerald-600" />
+                  <span>Android Google Play Subscription Paywall</span>
+                </h3>
+                <p className="text-[13px] text-medium mt-1">
+                  Enforces Google Play Billing Subscription (${monetizationConfig.introPriceUsd.toFixed(2)}/mo) via RevenueCat for Android users (`in.ourpregnancy.bloom`).
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
+                  monetizationConfig.isAndroidPaywallActive 
+                    ? 'bg-amber-100 text-amber-800 border border-amber-300' 
+                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                }`}>
+                  {monetizationConfig.isAndroidPaywallActive ? `Active Paywall ($${monetizationConfig.introPriceUsd.toFixed(2)}/mo)` : 'Free Launch Mode'}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={() => setMonetizationConfig(prev => ({ ...prev, isAndroidPaywallActive: !prev.isAndroidPaywallActive }))}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                    monetizationConfig.isAndroidPaywallActive ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      monetizationConfig.isAndroidPaywallActive ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
             <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 text-[12.5px] text-amber-950 flex items-start gap-2.5">
               <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
               <div>
-                <strong>Apple App Store Compliance:</strong> When enabled, iOS users will see the official Apple Paywall with In-App Purchase and &quot;Restore Purchases&quot; button. If disabled, all iOS users enjoy free access.
+                <strong>App Store &amp; Google Play Compliance:</strong> When enabled, iOS and Android users see their native store paywall (Apple StoreKit 2 or Google Play Billing) with automatic &quot;Restore Purchases&quot; and store subscription management links. If disabled for a platform, users on that platform enjoy free access.
               </div>
             </div>
           </div>
@@ -668,7 +706,7 @@ export const AdminPanel: React.FC = () => {
                   onChange={(e) => setMonetizationConfig(prev => ({ ...prev, introPriceUsd: parseFloat(e.target.value) || 2.99 }))}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
                 />
-                <span className="text-[11px] text-light mt-1 block">Default: $2.99</span>
+                <span className="text-[11px] text-light mt-1 block">Default: $2.99 (First 3 mos)</span>
               </div>
 
               <div>
@@ -763,17 +801,22 @@ export const AdminPanel: React.FC = () => {
 
           {/* Unit Economics Calculator */}
           <div className="bg-gradient-to-br from-emerald-50 via-cream to-white border border-emerald-200/80 rounded-2xl p-5 shadow-2xs space-y-2">
-            <h4 className="font-semibold text-emerald-900 text-[14px] flex items-center gap-2">
-              <CheckCircle className="w-4 h-4 text-emerald-600" />
-              <span>Unit Economics & Profit Margin</span>
-            </h4>
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+              <h4 className="font-semibold text-emerald-900 text-[14px] flex items-center gap-2">
+                <CheckCircle className="w-4 h-4 text-emerald-600" />
+                <span>Unit Economics & Profit Margin (iOS & Android)</span>
+              </h4>
+              <span className="text-[11px] text-emerald-800 font-medium">
+                15% service fee for first $1M/yr (Google Play 15% Tier & Apple Small Business)
+              </span>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center pt-1">
               <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
                 <span className="text-[11px] text-light uppercase font-bold block">User Price</span>
                 <span className="text-[17px] font-bold text-charcoal font-sans">${monetizationConfig.introPriceUsd.toFixed(2)}/mo</span>
               </div>
               <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
-                <span className="text-[11px] text-light uppercase font-bold block">Apple Share (15%)</span>
+                <span className="text-[11px] text-light uppercase font-bold block">Store Fee (15% Tier)</span>
                 <span className="text-[17px] font-bold text-rose-700 font-sans">-${(monetizationConfig.introPriceUsd * 0.15).toFixed(2)}</span>
               </div>
               <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
@@ -781,7 +824,7 @@ export const AdminPanel: React.FC = () => {
                 <span className="text-[17px] font-bold text-amber-700 font-sans">~$0.04</span>
               </div>
               <div className="p-2.5 bg-white rounded-xl border border-emerald-200">
-                <span className="text-[11px] text-emerald-800 uppercase font-bold block">Your Profit</span>
+                <span className="text-[11px] text-emerald-800 uppercase font-bold block">Your Net Profit</span>
                 <span className="text-[17px] font-bold text-emerald-700 font-sans">+${(monetizationConfig.introPriceUsd * 0.85 - 0.04).toFixed(2)}/mo</span>
               </div>
             </div>

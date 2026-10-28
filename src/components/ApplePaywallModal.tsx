@@ -12,9 +12,10 @@ import {
   RotateCcw,
   ExternalLink
 } from 'lucide-react';
-import { purchaseProSubscription, restoreApplePurchases } from '../utils/revenueCatService';
+import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
 import { usePlanner } from '../store';
-import { triggerHaptic } from '../utils/nativeBridge';
+import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
+import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
 
 interface ApplePaywallModalProps {
   isOpen: boolean;
@@ -30,6 +31,10 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
   const [successNotice, setSuccessNotice] = useState<string | null>(null);
 
   if (!isOpen) return null;
+
+  const platform = getPlatform();
+  const isAndroid = platform === 'android';
+  const mobileConfig = getLocalMonetizationConfig();
 
   const handlePurchase = async () => {
     setIsPurchasing(true);
@@ -63,7 +68,7 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
     triggerHaptic('light');
 
     try {
-      const res = await restoreApplePurchases();
+      const res = await restorePurchases();
       if (res.isActive) {
         updateState({ isPremium: true, planTier: 'premium' });
         setSuccessNotice('Your Pro subscription was successfully restored!');
@@ -72,7 +77,11 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
           onClose();
         }, 1500);
       } else {
-        setErrorNotice('No active Pro subscription found for this Apple ID.');
+        setErrorNotice(
+          isAndroid
+            ? 'No active Pro subscription found for this Google Play account.'
+            : 'No active Pro subscription found for this Apple ID.'
+        );
       }
     } catch (err: any) {
       setErrorNotice(err?.message || 'Could not restore purchases.');
@@ -97,7 +106,7 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-[11px] font-bold tracking-wide uppercase mb-3 border border-amber-400/30">
             <Crown className="w-3.5 h-3.5 text-amber-300" />
-            <span>Launch Special • 70% Off</span>
+            <span>Launch Special • {mobileConfig.discountPercentage}% Off</span>
           </div>
 
           <h2 className="text-2xl font-serif font-bold text-white mb-1.5">
@@ -129,15 +138,17 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
                 Monthly Pro Pass
               </span>
               <div className="flex items-baseline gap-2 mt-1">
-                <span className="text-2xl font-bold text-charcoal font-sans">$2.99</span>
-                <span className="text-[13px] text-light line-through font-medium">$9.99</span>
+                <span className="text-2xl font-bold text-charcoal font-sans">${mobileConfig.introPriceUsd.toFixed(2)}</span>
+                <span className="text-[13px] text-light line-through font-medium">${mobileConfig.regularPriceUsd.toFixed(2)}</span>
                 <span className="text-[12px] text-medium font-medium">/ month</span>
               </div>
-              <p className="text-[11px] text-medium mt-0.5">Renews monthly • Cancel anytime</p>
+              <p className="text-[11px] text-medium mt-0.5">
+                {isAndroid ? 'Renews monthly • Cancel anytime in Google Play Subscriptions' : 'Renews monthly • Cancel anytime'}
+              </p>
             </div>
             <div className="text-right">
               <span className="inline-block bg-neutral-900 text-amber-300 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
-                Save 70%
+                Save {mobileConfig.discountPercentage}%
               </span>
             </div>
           </div>
@@ -195,12 +206,12 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
               {isPurchasing ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  <span>Connecting with Apple...</span>
+                  <span>{isAndroid ? 'Connecting with Google Play...' : 'Connecting with Apple...'}</span>
                 </>
               ) : (
                 <>
                   <Crown className="w-4 h-4 text-amber-300" />
-                  <span>Subscribe for $2.99 / month</span>
+                  <span>Subscribe for ${mobileConfig.introPriceUsd.toFixed(2)} / month</span>
                 </>
               )}
             </button>
@@ -215,12 +226,32 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
             </button>
           </div>
 
-          {/* Apple Compliance Disclosures (Guideline 3.1.2) */}
+          {/* Platform Store Compliance Disclosures */}
           <div className="border-t border-border pt-4 text-[11px] text-light space-y-2 text-center leading-relaxed">
-            <p>
-              Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews for $2.99/month unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage or cancel your subscription at any time in your Apple ID account settings.
-            </p>
-            <div className="flex items-center justify-center gap-4 text-medium pt-1">
+            {isAndroid ? (
+              <p>
+                Payment will be charged to your Google Play account at confirmation of purchase. Subscription automatically renews for ${mobileConfig.introPriceUsd.toFixed(2)}/month for the first 3 months (then ${mobileConfig.regularPriceUsd.toFixed(2)}/month) unless canceled before the end of the current billing period. Cancel anytime in Google Play Subscriptions.
+              </p>
+            ) : (
+              <p>
+                Payment will be charged to your Apple ID account at confirmation of purchase. Subscription automatically renews for ${mobileConfig.introPriceUsd.toFixed(2)}/month unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal within 24 hours prior to the end of the current period. You can manage or cancel your subscription at any time in your Apple ID account settings.
+              </p>
+            )}
+            <div className="flex flex-wrap items-center justify-center gap-3 text-medium pt-1">
+              {isAndroid && (
+                <>
+                  <a
+                    href="https://play.google.com/store/account/subscriptions"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-charcoal inline-flex items-center gap-1"
+                  >
+                    <span>Google Play Subscriptions</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <span>•</span>
+                </>
+              )}
               <a 
                 href="https://ourpregnancy.in/terms" 
                 target="_blank" 

@@ -4,8 +4,15 @@ import { Purchases, CustomerInfo, PurchasesOfferings } from '@revenuecat/purchas
 // Public Apple RevenueCat API Key (can be configured via .env VITE_REVENUECAT_APPLE_KEY)
 export const REVENUECAT_APPLE_API_KEY = (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) || 'appl_OurPregnancyProdKey';
 
+// Public Google Play RevenueCat API Key (can be configured via .env VITE_REVENUECAT_GOOGLE_KEY)
+export const REVENUECAT_GOOGLE_API_KEY = (import.meta.env.VITE_REVENUECAT_GOOGLE_KEY as string) || 'goog_OurPregnancyProdKey';
+
 // Entitlement identifier configured in RevenueCat dashboard
 export const PRO_ENTITLEMENT_ID = 'pro';
+
+// Default product / base plan identifiers for Google Play & App Store
+export const PRO_MONTHLY_PRODUCT_ID = 'opin_pro_monthly';
+export const PRO_MONTHLY_BASE_PLAN_ID = 'monthly-auto-renew';
 
 export interface SubscriptionDetails {
   isActive: boolean;
@@ -16,39 +23,48 @@ export interface SubscriptionDetails {
 
 let isInitialized = false;
 
+function isSupportedNativeMobilePlatform(): boolean {
+  if (!Capacitor.isNativePlatform()) return false;
+  const platform = Capacitor.getPlatform();
+  return platform === 'ios' || platform === 'android';
+}
+
 /**
- * Initializes RevenueCat Purchases SDK on iOS devices.
- * Safe to call multiple times or on Web/Android (gracefully no-ops on non-iOS).
+ * Initializes RevenueCat Purchases SDK on iOS (StoreKit 2) and Android (Google Play Billing).
+ * Safe to call multiple times or on Web (gracefully no-ops on Web).
  */
 export async function initRevenueCat(appUserId?: string): Promise<boolean> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
+  if (!isSupportedNativeMobilePlatform()) {
     return false;
   }
+
+  const platform = Capacitor.getPlatform();
+  const apiKey = platform === 'android' ? REVENUECAT_GOOGLE_API_KEY : REVENUECAT_APPLE_API_KEY;
 
   try {
     if (!isInitialized) {
       await Purchases.setLogLevel({ level: 'DEBUG' });
       await Purchases.configure({
-        apiKey: REVENUECAT_APPLE_API_KEY,
+        apiKey,
         appUserID: appUserId || null
       });
       isInitialized = true;
-      console.log('RevenueCat initialized successfully for iOS.');
+      console.log(`RevenueCat initialized successfully for ${platform}.`);
     } else if (appUserId) {
       await Purchases.logIn({ appUserID: appUserId });
     }
     return true;
   } catch (error) {
-    console.warn('RevenueCat initialization notice:', error);
+    console.warn(`RevenueCat initialization notice (${platform}):`, error);
     return false;
   }
 }
 
 /**
- * Retrieves the current user's Pro subscription status from RevenueCat.
+ * Retrieves the current user's Pro subscription status from RevenueCat (iOS & Android).
  */
 export async function checkRevenueCatSubscription(): Promise<SubscriptionDetails> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
+  if (!isSupportedNativeMobilePlatform()) {
     return { isActive: false, expirationDate: null, productIdentifier: null, willRenew: false };
   }
 
@@ -62,10 +78,10 @@ export async function checkRevenueCatSubscription(): Promise<SubscriptionDetails
 }
 
 /**
- * Fetches available offerings configured in RevenueCat & App Store Connect.
+ * Fetches available offerings configured in RevenueCat (App Store Connect & Google Play Console).
  */
 export async function getSubscriptionOfferings(): Promise<PurchasesOfferings | null> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
+  if (!isSupportedNativeMobilePlatform()) {
     return null;
   }
 
@@ -79,12 +95,17 @@ export async function getSubscriptionOfferings(): Promise<PurchasesOfferings | n
 }
 
 /**
- * Triggers native Apple In-App Purchase / Face ID sheet for Pro subscription.
+ * Triggers native In-App Purchase sheet:
+ * - iOS: Apple StoreKit 2 / Face ID sheet
+ * - Android: Google Play Billing sheet (supports basePlanId & introductory offers)
  */
 export async function purchaseProSubscription(packageToPurchase?: any): Promise<{ success: boolean; customerInfo?: CustomerInfo; error?: string }> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
-    return { success: false, error: 'In-app purchases are only available on iOS.' };
+  if (!isSupportedNativeMobilePlatform()) {
+    return { success: false, error: 'In-app subscriptions are only available on the iOS and Android mobile apps.' };
   }
+
+  const platform = Capacitor.getPlatform();
+  const storeName = platform === 'android' ? 'Google Play Console' : 'App Store Connect';
 
   try {
     let result;
@@ -92,11 +113,23 @@ export async function purchaseProSubscription(packageToPurchase?: any): Promise<
       result = await Purchases.purchasePackage({ aPackage: packageToPurchase });
     } else {
       const offerings = await Purchases.getOfferings();
-      const currentPackage = offerings.current?.monthly || offerings.current?.availablePackages?.[0];
-      if (!currentPackage) {
-        throw new Error('No active subscription package found in App Store Connect. Please ensure offerings are configured.');
+      const availablePackages = offerings.current?.availablePackages || [];
+
+      // Match monthly package or explicit opin_pro_monthly / basePlanId package
+      const matchedPackage =
+        offerings.current?.monthly ||
+        availablePackages.find((pkg: any) =>
+          pkg?.product?.identifier?.includes(PRO_MONTHLY_PRODUCT_ID) ||
+          pkg?.product?.defaultOption?.basePlanId === PRO_MONTHLY_BASE_PLAN_ID ||
+          pkg?.identifier === '$rc_monthly'
+        ) ||
+        availablePackages[0];
+
+      if (!matchedPackage) {
+        throw new Error(`No active subscription package found in ${storeName}. Please ensure offerings and base plans are configured.`);
       }
-      result = await Purchases.purchasePackage({ aPackage: currentPackage });
+
+      result = await Purchases.purchasePackage({ aPackage: matchedPackage });
     }
 
     const isPro = Boolean(result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID]);
@@ -105,29 +138,33 @@ export async function purchaseProSubscription(packageToPurchase?: any): Promise<
     if (error?.userCancelled) {
       return { success: false, error: 'User cancelled transaction.' };
     }
-    console.error('Apple purchase failed:', error);
+    console.error(`${platform === 'android' ? 'Google Play' : 'Apple'} purchase failed:`, error);
     return { success: false, error: error?.message || 'Transaction could not be completed.' };
   }
 }
 
 /**
- * Restores previous App Store purchases for the current Apple ID.
- * Mandatory for Apple App Store Review compliance (Guideline 3.1.2).
+ * Restores previous App Store or Google Play purchases for the current store account.
  */
-export async function restoreApplePurchases(): Promise<{ success: boolean; isActive: boolean; error?: string }> {
-  if (!Capacitor.isNativePlatform() || Capacitor.getPlatform() !== 'ios') {
-    return { success: false, isActive: false, error: 'Restore purchases is only available on iOS.' };
+export async function restorePurchases(): Promise<{ success: boolean; isActive: boolean; error?: string }> {
+  if (!isSupportedNativeMobilePlatform()) {
+    return { success: false, isActive: false, error: 'Restore purchases is only available on iOS and Android.' };
   }
+
+  const platform = Capacitor.getPlatform();
 
   try {
     const result = await Purchases.restorePurchases();
     const isPro = Boolean(result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID]);
     return { success: true, isActive: isPro };
   } catch (error: any) {
-    console.error('Apple restore purchases failed:', error);
+    console.error(`${platform === 'android' ? 'Google Play' : 'Apple'} restore purchases failed:`, error);
     return { success: false, isActive: false, error: error?.message || 'Could not restore purchases.' };
   }
 }
+
+// Backwards-compatible alias
+export const restoreApplePurchases = restorePurchases;
 
 function parseCustomerInfo(info: CustomerInfo): SubscriptionDetails {
   const entitlement = info.entitlements.active[PRO_ENTITLEMENT_ID];

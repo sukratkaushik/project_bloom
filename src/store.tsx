@@ -115,8 +115,10 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
     const loadState = async () => {
       try {
         const record = await db.appState.get('global');
-        const iosConfig = getLocalMonetizationConfig();
-        const shouldBypassIos = getPlatform() === 'ios' && !iosConfig.isIosPaywallActive;
+        const mobileConfig = getLocalMonetizationConfig();
+        const shouldBypassMobilePaywall =
+          (getPlatform() === 'ios' && !mobileConfig.isIosPaywallActive) ||
+          (getPlatform() === 'android' && !mobileConfig.isAndroidPaywallActive);
 
         if (record) {
           const parsed = JSON.parse(record.stateJSON);
@@ -125,7 +127,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             ...prev,
             ...parsed,
             activeJourneyId,
-            ...(shouldBypassIos ? { isPremium: true, planTier: 'premium' as const } : {}),
+            ...(shouldBypassMobilePaywall ? { isPremium: true, planTier: 'premium' as const } : {}),
             notes: { ...prev.notes, ...(parsed.notes || {}) },
             customNoteTopics: parsed.customNoteTopics || prev.customNoteTopics || [],
             isDarkModeActive: prev.isDarkModeActive
@@ -140,7 +142,7 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
               ...prev,
               ...parsed,
               activeJourneyId,
-              ...(shouldBypassIos ? { isPremium: true, planTier: 'premium' as const } : {}),
+              ...(shouldBypassMobilePaywall ? { isPremium: true, planTier: 'premium' as const } : {}),
               isDarkModeActive: prev.isDarkModeActive
             }));
           }
@@ -171,10 +173,13 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
           let planTier: 'free' | 'standard' | 'premium' = 'free';
           let isPremium = false;
 
-          const iosSettings = getLocalMonetizationConfig();
-          const shouldBypassIos = getPlatform() === 'ios' && !iosSettings.isIosPaywallActive;
+          const mobileSettings = getLocalMonetizationConfig();
+          const currentPlatform = getPlatform();
+          const shouldBypassMobilePaywall =
+            (currentPlatform === 'ios' && !mobileSettings.isIosPaywallActive) ||
+            (currentPlatform === 'android' && !mobileSettings.isAndroidPaywallActive);
 
-          if (shouldBypassIos || isUserAdmin) {
+          if (shouldBypassMobilePaywall || isUserAdmin) {
             planTier = 'premium';
             isPremium = true;
           } else if (profile?.planTier) {
@@ -185,8 +190,8 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             }
           }
 
-          // If on iOS and not yet verified as premium, check RevenueCat entitlements
-          if (getPlatform() === 'ios' && !isPremium) {
+          // If on iOS or Android and not yet verified as premium, check RevenueCat entitlements
+          if ((currentPlatform === 'ios' || currentPlatform === 'android') && !isPremium) {
             initRevenueCat(user.uid).then(async (ok) => {
               if (ok) {
                 const sub = await checkRevenueCatSubscription();

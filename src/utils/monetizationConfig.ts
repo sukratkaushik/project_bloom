@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 
 export interface IosMonetizationConfig {
   isIosPaywallActive: boolean;
+  isAndroidPaywallActive: boolean;
   introPriceUsd: number;
   regularPriceUsd: number;
   discountPercentage: number;
@@ -11,8 +12,11 @@ export interface IosMonetizationConfig {
   dailyReportLimit: number;
 }
 
+export type MobileMonetizationConfig = IosMonetizationConfig;
+
 export const DEFAULT_IOS_CONFIG: IosMonetizationConfig = {
-  isIosPaywallActive: true,      // Set to true to require Apple subscription
+  isIosPaywallActive: true,      // Set to true to require Apple App Store subscription
+  isAndroidPaywallActive: true,  // Set to true to require Google Play Billing subscription
   introPriceUsd: 2.99,          // Discounted intro price
   regularPriceUsd: 9.99,        // Regular price
   discountPercentage: 70,       // 70% off

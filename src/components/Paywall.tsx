@@ -19,8 +19,8 @@ import {
 import { navigate } from '../utils/navigation';
 import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
 import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
-import { purchaseProSubscription, restoreApplePurchases } from '../utils/revenueCatService';
-import { RotateCcw } from 'lucide-react';
+import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
+import { RotateCcw, ExternalLink } from 'lucide-react';
 
 interface PaywallProps {
   children: React.ReactNode;
@@ -167,7 +167,10 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const [isRestoringIos, setIsRestoringIos] = useState(false);
 
   const iosConfig = getLocalMonetizationConfig();
-  const isIos = getPlatform() === 'ios';
+  const currentPlatform = getPlatform();
+  const isIos = currentPlatform === 'ios';
+  const isAndroid = currentPlatform === 'android';
+  const isNativeMobile = isIos || isAndroid;
 
   const planTier = state.planTier || (state.isPremium ? 'premium' : 'free');
   const hasAccess = checkAccess(planTier, featureName, state.isAdmin);
@@ -176,8 +179,11 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     return <>{children}</>;
   }
 
-  // If on iOS and admin disabled the paywall, allow free access:
+  // If on iOS or Android and admin disabled the respective paywall, allow free access:
   if (isIos && !iosConfig.isIosPaywallActive) {
+    return <>{children}</>;
+  }
+  if (isAndroid && !iosConfig.isAndroidPaywallActive) {
     return <>{children}</>;
   }
 
@@ -208,13 +214,18 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     triggerHaptic('light');
 
     try {
-      const res = await restoreApplePurchases();
+      const res = await restorePurchases();
       if (res.isActive) {
         updateState({ isPremium: true, planTier: 'premium' });
         setIosNotice({ type: 'success', message: 'Your subscription was successfully restored!' });
         triggerHaptic('heavy');
       } else {
-        setIosNotice({ type: 'error', message: 'No active Pro subscription found for this Apple ID.' });
+        setIosNotice({
+          type: 'error',
+          message: isAndroid
+            ? 'No active Pro subscription found for this Google Play account.'
+            : 'No active Pro subscription found for this Apple ID.'
+        });
       }
     } catch (err: any) {
       setIosNotice({ type: 'error', message: err?.message || 'Could not restore purchases.' });
@@ -286,7 +297,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     });
   };
 
-  if (isIos) {
+  if (isNativeMobile) {
     return (
       <div className="animate-in fade-in duration-300 pb-10 space-y-5 max-w-xl mx-auto">
         <div className="bg-white border border-border/80 rounded-2xl shadow-2xs overflow-hidden">
@@ -298,7 +309,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
                 <span>Special Launch Offer • Save {iosConfig.discountPercentage}%</span>
               </span>
               <span className="text-[11px] font-medium text-white/70 bg-white/10 px-2.5 py-0.5 rounded-full">
-                Apple In-App Purchase
+                {isAndroid ? 'Google Play Billing' : 'Apple In-App Purchase'}
               </span>
             </div>
 
@@ -365,7 +376,9 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
                 <span className="text-[13px] text-light line-through font-medium">${iosConfig.regularPriceUsd.toFixed(2)}</span>
                 <span className="text-[12px] text-medium font-medium">/ month</span>
               </div>
-              <p className="text-[11px] text-medium mt-0.5">Renews monthly • Cancel anytime</p>
+              <p className="text-[11px] text-medium mt-0.5">
+                {isAndroid ? 'Renews monthly • Cancel anytime in Google Play Subscriptions' : 'Renews monthly • Cancel anytime'}
+              </p>
             </div>
             <span className="bg-neutral-900 text-amber-300 text-[11px] font-bold px-2.5 py-1 rounded-full shadow-sm">
               Save {iosConfig.discountPercentage}%
@@ -381,7 +394,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
             {isProcessing ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Connecting with Apple...</span>
+                <span>{isAndroid ? 'Connecting with Google Play...' : 'Connecting with Apple...'}</span>
               </>
             ) : (
               <>
@@ -402,10 +415,30 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
           </button>
 
           <div className="border-t border-border pt-3 text-[11px] text-light space-y-1.5 text-center leading-relaxed">
-            <p>
-              Subscription automatically renews for ${iosConfig.introPriceUsd.toFixed(2)}/month unless canceled at least 24 hours before the end of the current billing cycle in your Apple ID Account Settings.
-            </p>
-            <div className="flex items-center justify-center gap-3 text-medium pt-1">
+            {isAndroid ? (
+              <p>
+                Subscription automatically renews for ${iosConfig.introPriceUsd.toFixed(2)}/month for the first 3 months (then ${iosConfig.regularPriceUsd.toFixed(2)}/month) unless canceled before the end of the current billing cycle. Cancel anytime in Google Play Subscriptions.
+              </p>
+            ) : (
+              <p>
+                Subscription automatically renews for ${iosConfig.introPriceUsd.toFixed(2)}/month unless canceled at least 24 hours before the end of the current billing cycle in your Apple ID Account Settings.
+              </p>
+            )}
+            <div className="flex flex-wrap items-center justify-center gap-3 text-medium pt-1">
+              {isAndroid && (
+                <>
+                  <a
+                    href="https://play.google.com/store/account/subscriptions"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="underline hover:text-charcoal inline-flex items-center gap-1"
+                  >
+                    <span>Google Play Subscriptions</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                  <span>•</span>
+                </>
+              )}
               <a href="https://ourpregnancy.in/terms" target="_blank" rel="noreferrer" className="underline hover:text-charcoal">
                 Terms of Use (EULA)
               </a>
