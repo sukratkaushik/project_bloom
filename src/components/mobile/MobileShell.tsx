@@ -474,10 +474,10 @@ export const MobileShell: React.FC = () => {
 
           {/* Full-width Scrollable Content Container */}
           <div 
-            className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-4 pb-28 max-w-3xl mx-auto w-full custom-scrollbar"
+            className="flex-1 overflow-y-auto overscroll-contain px-3 xs:px-4 sm:px-6 py-3.5 pb-28 max-w-3xl mx-auto w-full custom-scrollbar"
             style={{ WebkitOverflowScrolling: 'touch' }}
           >
-            <AdminPanel />
+            <AdminPanel isMobileModal={true} />
           </div>
         </div>
       )}

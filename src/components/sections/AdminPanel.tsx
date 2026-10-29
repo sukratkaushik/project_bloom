@@ -10,22 +10,17 @@ import {
   CheckCircle, 
   ShieldAlert, 
   Sparkles, 
-  Calendar, 
   Mail, 
   Check, 
-  Clock, 
-  Lock,
   RefreshCw,
-  Edit3,
   ChevronDown,
-  UserCheck,
   Shield,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Smartphone
 } from 'lucide-react';
 import { 
   getLocalMonetizationConfig, 
-  saveLocalMonetizationConfig, 
   syncMonetizationConfigToCloud, 
   loadMonetizationConfigFromCloud, 
   IosMonetizationConfig 
@@ -40,7 +35,11 @@ interface FeedbackItem {
   createdAt: number;
 }
 
-export const AdminPanel: React.FC = () => {
+interface AdminPanelProps {
+  isMobileModal?: boolean;
+}
+
+export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false }) => {
   const { state } = usePlanner();
   const [activeTab, setActiveTab] = useState<'users' | 'feedbacks' | 'monetization'>('users');
   
@@ -61,6 +60,13 @@ export const AdminPanel: React.FC = () => {
   // Monetization state
   const [monetizationConfig, setMonetizationConfig] = useState<IosMonetizationConfig>(() => getLocalMonetizationConfig());
   const [isSavingMonetization, setIsSavingMonetization] = useState(false);
+
+  // String input buffers for smooth editing without aggressive number parsing
+  const [introPriceInput, setIntroPriceInput] = useState<string>(() => String(monetizationConfig.introPriceUsd));
+  const [regularPriceInput, setRegularPriceInput] = useState<string>(() => String(monetizationConfig.regularPriceUsd));
+  const [foodScansInput, setFoodScansInput] = useState<string>(() => String(monetizationConfig.dailyFoodScanLimit));
+  const [aiChatInput, setAiChatInput] = useState<string>(() => String(monetizationConfig.dailyAiChatLimit));
+  const [reportsInput, setReportsInput] = useState<string>(() => String(monetizationConfig.dailyReportLimit));
 
   // Selected user for modal / plan assign
   const [selectedUser, setSelectedUser] = useState<UserProfile | null>(null);
@@ -94,7 +100,7 @@ export const AdminPanel: React.FC = () => {
     try {
       await deleteUserByAdminCallable(userToDelete.uid);
       setUsers((prev) => prev.filter((u) => u.uid !== userToDelete.uid));
-      showToast(`User ${userToDelete.displayName || userToDelete.email} and all data permanently deleted.`);
+      showToast(`User ${userToDelete.displayName || userToDelete.email} permanently deleted.`);
       setUserToDelete(null);
     } catch (err: any) {
       console.error("Failed to delete user:", err);
@@ -127,15 +133,114 @@ export const AdminPanel: React.FC = () => {
       fetchUsers();
       fetchFeedbacks();
       loadMonetizationConfigFromCloud().then(cfg => {
-        if (cfg) setMonetizationConfig(cfg);
+        if (cfg) {
+          setMonetizationConfig(cfg);
+          setIntroPriceInput(String(cfg.introPriceUsd));
+          setRegularPriceInput(String(cfg.regularPriceUsd));
+          setFoodScansInput(String(cfg.dailyFoodScanLimit));
+          setAiChatInput(String(cfg.dailyAiChatLimit));
+          setReportsInput(String(cfg.dailyReportLimit));
+        }
       }).catch(e => console.warn('Could not load monetization config:', e));
     }
   }, [isAdmin]);
 
+  const handleIntroPriceChange = (val: string) => {
+    setIntroPriceInput(val);
+    const intro = parseFloat(val);
+    const reg = parseFloat(regularPriceInput);
+    if (!isNaN(intro) && intro > 0) {
+      const regular = (!isNaN(reg) && reg > 0) ? reg : monetizationConfig.regularPriceUsd;
+      const discount = regular > intro ? Math.round(((regular - intro) / regular) * 100) : 0;
+      setMonetizationConfig(prev => ({
+        ...prev,
+        introPriceUsd: intro,
+        discountPercentage: discount
+      }));
+    }
+  };
+
+  const handleRegularPriceChange = (val: string) => {
+    setRegularPriceInput(val);
+    const reg = parseFloat(val);
+    const intro = parseFloat(introPriceInput);
+    if (!isNaN(reg) && reg > 0) {
+      const promotional = (!isNaN(intro) && intro > 0) ? intro : monetizationConfig.introPriceUsd;
+      const discount = reg > promotional ? Math.round(((reg - promotional) / reg) * 100) : 0;
+      setMonetizationConfig(prev => ({
+        ...prev,
+        regularPriceUsd: reg,
+        discountPercentage: discount
+      }));
+    }
+  };
+
+  const handleIntroPriceBlur = () => {
+    const num = parseFloat(introPriceInput);
+    if (isNaN(num) || num <= 0) {
+      setIntroPriceInput("2.99");
+      handleIntroPriceChange("2.99");
+    } else {
+      setIntroPriceInput(String(num));
+    }
+  };
+
+  const handleRegularPriceBlur = () => {
+    const num = parseFloat(regularPriceInput);
+    if (isNaN(num) || num <= 0) {
+      setRegularPriceInput("9.99");
+      handleRegularPriceChange("9.99");
+    } else {
+      setRegularPriceInput(String(num));
+    }
+  };
+
+  const handleFoodScansChange = (val: string) => {
+    setFoodScansInput(val);
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      setMonetizationConfig(prev => ({ ...prev, dailyFoodScanLimit: num }));
+    }
+  };
+
+  const handleAiChatChange = (val: string) => {
+    setAiChatInput(val);
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      setMonetizationConfig(prev => ({ ...prev, dailyAiChatLimit: num }));
+    }
+  };
+
+  const handleReportsChange = (val: string) => {
+    setReportsInput(val);
+    const num = parseInt(val, 10);
+    if (!isNaN(num) && num > 0) {
+      setMonetizationConfig(prev => ({ ...prev, dailyReportLimit: num }));
+    }
+  };
+
   const handleSaveMonetization = async () => {
     setIsSavingMonetization(true);
     try {
-      await syncMonetizationConfigToCloud(monetizationConfig);
+      const finalIntro = parseFloat(introPriceInput) || monetizationConfig.introPriceUsd;
+      const finalRegular = parseFloat(regularPriceInput) || monetizationConfig.regularPriceUsd;
+      const finalDiscount = finalRegular > finalIntro ? Math.round(((finalRegular - finalIntro) / finalRegular) * 100) : monetizationConfig.discountPercentage;
+      const finalFood = parseInt(foodScansInput, 10) || monetizationConfig.dailyFoodScanLimit;
+      const finalChat = parseInt(aiChatInput, 10) || monetizationConfig.dailyAiChatLimit;
+      const finalReport = parseInt(reportsInput, 10) || monetizationConfig.dailyReportLimit;
+
+      const toSave: IosMonetizationConfig = {
+        ...monetizationConfig,
+        introPriceUsd: finalIntro,
+        regularPriceUsd: finalRegular,
+        discountPercentage: finalDiscount,
+        dailyFoodScanLimit: finalFood,
+        dailyAiChatLimit: finalChat,
+        dailyReportLimit: finalReport,
+      };
+
+      setMonetizationConfig(toSave);
+      await syncMonetizationConfigToCloud(toSave);
       showToast('Mobile Monetization (iOS & Android) settings updated and live!');
     } catch (err: any) {
       showToast(`Saved locally: ${err?.message || 'Updated'}`);
@@ -160,7 +265,7 @@ export const AdminPanel: React.FC = () => {
             durationMonths
           );
           if (emailRes.success) {
-            emailSuccessText = " & email notification sent";
+            emailSuccessText = " & email sent";
           } else {
             emailSuccessText = ` (email failed: ${emailRes.error || 'delivery error'})`;
           }
@@ -170,10 +275,9 @@ export const AdminPanel: React.FC = () => {
         }
       }
 
-      const planLabel = planOption === 'premium' ? 'PRO PLAN' : 'FREE PLAN';
-      showToast(`Updated plan for ${selectedUser.displayName || selectedUser.email || selectedUser.uid} to ${planLabel}${emailSuccessText}!`);
+      const planLabel = planOption === 'premium' ? 'PRO' : 'FREE';
+      showToast(`Updated ${selectedUser.displayName || selectedUser.email || selectedUser.uid} to ${planLabel}${emailSuccessText}!`);
       
-      // Update local state
       setUsers(prev => prev.map(u => {
         if (u.uid === selectedUser.uid) {
           return {
@@ -187,7 +291,7 @@ export const AdminPanel: React.FC = () => {
       setSelectedUser(null);
     } catch (err) {
       console.error("Failed to update plan:", err);
-      showToast("Error updating user plan. Check console.");
+      showToast("Error updating user plan.");
     } finally {
       setUpdatingUid(null);
     }
@@ -198,7 +302,7 @@ export const AdminPanel: React.FC = () => {
     if (isOwner) return;
 
     const newRole = targetUser.role === 'admin' ? 'user' : 'admin';
-    if (!window.confirm(`Are you sure you want to change ${targetUser.email || targetUser.displayName}'s role to ${newRole.toUpperCase()}?`)) {
+    if (!window.confirm(`Change ${targetUser.email || targetUser.displayName}'s role to ${newRole.toUpperCase()}?`)) {
       return;
     }
     setUpdatingUid(targetUser.uid);
@@ -213,8 +317,6 @@ export const AdminPanel: React.FC = () => {
       setUpdatingUid(null);
     }
   };
-
-  const isSelectedUserOwner = isSuperAdminEmail(selectedUser?.email);
 
   const getInitials = (name?: string | null, email?: string | null) => {
     if (name && name.trim()) {
@@ -240,11 +342,11 @@ export const AdminPanel: React.FC = () => {
 
   if (!isAdmin) {
     return (
-      <div className="p-8 bg-critical-bg border border-critical/30 rounded-2xl text-critical flex items-center gap-4">
-        <ShieldAlert className="w-8 h-8 flex-shrink-0" />
+      <div className="p-6 bg-critical-bg border border-critical/30 rounded-2xl text-critical flex items-center gap-3.5">
+        <ShieldAlert className="w-7 h-7 shrink-0" />
         <div>
-          <h3 className="font-bold text-[18px]">Access Denied</h3>
-          <p className="text-sm">You do not have administrative privileges to view this section.</p>
+          <h3 className="font-bold text-[16px]">Access Denied</h3>
+          <p className="text-xs">You do not have administrative privileges to view this section.</p>
         </div>
       </div>
     );
@@ -259,12 +361,10 @@ export const AdminPanel: React.FC = () => {
     const isOwner = isSuperAdminEmail(u.email);
     const effectivePlan: 'pro' | 'free' = isOwner ? 'pro' : ((u.planTier === 'premium' || (u.planTier as string) === 'pro') ? 'pro' : 'free');
 
-    // Filter by tier chips
     if (filterTier === 'pro' && effectivePlan !== 'pro') return false;
     if (filterTier === 'free' && effectivePlan !== 'free') return false;
     if (filterTier === 'admin' && u.role !== 'admin' && !isOwner) return false;
 
-    // Filter by search query
     const q = searchQuery.toLowerCase().trim();
     if (!q) return true;
     return (
@@ -275,100 +375,104 @@ export const AdminPanel: React.FC = () => {
   });
 
   return (
-    <div className="animate-in fade-in duration-300 max-w-5xl space-y-5">
-      {/* Header & Sleek Single-Line Tab Switcher */}
-      <div className="flex flex-col gap-3 pb-3 border-b border-border/80">
-        <div className="flex items-center justify-between gap-2">
+    <div className="animate-in fade-in duration-200 max-w-4xl mx-auto space-y-4">
+      {/* Desktop Header (Hidden inside mobile modal since MobileShell has native top bar) */}
+      {!isMobileModal && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2">
           <div>
-            <h1 className="font-serif text-[22px] sm:text-[28px] text-charcoal dark:text-white font-bold tracking-tight">
+            <h1 className="font-serif text-[24px] sm:text-[28px] text-charcoal dark:text-white font-semibold tracking-tight leading-tight">
               Admin Suite
             </h1>
-            <p className="text-medium text-xs sm:text-[13px] mt-0.5">
-              Manage user subscriptions, tier access, and monetization limits.
+            <p className="text-medium text-[13px] mt-0.5">
+              Manage subscriptions, instant tier access, and mobile store paywalls.
             </p>
           </div>
         </div>
+      )}
 
-        {/* Modern Segmented Tab Switcher (Strictly Single-Line, zero text-wrapping) */}
-        <div className="flex bg-[#F2EDE5] dark:bg-charcoal/50 p-1 rounded-xl border border-border/70 w-full overflow-x-auto no-scrollbar gap-1">
-          <button
-            type="button"
-            onClick={() => setActiveTab('users')}
-            className={`flex-1 min-w-[100px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'users'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
-                : 'text-medium hover:text-charcoal'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5 shrink-0" />
-            <span>Users</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-              activeTab === 'users' ? 'bg-sage-pale text-sage-dark' : 'bg-black/5 text-medium'
-            }`}>
-              {users.length}
-            </span>
-          </button>
+      {/* Sleek Single-Row 3-Tab Segmented Control */}
+      <div className="grid grid-cols-3 gap-1 p-1 bg-[#F3EFE6] dark:bg-charcoal/50 rounded-2xl border border-border/80 shadow-2xs">
+        <button
+          type="button"
+          onClick={() => setActiveTab('users')}
+          className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-[12.5px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeTab === 'users'
+              ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+              : 'text-medium hover:text-charcoal dark:hover:text-white'
+          }`}
+        >
+          <Users className="w-3.5 h-3.5 shrink-0 text-sage-dark" />
+          <span>Users</span>
+          <span className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-extrabold ${
+            activeTab === 'users'
+              ? 'bg-sage/15 text-sage-dark'
+              : 'bg-charcoal/8 text-medium'
+          }`}>
+            {users.length}
+          </span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('feedbacks')}
-            className={`flex-1 min-w-[100px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'feedbacks'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
-                : 'text-medium hover:text-charcoal'
-            }`}
-          >
-            <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-            <span>Feedback</span>
-            <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-bold ${
-              activeTab === 'feedbacks' ? 'bg-sage-pale text-sage-dark' : 'bg-black/5 text-medium'
-            }`}>
-              {feedbacks.length}
-            </span>
-          </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('feedbacks')}
+          className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-[12.5px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeTab === 'feedbacks'
+              ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+              : 'text-medium hover:text-charcoal dark:hover:text-white'
+          }`}
+        >
+          <MessageSquare className="w-3.5 h-3.5 shrink-0 text-sage-dark" />
+          <span>Feedback</span>
+          <span className={`text-[10.5px] px-1.5 py-0.2 rounded-full font-extrabold ${
+            activeTab === 'feedbacks'
+              ? 'bg-sage/15 text-sage-dark'
+              : 'bg-charcoal/8 text-medium'
+          }`}>
+            {feedbacks.length}
+          </span>
+        </button>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab('monetization')}
-            className={`flex-1 min-w-[130px] flex items-center justify-center gap-1.5 py-1.5 px-3 text-xs font-bold rounded-lg transition-all whitespace-nowrap cursor-pointer ${
-              activeTab === 'monetization'
-                ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-2xs'
-                : 'text-medium hover:text-charcoal'
-            }`}
-          >
-            <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <span>Pricing & Limits</span>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setActiveTab('monetization')}
+          className={`flex items-center justify-center gap-1.5 py-2 px-2 rounded-xl text-[12.5px] font-bold whitespace-nowrap transition-all cursor-pointer ${
+            activeTab === 'monetization'
+              ? 'bg-white dark:bg-[#1E293B] text-charcoal dark:text-white shadow-xs'
+              : 'text-medium hover:text-charcoal dark:hover:text-white'
+          }`}
+        >
+          <Crown className="w-3.5 h-3.5 shrink-0 text-amber-500" />
+          <span>Monetization</span>
+        </button>
       </div>
 
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="fixed bottom-8 right-8 z-[200] bg-charcoal text-white px-5 py-3.5 rounded-xl shadow-xl flex items-center gap-3 text-sm font-semibold animate-in slide-in-from-bottom-5 border border-white/20">
-          <CheckCircle className="w-5 h-5 text-sage shrink-0" />
-          <span>{toastMsg}</span>
+        <div className="fixed bottom-6 left-4 right-4 sm:left-auto sm:right-8 sm:max-w-sm z-[200] bg-charcoal text-white px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 text-[13px] font-semibold animate-in slide-in-from-bottom-5 border border-white/15">
+          <CheckCircle className="w-4 h-4 text-sage shrink-0" />
+          <span className="truncate">{toastMsg}</span>
         </div>
       )}
 
       {/* TAB 1: USERS & PLANS */}
       {activeTab === 'users' && (
-        <div className="space-y-3.5">
-          {/* Integrated Search Bar + Refresh Icon Button */}
+        <div className="space-y-3">
+          {/* Search Input + Inline Refresh Button (Single Row) */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-light pointer-events-none" />
+              <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-light pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search user by email or name..."
+                placeholder="Search user by name or email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-9 pr-8 py-2 bg-white dark:bg-[#1E293B] border border-border/80 rounded-xl text-xs sm:text-sm focus:outline-none focus:border-sage shadow-2xs"
+                className="w-full pl-9 pr-8 py-2.5 bg-white dark:bg-[#1E293B] border border-border rounded-xl text-[13px] text-charcoal dark:text-white placeholder:text-light focus:outline-none focus:border-sage shadow-2xs"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-light hover:text-charcoal text-xs cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-light hover:text-charcoal text-xs cursor-pointer"
                 >
                   ✕
                 </button>
@@ -379,314 +483,174 @@ export const AdminPanel: React.FC = () => {
               type="button"
               onClick={fetchUsers}
               disabled={loadingUsers}
-              title="Refresh users database"
-              className="p-2.5 bg-white dark:bg-[#1E293B] hover:bg-cream border border-border/80 rounded-xl text-charcoal dark:text-white cursor-pointer transition-all shadow-2xs shrink-0 disabled:opacity-50 active:scale-95"
+              title="Refresh users"
+              aria-label="Refresh users"
+              className="h-[40px] px-3 bg-white dark:bg-[#1E293B] hover:bg-cream/60 border border-border rounded-xl text-charcoal dark:text-white flex items-center justify-center gap-1.5 text-[12px] font-semibold shrink-0 cursor-pointer transition-all shadow-2xs disabled:opacity-50"
             >
-              <RefreshCw className={`w-4 h-4 ${loadingUsers ? 'animate-spin text-sage' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-sage-dark ${loadingUsers ? 'animate-spin' : ''}`} />
+              <span className="hidden sm:inline">Refresh</span>
             </button>
           </div>
 
-          {/* Quick Filter Chips (Single-Line Horizontal Scroll) */}
-          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 -mx-1 px-1">
+          {/* Single-Row Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
             {[
               { key: 'all', label: 'All', count: users.length },
-              { key: 'pro', label: 'Pro', icon: '✨', count: proCount },
+              { key: 'pro', label: '👑 Pro', count: proCount },
               { key: 'free', label: 'Free', count: freeCount },
-              { key: 'admin', label: 'Admins', icon: '👑', count: adminCount },
-            ].map((chip) => (
-              <button
-                key={chip.key}
-                type="button"
-                onClick={() => setFilterTier(chip.key as any)}
-                className={`px-3 py-1 text-xs font-semibold rounded-full whitespace-nowrap transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
-                  filterTier === chip.key
-                    ? 'bg-charcoal text-white dark:bg-white dark:text-charcoal shadow-2xs'
-                    : 'bg-white dark:bg-[#1E293B] text-medium hover:text-charcoal border border-border/80'
-                }`}
-              >
-                {chip.icon && <span>{chip.icon}</span>}
-                <span>{chip.label}</span>
-                <span className="opacity-70 text-[10.5px]">({chip.count})</span>
-              </button>
-            ))}
+              { key: 'admin', label: '🛡 Admins', count: adminCount },
+            ].map((chip) => {
+              const active = filterTier === chip.key;
+              return (
+                <button
+                  key={chip.key}
+                  type="button"
+                  onClick={() => setFilterTier(chip.key as any)}
+                  className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-bold rounded-full whitespace-nowrap shrink-0 transition-all cursor-pointer ${
+                    active
+                      ? 'bg-charcoal text-white dark:bg-white dark:text-charcoal shadow-2xs'
+                      : 'bg-white dark:bg-[#1E293B] text-medium hover:text-charcoal border border-border/90'
+                  }`}
+                >
+                  <span>{chip.label}</span>
+                  <span className={`text-[11px] ${active ? 'text-white/80 dark:text-charcoal/70' : 'text-light'}`}>
+                    {chip.count}
+                  </span>
+                </button>
+              );
+            })}
           </div>
 
-          {/* Users List Container */}
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-border/80 shadow-2xs overflow-hidden">
+          {/* Sleek Single-Row User List Card */}
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl border border-border shadow-2xs overflow-hidden">
             {loadingUsers ? (
-              <div className="p-10 text-center text-medium flex flex-col items-center gap-2">
+              <div className="p-10 text-center text-medium text-[13px] flex flex-col items-center gap-2">
                 <RefreshCw className="w-5 h-5 animate-spin text-sage" />
-                <span className="text-xs">Loading users database...</span>
+                <span>Loading users...</span>
               </div>
             ) : filteredUsers.length === 0 ? (
-              <div className="p-10 text-center text-medium text-xs">
-                No users found {searchQuery ? `matching "${searchQuery}"` : 'in this category'}.
+              <div className="p-10 text-center text-medium text-[13px]">
+                No users found {searchQuery ? `matching "${searchQuery}"` : 'in this filter'}.
               </div>
             ) : (
-              <>
-                {/* 1. MOBILE RESPONSIVE CARDS (strictly single-line, zero clipping, beautiful touch targets) */}
-                <div className="md:hidden divide-y divide-border/60">
-                  {filteredUsers.map((user) => {
-                    const isOwnerUser = isSuperAdminEmail(user.email);
-                    const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
-                    const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
-                    const initials = getInitials(user.displayName, user.email);
+              <div className="divide-y divide-border/70">
+                {filteredUsers.map((user) => {
+                  const isOwnerUser = isSuperAdminEmail(user.email);
+                  const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
+                  const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
+                  const initials = getInitials(user.displayName, user.email);
 
-                    return (
-                      <div key={user.uid} className="p-3 flex items-center justify-between gap-2.5 hover:bg-cream/40 transition-colors">
-                        {/* Avatar & User Details */}
-                        <div className="flex items-center gap-2.5 min-w-0 flex-1">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                            isOwnerUser || user.role === 'admin'
-                              ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                              : isProUser
-                              ? 'bg-gold-pale text-gold-dark border border-gold/40'
-                              : 'bg-gray-100 text-charcoal/80 border border-border/70'
-                          }`}>
-                            {initials}
-                          </div>
+                  const expiryLabel = isOwnerUser
+                    ? 'Owner'
+                    : user.planExpiry
+                    ? isExpired
+                      ? 'Expired'
+                      : `Exp ${formatDateDDMMYY(user.planExpiry)}`
+                    : isProUser
+                    ? 'Lifetime'
+                    : null;
 
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-charcoal dark:text-white text-[12.5px] truncate">
-                                {user.displayName || 'Unnamed User'}
-                              </span>
-                              {isOwnerUser && (
-                                <span className="text-[9px] bg-purple-100 text-purple-700 px-1 rounded font-bold shrink-0">
-                                  Owner
-                                </span>
-                              )}
-                              {user.emailVerified === false && (
-                                <span className="text-[9px] bg-amber-100 text-amber-800 px-1 rounded font-medium shrink-0">
-                                  Unverified
-                                </span>
-                              )}
-                            </div>
-                            <div className="text-[11px] text-light truncate flex items-center gap-1 mt-0.5">
-                              <span className="truncate">{user.email || user.uid}</span>
-                              {isOwnerUser ? (
-                                <>
-                                  <span>•</span>
-                                  <span className="text-sage-dark font-medium shrink-0">Lifetime</span>
-                                </>
-                              ) : user.planExpiry ? (
-                                <>
-                                  <span>•</span>
-                                  <span className={`shrink-0 ${isExpired ? 'text-critical font-medium' : ''}`}>
-                                    {isExpired ? 'Expired' : formatDateDDMMYY(user.planExpiry)}
-                                  </span>
-                                </>
-                              ) : isProUser ? (
-                                <>
-                                  <span>•</span>
-                                  <span className="text-sage-dark font-medium shrink-0">Lifetime</span>
-                                </>
-                              ) : null}
-                            </div>
-                          </div>
+                  return (
+                    <div
+                      key={user.uid}
+                      className="flex items-center justify-between gap-2.5 px-3.5 sm:px-4 py-3 hover:bg-cream/40 dark:hover:bg-white/5 transition-colors"
+                    >
+                      {/* Left: Avatar + Single-line Name & Email */}
+                      <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                        <div className={`w-9 h-9 rounded-full flex items-center justify-center text-[11.5px] font-bold shrink-0 ${
+                          isOwnerUser || user.role === 'admin'
+                            ? 'bg-purple-100 text-purple-800 border border-purple-300/80'
+                            : isProUser
+                            ? 'bg-amber-50 text-amber-900 border border-amber-300/70'
+                            : 'bg-[#F4EFE6] dark:bg-charcoal/40 text-charcoal/80 dark:text-white/80 border border-border/60'
+                        }`}>
+                          {initials}
                         </div>
 
-                        {/* Right: Single-Line Plan Pill + Quick Actions */}
-                        <div className="flex items-center gap-1.5 shrink-0">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setPlanOption(isProUser ? 'premium' : 'free');
-                              setDurationMonths(user.planExpiry ? 3 : null);
-                            }}
-                            className={`whitespace-nowrap px-2.5 py-1 rounded-full text-[11.5px] font-bold cursor-pointer transition-all flex items-center gap-1 shadow-3xs active:scale-95 ${
-                              isProUser
-                                ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
-                                : 'bg-gray-100 text-charcoal/80 border border-border/80 hover:bg-gray-200/60'
-                            }`}
-                          >
-                            <span>{isProUser ? '✨ Pro' : 'Free'}</span>
-                            <ChevronDown size={11} className="opacity-60" />
-                          </button>
-
-                          {/* Admin toggle icon */}
-                          {!isOwnerUser && (
-                            <button
-                              type="button"
-                              onClick={() => handleToggleAdminRole(user)}
-                              disabled={updatingUid === user.uid}
-                              title={user.role === 'admin' ? "Revoke Admin" : "Grant Admin"}
-                              className={`p-1.5 rounded-lg text-xs cursor-pointer transition-all ${
-                                user.role === 'admin'
-                                  ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                                  : 'text-gray-300 hover:text-purple-600'
-                              }`}
-                            >
-                              👑
-                            </button>
-                          )}
-
-                          {/* Delete button */}
-                          {!isOwnerUser && !isSuperAdminEmail(user.email) && (
-                            <button
-                              type="button"
-                              onClick={() => setUserToDelete(user)}
-                              title="Delete user"
-                              className="p-1.5 rounded-lg text-gray-300 hover:text-red-600 transition-colors cursor-pointer"
-                            >
-                              <Trash2 size={13} />
-                            </button>
-                          )}
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 min-w-0">
+                            <span className="font-semibold text-[13.5px] text-charcoal dark:text-white truncate">
+                              {user.displayName || 'Unnamed Mother'}
+                            </span>
+                            {expiryLabel && (
+                              <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-bold whitespace-nowrap shrink-0 ${
+                                isExpired
+                                  ? 'bg-red-50 text-red-700 border border-red-200'
+                                  : isOwnerUser
+                                  ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                                  : 'bg-emerald-50 text-emerald-800 border border-emerald-200/70'
+                              }`}>
+                                {expiryLabel}
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-light text-[11.5px] truncate">
+                            {user.email || user.uid}
+                          </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
 
-                {/* 2. DESKTOP EXPANSIVE TABLE (spacious, clean single-line pills, wide headers) */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-left text-[13px] border-collapse">
-                    <thead>
-                      <tr className="border-b border-border bg-gray-50/70 dark:bg-charcoal/20 text-light text-[11px] uppercase font-bold tracking-wider">
-                        <th className="py-3 px-4">User</th>
-                        <th className="py-3 px-4">Plan</th>
-                        <th className="py-3 px-4">Expiry</th>
-                        <th className="py-3 px-4">Joined</th>
-                        <th className="py-3 px-4 text-center">Admin</th>
-                        <th className="py-3 px-4 text-center">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-border">
-                      {filteredUsers.map((user) => {
-                        const isOwnerUser = isSuperAdminEmail(user.email);
-                        const isProUser = isOwnerUser || user.planTier === 'premium' || (user.planTier as string) === 'pro' || user.role === 'admin';
-                        const isExpired = user.planExpiry ? user.planExpiry < Date.now() : false;
-                        const initials = getInitials(user.displayName, user.email);
+                      {/* Right: Single-Line Plan Pill + Compact Admin & Delete Icons */}
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedUser(user);
+                            setPlanOption(isProUser ? 'premium' : 'free');
+                            setDurationMonths(user.planExpiry ? 3 : null);
+                          }}
+                          title="Change subscription tier"
+                          className={`inline-flex items-center justify-center gap-1 h-7 px-2.5 rounded-full text-[11.5px] font-bold whitespace-nowrap shrink-0 cursor-pointer transition-all active:scale-95 ${
+                            isProUser
+                              ? 'bg-amber-100/80 text-amber-900 border border-amber-300/80 hover:bg-amber-200/70'
+                              : 'bg-[#F4EFE6] dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-charcoal/30'
+                          }`}
+                        >
+                          {isProUser && <Sparkles className="w-3 h-3 text-amber-700 shrink-0" />}
+                          <span>{isProUser ? 'Pro' : 'Free'}</span>
+                          <ChevronDown className="w-3 h-3 opacity-60 shrink-0" />
+                        </button>
 
-                        return (
-                          <tr key={user.uid} className="hover:bg-cream/40 dark:hover:bg-white/5 transition-colors group">
-                            {/* User Details */}
-                            <td className="py-3 px-4">
-                              <div className="flex items-center gap-2.5">
-                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0 ${
-                                  isOwnerUser || user.role === 'admin'
-                                    ? 'bg-purple-100 text-purple-700 border border-purple-300'
-                                    : isProUser
-                                    ? 'bg-gold-pale text-gold-dark border border-gold/30'
-                                    : 'bg-gray-100 dark:bg-charcoal/30 text-charcoal/80 dark:text-white/80'
-                                }`}>
-                                  {initials}
-                                </div>
+                        {/* Admin Role Toggle */}
+                        {isOwnerUser ? (
+                          <span
+                            title="Primary Owner"
+                            className="w-7 h-7 rounded-lg bg-purple-50 border border-purple-200/70 flex items-center justify-center text-[12px] shrink-0 select-none"
+                          >
+                            👑
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => handleToggleAdminRole(user)}
+                            disabled={updatingUid === user.uid}
+                            title={user.role === 'admin' ? 'Revoke Admin' : 'Grant Admin'}
+                            className={`w-7 h-7 rounded-lg flex items-center justify-center text-[12px] shrink-0 cursor-pointer transition-all ${
+                              user.role === 'admin'
+                                ? 'bg-purple-100 text-purple-800 border border-purple-300'
+                                : 'text-light hover:text-purple-700 hover:bg-purple-50 border border-transparent'
+                            }`}
+                          >
+                            👑
+                          </button>
+                        )}
 
-                                <div className="flex flex-col min-w-0">
-                                  <div className="flex items-center gap-1.5 flex-wrap">
-                                    <span className="font-bold text-charcoal dark:text-white truncate max-w-[200px]" title={user.displayName || ''}>
-                                      {user.displayName || 'Unnamed User'}
-                                    </span>
-                                    {isOwnerUser && (
-                                      <span className="text-[9px] bg-purple-100 text-purple-700 px-1 rounded font-bold shrink-0">
-                                        Owner
-                                      </span>
-                                    )}
-                                    {user.emailVerified === false && (
-                                      <span className="text-[9px] bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 px-1.5 py-0.2 rounded font-semibold shrink-0">
-                                        Unverified
-                                      </span>
-                                    )}
-                                  </div>
-                                  <span className="text-light text-[11.5px] truncate max-w-[220px]" title={user.email || user.uid}>
-                                    {user.email || user.uid}
-                                  </span>
-                                </div>
-                              </div>
-                            </td>
-
-                            {/* Plan Tier Pill (Strictly Single-Line) */}
-                            <td className="py-3 px-4">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setSelectedUser(user);
-                                  setPlanOption(isProUser ? 'premium' : 'free');
-                                  setDurationMonths(user.planExpiry ? 3 : null);
-                                }}
-                                title="Click to change plan"
-                                className={`whitespace-nowrap inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-bold cursor-pointer transition-all shadow-3xs hover:scale-105 active:scale-95 ${
-                                  isProUser
-                                    ? 'bg-gold-pale text-gold-dark border border-gold/40 hover:bg-gold/20'
-                                    : 'bg-gray-100 dark:bg-white/10 text-charcoal/80 dark:text-white/80 border border-border hover:border-gray-400'
-                                }`}
-                              >
-                                <span>{isProUser ? '✨ Pro' : 'Free'}</span>
-                                <ChevronDown className="w-3 h-3 opacity-60 group-hover:opacity-100" />
-                              </button>
-                            </td>
-
-                            {/* Expiry */}
-                            <td className="py-3 px-4 text-medium text-xs whitespace-nowrap">
-                              {isOwnerUser ? (
-                                <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
-                              ) : user.planExpiry ? (
-                                isExpired ? (
-                                  <span className="text-critical font-semibold">Expired</span>
-                                ) : (
-                                  <span className="font-medium text-charcoal/80 dark:text-white/80">
-                                    {formatDateDDMMYY(user.planExpiry)}
-                                  </span>
-                                )
-                              ) : isProUser ? (
-                                <span className="text-sage-dark dark:text-sage font-semibold">Lifetime</span>
-                              ) : (
-                                <span className="text-light">—</span>
-                              )}
-                            </td>
-
-                            {/* Joined Date */}
-                            <td className="py-3 px-4 text-light text-xs whitespace-nowrap">
-                              {formatDateDDMMYY(user.createdAt)}
-                            </td>
-
-                            {/* Admin Role Toggle Icon */}
-                            <td className="py-3 px-4 text-center">
-                              {isOwnerUser ? (
-                                <span title="Primary Owner" className="text-purple-600 text-sm cursor-default">
-                                  👑
-                                </span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => handleToggleAdminRole(user)}
-                                  disabled={updatingUid === user.uid}
-                                  title={user.role === 'admin' ? "Admin active (Click to revoke)" : "Click to grant Admin privileges"}
-                                  className={`p-1.5 rounded-lg text-xs cursor-pointer transition-all ${
-                                    user.role === 'admin'
-                                      ? 'bg-purple-100 text-purple-700 border border-purple-300 shadow-3xs hover:bg-purple-200'
-                                      : 'opacity-25 hover:opacity-100 hover:bg-purple-50 text-purple-700'
-                                  }`}
-                                >
-                                  👑
-                                </button>
-                              )}
-                            </td>
-
-                            {/* Actions Column: Delete User */}
-                            <td className="py-3 px-4 text-center">
-                              {isOwnerUser || isSuperAdminEmail(user.email) ? (
-                                <span className="text-xs text-light italic">—</span>
-                              ) : (
-                                <button
-                                  type="button"
-                                  onClick={() => setUserToDelete(user)}
-                                  title="Delete user and all data"
-                                  className="p-1.5 rounded-lg text-gray-300 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-all cursor-pointer"
-                                >
-                                  <Trash2 size={15} />
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              </>
+                        {/* Delete User Button */}
+                        {!isOwnerUser && (
+                          <button
+                            type="button"
+                            onClick={() => setUserToDelete(user)}
+                            title="Delete user"
+                            className="w-7 h-7 rounded-lg flex items-center justify-center text-light hover:text-red-600 hover:bg-red-50 transition-all cursor-pointer shrink-0"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             )}
           </div>
         </div>
@@ -694,50 +658,55 @@ export const AdminPanel: React.FC = () => {
 
       {/* TAB 2: FEEDBACKS */}
       {activeTab === 'feedbacks' && (
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="font-serif text-lg text-charcoal dark:text-white font-semibold">User Feedback & Inquiries</h3>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between gap-2 px-0.5">
+            <h3 className="font-serif text-[16px] text-charcoal dark:text-white font-semibold whitespace-nowrap">
+              Community Feedback ({feedbacks.length})
+            </h3>
             <button
+              type="button"
               onClick={fetchFeedbacks}
               disabled={loadingFeedbacks}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] border border-border rounded-xl text-charcoal dark:text-white cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[12px] font-semibold bg-white dark:bg-[#1E293B] border border-border rounded-xl text-charcoal dark:text-white whitespace-nowrap shrink-0 cursor-pointer shadow-2xs"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${loadingFeedbacks ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 text-sage-dark ${loadingFeedbacks ? 'animate-spin' : ''}`} />
               <span>Refresh</span>
             </button>
           </div>
 
           {loadingFeedbacks ? (
-            <div className="p-8 text-center text-medium flex items-center justify-center gap-2">
+            <div className="p-10 text-center text-medium text-[13px] flex items-center justify-center gap-2 bg-white dark:bg-[#1E293B] border border-border rounded-2xl">
               <RefreshCw className="w-4 h-4 animate-spin text-sage" />
               <span>Loading feedbacks...</span>
             </div>
           ) : feedbacks.length === 0 ? (
-            <div className="p-8 text-center text-medium bg-white dark:bg-[#1E293B] border border-border rounded-2xl">
+            <div className="p-10 text-center text-medium text-[13px] bg-white dark:bg-[#1E293B] border border-border rounded-2xl">
               No feedbacks submitted yet.
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {feedbacks.map((item) => (
-                <div key={item.id} className="p-4 bg-white dark:bg-[#1E293B] border border-border rounded-2xl shadow-2xs space-y-2">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    <div className="flex items-center gap-2">
-                      <span className={`px-2 py-0.5 text-[11px] font-bold rounded-md uppercase tracking-wider ${
+                <div key={item.id} className="p-4 bg-white dark:bg-[#1E293B] border border-border rounded-2xl shadow-2xs space-y-1.5">
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span className={`px-2 py-0.5 text-[10px] font-bold rounded-md uppercase tracking-wider shrink-0 ${
                         item.type === 'bug' ? 'bg-amber-100 text-amber-800' :
                         item.type === 'feature' ? 'bg-sage-pale text-sage-dark' :
                         'bg-blue-50 text-blue-700'
                       }`}>
                         {item.type}
                       </span>
-                      <span className="text-[13px] font-semibold text-charcoal">{item.userEmail}</span>
+                      <span className="text-[12.5px] font-semibold text-charcoal dark:text-white truncate">
+                        {item.userEmail}
+                      </span>
                     </div>
-                    <span className="text-[11.5px] text-light">
-                      {new Date(item.createdAt).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })}
+                    <span className="text-[11px] text-light whitespace-nowrap shrink-0">
+                      {new Date(item.createdAt).toLocaleDateString()}
                     </span>
                   </div>
-                  <div className="text-[13.5px] text-charcoal leading-relaxed whitespace-pre-wrap">
+                  <p className="text-[13px] text-charcoal dark:text-white/90 leading-relaxed whitespace-pre-wrap">
                     {item.message}
-                  </div>
+                  </p>
                 </div>
               ))}
             </div>
@@ -747,316 +716,330 @@ export const AdminPanel: React.FC = () => {
 
       {/* TAB 3: MOBILE MONETIZATION (IOS & ANDROID) */}
       {activeTab === 'monetization' && (
-        <div className="space-y-6">
-          {/* Card 1: Mobile In-App Paywall Master Toggles (iOS & Android) */}
-          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-5">
-            {/* iOS Toggle */}
-            <div className="flex items-center justify-between flex-wrap gap-4 pb-5 border-b border-border/70">
-              <div>
-                <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-amber-500" />
-                  <span>iOS App Store Subscription Paywall</span>
+        <div className="space-y-3.5">
+          {/* Card 1: Compact Single-Row Store Paywall Master Toggles */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3.5">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <Smartphone className="w-4 h-4 text-sage-dark shrink-0" />
+                <h3 className="font-serif text-[16px] text-charcoal dark:text-white font-bold truncate">
+                  Mobile Store Paywalls
                 </h3>
-                <p className="text-[13px] text-medium mt-1">
-                  Enforces Apple StoreKit 2 In-App Purchase (${monetizationConfig.introPriceUsd.toFixed(2)}/mo) for Pro features (AI Food Scanner, Report OCR, Ask AI, Partner Sync).
-                </p>
               </div>
+              <span className="text-[11px] font-bold text-amber-900 bg-amber-100/80 border border-amber-300/60 px-2.5 py-0.5 rounded-full whitespace-nowrap shrink-0">
+                ${monetizationConfig.introPriceUsd.toFixed(2)}/mo Pro Pass
+              </span>
+            </div>
 
-              <div className="flex items-center gap-3">
-                <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                  monetizationConfig.isIosPaywallActive 
-                    ? 'bg-amber-100 text-amber-800 border border-amber-300' 
-                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                }`}>
-                  {monetizationConfig.isIosPaywallActive ? `Active Paywall ($${monetizationConfig.introPriceUsd.toFixed(2)}/mo)` : 'Free Launch Mode'}
-                </span>
+            <div className="divide-y divide-border/70 border border-border/80 rounded-xl bg-[#FDFBF7] dark:bg-charcoal/30 overflow-hidden">
+              {/* iOS Row */}
+              <div className="flex items-center justify-between gap-3 p-3.5">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[13.5px] text-charcoal dark:text-white whitespace-nowrap">
+                      iOS App Store
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full whitespace-nowrap ${
+                      monetizationConfig.isIosPaywallActive
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                        : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    }`}>
+                      {monetizationConfig.isIosPaywallActive ? 'Paywall Active' : 'Free Mode'}
+                    </span>
+                  </div>
+                  <p className="text-[11.5px] text-medium truncate mt-0.5">
+                    Apple StoreKit 2 • RevenueCat In-App Purchase
+                  </p>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => setMonetizationConfig(prev => ({ ...prev, isIosPaywallActive: !prev.isIosPaywallActive }))}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                  aria-label="Toggle iOS Paywall"
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
                     monetizationConfig.isIosPaywallActive ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
                       monetizationConfig.isIosPaywallActive ? 'translate-x-5' : 'translate-x-0'
                     }`}
                   />
                 </button>
               </div>
-            </div>
 
-            {/* Android Toggle */}
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              <div>
-                <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-emerald-600" />
-                  <span>Android Google Play Subscription Paywall</span>
-                </h3>
-                <p className="text-[13px] text-medium mt-1">
-                  Enforces Google Play Billing Subscription (${monetizationConfig.introPriceUsd.toFixed(2)}/mo) via RevenueCat for Android users (`in.ourpregnancy.bloom`).
-                </p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className={`text-[12px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider ${
-                  monetizationConfig.isAndroidPaywallActive 
-                    ? 'bg-amber-100 text-amber-800 border border-amber-300' 
-                    : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
-                }`}>
-                  {monetizationConfig.isAndroidPaywallActive ? `Active Paywall ($${monetizationConfig.introPriceUsd.toFixed(2)}/mo)` : 'Free Launch Mode'}
-                </span>
+              {/* Android Row */}
+              <div className="flex items-center justify-between gap-3 p-3.5">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="font-bold text-[13.5px] text-charcoal dark:text-white whitespace-nowrap">
+                      Android Google Play
+                    </span>
+                    <span className={`text-[10px] font-bold px-2 py-0.2 rounded-full whitespace-nowrap ${
+                      monetizationConfig.isAndroidPaywallActive
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300'
+                        : 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                    }`}>
+                      {monetizationConfig.isAndroidPaywallActive ? 'Paywall Active' : 'Free Mode'}
+                    </span>
+                  </div>
+                  <p className="text-[11.5px] text-medium truncate mt-0.5">
+                    Google Play Billing • RevenueCat Subscription
+                  </p>
+                </div>
 
                 <button
                   type="button"
                   onClick={() => setMonetizationConfig(prev => ({ ...prev, isAndroidPaywallActive: !prev.isAndroidPaywallActive }))}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-hidden ${
+                  aria-label="Toggle Android Paywall"
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${
                     monetizationConfig.isAndroidPaywallActive ? 'bg-amber-500' : 'bg-gray-300 dark:bg-gray-600'
                   }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition duration-200 ease-in-out ${
                       monetizationConfig.isAndroidPaywallActive ? 'translate-x-5' : 'translate-x-0'
                     }`}
                   />
                 </button>
               </div>
             </div>
+          </div>
 
-            <div className="p-3.5 rounded-xl bg-amber-50/60 border border-amber-200/80 text-[12.5px] text-amber-950 flex items-start gap-2.5">
-              <Sparkles className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          {/* Card 2: Pricing & Launch Promotion (Single 3-Col Row) */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-serif text-[16px] text-charcoal dark:text-white font-bold flex items-center gap-2 whitespace-nowrap">
+                <Sparkles className="w-4 h-4 text-amber-500 shrink-0" />
+                <span>Pricing & Launch Offer</span>
+              </h3>
+              <span className="text-[11px] text-light whitespace-nowrap">First 3 months intro</span>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2.5">
               <div>
-                <strong>App Store &amp; Google Play Compliance:</strong> When enabled, iOS and Android users see their native store paywall (Apple StoreKit 2 or Google Play Billing) with automatic &quot;Restore Purchases&quot; and store subscription management links. If disabled for a platform, users on that platform enjoy free access.
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  Promo ($/mo)
+                </label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="2.99"
+                  value={introPriceInput}
+                  onChange={(e) => handleIntroPriceChange(e.target.value)}
+                  onBlur={handleIntroPriceBlur}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-[#FDFBF7] dark:bg-charcoal text-charcoal dark:text-white text-[16px] font-bold focus:outline-none focus:border-sage shadow-3xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  Regular ($/mo)
+                </label>
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  placeholder="9.99"
+                  value={regularPriceInput}
+                  onChange={(e) => handleRegularPriceChange(e.target.value)}
+                  onBlur={handleRegularPriceBlur}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-[#FDFBF7] dark:bg-charcoal text-charcoal dark:text-white text-[16px] font-bold focus:outline-none focus:border-sage shadow-3xs"
+                />
+              </div>
+
+              <div>
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  Discount (Auto)
+                </label>
+                <div className="w-full px-2.5 py-2 rounded-xl border border-amber-300/80 bg-amber-50/70 dark:bg-amber-950/40 text-amber-900 dark:text-amber-200 text-[15px] font-bold flex items-center justify-center gap-1 shadow-3xs select-none">
+                  <span>{monetizationConfig.discountPercentage}%</span>
+                  <span className="text-[9.5px] uppercase tracking-wider font-semibold opacity-75">OFF</span>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Card 2: Pricing & Promotion Settings */}
-          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
-            <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-amber-500" />
-              <span>Pricing & Launch Promotion</span>
-            </h3>
+          {/* Card 3: Fair Use Daily Caps (Single 3-Col Row) */}
+          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-4 sm:p-5 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <h3 className="font-serif text-[16px] text-charcoal dark:text-white font-bold flex items-center gap-2 whitespace-nowrap">
+                <Shield className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Fair Use Daily Caps</span>
+              </h3>
+              <span className="text-[11px] text-light whitespace-nowrap">Anti-abuse protection</span>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-2.5">
               <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Promotional Price ($/mo)
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  Food Scans
                 </label>
                 <input
-                  type="number"
-                  step="0.01"
-                  min="0.99"
-                  value={monetizationConfig.introPriceUsd}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, introPriceUsd: parseFloat(e.target.value) || 2.99 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                  type="text"
+                  inputMode="numeric"
+                  value={foodScansInput}
+                  onChange={(e) => handleFoodScansChange(e.target.value)}
+                  onBlur={() => {
+                    if (!parseInt(foodScansInput, 10)) {
+                      setFoodScansInput("25");
+                      handleFoodScansChange("25");
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-[#FDFBF7] dark:bg-charcoal text-charcoal dark:text-white text-[16px] font-bold focus:outline-none focus:border-sage shadow-3xs"
                 />
-                <span className="text-[11px] text-light mt-1 block">Default: $2.99 (First 3 mos)</span>
               </div>
 
               <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Regular Price ($/mo)
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  AI Chats
                 </label>
                 <input
-                  type="number"
-                  step="0.01"
-                  min="1.99"
-                  value={monetizationConfig.regularPriceUsd}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, regularPriceUsd: parseFloat(e.target.value) || 9.99 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                  type="text"
+                  inputMode="numeric"
+                  value={aiChatInput}
+                  onChange={(e) => handleAiChatChange(e.target.value)}
+                  onBlur={() => {
+                    if (!parseInt(aiChatInput, 10)) {
+                      setAiChatInput("60");
+                      handleAiChatChange("60");
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-[#FDFBF7] dark:bg-charcoal text-charcoal dark:text-white text-[16px] font-bold focus:outline-none focus:border-sage shadow-3xs"
                 />
-                <span className="text-[11px] text-light mt-1 block">Strikethrough: $9.99</span>
               </div>
 
               <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Discount Badge (%)
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider block mb-1 truncate">
+                  Lab Reports
                 </label>
                 <input
-                  type="number"
-                  min="0"
-                  max="99"
-                  value={monetizationConfig.discountPercentage}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, discountPercentage: parseInt(e.target.value, 10) || 70 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
+                  type="text"
+                  inputMode="numeric"
+                  value={reportsInput}
+                  onChange={(e) => handleReportsChange(e.target.value)}
+                  onBlur={() => {
+                    if (!parseInt(reportsInput, 10)) {
+                      setReportsInput("10");
+                      handleReportsChange("10");
+                    }
+                  }}
+                  className="w-full px-3 py-2 rounded-xl border border-border bg-[#FDFBF7] dark:bg-charcoal text-charcoal dark:text-white text-[16px] font-bold focus:outline-none focus:border-sage shadow-3xs"
                 />
-                <span className="text-[11px] text-light mt-1 block">Displayed on paywall badge</span>
               </div>
             </div>
           </div>
 
-          {/* Card 3: Fair Use Daily Limits (Abuse Protection) */}
-          <div className="bg-white dark:bg-[#1E293B] border border-border rounded-2xl p-6 shadow-2xs space-y-4">
-            <h3 className="font-serif text-lg text-charcoal dark:text-white font-bold flex items-center gap-2">
-              <Shield className="w-5 h-5 text-emerald-600" />
-              <span>Fair Use Protection (Anti-Abuse Daily Limits)</span>
-            </h3>
-            <p className="text-[13px] text-medium">
-              Protects your Gemini API budget from bots and scrapers. Normal mothers scan 2-5 times/day and will never hit these caps.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Max Food Scans / Day
-                </label>
-                <input
-                  type="number"
-                  min="5"
-                  max="200"
-                  value={monetizationConfig.dailyFoodScanLimit}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyFoodScanLimit: parseInt(e.target.value, 10) || 25 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
-                />
-                <span className="text-[11px] text-light mt-1 block">Recommended: 25 / day</span>
-              </div>
-
-              <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Max AI Chat / Day
-                </label>
-                <input
-                  type="number"
-                  min="10"
-                  max="500"
-                  value={monetizationConfig.dailyAiChatLimit}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyAiChatLimit: parseInt(e.target.value, 10) || 60 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
-                />
-                <span className="text-[11px] text-light mt-1 block">Recommended: 60 / day</span>
-              </div>
-
-              <div>
-                <label className="text-[12px] font-bold text-light uppercase tracking-wider block mb-1.5">
-                  Max Reports / Day
-                </label>
-                <input
-                  type="number"
-                  min="2"
-                  max="100"
-                  value={monetizationConfig.dailyReportLimit}
-                  onChange={(e) => setMonetizationConfig(prev => ({ ...prev, dailyReportLimit: parseInt(e.target.value, 10) || 10 }))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-border bg-gray-50 dark:bg-charcoal text-charcoal dark:text-white text-[14px] font-bold"
-                />
-                <span className="text-[11px] text-light mt-1 block">Recommended: 10 / day</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Unit Economics Calculator */}
-          <div className="bg-gradient-to-br from-emerald-50 via-cream to-white border border-emerald-200/80 rounded-2xl p-5 shadow-2xs space-y-2">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
-              <h4 className="font-semibold text-emerald-900 text-[14px] flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-emerald-600" />
-                <span>Unit Economics & Profit Margin (iOS & Android)</span>
+          {/* Card 4: Unit Economics Calculator */}
+          <div className="bg-gradient-to-br from-emerald-50/90 via-cream/60 to-white border border-emerald-200/80 rounded-2xl p-4 shadow-2xs space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <h4 className="font-semibold text-emerald-950 text-[13.5px] flex items-center gap-1.5 whitespace-nowrap">
+                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                <span>Unit Economics (15% Store Tier)</span>
               </h4>
-              <span className="text-[11px] text-emerald-800 font-medium">
-                15% service fee for first $1M/yr (Google Play 15% Tier & Apple Small Business)
+              <span className="text-[10.5px] text-emerald-800 font-medium whitespace-nowrap">
+                Apple &amp; Google Play
               </span>
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center pt-1">
-              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
-                <span className="text-[11px] text-light uppercase font-bold block">User Price</span>
-                <span className="text-[17px] font-bold text-charcoal font-sans">${monetizationConfig.introPriceUsd.toFixed(2)}/mo</span>
+            <div className="grid grid-cols-4 gap-2 text-center">
+              <div className="p-2 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[10px] text-light uppercase font-bold block truncate">Price</span>
+                <span className="text-[14px] sm:text-[15px] font-bold text-charcoal font-sans">${monetizationConfig.introPriceUsd.toFixed(2)}</span>
               </div>
-              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
-                <span className="text-[11px] text-light uppercase font-bold block">Store Fee (15% Tier)</span>
-                <span className="text-[17px] font-bold text-rose-700 font-sans">-${(monetizationConfig.introPriceUsd * 0.15).toFixed(2)}</span>
+              <div className="p-2 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[10px] text-light uppercase font-bold block truncate">Store 15%</span>
+                <span className="text-[14px] sm:text-[15px] font-bold text-rose-700 font-sans">-${(monetizationConfig.introPriceUsd * 0.15).toFixed(2)}</span>
               </div>
-              <div className="p-2.5 bg-white rounded-xl border border-emerald-100">
-                <span className="text-[11px] text-light uppercase font-bold block">Avg Gemini Cost</span>
-                <span className="text-[17px] font-bold text-amber-700 font-sans">~$0.04</span>
+              <div className="p-2 bg-white rounded-xl border border-emerald-100">
+                <span className="text-[10px] text-light uppercase font-bold block truncate">AI Cost</span>
+                <span className="text-[14px] sm:text-[15px] font-bold text-amber-700 font-sans">~$0.04</span>
               </div>
-              <div className="p-2.5 bg-white rounded-xl border border-emerald-200">
-                <span className="text-[11px] text-emerald-800 uppercase font-bold block">Your Net Profit</span>
-                <span className="text-[17px] font-bold text-emerald-700 font-sans">+${(monetizationConfig.introPriceUsd * 0.85 - 0.04).toFixed(2)}/mo</span>
+              <div className="p-2 bg-white rounded-xl border border-emerald-200">
+                <span className="text-[10px] text-emerald-800 uppercase font-bold block truncate">Net Profit</span>
+                <span className="text-[14px] sm:text-[15px] font-bold text-emerald-700 font-sans">+${(monetizationConfig.introPriceUsd * 0.85 - 0.04).toFixed(2)}</span>
               </div>
             </div>
           </div>
 
           {/* Save Button */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={handleSaveMonetization}
-              disabled={isSavingMonetization}
-              className="px-6 py-3 bg-neutral-900 hover:bg-neutral-800 text-white font-bold rounded-xl flex items-center gap-2 text-[14px] shadow-sm cursor-pointer disabled:opacity-50"
-            >
-              {isSavingMonetization ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 text-amber-400" />}
-              <span>Save & Apply Monetization Settings</span>
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={handleSaveMonetization}
+            disabled={isSavingMonetization}
+            className="w-full py-3 bg-charcoal hover:bg-neutral-800 active:scale-[0.99] text-white font-bold rounded-xl flex items-center justify-center gap-2 text-[14px] shadow-sm cursor-pointer transition-all disabled:opacity-50"
+          >
+            {isSavingMonetization ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4 text-amber-400" />}
+            <span>Save & Apply Monetization Settings</span>
+          </button>
         </div>
       )}
 
       {/* PLAN CHANGE MODAL */}
       {selectedUser && (
         <div className="fixed inset-0 z-[150] bg-charcoal/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-6 sm:p-7 max-w-md w-full shadow-2xl border border-border space-y-5 animate-in zoom-in-95">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="font-serif text-2xl text-charcoal dark:text-white font-bold">Assign Subscription</h3>
-                <p className="text-light text-[13px] mt-0.5 truncate max-w-[280px]">
-                  {selectedUser.displayName || 'User'} ({selectedUser.email || selectedUser.uid})
+          <div className="bg-white dark:bg-[#1E293B] rounded-3xl p-5 sm:p-6 max-w-sm w-full shadow-2xl border border-border space-y-4 animate-in zoom-in-95">
+            <div className="flex justify-between items-start gap-2">
+              <div className="min-w-0">
+                <h3 className="font-serif text-xl text-charcoal dark:text-white font-bold">Assign Subscription</h3>
+                <p className="text-light text-[12px] mt-0.5 truncate">
+                  {selectedUser.displayName || 'Mother'} • {selectedUser.email || selectedUser.uid}
                 </p>
               </div>
               <button
+                type="button"
                 onClick={() => setSelectedUser(null)}
-                className="p-1 text-light hover:text-charcoal dark:hover:text-white cursor-pointer text-lg"
+                className="p-1 text-light hover:text-charcoal dark:hover:text-white cursor-pointer text-base"
               >
                 ✕
               </button>
             </div>
 
             {/* Select Plan Tier */}
-            <div className="space-y-2">
-              <label className="text-[11px] font-bold text-light uppercase tracking-wider">Select Tier</label>
-              <div className="grid grid-cols-2 gap-2.5">
+            <div className="space-y-1.5">
+              <label className="text-[10.5px] font-bold text-light uppercase tracking-wider">Select Tier</label>
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setPlanOption('free')}
-                  className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                  className={`py-2.5 px-3 rounded-xl border text-center text-[13px] whitespace-nowrap transition-all cursor-pointer ${
                     planOption === 'free'
                       ? 'border-charcoal dark:border-white bg-gray-100 dark:bg-white/10 font-bold text-charcoal dark:text-white'
                       : 'border-border hover:border-gray-300 text-charcoal dark:text-white'
                   }`}
                 >
-                  <span className="text-[13px] block">Free Plan</span>
+                  Free Plan
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setPlanOption('premium')}
-                  className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                  className={`py-2.5 px-3 rounded-xl border text-center text-[13px] whitespace-nowrap transition-all cursor-pointer ${
                     planOption === 'premium'
-                      ? 'border-gold bg-gold-pale text-gold-dark font-bold'
-                      : 'border-border hover:border-gold text-charcoal dark:text-white'
+                      ? 'border-amber-400 bg-amber-50 text-amber-900 font-bold'
+                      : 'border-border hover:border-amber-300 text-charcoal dark:text-white'
                   }`}
                 >
-                  <span className="text-[13px] block">👑 Pro Plan</span>
+                  👑 Pro Plan
                 </button>
               </div>
             </div>
 
             {/* Select Duration */}
             {planOption !== 'free' && (
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-light uppercase tracking-wider">Duration</label>
+              <div className="space-y-1.5">
+                <label className="text-[10.5px] font-bold text-light uppercase tracking-wider">Duration</label>
                 <div className="grid grid-cols-3 gap-2 text-[12px]">
                   {[
-                    { label: '1 Month', val: 1 },
-                    { label: '3 Months', val: 3 },
-                    { label: '6 Months', val: 6 },
-                    { label: '12 Months', val: 12 },
-                    { label: 'Lifetime / Perpetual', val: null },
+                    { label: '1 Mo', val: 1 },
+                    { label: '3 Mos', val: 3 },
+                    { label: '6 Mos', val: 6 },
+                    { label: '12 Mos', val: 12 },
+                    { label: 'Lifetime Access', val: null },
                   ].map((dur) => (
                     <button
                       key={String(dur.val)}
                       type="button"
                       onClick={() => setDurationMonths(dur.val)}
-                      className={`p-2.5 rounded-xl border text-center transition-all cursor-pointer ${
+                      className={`py-2 px-2 rounded-xl border text-center whitespace-nowrap transition-all cursor-pointer ${
                         durationMonths === dur.val
                           ? 'border-sage-dark bg-sage/20 font-bold text-sage-dark'
                           : 'border-border hover:border-sage'
@@ -1071,26 +1054,26 @@ export const AdminPanel: React.FC = () => {
 
             {/* Email Notification Option */}
             {planOption !== 'free' && selectedUser.email && (
-              <label className="flex items-center gap-2.5 p-3 bg-cream dark:bg-[#0F172A] border border-border rounded-xl cursor-pointer text-[12.5px] text-charcoal dark:text-white">
+              <label className="flex items-center gap-2.5 p-2.5 bg-cream dark:bg-[#0F172A] border border-border rounded-xl cursor-pointer text-[12px] text-charcoal dark:text-white">
                 <input
                   type="checkbox"
                   checked={sendEmailNotification}
                   onChange={(e) => setSendEmailNotification(e.target.checked)}
-                  className="w-4 h-4 rounded text-sage focus:ring-sage"
+                  className="w-4 h-4 rounded text-sage focus:ring-sage shrink-0"
                 />
                 <span className="flex items-center gap-1.5 font-medium truncate">
                   <Mail className="w-3.5 h-3.5 text-sage shrink-0" />
-                  <span className="truncate">Send warm invitation email to <strong>{selectedUser.email}</strong></span>
+                  <span className="truncate">Notify <strong>{selectedUser.email}</strong></span>
                 </span>
               </label>
             )}
 
             {/* Actions */}
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={() => setSelectedUser(null)}
-                className="flex-1 py-2.5 border border-border rounded-xl text-sm font-semibold text-charcoal dark:text-white hover:bg-gray-50 cursor-pointer"
+                className="flex-1 py-2.5 border border-border rounded-xl text-[13px] font-semibold text-charcoal dark:text-white hover:bg-gray-50 cursor-pointer"
               >
                 Cancel
               </button>
@@ -1098,9 +1081,9 @@ export const AdminPanel: React.FC = () => {
                 type="button"
                 onClick={handleApplyPlan}
                 disabled={updatingUid === selectedUser.uid}
-                className="flex-1 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-sm font-bold shadow-md cursor-pointer transition-colors disabled:opacity-50"
+                className="flex-1 py-2.5 bg-sage hover:bg-sage-dark text-white rounded-xl text-[13px] font-bold shadow-sm cursor-pointer transition-colors disabled:opacity-50"
               >
-                {updatingUid === selectedUser.uid ? 'Saving...' : 'Confirm Plan'}
+                {updatingUid === selectedUser.uid ? 'Saving...' : 'Confirm'}
               </button>
             </div>
           </div>
@@ -1110,38 +1093,29 @@ export const AdminPanel: React.FC = () => {
       {/* Delete User Confirmation Modal */}
       {userToDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-md w-full p-6 shadow-2xl border border-border space-y-4">
+          <div className="bg-white dark:bg-[#1E293B] rounded-2xl max-w-sm w-full p-5 shadow-2xl border border-border space-y-4">
             <div className="flex items-center gap-3 text-critical">
               <div className="w-10 h-10 rounded-full bg-red-100 dark:bg-red-950/50 flex items-center justify-center shrink-0">
-                <AlertTriangle size={22} className="text-red-600" />
+                <AlertTriangle size={20} className="text-red-600" />
               </div>
               <div>
-                <h3 className="font-serif font-bold text-[18px] text-charcoal">Delete User Account</h3>
-                <p className="text-[12px] text-light">This action is permanent and cannot be undone.</p>
+                <h3 className="font-serif font-bold text-[17px] text-charcoal dark:text-white">Delete User Account</h3>
+                <p className="text-[11.5px] text-light">Permanent action • Cannot be undone</p>
               </div>
             </div>
 
-            <div className="p-3.5 bg-red-50/70 dark:bg-red-950/20 border border-red-200/80 dark:border-red-900/40 rounded-xl space-y-2 text-[12.5px] text-charcoal">
+            <div className="p-3 bg-red-50/70 dark:bg-red-950/20 border border-red-200/80 rounded-xl text-[12px] text-charcoal dark:text-white space-y-1">
               <p>
-                Are you sure you want to permanently delete <strong className="text-red-700 dark:text-red-400">{userToDelete.displayName || userToDelete.email}</strong>?
+                Permanently delete <strong className="text-red-700 dark:text-red-400">{userToDelete.displayName || userToDelete.email}</strong> and all pregnancy logs, vitals, and authentication records?
               </p>
-              <p className="text-[11.5px] text-light">
-                This will completely remove:
-              </p>
-              <ul className="list-disc list-inside text-[11.5px] text-light space-y-0.5 pl-1">
-                <li>Firebase Authentication login credentials</li>
-                <li>User profile and pregnancy configurations</li>
-                <li>All pregnancy tracking history (kicks, vitals, logs)</li>
-                <li>All submitted feedback records</li>
-              </ul>
             </div>
 
-            <div className="flex gap-3 pt-2">
+            <div className="flex gap-2.5 pt-1">
               <button
                 type="button"
                 onClick={() => setUserToDelete(null)}
                 disabled={isDeleting}
-                className="flex-1 py-2.5 border border-border rounded-xl text-sm font-semibold text-charcoal dark:text-white hover:bg-gray-50 cursor-pointer disabled:opacity-50"
+                className="flex-1 py-2.5 border border-border rounded-xl text-[13px] font-semibold text-charcoal dark:text-white hover:bg-gray-50 cursor-pointer disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1149,15 +1123,15 @@ export const AdminPanel: React.FC = () => {
                 type="button"
                 onClick={handleDeleteUser}
                 disabled={isDeleting}
-                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-bold shadow-md cursor-pointer transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-[13px] font-bold shadow-sm cursor-pointer transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50"
               >
                 {isDeleting ? (
                   <>
-                    <RefreshCw size={15} className="animate-spin" /> Deleting...
+                    <RefreshCw size={14} className="animate-spin" /> Deleting...
                   </>
                 ) : (
                   <>
-                    <Trash2 size={15} /> Delete Permanently
+                    <Trash2 size={14} /> Delete
                   </>
                 )}
               </button>
