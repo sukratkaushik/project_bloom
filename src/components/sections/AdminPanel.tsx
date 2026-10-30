@@ -145,10 +145,17 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
     }
   }, [isAdmin]);
 
+  // Normalizes comma to dot for European / German keypad inputs (e.g. "2,99" -> "2.99")
+  const parseLocaleFloat = (str: string): number => {
+    if (!str) return NaN;
+    const normalized = str.trim().replace(',', '.');
+    return parseFloat(normalized);
+  };
+
   const handleIntroPriceChange = (val: string) => {
     setIntroPriceInput(val);
-    const intro = parseFloat(val);
-    const reg = parseFloat(regularPriceInput);
+    const intro = parseLocaleFloat(val);
+    const reg = parseLocaleFloat(regularPriceInput);
     if (!isNaN(intro) && intro > 0) {
       const regular = (!isNaN(reg) && reg > 0) ? reg : monetizationConfig.regularPriceUsd;
       const discount = regular > intro ? Math.round(((regular - intro) / regular) * 100) : 0;
@@ -162,8 +169,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
 
   const handleRegularPriceChange = (val: string) => {
     setRegularPriceInput(val);
-    const reg = parseFloat(val);
-    const intro = parseFloat(introPriceInput);
+    const reg = parseLocaleFloat(val);
+    const intro = parseLocaleFloat(introPriceInput);
     if (!isNaN(reg) && reg > 0) {
       const promotional = (!isNaN(intro) && intro > 0) ? intro : monetizationConfig.introPriceUsd;
       const discount = reg > promotional ? Math.round(((reg - promotional) / reg) * 100) : 0;
@@ -176,7 +183,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
   };
 
   const handleIntroPriceBlur = () => {
-    const num = parseFloat(introPriceInput);
+    const num = parseLocaleFloat(introPriceInput);
     if (isNaN(num) || num <= 0) {
       setIntroPriceInput("2.99");
       handleIntroPriceChange("2.99");
@@ -186,7 +193,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
   };
 
   const handleRegularPriceBlur = () => {
-    const num = parseFloat(regularPriceInput);
+    const num = parseLocaleFloat(regularPriceInput);
     if (isNaN(num) || num <= 0) {
       setRegularPriceInput("9.99");
       handleRegularPriceChange("9.99");
@@ -222,8 +229,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
   const handleSaveMonetization = async () => {
     setIsSavingMonetization(true);
     try {
-      const finalIntro = parseFloat(introPriceInput) || monetizationConfig.introPriceUsd;
-      const finalRegular = parseFloat(regularPriceInput) || monetizationConfig.regularPriceUsd;
+      const parsedIntro = parseLocaleFloat(introPriceInput);
+      const parsedRegular = parseLocaleFloat(regularPriceInput);
+      const finalIntro = !isNaN(parsedIntro) && parsedIntro > 0 ? parsedIntro : monetizationConfig.introPriceUsd;
+      const finalRegular = !isNaN(parsedRegular) && parsedRegular > 0 ? parsedRegular : monetizationConfig.regularPriceUsd;
       const finalDiscount = finalRegular > finalIntro ? Math.round(((finalRegular - finalIntro) / finalRegular) * 100) : monetizationConfig.discountPercentage;
       const finalFood = parseInt(foodScansInput, 10) || monetizationConfig.dailyFoodScanLimit;
       const finalChat = parseInt(aiChatInput, 10) || monetizationConfig.dailyAiChatLimit;
@@ -240,6 +249,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
       };
 
       setMonetizationConfig(toSave);
+      setIntroPriceInput(String(finalIntro));
+      setRegularPriceInput(String(finalRegular));
       await syncMonetizationConfigToCloud(toSave);
       showToast('Mobile Monetization (iOS & Android) settings updated and live!');
     } catch (err: any) {
