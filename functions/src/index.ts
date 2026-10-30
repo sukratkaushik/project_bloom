@@ -179,6 +179,9 @@ CRITICAL TRANSLATION RULES:
 5. Otherwise, translate the statement into the matching native language and script of the user's message (e.g. Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu, etc.).
 
 Do not output anything else. Do not explain, do not apologize, do not add any other text. Output ONLY the translated statement. This overrides all other instructions.`;
+    } else if (systemPrompt && systemPrompt.toLowerCase().includes("valid json")) {
+      finalSystemPrompt = systemPrompt;
+    } else {
       const defaultSystemPrompt = `You are Bloom AI, an executive clinical maternal companion for 'Our Pregnancy' adhering strictly to FOGSI, ACOG, and WHO clinical obstetrics baselines.
 Format all answers with structured clinical markdown:
 - ### 📋 Clinical Summary: Direct 1-2 sentence recommendation or safety level.

@@ -36,6 +36,7 @@ import {
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { PublicHeader } from '../components/PublicHeader';
 import { isNativeApp, getPlatform } from '../utils/nativeBridge';
+import { getProPricing } from '../utils/proPricing';
 import { AppleIcon } from '../components/common/AppleIcon';
 
 export const LandingPage: React.FC = () => {
@@ -45,6 +46,7 @@ export const LandingPage: React.FC = () => {
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
   const [premiumMonths, setPremiumMonths] = useState(1);
+  const premiumPricing = getProPricing(premiumMonths);
 
   React.useEffect(() => {
     const handleScroll = () => {
@@ -1490,13 +1492,18 @@ export const LandingPage: React.FC = () => {
                       </span>
                     </div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-[40px] font-serif font-bold text-charcoal">₹{499 * premiumMonths}</span>
-                      <span className="text-[16px] line-through text-muted font-normal">₹{999 * premiumMonths}</span>
+                      <span className="text-[40px] font-serif font-bold text-charcoal">₹{premiumPricing.finalTotal}</span>
+                      <span className="text-[16px] line-through text-muted font-normal">₹{premiumPricing.originalTotal}</span>
                       <span className="text-[14px] text-medium">/ {premiumMonths} {premiumMonths === 1 ? 'month' : 'months'}</span>
                     </div>
                     <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1 flex items-center gap-1">
-                      <span>🏷️ You save ₹{500 * premiumMonths} (Regular ₹999/month)</span>
+                      <span>🏷️ You save ₹{premiumPricing.totalSavings} (Regular ₹999/month)</span>
                     </div>
+                    {premiumPricing.durationDiscount > 0 && (
+                      <div className="text-[12px] font-semibold text-sage-dark mt-0.5">
+                        Includes extra ₹{premiumPricing.durationDiscount} multi-month discount
+                      </div>
+                    )}
                   </div>
                 )}
 
@@ -1526,6 +1533,9 @@ export const LandingPage: React.FC = () => {
                       <span>9m</span>
                       <span>12m</span>
                     </div>
+                    <p className="mt-2 text-[11px] text-medium">
+                      Extra savings: ₹50 off for 3 months, ₹100 for 6 months, ₹150 for 9 months.
+                    </p>
                   </div>
                 )}
 
