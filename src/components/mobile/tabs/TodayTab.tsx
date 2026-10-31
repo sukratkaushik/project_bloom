@@ -34,6 +34,7 @@ import {
 } from '../../../utils/fetalGrowth';
 import { FetalGrowthReassuranceModal } from '../../FetalGrowthReassuranceModal';
 import { getAuthoritativeNextMilestone } from '../../../data/clinicalSchedule';
+import { getHealthProviderName, getHealthPlatform } from '../../../utils/healthConnectBridge';
 
 interface TodayTabProps {
   onOpenTool: (toolId: string) => void;
@@ -933,11 +934,11 @@ export const TodayTab: React.FC<TodayTabProps> = ({
           </div>
         </div>
 
-        {/* Health Connect Quick Strip */}
+        {/* Native Health Quick Strip */}
         <div className="mt-3 pt-2.5 border-t border-border/60 flex items-center justify-between text-[11px]">
           <div className="flex items-center gap-1.5">
-            <HeartPulse size={13} className="text-sage" />
-            <span className="font-semibold text-charcoal">Google Health Connect</span>
+            <HeartPulse size={13} className={getHealthPlatform() === 'ios' ? 'text-[#FF2D55]' : 'text-sage'} />
+            <span className="font-semibold text-charcoal">{getHealthProviderName()}</span>
           </div>
           <button
             type="button"

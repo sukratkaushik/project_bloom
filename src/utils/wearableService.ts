@@ -1,6 +1,6 @@
 import { db, VitalsLog } from '../db';
 import { v4 as uuidv4 } from 'uuid';
-import { syncHealthConnectVitals } from './healthConnectBridge';
+import { syncHealthVitals, getHealthPlatform } from './healthConnectBridge';
 
 export interface WearableDevice {
   id: string;
@@ -23,9 +23,10 @@ export const WEARABLE_DEVICES: WearableDevice[] = [
   {
     id: 'apple_health',
     name: 'Apple Health',
-    description: 'Sync heart rate, physical activity, and sleep metrics from Apple Watch.',
+    description: 'Sync heart rate, physical activity, blood pressure, and sleep metrics from Apple Watch & HealthKit.',
     color: '#FF2D55',
-    icon: '⌚'
+    icon: '⌚',
+    isNativeHealth: true
   },
   {
     id: 'oura',
@@ -49,6 +50,18 @@ export const WEARABLE_DEVICES: WearableDevice[] = [
     icon: '💠'
   }
 ];
+
+/**
+ * Returns third-party wearable devices excluding whichever native health provider
+ * (Apple Health on iOS, Google Health on Android) is already highlighted as the hero card.
+ */
+export function getAvailableWearables(): WearableDevice[] {
+  const platform = getHealthPlatform();
+  if (platform === 'ios') {
+    return WEARABLE_DEVICES.filter(d => d.id !== 'apple_health' && d.id !== 'google_health');
+  }
+  return WEARABLE_DEVICES.filter(d => d.id !== 'google_health');
+}
 
 /**
  * Generates realistic pregnancy-related biometrics for simulation.
@@ -92,8 +105,14 @@ export function generateMockBiometrics(source: string, daysAgo: number): {
  * Syncs data for the last 7 days for a given wearable source into Dexie DB.
  */
 export async function syncWearableData(journeyId: string, source: string): Promise<VitalsLog[]> {
-  if (source === 'google_health' || source === 'google_fit' || source === 'Google Health Connect') {
-    const res = await syncHealthConnectVitals(journeyId, 7);
+  if (
+    source === 'google_health' ||
+    source === 'google_fit' ||
+    source === 'Google Health Connect' ||
+    source === 'apple_health' ||
+    source === 'Apple Health'
+  ) {
+    const res = await syncHealthVitals(journeyId, 7);
     return res.syncedLogs;
   }
 

@@ -284,7 +284,20 @@ export const exportToPDF = async (state: PlannerState) => {
           } else if (vital.type === 'WEARABLE') {
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(51, 51, 51);
-            const sourceName = vital.source === 'apple_health' ? 'Apple Health' : vital.source === 'oura' ? 'Oura Ring' : vital.source === 'google_fit' ? 'Google Fit' : vital.source === 'garmin' ? 'Garmin' : vital.source === 'fitbit' ? 'Fitbit' : 'Wearable';
+            const sourceName =
+              vital.source === 'apple_health' || vital.source === 'Apple Health'
+                ? 'Apple Health'
+                : vital.source === 'google_health' || vital.source === 'Google Health Connect'
+                ? 'Health Connect'
+                : vital.source === 'oura'
+                ? 'Oura Ring'
+                : vital.source === 'google_fit'
+                ? 'Google Fit'
+                : vital.source === 'garmin'
+                ? 'Garmin'
+                : vital.source === 'fitbit'
+                ? 'Fitbit'
+                : 'Wearable';
             doc.text(`Wearables Sync (${sourceName})`, margin + 6, yPos);
             yPos += 5;
             doc.setFont('helvetica', 'normal');

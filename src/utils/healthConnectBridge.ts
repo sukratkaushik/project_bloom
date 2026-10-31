@@ -3,12 +3,16 @@ import { HealthFitness } from '@capacitor/health-fitness';
 import { db, VitalsLog } from '../db';
 import { v4 as uuidv4 } from 'uuid';
 
+export type HealthPlatformType = 'ios' | 'android' | 'web';
+
 export interface HealthConnectStatus {
   isSupported: boolean;
   isNative: boolean;
   isConnected: boolean;
   lastSyncTime: number | null;
   syncedCount: number;
+  platform: HealthPlatformType;
+  providerName: string;
 }
 
 export interface SyncVitalsResult {
@@ -27,22 +31,63 @@ const STORAGE_KEYS = {
 };
 
 /**
- * Checks whether Android Health Connect / native health bridge is available.
+ * Returns current platform: 'ios', 'android', or 'web'.
  */
-export const isHealthConnectSupported = (): boolean => {
-  return Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android';
+export const getHealthPlatform = (): HealthPlatformType => {
+  if (Capacitor.isNativePlatform()) {
+    const p = Capacitor.getPlatform();
+    if (p === 'ios') return 'ios';
+    if (p === 'android') return 'android';
+  }
+  return 'web';
 };
 
 /**
- * Returns current Health Connect connection state and metadata.
+ * Returns user-facing name of the native health service.
  */
-export const getHealthConnectStatus = (): HealthConnectStatus => {
+export const getHealthProviderName = (): string => {
+  const p = getHealthPlatform();
+  if (p === 'ios') return 'Apple Health';
+  if (p === 'android') return 'Google Health Connect';
+  return 'Connected Health (Preview)';
+};
+
+/**
+ * Returns concise description of the native health bridge.
+ */
+export const getHealthProviderDescription = (): string => {
+  const p = getHealthPlatform();
+  if (p === 'ios') return 'Sync prenatal biometrics via HealthKit & Apple Watch';
+  if (p === 'android') return 'Automatic background sync from Android';
+  return 'Simulated health sync for web preview';
+};
+
+/**
+ * Checks whether native health bridge is available (iOS HealthKit or Android Health Connect).
+ */
+export const isNativeHealthSupported = (): boolean => {
+  return Capacitor.isNativePlatform();
+};
+
+/**
+ * Backwards-compatible check.
+ */
+export const isHealthConnectSupported = (): boolean => {
+  return Capacitor.isNativePlatform();
+};
+
+/**
+ * Returns current health connection state and metadata.
+ */
+export const getHealthStatus = (): HealthConnectStatus => {
   const isNative = Capacitor.isNativePlatform();
-  const isSupported = isHealthConnectSupported();
+  const isSupported = isNativeHealthSupported();
   const isConnected = localStorage.getItem(STORAGE_KEYS.CONNECTED) === 'true';
   const lastSyncRaw = localStorage.getItem(STORAGE_KEYS.LAST_SYNC);
   const lastSyncTime = lastSyncRaw ? parseInt(lastSyncRaw, 10) : null;
   const syncedCount = parseInt(localStorage.getItem(STORAGE_KEYS.LAST_COUNT) || '0', 10);
+  const platform = getHealthPlatform();
+  const providerName = getHealthProviderName();
 
   return {
     isSupported,
@@ -50,15 +95,22 @@ export const getHealthConnectStatus = (): HealthConnectStatus => {
     isConnected,
     lastSyncTime,
     syncedCount,
+    platform,
+    providerName,
   };
 };
 
+export const getHealthConnectStatus = getHealthStatus;
+
 /**
- * Requests Health Connect read/write permissions for pregnancy-critical vitals.
+ * Requests Health read/write permissions for pregnancy-critical vitals.
+ * Works for both Apple HealthKit (iOS) and Health Connect (Android).
  */
-export const requestHealthConnectPermissions = async (): Promise<{ success: boolean; error?: string }> => {
-  if (!isHealthConnectSupported()) {
-    // In web / non-Android mode, toggle simulated connection
+export const requestHealthPermissions = async (): Promise<{ success: boolean; error?: string }> => {
+  const providerName = getHealthProviderName();
+
+  if (!isNativeHealthSupported()) {
+    // In web / desktop preview mode, toggle simulated connection
     localStorage.setItem(STORAGE_KEYS.CONNECTED, 'true');
     return { success: true };
   }
@@ -76,7 +128,7 @@ export const requestHealthConnectPermissions = async (): Promise<{ success: bool
     localStorage.setItem(STORAGE_KEYS.CONNECTED, 'true');
     return { success: true };
   } catch (err: any) {
-    console.error('Failed to request Health Connect permissions:', err);
+    console.error(`Failed to request ${providerName} permissions:`, err);
     return {
       success: false,
       error: err?.message || 'Permission request was denied or cancelled.',
@@ -84,11 +136,13 @@ export const requestHealthConnectPermissions = async (): Promise<{ success: bool
   }
 };
 
+export const requestHealthConnectPermissions = requestHealthPermissions;
+
 /**
- * Disconnects Health Connect and revokes local session credentials.
+ * Disconnects health bridge and resets local session credentials.
  */
-export const disconnectHealthConnect = async (): Promise<void> => {
-  if (isHealthConnectSupported()) {
+export const disconnectHealthPlatform = async (): Promise<void> => {
+  if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
     try {
       await HealthFitness.disconnectFromHealthConnect();
     } catch (err) {
@@ -101,11 +155,14 @@ export const disconnectHealthConnect = async (): Promise<void> => {
   localStorage.removeItem(STORAGE_KEYS.LAST_COUNT);
 };
 
+export const disconnectHealthConnect = disconnectHealthPlatform;
+
 /**
- * Opens Android's system Health Connect manager screen.
+ * Opens native health manager (Apple Health on iOS, Health Connect on Android).
  */
-export const openHealthConnectApp = async (): Promise<void> => {
-  if (isHealthConnectSupported()) {
+export const openHealthApp = async (): Promise<void> => {
+  const platform = getHealthPlatform();
+  if (platform === 'android') {
     try {
       await HealthFitness.openHealthConnect();
     } catch (err) {
@@ -113,10 +170,14 @@ export const openHealthConnectApp = async (): Promise<void> => {
       // Deep link to Play Store if not installed
       window.open('https://play.google.com/store/apps/details?id=com.google.android.apps.healthdata', '_blank');
     }
+  } else if (platform === 'ios') {
+    window.location.href = 'x-apple-health://';
   } else {
     window.open('https://health.google/health-connect/', '_blank');
   }
 };
+
+export const openHealthConnectApp = openHealthApp;
 
 // Formats date to 'yyyy-MM-ddTHH:mm:ssZ' without milliseconds as required by Health Connect native parser
 const toHealthDate = (d: Date): string => {
@@ -185,7 +246,7 @@ function generateMockImport(daysAgo: number) {
  * Synchronizes Health Connect data from native Android Health Connect (or simulation fallback)
  * into Dexie local database (`db.vitalsLogs`).
  */
-export const syncHealthConnectVitals = async (
+export const syncHealthVitals = async (
   journeyId: string,
   daysBack: number = 7
 ): Promise<SyncVitalsResult> => {
@@ -199,6 +260,10 @@ export const syncHealthConnectVitals = async (
     };
   }
 
+  const platform = getHealthPlatform();
+  const providerName = getHealthProviderName();
+  const sourceName = platform === 'ios' ? 'Apple Health' : platform === 'android' ? 'Google Health Connect' : 'Connected Health (Preview)';
+
   const startDate = new Date();
   startDate.setDate(startDate.getDate() - daysBack);
   startDate.setHours(0, 0, 0, 0);
@@ -210,8 +275,8 @@ export const syncHealthConnectVitals = async (
   let updatedCount = 0;
 
   try {
-    if (isHealthConnectSupported()) {
-      // 1. Native Android Health Connect Queries
+    if (isNativeHealthSupported()) {
+      // 1. Native Health Queries (Apple HealthKit on iOS / Health Connect on Android)
       const [bpRecords, weightRecords, hrRecords, stepRecords, sleepRecords, spo2Records, tempRecords] =
         await Promise.all([
           queryVariable('BLOOD_PRESSURE', startDate, endDate),
@@ -236,9 +301,10 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        // Health Connect BP records typically supply systolic and diastolic in mmHg
-        existing.systolic = Math.round(r.systolic || r.value?.systolic || 120);
-        existing.diastolic = Math.round(r.diastolic || r.value?.diastolic || 80);
+        const sys = r.systolic || r.value?.systolic || (typeof r.value === 'number' ? r.value : 120);
+        const dia = r.diastolic || r.value?.diastolic || 80;
+        existing.systolic = Math.round(sys);
+        existing.diastolic = Math.round(dia);
         dayMap.set(key, existing);
       });
 
@@ -259,7 +325,7 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        const bpm = Math.round(r.bpm || r.heartRate || r.value || 0);
+        const bpm = Math.round(r.bpm || r.heartRate || (typeof r.value === 'number' ? r.value : 0));
         if (bpm > 0) {
           existing.pulse = bpm;
           existing.restingHeartRate = bpm;
@@ -272,7 +338,7 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        const steps = Math.round(r.steps || r.value || 0);
+        const steps = Math.round(r.steps || (typeof r.value === 'number' ? r.value : 0));
         if (steps > 0) {
           existing.steps = (existing.steps || 0) + steps;
         }
@@ -284,13 +350,12 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        // Duration in hours
         let hours = 0;
         if (r.durationMinutes) {
           hours = r.durationMinutes / 60;
         } else if (r.startDate && r.endDate) {
           hours = (new Date(r.endDate).getTime() - new Date(r.startDate).getTime()) / (1000 * 60 * 60);
-        } else if (r.value) {
+        } else if (typeof r.value === 'number') {
           hours = Number(r.value);
         }
         if (hours > 0 && hours < 24) {
@@ -304,7 +369,7 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        const spo2 = Math.round(r.percentage || r.value || 0);
+        const spo2 = Math.round(r.percentage || (typeof r.value === 'number' ? r.value : 0));
         if (spo2 > 0) existing.spo2 = spo2;
         dayMap.set(key, existing);
       });
@@ -314,7 +379,7 @@ export const syncHealthConnectVitals = async (
         const t = r.startDate ? new Date(r.startDate).getTime() : Date.now();
         const key = getDayKey(t);
         const existing = dayMap.get(key) || { timestamp: t };
-        const temp = Number(r.temperature || r.value || 0);
+        const temp = Number(r.temperature || (typeof r.value === 'number' ? r.value : 0));
         if (temp > 30 && temp < 45) {
           existing.basalBodyTemp = Math.round(temp * 10) / 10;
         }
@@ -329,16 +394,21 @@ export const syncHealthConnectVitals = async (
           .equals(journeyId)
           .filter(log => {
             const lDate = getDayKey(log.timestamp);
-            return lDate === dayKey && log.source === 'Google Health Connect';
+            return (
+              lDate === dayKey &&
+              (log.source === sourceName ||
+                log.source === 'Google Health Connect' ||
+                log.source === 'Apple Health' ||
+                log.source === 'apple_health')
+            );
           })
           .first();
 
         if (existingInDb) {
-          // Merge updated metrics
           await db.vitalsLogs.update(existingInDb.id, {
             ...metrics,
-            source: 'Google Health Connect',
-            notes: existingInDb.notes || 'Imported from Google Health Connect',
+            source: sourceName,
+            notes: existingInDb.notes || `Imported from ${sourceName}`,
           });
           updatedCount++;
           importedLogs.push({ ...existingInDb, ...metrics });
@@ -348,8 +418,8 @@ export const syncHealthConnectVitals = async (
             journeyId,
             timestamp: ts,
             type: 'WEARABLE',
-            source: 'Google Health Connect',
-            notes: 'Imported from Google Health Connect',
+            source: sourceName,
+            notes: `Imported from ${sourceName}`,
             ...metrics,
           };
           await db.vitalsLogs.put(newEntry);
@@ -367,7 +437,11 @@ export const syncHealthConnectVitals = async (
           .equals(journeyId)
           .filter(log => {
             return (
-              (log.source === 'Google Health Connect' || log.source === 'Google Health Connect (Preview)') &&
+              (log.source === sourceName ||
+                log.source === 'Google Health Connect' ||
+                log.source === 'Google Health Connect (Preview)' ||
+                log.source === 'Apple Health' ||
+                log.source === 'Apple Health (Preview)') &&
               new Date(log.timestamp).toDateString() === dayStr
             );
           })
@@ -376,7 +450,7 @@ export const syncHealthConnectVitals = async (
         if (existing) {
           await db.vitalsLogs.update(existing.id, {
             ...mock,
-            source: 'Google Health Connect (Preview)',
+            source: sourceName,
           });
           updatedCount++;
           importedLogs.push({ ...existing, ...mock });
@@ -385,8 +459,8 @@ export const syncHealthConnectVitals = async (
             id: uuidv4(),
             journeyId,
             type: 'WEARABLE',
-            source: 'Google Health Connect (Preview)',
-            notes: 'Imported from Google Health Connect (Preview)',
+            source: sourceName,
+            notes: `Imported from ${sourceName}`,
             ...mock,
           };
           await db.vitalsLogs.put(newEntry);
@@ -404,18 +478,20 @@ export const syncHealthConnectVitals = async (
       success: true,
       importedCount: importedLogs.length - updatedCount,
       updatedCount,
-      message: `Successfully synchronized ${importedLogs.length} days of Google Health records into local database.`,
+      message: `Successfully synchronized ${importedLogs.length} days of ${providerName} records into local database.`,
       syncedLogs: importedLogs,
     };
   } catch (err: any) {
-    console.error('Error synchronizing Health Connect vitals:', err);
+    console.error(`Error synchronizing ${providerName} vitals:`, err);
     return {
       success: false,
       importedCount: 0,
       updatedCount: 0,
-      message: 'Failed to synchronize with Health Connect.',
+      message: `Failed to synchronize with ${providerName}.`,
       error: err?.message || String(err),
       syncedLogs: [],
     };
   }
 };
+
+export const syncHealthConnectVitals = syncHealthVitals;

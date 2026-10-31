@@ -30,14 +30,17 @@ import {
   FileText,
   Smartphone
 } from 'lucide-react';
-import { WEARABLE_DEVICES, syncWearableData } from '../../utils/wearableService';
+import { WEARABLE_DEVICES, syncWearableData, getAvailableWearables } from '../../utils/wearableService';
 import {
   getHealthConnectStatus,
   requestHealthConnectPermissions,
   disconnectHealthConnect,
   syncHealthConnectVitals,
   openHealthConnectApp,
-  HealthConnectStatus
+  HealthConnectStatus,
+  getHealthPlatform,
+  getHealthProviderName,
+  getHealthProviderDescription,
 } from '../../utils/healthConnectBridge';
 import { triggerHaptic } from '../../utils/nativeBridge';
 
@@ -236,7 +239,10 @@ export const VitalsTracker: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'BP' | 'WEIGHT' | 'WEARABLES'>('BP');
   const [isSyncing, setIsSyncing] = useState(false);
 
-  // Health Connect specific state
+  // Native Health platform state
+  const healthPlatform = getHealthPlatform();
+  const providerName = getHealthProviderName();
+  const providerDescription = getHealthProviderDescription();
   const [hcStatus, setHcStatus] = useState<HealthConnectStatus>(() => getHealthConnectStatus());
   const [isSyncingHC, setIsSyncingHC] = useState(false);
   const [hcFeedback, setHcFeedback] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
@@ -351,7 +357,7 @@ export const VitalsTracker: React.FC = () => {
   const handleDisconnectHC = async () => {
     await disconnectHealthConnect();
     setHcStatus(getHealthConnectStatus());
-    setHcFeedback({ message: 'Disconnected Google Health Connect.', type: 'info' });
+    setHcFeedback({ message: `Disconnected ${providerName}.`, type: 'info' });
   };
 
   const handleOpenHCApp = async () => {
@@ -748,16 +754,29 @@ export const VitalsTracker: React.FC = () => {
                 </div>
               )}
 
-              {/* Google Health Connect Card */}
+              {/* Native Health Bridge Card (Apple Health on iOS / Google Health Connect on Android) */}
               <div className="bg-gradient-to-br from-cream via-cream/50 to-white border border-border/80 rounded-2xl p-5 shadow-2xs">
                 <div className="flex items-center justify-between gap-3 flex-wrap pb-3.5 border-b border-border/60">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center text-sage">
-                      <Smartphone className="w-5 h-5" />
-                    </div>
+                    {healthPlatform === 'ios' ? (
+                      <div className="w-9 h-9 rounded-xl bg-rose-50 border border-rose-100 flex items-center justify-center text-[#FF2D55]">
+                        <Heart className="w-5 h-5 fill-rose-500/20 text-[#FF2D55]" />
+                      </div>
+                    ) : (
+                      <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center text-sage">
+                        <Smartphone className="w-5 h-5" />
+                      </div>
+                    )}
                     <div>
-                      <h3 className="font-serif text-[17px] text-charcoal font-normal">Google Health Connect</h3>
-                      <p className="text-[11.5px] text-medium">Automatic background sync from Android</p>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-serif text-[17px] text-charcoal font-normal">{providerName}</h3>
+                        {healthPlatform === 'ios' && (
+                          <span className="text-[10px] font-sans font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-rose-100 text-rose-700">
+                            HealthKit
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[11.5px] text-medium">{providerDescription}</p>
                     </div>
                   </div>
 
@@ -774,7 +793,9 @@ export const VitalsTracker: React.FC = () => {
                 </div>
 
                 <p className="text-[12.5px] text-medium leading-relaxed my-3.5">
-                  Import Blood Pressure, Weight, Heart Rate, Steps, and Sleep securely without leaving your device.
+                  {healthPlatform === 'ios'
+                    ? 'Import Blood Pressure, Weight, Heart Rate, Steps, and Sleep securely from Apple Health & Apple Watch without leaving your device.'
+                    : 'Import Blood Pressure, Weight, Heart Rate, Steps, and Sleep securely without leaving your device.'}
                 </p>
 
                 <div className="flex items-center justify-between gap-3 pt-1">
@@ -796,7 +817,7 @@ export const VitalsTracker: React.FC = () => {
                     disabled={isSyncingHC}
                     className="px-4 py-2 bg-sage hover:bg-sage-dark text-white rounded-xl text-[12.5px] font-medium shadow-2xs active:scale-95 transition-all cursor-pointer disabled:opacity-70"
                   >
-                    {isSyncingHC ? 'Syncing...' : hcStatus.isConnected ? 'Sync Now' : 'Connect Device'}
+                    {isSyncingHC ? 'Syncing...' : hcStatus.isConnected ? 'Sync Now' : `Connect ${providerName}`}
                   </button>
                 </div>
               </div>
@@ -815,7 +836,7 @@ export const VitalsTracker: React.FC = () => {
                   Other Connected Platforms
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                  {WEARABLE_DEVICES.filter(d => !d.isNativeHealth).map(device => (
+                  {getAvailableWearables().map(device => (
                     <div
                       key={device.id}
                       className="bg-white border border-border/80 rounded-xl p-3 flex items-center justify-between hover:border-sage/40 transition-colors shadow-2xs"
@@ -992,8 +1013,13 @@ export const VitalsTracker: React.FC = () => {
                           {log.weight} <span className="text-[12px] text-medium font-sans font-normal">{log.unit}</span>
                         </span>
                       ) : (
-                        <span className="font-medium text-[14px] text-charcoal">
-                          {log.source === 'Google Health Connect' ? 'Health Connect' : (WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source)}
+                        <span className="font-medium text-[14px] text-charcoal flex items-center gap-1.5">
+                          {log.source === 'Apple Health' && <Heart className="w-3.5 h-3.5 text-[#FF2D55] fill-[#FF2D55]" />}
+                          {log.source === 'Google Health Connect'
+                            ? 'Health Connect'
+                            : log.source === 'Apple Health'
+                            ? 'Apple Health'
+                            : WEARABLE_DEVICES.find(d => d.id === log.source)?.name || log.source}
                         </span>
                       )}
 
