@@ -2,10 +2,10 @@ import { Capacitor } from '@capacitor/core';
 import { Purchases, CustomerInfo, PurchasesOfferings, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
 // Public Apple RevenueCat API Key (can be configured via .env VITE_REVENUECAT_APPLE_KEY)
-export const REVENUECAT_APPLE_API_KEY = (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) || 'appl_OurPregnancyProdKey';
+export const REVENUECAT_APPLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) : '') || 'appl_OurPregnancyProdKey';
 
 // Public Google Play RevenueCat API Key (can be configured via .env VITE_REVENUECAT_GOOGLE_KEY)
-export const REVENUECAT_GOOGLE_API_KEY = (import.meta.env.VITE_REVENUECAT_GOOGLE_KEY as string) || 'goog_OurPregnancyProdKey';
+export const REVENUECAT_GOOGLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_GOOGLE_KEY as string) : '') || 'goog_OurPregnancyProdKey';
 
 // Entitlement identifier configured in RevenueCat dashboard
 export const PRO_ENTITLEMENT_ID = 'pro';
