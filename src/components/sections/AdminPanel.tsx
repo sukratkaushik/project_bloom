@@ -321,9 +321,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
       await setUserRole(targetUser.uid, newRole);
       showToast(`Updated role for ${targetUser.email || targetUser.displayName} to ${newRole.toUpperCase()}`);
       setUsers(prev => prev.map(u => u.uid === targetUser.uid ? { ...u, role: newRole } : u));
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to update role:", err);
-      showToast("Error updating user role.");
+      showToast(`Error updating user role: ${err?.message || 'Check permissions'}`);
     } finally {
       setUpdatingUid(null);
     }

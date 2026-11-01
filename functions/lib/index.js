@@ -1089,10 +1089,8 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
     if (!request.auth) {
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
-    const callerEmail = request.auth.token.email;
     const db = admin.firestore();
-    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = await isAuthorizedAdmin(request.auth);
     if (!isCallerAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can view the user directory.");
     }
@@ -1110,13 +1108,15 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
         for (const authUser of listUsersResult.users) {
             seenUids.add(authUser.uid);
             const existingDoc = firestoreUserMap.get(authUser.uid) || {};
+            const normEmail = authUser.email?.toLowerCase()?.trim() || "";
+            const isSuperAdmin = Boolean(normEmail && exports.ADMIN_EMAILS.includes(normEmail));
             // If Firestore document is missing, backfill it so it's persisted in the DB
             if (!firestoreUserMap.has(authUser.uid)) {
                 const newProfile = {
                     uid: authUser.uid,
                     email: authUser.email || null,
                     displayName: authUser.displayName || null,
-                    role: (authUser.email === "sukrat.kaushik@gmail.com" || authUser.email === "sukrat.kaushik@ourpregnancy.in") ? "admin" : "user",
+                    role: isSuperAdmin ? "admin" : "user",
                     planTier: "free",
                     planExpiry: null,
                     isSetup: false,
@@ -1131,7 +1131,7 @@ exports.getAdminUsersList = (0, https_1.onCall)({ region: "asia-south1" }, async
                 uid: authUser.uid,
                 email: authUser.email || existingDoc.email || null,
                 displayName: authUser.displayName || existingDoc.displayName || null,
-                role: existingDoc.role || ((authUser.email === "sukrat.kaushik@gmail.com" || authUser.email === "sukrat.kaushik@ourpregnancy.in") ? "admin" : "user"),
+                role: existingDoc.role || (isSuperAdmin ? "admin" : "user"),
                 planTier: existingDoc.planTier || "free",
                 planExpiry: existingDoc.planExpiry || null,
                 isSetup: existingDoc.isSetup ?? false,
