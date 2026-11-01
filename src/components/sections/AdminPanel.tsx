@@ -300,9 +300,9 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
         return u;
       }));
       setSelectedUser(null);
-    } catch (err) {
+    } catch (err: any) {
       console.error("Failed to update plan:", err);
-      showToast("Error updating user plan.");
+      showToast(`Error updating user plan: ${err?.message || 'Check permissions'}`);
     } finally {
       setUpdatingUid(null);
     }

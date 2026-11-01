@@ -21,6 +21,28 @@ const razorpayKeySecret = defineSecret("RAZORPAY_KEY_SECRET");
 const smtpUserSecret = defineSecret("SMTP_USER");
 const smtpPassSecret = defineSecret("SMTP_PASS");
 
+export const ADMIN_EMAILS: readonly string[] = [
+  "sukrat.kaushik@gmail.com",
+  "kaushiksukrat@gmail.com",
+  "sukrat.kaushik@ourpregnancy.in",
+];
+
+async function isAuthorizedAdmin(auth: { uid: string; token: any }): Promise<boolean> {
+  const callerEmail = auth.token?.email?.toLowerCase()?.trim();
+  if (callerEmail && ADMIN_EMAILS.includes(callerEmail)) {
+    return true;
+  }
+  if (auth.token?.admin === true || auth.token?.role === "admin") {
+    return true;
+  }
+  try {
+    const callerDoc = await admin.firestore().collection("users").doc(auth.uid).get();
+    return callerDoc.data()?.role === "admin";
+  } catch (e) {
+    return false;
+  }
+}
+
 function isQueryDueDateInvalid(message: string): boolean {
   const clean = message.toLowerCase();
 
@@ -735,12 +757,8 @@ export const sendPlanChangeNotificationEmail = onCall(
     }
 
     // Verify caller is admin
-    const callerEmail = request.auth.token.email;
-    const db = admin.firestore();
-    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
-
-    if (!isCallerAdmin) {
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
       throw new HttpsError("permission-denied", "Only administrators can send plan notifications.");
     }
 
@@ -1188,10 +1206,7 @@ export const deleteUserByAdmin = onCall(
       throw new HttpsError("unauthenticated", "Authentication is required.");
     }
 
-    const callerEmail = request.auth.token.email;
-    const db = admin.firestore();
-    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = await isAuthorizedAdmin(request.auth);
 
     if (!isCallerAdmin) {
       throw new HttpsError("permission-denied", "Only administrators can delete users.");
@@ -1201,6 +1216,8 @@ export const deleteUserByAdmin = onCall(
     if (!targetUid) {
       throw new HttpsError("invalid-argument", "targetUid is required.");
     }
+
+    const db = admin.firestore();
 
     // Safety: Protect the primary owner account from deletion
     if (targetUid === request.auth.uid || targetUid === "sukrat.kaushik@gmail.com" || targetUid === "sukrat.kaushik@ourpregnancy.in") {
@@ -1214,7 +1231,7 @@ export const deleteUserByAdmin = onCall(
         const trackingSnap = await jDoc.ref.collection("trackingData").get();
         if (!trackingSnap.empty) {
           const batch = db.batch();
-          trackingSnap.docs.forEach((doc) => batch.delete(doc.ref));
+          trackingSnap.docs.forEach((doc: any) => batch.delete(doc.ref));
           await batch.commit();
         }
         await jDoc.ref.delete();
@@ -1224,7 +1241,7 @@ export const deleteUserByAdmin = onCall(
       const feedbackSnap = await db.collection("feedbacks").where("uid", "==", targetUid).get();
       if (!feedbackSnap.empty) {
         const fBatch = db.batch();
-        feedbackSnap.docs.forEach((doc) => fBatch.delete(doc.ref));
+        feedbackSnap.docs.forEach((doc: any) => fBatch.delete(doc.ref));
         await fBatch.commit();
       }
 
@@ -1243,6 +1260,78 @@ export const deleteUserByAdmin = onCall(
       console.error(`Failed to delete user ${targetUid}:`, err);
       throw new HttpsError("internal", err.message || "Failed to delete user.");
     }
+  }
+);
+
+/**
+ * Admin-only callable function to reliably assign or revoke user subscription plans.
+ * Uses Firebase Admin SDK to bypass client-side Firestore security rules restrictions.
+ */
+export const updateUserSubscriptionByAdmin = onCall(
+  { region: "asia-south1" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
+      throw new HttpsError("permission-denied", "Only administrators can update user plans.");
+    }
+
+    const { targetUid, planTier, durationMonths } = request.data;
+    if (!targetUid || !planTier) {
+      throw new HttpsError("invalid-argument", "targetUid and planTier are required.");
+    }
+
+    const months = durationMonths ? Number(durationMonths) : null;
+    const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
+
+    const db = admin.firestore();
+    await db.collection("users").doc(targetUid).set({
+      planTier,
+      planExpiry,
+      isPremium: planTier === "premium",
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    return { success: true, targetUid, planTier, planExpiry };
+  }
+);
+
+/**
+ * Admin-only callable function to safely toggle or assign user roles.
+ */
+export const setUserRoleByAdmin = onCall(
+  { region: "asia-south1" },
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Authentication is required.");
+    }
+
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
+      throw new HttpsError("permission-denied", "Only administrators can change user roles.");
+    }
+
+    const { targetUid, role } = request.data;
+    if (!targetUid || !role) {
+      throw new HttpsError("invalid-argument", "targetUid and role are required.");
+    }
+
+    const db = admin.firestore();
+    const targetDoc = await db.collection("users").doc(targetUid).get();
+    const targetEmail = targetDoc.data()?.email?.toLowerCase()?.trim();
+    if (targetEmail && ADMIN_EMAILS.includes(targetEmail) && role !== "admin") {
+      throw new HttpsError("failed-precondition", "Super administrator accounts cannot be demoted.");
+    }
+
+    await db.collection("users").doc(targetUid).set({
+      role,
+      updatedAt: Date.now()
+    }, { merge: true });
+
+    return { success: true, targetUid, role };
   }
 );
 

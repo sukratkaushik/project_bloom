@@ -146,12 +146,28 @@ export const updateUserSubscription = async (
   planTier: 'free' | 'standard' | 'premium',
   months: number | null
 ) => {
+  const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
+
+  // 1. Try secure Cloud Function first (Firebase Admin SDK bypasses client rules constraints)
+  try {
+    const fn = httpsCallable(functions, 'updateUserSubscriptionByAdmin');
+    const res = await fn({ targetUid, planTier, durationMonths: months }) as {
+      data: { success: boolean; planTier: string; planExpiry: number | null };
+    };
+    if (res?.data?.success) {
+      return { planTier, planExpiry: res.data.planExpiry };
+    }
+  } catch (fnErr) {
+    console.warn("updateUserSubscriptionByAdmin function fallback to direct Firestore:", fnErr);
+  }
+
+  // 2. Direct Firestore fallback
   try {
     const userRef = doc(db, 'users', targetUid);
-    const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
     await setDoc(userRef, {
       planTier,
       planExpiry,
+      isPremium: planTier === 'premium',
       updatedAt: Date.now()
     }, { merge: true });
     return { planTier, planExpiry };
@@ -162,6 +178,20 @@ export const updateUserSubscription = async (
 };
 
 export const setUserRole = async (targetUid: string, role: 'admin' | 'user') => {
+  // 1. Try secure Cloud Function first
+  try {
+    const fn = httpsCallable(functions, 'setUserRoleByAdmin');
+    const res = await fn({ targetUid, role }) as {
+      data: { success: boolean; role: 'admin' | 'user' };
+    };
+    if (res?.data?.success) {
+      return role;
+    }
+  } catch (fnErr) {
+    console.warn("setUserRoleByAdmin function fallback to direct Firestore:", fnErr);
+  }
+
+  // 2. Direct Firestore fallback
   try {
     const userRef = doc(db, 'users', targetUid);
     await setDoc(userRef, {

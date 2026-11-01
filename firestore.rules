@@ -11,12 +11,13 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == userId;
     }
 
-    function isDocOwner() {
-      return isAuthenticated() && (resource == null || request.auth.uid == resource.data.uid);
-    }
-
     function isAdmin() {
       return isAuthenticated() && (
+        (request.auth.token.email != null && request.auth.token.email in [
+          'sukrat.kaushik@gmail.com',
+          'kaushiksukrat@gmail.com',
+          'sukrat.kaushik@ourpregnancy.in'
+        ]) ||
         request.auth.token.admin == true ||
         request.auth.token.role == 'admin' ||
         (exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
@@ -26,9 +27,8 @@ service cloud.firestore {
 
     // Rules for User Profiles
     match /users/{userId} {
-      allow read: if isOwner(userId) || isAdmin();
-      allow create: if isOwner(userId);
-      allow update: if isOwner(userId) || isAdmin();
+      allow read, update: if isOwner(userId) || isAdmin();
+      allow create: if isOwner(userId) || isAdmin();
       allow delete: if isAdmin();
     }
 

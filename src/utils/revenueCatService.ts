@@ -1,5 +1,5 @@
 import { Capacitor } from '@capacitor/core';
-import { Purchases, CustomerInfo, PurchasesOfferings } from '@revenuecat/purchases-capacitor';
+import { Purchases, CustomerInfo, PurchasesOfferings, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
 // Public Apple RevenueCat API Key (can be configured via .env VITE_REVENUECAT_APPLE_KEY)
 export const REVENUECAT_APPLE_API_KEY = (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) || 'appl_OurPregnancyProdKey';
@@ -43,7 +43,7 @@ export async function initRevenueCat(appUserId?: string): Promise<boolean> {
 
   try {
     if (!isInitialized) {
-      await Purchases.setLogLevel({ level: 'DEBUG' });
+      await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG });
       await Purchases.configure({
         apiKey,
         appUserID: appUserId || null

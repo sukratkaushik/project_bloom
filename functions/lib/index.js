@@ -36,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.triggerWelcomeEmailIfNew = exports.verifyOtp = exports.sendVerificationOtp = exports.deleteMyOwnAccount = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPromoActivationEmail = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = void 0;
+exports.triggerWelcomeEmailIfNew = exports.verifyOtp = exports.sendVerificationOtp = exports.deleteMyOwnAccount = exports.setUserRoleByAdmin = exports.updateUserSubscriptionByAdmin = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPromoActivationEmail = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = exports.ADMIN_EMAILS = void 0;
 const https_1 = require("firebase-functions/v2/https");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
@@ -51,6 +51,27 @@ const razorpayKeyId = (0, params_1.defineSecret)("RAZORPAY_KEY_ID");
 const razorpayKeySecret = (0, params_1.defineSecret)("RAZORPAY_KEY_SECRET");
 const smtpUserSecret = (0, params_1.defineSecret)("SMTP_USER");
 const smtpPassSecret = (0, params_1.defineSecret)("SMTP_PASS");
+exports.ADMIN_EMAILS = [
+    "sukrat.kaushik@gmail.com",
+    "kaushiksukrat@gmail.com",
+    "sukrat.kaushik@ourpregnancy.in",
+];
+async function isAuthorizedAdmin(auth) {
+    const callerEmail = auth.token?.email?.toLowerCase()?.trim();
+    if (callerEmail && exports.ADMIN_EMAILS.includes(callerEmail)) {
+        return true;
+    }
+    if (auth.token?.admin === true || auth.token?.role === "admin") {
+        return true;
+    }
+    try {
+        const callerDoc = await admin.firestore().collection("users").doc(auth.uid).get();
+        return callerDoc.data()?.role === "admin";
+    }
+    catch (e) {
+        return false;
+    }
+}
 function isQueryDueDateInvalid(message) {
     const clean = message.toLowerCase();
     // 1. Check if the message contains a year 2028 or later
@@ -734,11 +755,8 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
     // Verify caller is admin
-    const callerEmail = request.auth.token.email;
-    const db = admin.firestore();
-    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
-    if (!isCallerAdmin) {
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can send plan notifications.");
     }
     const { targetEmail, targetName, planTier, durationMonths } = request.data;
@@ -1150,10 +1168,7 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
     if (!request.auth) {
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
-    const callerEmail = request.auth.token.email;
-    const db = admin.firestore();
-    const callerDoc = await db.collection("users").doc(request.auth.uid).get();
-    const isCallerAdmin = callerEmail === "sukrat.kaushik@gmail.com" || callerEmail === "sukrat.kaushik@ourpregnancy.in" || callerDoc.data()?.role === "admin";
+    const isCallerAdmin = await isAuthorizedAdmin(request.auth);
     if (!isCallerAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can delete users.");
     }
@@ -1161,6 +1176,7 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
     if (!targetUid) {
         throw new https_1.HttpsError("invalid-argument", "targetUid is required.");
     }
+    const db = admin.firestore();
     // Safety: Protect the primary owner account from deletion
     if (targetUid === request.auth.uid || targetUid === "sukrat.kaushik@gmail.com" || targetUid === "sukrat.kaushik@ourpregnancy.in") {
         throw new https_1.HttpsError("failed-precondition", "Primary administrator account cannot be deleted.");
@@ -1199,6 +1215,60 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
         console.error(`Failed to delete user ${targetUid}:`, err);
         throw new https_1.HttpsError("internal", err.message || "Failed to delete user.");
     }
+});
+/**
+ * Admin-only callable function to reliably assign or revoke user subscription plans.
+ * Uses Firebase Admin SDK to bypass client-side Firestore security rules restrictions.
+ */
+exports.updateUserSubscriptionByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
+        throw new https_1.HttpsError("permission-denied", "Only administrators can update user plans.");
+    }
+    const { targetUid, planTier, durationMonths } = request.data;
+    if (!targetUid || !planTier) {
+        throw new https_1.HttpsError("invalid-argument", "targetUid and planTier are required.");
+    }
+    const months = durationMonths ? Number(durationMonths) : null;
+    const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
+    const db = admin.firestore();
+    await db.collection("users").doc(targetUid).set({
+        planTier,
+        planExpiry,
+        isPremium: planTier === "premium",
+        updatedAt: Date.now()
+    }, { merge: true });
+    return { success: true, targetUid, planTier, planExpiry };
+});
+/**
+ * Admin-only callable function to safely toggle or assign user roles.
+ */
+exports.setUserRoleByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    if (!isAdmin) {
+        throw new https_1.HttpsError("permission-denied", "Only administrators can change user roles.");
+    }
+    const { targetUid, role } = request.data;
+    if (!targetUid || !role) {
+        throw new https_1.HttpsError("invalid-argument", "targetUid and role are required.");
+    }
+    const db = admin.firestore();
+    const targetDoc = await db.collection("users").doc(targetUid).get();
+    const targetEmail = targetDoc.data()?.email?.toLowerCase()?.trim();
+    if (targetEmail && exports.ADMIN_EMAILS.includes(targetEmail) && role !== "admin") {
+        throw new https_1.HttpsError("failed-precondition", "Super administrator accounts cannot be demoted.");
+    }
+    await db.collection("users").doc(targetUid).set({
+        role,
+        updatedAt: Date.now()
+    }, { merge: true });
+    return { success: true, targetUid, role };
 });
 /**
  * Self-service permanent account deletion.
