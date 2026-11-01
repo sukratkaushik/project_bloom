@@ -294,9 +294,21 @@ export const LandingPage: React.FC = () => {
     setShowPassword(false);
   };
 
+  const formatOtpErrorMessage = (rawError: any): string => {
+    const msg = String(rawError?.message || rawError || '');
+    if (!msg) return 'Could not send verification code. Please try again.';
+    if (msg.includes('wait 45 seconds') || msg.includes('resource-exhausted')) {
+      return 'Please wait 45 seconds before requesting another code.';
+    }
+    if (msg.includes('535') || msg.includes('BadCredentials') || msg.includes('SMTP_PASS')) {
+      return 'Email delivery service is currently reconnecting. Please tap Resend Code in a moment.';
+    }
+    return msg.replace(/^Could not dispatch verification email:\s*/i, '');
+  };
+
   const getFirebaseErrorMessage = (code: string) => {
     switch (code) {
-      case 'auth/email-not-verified': return 'Your email address is not verified yet. Please enter the 6-digit verification code sent to your inbox.';
+      case 'auth/email-not-verified': return 'Your email address is not verified yet. We have sent a 6-digit verification code to your inbox.';
       case 'auth/email-already-in-use': return 'This email is already registered. Try logging in instead.';
       case 'auth/invalid-email': return 'Please enter a valid email address.';
       case 'auth/weak-password': return 'Password must be at least 6 characters.';
@@ -341,7 +353,7 @@ export const LandingPage: React.FC = () => {
         alert('Email verified successfully! Please enter your password to log in.');
       }
     } catch (err: any) {
-      setOtpError(err?.message || 'Invalid or expired verification code. Please try again.');
+      setOtpError(formatOtpErrorMessage(err) || 'Invalid or expired verification code. Please try again.');
     } finally {
       setIsVerifyingOtp(false);
     }
@@ -390,6 +402,42 @@ export const LandingPage: React.FC = () => {
         }
       }
     } catch (error: any) {
+      if (error?.code === 'auth/email-not-verified') {
+        const targetEmail = emailInput.trim().toLowerCase();
+        setRegisteredEmail(targetEmail);
+        setCachedPassword(passwordInput);
+        setShowVerifyNotice(true);
+        setOtpInput('');
+        setOtpError('');
+        setResendStatus('sending');
+        setResendMessage('Sending 6-digit verification code to your email...');
+        try {
+          await sendVerificationOtpCallable(targetEmail);
+          setResendStatus('sent');
+          setResendMessage('A 6-digit verification code was just sent to your inbox. Please check your email.');
+          setResendCooldown(45);
+          const timer = setInterval(() => {
+            setResendCooldown((prev) => {
+              if (prev <= 1) {
+                clearInterval(timer);
+                return 0;
+              }
+              return prev - 1;
+            });
+          }, 1000);
+        } catch (otpErr: any) {
+          console.warn("Auto-resend OTP on login error:", otpErr);
+          const errText = String(otpErr?.message || '');
+          if (errText.includes('wait 45 seconds') || errText.includes('resource-exhausted')) {
+            setResendStatus('idle');
+            setResendMessage('A code was recently sent. Please enter the 6 digits from your email, or wait 45s to request a new one.');
+          } else {
+            setResendStatus('error');
+            setResendMessage(formatOtpErrorMessage(otpErr));
+          }
+        }
+        return;
+      }
       setAuthError(getFirebaseErrorMessage(error?.code || ''));
     } finally {
       setIsSubmitting(false);
@@ -508,7 +556,7 @@ export const LandingPage: React.FC = () => {
                           }, 1000);
                         } catch (err: any) {
                           setResendStatus('error');
-                          setResendMessage(err?.message || 'Could not resend code. Please try again.');
+                          setResendMessage(formatOtpErrorMessage(err));
                         }
                       }}
                       disabled={resendCooldown > 0 || resendStatus === 'sending'}
