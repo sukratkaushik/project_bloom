@@ -144,18 +144,19 @@ export const deleteMyOwnAccountCallable = async (): Promise<{ success: boolean; 
 export const updateUserSubscription = async (
   targetUid: string,
   planTier: 'free' | 'standard' | 'premium',
-  months: number | null
+  months: number | null,
+  sendNotification?: boolean
 ) => {
   const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
 
   // 1. Try secure Cloud Function first (Firebase Admin SDK bypasses client rules constraints)
   try {
     const fn = httpsCallable(functions, 'updateUserSubscriptionByAdmin');
-    const res = await fn({ targetUid, planTier, durationMonths: months }) as {
-      data: { success: boolean; planTier: string; planExpiry: number | null };
+    const res = await fn({ targetUid, planTier, durationMonths: months, sendNotification }) as {
+      data: { success: boolean; planTier: string; planExpiry: number | null; emailSent?: boolean };
     };
     if (res?.data?.success) {
-      return { planTier, planExpiry: res.data.planExpiry };
+      return { planTier, planExpiry: res.data.planExpiry, emailSent: res.data.emailSent };
     }
   } catch (fnErr) {
     console.warn("updateUserSubscriptionByAdmin function fallback to direct Firestore:", fnErr);
@@ -208,7 +209,7 @@ export const setUserRole = async (targetUid: string, role: 'admin' | 'user') => 
 export const sendPlanChangeEmail = async (
   targetEmail: string,
   targetName: string | null | undefined,
-  planTier: 'standard' | 'premium',
+  planTier: 'free' | 'standard' | 'premium',
   durationMonths: number | null
 ) => {
   try {

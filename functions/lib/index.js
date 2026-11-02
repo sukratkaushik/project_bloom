@@ -36,8 +36,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.triggerWelcomeEmailIfNew = exports.verifyOtp = exports.sendVerificationOtp = exports.deleteMyOwnAccount = exports.setUserRoleByAdmin = exports.updateUserSubscriptionByAdmin = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPromoActivationEmail = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = exports.ADMIN_EMAILS = void 0;
+exports.triggerWelcomeEmailIfNew = exports.verifyOtp = exports.sendVerificationOtp = exports.deleteMyOwnAccount = exports.setUserRoleByAdmin = exports.updateUserSubscriptionByAdmin = exports.deleteUserByAdmin = exports.getAdminUsersList = exports.sendPromoActivationEmail = exports.onSubscriptionPlanChanged = exports.sendPlanChangeNotificationEmail = exports.verifyPaymentSignature = exports.createPaymentOrder = exports.analyzeMedicalReport = exports.analyzeFood = exports.parseDocument = exports.chatWithAI = exports.ADMIN_EMAILS = void 0;
+exports.sendPlanChangeEmailDirect = sendPlanChangeEmailDirect;
 const https_1 = require("firebase-functions/v2/https");
+const firestore_1 = require("firebase-functions/v2/firestore");
 const params_1 = require("firebase-functions/params");
 const admin = __importStar(require("firebase-admin"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -804,46 +806,90 @@ async function sendEmailWithFallback(mailOptions) {
     }
 }
 /**
- * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
+ * Internal helper to dispatch branded plan change notification emails.
+ * Supports both Pro Upgrade and Free Plan Transition across all platforms.
  */
-exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] }, async (request) => {
-    if (!request.auth) {
-        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
-    }
-    // Verify caller is admin
-    const isAdmin = await isAuthorizedAdmin(request.auth);
-    if (!isAdmin) {
-        throw new https_1.HttpsError("permission-denied", "Only administrators can send plan notifications.");
-    }
-    const { targetEmail, targetName, planTier, durationMonths } = request.data;
-    if (!targetEmail || !planTier) {
-        throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
-    }
+async function sendPlanChangeEmailDirect(targetEmail, targetName, planTier, durationMonths) {
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
-    const tierTitle = "Pro Plan";
-    const durationText = durationMonths ? `${durationMonths} month${durationMonths > 1 ? "s" : ""} access` : "lifetime access";
-    const proBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">✨ <strong>24/7 OPIN AI Clinical Companion</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant meal nutrition &amp; ingredient hazard verification.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">📂 <strong>AI Medical Report &amp; Ultrasound Analyzer</strong> — Clear explanations of scans, lab ranges &amp; blood tests.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Real-Time Encrypted Partner Sync</strong> — Live sync with your partner via private connection.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor EHR &amp; FHIR R4 Medical Exports</strong> — Obstetric summaries ready for your OB-GYN consultations.</li>
-      <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes &amp; Legal Leave Rights</strong> — Step-by-step guidance on PMMVY, JSY, and 26-week salary protections.</li>
+    const isPro = planTier === "premium" || planTier === "pro";
+    let subject;
+    let preheader;
+    let heading;
+    let introParagraph;
+    let cardHtml;
+    const ctaText = "Open my dashboard";
+    const ctaUrl = "https://ourpregnancy.in/dashboard";
+    if (isPro) {
+        const durationText = durationMonths ? `${durationMonths} month${durationMonths > 1 ? "s" : ""} access` : "lifetime access";
+        subject = "You've been upgraded to Our Pregnancy Pro Plan 🎉";
+        preheader = `You've been upgraded to Our Pregnancy Pro Plan (${durationText}).`;
+        heading = "A gift for your pregnancy journey";
+        introParagraph = `As part of our commitment to supporting expectant mothers and families with gentle, science-backed guidance, we have gifted you full access to the <strong>Our Pregnancy Pro Plan</strong> with ${durationText}.`;
+        cardHtml = `
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #E9F5E9; border-radius: 14px; border: 1px solid #8AB6A3; margin-bottom: 26px;">
+        <tr>
+          <td style="padding: 20px 22px;">
+            <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #2C3E50; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+              🎁 What's now unlocked for you:
+            </h3>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.75;">
+              <li style="margin-bottom: 10px; color: #2C3E50;">✨ <strong>24/7 OPIN AI Clinical Companion</strong> — Instant, comforting answers to any pregnancy question or symptom.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant meal nutrition &amp; ingredient hazard verification.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">📂 <strong>AI Medical Report &amp; Ultrasound Analyzer</strong> — Clear explanations of scans, lab ranges &amp; blood tests.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🤝 <strong>Real-Time Encrypted Partner Sync</strong> — Live sync with your partner via private connection.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor EHR &amp; FHIR R4 Medical Exports</strong> — Obstetric summaries ready for your OB-GYN consultations.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes &amp; Legal Leave Rights</strong> — Step-by-step guidance on PMMVY, JSY, and 26-week salary protections.</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
     `;
-    const benefitItemsHtml = proBenefits;
+    }
+    else {
+        subject = "Your Our Pregnancy subscription update: Free Plan";
+        preheader = "Your subscription has transitioned to the Our Pregnancy Free Plan.";
+        heading = "Your pregnancy journey continues with us";
+        introParagraph = `We are writing to confirm that your account subscription has transitioned to the <strong>Our Pregnancy Free Plan</strong>. Every pregnancy path is unique, and our commitment to supporting you and your baby remains steadfast.`;
+        cardHtml = `
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #F8FAF8; border-radius: 14px; border: 1px solid #8AB6A3; margin-bottom: 18px;">
+        <tr>
+          <td style="padding: 20px 22px;">
+            <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #2C3E50; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
+              🌸 Everything active &amp; ready on your Free Plan:
+            </h3>
+            <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.75;">
+              <li style="margin-bottom: 10px; color: #2C3E50;">📅 <strong>Weekly &amp; Daily Journey Tracking</strong> — Follow gestational milestones, fetal size comparisons &amp; evidence-based tips.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🦶 <strong>Kick Counter &amp; Contraction Timer</strong> — Essential movement tracking and labor timing tools at your fingertips.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">💧 <strong>Daily Vitals, Mood &amp; Hydration Logs</strong> — Record blood pressure, mood, symptoms, and daily fluids.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🎒 <strong>Hospital Bag &amp; Birth Plan Checklists</strong> — Trimester preparation checklists for labor and delivery.</li>
+              <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes &amp; Legal Rights</strong> — Step-by-step guidance on PMMVY, JSY, and legal leave entitlements.</li>
+            </ul>
+          </td>
+        </tr>
+      </table>
+
+      <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FFFDF8; border-radius: 12px; border: 1px solid #E8EDE9; margin-bottom: 22px;">
+        <tr>
+          <td style="padding: 14px 18px; font-size: 13.5px; line-height: 1.6; color: #4A5568;">
+            ⏸️ <em><strong>Note on Pro features:</strong> 24/7 OPIN AI Clinical Companion, unlimited AI Food Scanner &amp; nutrition analysis, and Medical Report Analyzer are paused while on the Free Plan. All your past records and saved data remain safely preserved. You can reactivate Pro access at any time.</em>
+          </td>
+        </tr>
+      </table>
+    `;
+    }
     const emailHtml = `
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>A gift for your pregnancy journey</title>
+  <title>${subject}</title>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body style="margin: 0; padding: 0; background-color: #FDFBF7; font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #2C3E50; -webkit-font-smoothing: antialiased;">
   <!-- Preheader for inbox preview -->
   <div style="display: none; max-height: 0px; overflow: hidden; opacity: 0; font-size: 1px; line-height: 1px;">
-    You've been upgraded to Our Pregnancy Pro Plan (${durationText}).
+    ${preheader}
   </div>
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #FDFBF7; padding: 36px 16px;">
     <tr>
@@ -867,43 +913,32 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
           <!-- Body Content -->
           <tr>
             <td style="padding: 32px 32px 28px;">
-              <h1 style="margin: 0 0 16px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 25px; font-weight: 600; color: #2C3E50; line-height: 1.35;">
-                A gift for your pregnancy journey
+              <h1 style="margin: 0 0 16px 0; font-family: 'Playfair Display', Georgia, serif; font-size: 24px; font-weight: 600; color: #2C3E50; line-height: 1.35;">
+                ${heading}
               </h1>
               <p style="font-size: 15.5px; line-height: 1.6; color: #2C3E50; margin: 0 0 14px 0;">
                 Hello ${recipientName},
               </p>
               <p style="font-size: 15px; line-height: 1.6; color: #4A5568; margin: 0 0 22px 0;">
-                As part of our commitment to supporting expectant mothers and families with gentle, science-backed guidance, we have gifted you full access to the <strong>Our Pregnancy ${tierTitle}</strong> with ${durationText}.
+                ${introParagraph}
               </p>
 
               <!-- Feature Highlight Card -->
-              <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: ${planTier === 'premium' ? '#FEF9EE' : '#E9F5E9'}; border-radius: 14px; border: 1px solid ${planTier === 'premium' ? '#F4A261' : '#8AB6A3'}; margin-bottom: 26px;">
-                <tr>
-                  <td style="padding: 20px 22px;">
-                    <h3 style="margin: 0 0 12px 0; font-size: 15px; color: #2C3E50; font-family: 'Playfair Display', Georgia, serif; font-weight: 600;">
-                      🎁 What's now unlocked for you:
-                    </h3>
-                    <ul style="margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.75;">
-                      ${benefitItemsHtml}
-                    </ul>
-                  </td>
-                </tr>
-              </table>
+              ${cardHtml}
 
               <!-- CTA Button (Pill shaped, Sage) -->
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="margin: 28px 0 16px 0;">
                 <tr>
                   <td align="center">
-                    <a href="https://ourpregnancy.in/dashboard" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
-                      Open my dashboard
+                    <a href="${ctaUrl}" target="_blank" style="background-color: #8AB6A3; color: #FFFFFF; padding: 14px 34px; border-radius: 9999px; font-size: 15px; font-weight: 600; text-decoration: none; display: inline-block; font-family: 'Nunito', Helvetica, Arial, sans-serif; box-shadow: 0 3px 12px rgba(138, 182, 163, 0.35);">
+                      ${ctaText}
                     </a>
                   </td>
                 </tr>
               </table>
 
               <p style="font-size: 13px; color: #6B7A87; line-height: 1.6; margin: 16px 0 0 0; text-align: center;">
-                <em>No credit card or payment required. This access is activated directly on your account.</em>
+                <em>${isPro ? "No credit card or payment required. This access is activated directly on your account." : "Access your pregnancy journal, kick counter, and tracking tools anytime."}</em>
               </p>
             </td>
           </tr>
@@ -928,22 +963,105 @@ exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-so
   </table>
 </body>
 </html>
-    `;
+  `;
     const mailOptions = {
         from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
         replyTo: "support@ourpregnancy.in",
         to: targetEmail,
-        subject: `You've been upgraded to Our Pregnancy Pro Plan 🎉`,
+        subject: subject,
         html: emailHtml,
     };
     try {
         const info = await sendEmailWithFallback(mailOptions);
-        console.log(`[SMTP SUCCESS]: Plan notification email sent to ${targetEmail}. Message ID: ${info.messageId}`);
+        console.log(`[SMTP SUCCESS]: Plan notification email (${isPro ? "PRO" : "FREE"}) sent to ${targetEmail}. Message ID: ${info.messageId}`);
         return { success: true, message: `Email sent to ${targetEmail}` };
     }
     catch (err) {
         console.error(`[SMTP ERROR]: Failed to send plan change email to ${targetEmail}:`, err?.message || err, err?.code, err?.response);
         return { success: false, error: err?.message || "SMTP transmission error" };
+    }
+}
+/**
+ * Callable function to dispatch branded plan change notification emails.
+ * Authorized for administrators, or for an authenticated user notifying themselves.
+ */
+exports.sendPlanChangeNotificationEmail = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] }, async (request) => {
+    if (!request.auth) {
+        throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
+    }
+    const { targetEmail, targetName, planTier, durationMonths } = request.data;
+    if (!targetEmail || !planTier) {
+        throw new https_1.HttpsError("invalid-argument", "Target email and plan tier are required.");
+    }
+    // Verify caller is admin OR user notifying self
+    const isAdmin = await isAuthorizedAdmin(request.auth);
+    const callerEmail = request.auth.token?.email?.toLowerCase()?.trim();
+    const isSelf = Boolean(callerEmail && callerEmail === String(targetEmail).toLowerCase().trim());
+    if (!isAdmin && !isSelf) {
+        throw new https_1.HttpsError("permission-denied", "Unauthorized to send plan notifications.");
+    }
+    const result = await sendPlanChangeEmailDirect(targetEmail, targetName, planTier, durationMonths);
+    // If successfully sent Free plan downgrade email, record timestamp in Firestore to prevent duplicate trigger alerts
+    if (result.success && (planTier === "free" || planTier === "standard")) {
+        try {
+            const db = admin.firestore();
+            const userQuery = await db.collection("users").where("email", "==", String(targetEmail).toLowerCase().trim()).limit(1).get();
+            if (!userQuery.empty) {
+                await userQuery.docs[0].ref.set({
+                    lastDowngradeEmailSentAt: Date.now(),
+                }, { merge: true });
+            }
+        }
+        catch (err) {
+            console.warn("[sendPlanChangeNotificationEmail]: Could not record lastDowngradeEmailSentAt:", err);
+        }
+    }
+    return result;
+});
+/**
+ * Omnichannel Firestore Trigger: Listens to updates on `/users/{userId}`.
+ * If a subscriber transitions from Pro/Premium to Free (due to expiry, cancellation,
+ * StoreKit/Google Play state change, or admin demotion), automatically sends the
+ * gentle Free Plan Transition alert email to their inbox.
+ */
+exports.onSubscriptionPlanChanged = (0, firestore_1.onDocumentUpdated)({
+    document: "users/{userId}",
+    region: "asia-south1",
+    secrets: [smtpUserSecret, smtpPassSecret],
+}, async (event) => {
+    const beforeData = event.data?.before?.data();
+    const afterData = event.data?.after?.data();
+    if (!beforeData || !afterData)
+        return;
+    const beforeIsPro = Boolean(beforeData.isPremium === true || beforeData.planTier === "premium" || beforeData.planTier === "pro");
+    const afterIsPro = Boolean(afterData.isPremium === true || afterData.planTier === "premium" || afterData.planTier === "pro");
+    // Detected transition from Pro to Free
+    if (beforeIsPro && !afterIsPro) {
+        const email = (afterData.email || beforeData.email || "").toLowerCase().trim();
+        if (!email || !email.includes("@")) {
+            console.warn(`[onSubscriptionPlanChanged]: No valid email for user ${event.params.userId}. Skipping.`);
+            return;
+        }
+        const now = Date.now();
+        const lastSent = Number(afterData.lastDowngradeEmailSentAt || 0);
+        // Deduplicate: if an alert was already dispatched in the last 15 minutes, skip
+        if (now - lastSent < 15 * 60 * 1000) {
+            console.log(`[onSubscriptionPlanChanged]: Downgrade alert recently sent to ${email} (${Math.round((now - lastSent) / 1000)}s ago). Skipping duplicate.`);
+            return;
+        }
+        console.log(`[onSubscriptionPlanChanged]: Pro -> Free transition detected for ${email}. Dispatching alert.`);
+        const name = afterData.displayName || beforeData.displayName || "there";
+        const res = await sendPlanChangeEmailDirect(email, name, "free");
+        if (res.success) {
+            await event.data?.after.ref.set({
+                lastDowngradeEmailSentAt: now,
+                updatedAt: now,
+            }, { merge: true });
+            console.log(`[onSubscriptionPlanChanged]: Downgrade alert email successfully sent to ${email}.`);
+        }
+        else {
+            console.error(`[onSubscriptionPlanChanged]: Failed to send downgrade email to ${email}:`, res.error);
+        }
     }
 });
 /**
@@ -1224,8 +1342,9 @@ exports.deleteUserByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async
 /**
  * Admin-only callable function to reliably assign or revoke user subscription plans.
  * Uses Firebase Admin SDK to bypass client-side Firestore security rules restrictions.
+ * Automatically dispatches the branded plan alert email (both Pro and Free) when requested.
  */
-exports.updateUserSubscriptionByAdmin = (0, https_1.onCall)({ region: "asia-south1" }, async (request) => {
+exports.updateUserSubscriptionByAdmin = (0, https_1.onCall)({ region: "asia-south1", secrets: [smtpUserSecret, smtpPassSecret] }, async (request) => {
     if (!request.auth) {
         throw new https_1.HttpsError("unauthenticated", "Authentication is required.");
     }
@@ -1233,20 +1352,49 @@ exports.updateUserSubscriptionByAdmin = (0, https_1.onCall)({ region: "asia-sout
     if (!isAdmin) {
         throw new https_1.HttpsError("permission-denied", "Only administrators can update user plans.");
     }
-    const { targetUid, planTier, durationMonths } = request.data;
+    const { targetUid, planTier, durationMonths, sendNotification } = request.data;
     if (!targetUid || !planTier) {
         throw new https_1.HttpsError("invalid-argument", "targetUid and planTier are required.");
     }
     const months = durationMonths ? Number(durationMonths) : null;
     const planExpiry = months ? Date.now() + months * 30 * 24 * 60 * 60 * 1000 : null;
     const db = admin.firestore();
-    await db.collection("users").doc(targetUid).set({
+    const userRef = db.collection("users").doc(targetUid);
+    const existingDoc = await userRef.get();
+    const existingData = existingDoc.data() || {};
+    const now = Date.now();
+    await userRef.set({
         planTier,
         planExpiry,
         isPremium: planTier === "premium",
-        updatedAt: Date.now()
+        updatedAt: now
     }, { merge: true });
-    return { success: true, targetUid, planTier, planExpiry };
+    let emailSent = false;
+    let emailError;
+    // Send plan notification email if requested (defaults to true if target email exists)
+    const shouldNotify = sendNotification !== false;
+    const targetEmail = existingData.email?.toLowerCase()?.trim();
+    if (shouldNotify && targetEmail && targetEmail.includes("@")) {
+        const targetName = existingData.displayName || "";
+        const emailRes = await sendPlanChangeEmailDirect(targetEmail, targetName, planTier, months);
+        emailSent = emailRes.success;
+        if (emailRes.success) {
+            if (planTier === "free" || planTier === "standard") {
+                await userRef.set({ lastDowngradeEmailSentAt: now }, { merge: true });
+            }
+        }
+        else {
+            emailError = emailRes.error;
+        }
+    }
+    return {
+        success: true,
+        targetUid,
+        planTier,
+        planExpiry,
+        emailSent,
+        emailError,
+    };
 });
 /**
  * Admin-only callable function to safely toggle or assign user roles.

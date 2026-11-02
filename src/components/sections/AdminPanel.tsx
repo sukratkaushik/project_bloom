@@ -264,25 +264,29 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
     if (!selectedUser) return;
     setUpdatingUid(selectedUser.uid);
     try {
-      await updateUserSubscription(selectedUser.uid, planOption, durationMonths);
+      const subRes = await updateUserSubscription(selectedUser.uid, planOption, durationMonths, sendEmailNotification);
       
       let emailSuccessText = "";
-      if (sendEmailNotification && selectedUser.email && planOption === 'premium') {
-        try {
-          const emailRes = await sendPlanChangeEmail(
-            selectedUser.email,
-            selectedUser.displayName,
-            'premium',
-            durationMonths
-          );
-          if (emailRes.success) {
-            emailSuccessText = " & email sent";
-          } else {
-            emailSuccessText = ` (email failed: ${emailRes.error || 'delivery error'})`;
+      if (sendEmailNotification && selectedUser.email) {
+        if (subRes?.emailSent) {
+          emailSuccessText = " & email sent";
+        } else {
+          try {
+            const emailRes = await sendPlanChangeEmail(
+              selectedUser.email,
+              selectedUser.displayName,
+              planOption,
+              durationMonths
+            );
+            if (emailRes.success) {
+              emailSuccessText = " & email sent";
+            } else {
+              emailSuccessText = ` (email failed: ${emailRes.error || 'delivery error'})`;
+            }
+          } catch (e: any) {
+            console.warn("Could not dispatch plan email:", e);
+            emailSuccessText = ` (email error: ${e?.message || 'failed'})`;
           }
-        } catch (e: any) {
-          console.warn("Could not dispatch plan email:", e);
-          emailSuccessText = ` (email error: ${e?.message || 'failed'})`;
         }
       }
 
@@ -1064,7 +1068,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
             )}
 
             {/* Email Notification Option */}
-            {planOption !== 'free' && selectedUser.email && (
+            {selectedUser.email && (
               <label className="flex items-center gap-2.5 p-2.5 bg-cream dark:bg-[#0F172A] border border-border rounded-xl cursor-pointer text-[12px] text-charcoal dark:text-white">
                 <input
                   type="checkbox"
@@ -1074,7 +1078,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ isMobileModal = false })
                 />
                 <span className="flex items-center gap-1.5 font-medium truncate">
                   <Mail className="w-3.5 h-3.5 text-sage shrink-0" />
-                  <span className="truncate">Notify <strong>{selectedUser.email}</strong></span>
+                  <span className="truncate">Notify <strong>{selectedUser.email}</strong> of plan change</span>
                 </span>
               </label>
             )}

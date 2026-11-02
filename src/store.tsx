@@ -3,7 +3,7 @@ import { PlannerState, BudgetItem } from './types';
 import { db, JourneyStatus, CalculationMethod } from './db';
 import { v4 as uuidv4 } from 'uuid';
 import { addDays, addWeeks } from './utils';
-import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserProfile, saveUserProfile } from './firebase';
+import { auth, db as firestoreDb, handleFirestoreError, OperationType, getUserProfile, saveUserProfile, updateUserSubscription } from './firebase';
 import { doc, setDoc, getDoc, onSnapshot, collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import { cloudSync, saveJourney } from './cloudSync';
 import { getPlatform } from './utils/nativeBridge';
@@ -187,6 +187,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
             if (!profile.planExpiry || profile.planExpiry > Date.now()) {
               planTier = profile.planTier;
               isPremium = (planTier === 'premium');
+            } else if (profile.planExpiry && profile.planExpiry <= Date.now() && (profile.planTier === 'premium' || profile.isPremium)) {
+              // Expired plan on web or mobile: synchronize downgrade to Free in Firestore
+              updateUserSubscription(user.uid, 'free', null).catch(err => {
+                console.warn('Could not sync expired plan to Firestore:', err);
+              });
             }
           }
 
@@ -197,6 +202,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 const sub = await checkRevenueCatSubscription();
                 if (sub.isActive) {
                   setState(prev => ({ ...prev, isPremium: true, planTier: 'premium' }));
+                } else if (profile?.isPremium || profile?.planTier === 'premium') {
+                  // RevenueCat subscription expired or cancelled on iOS / Android: synchronize downgrade
+                  updateUserSubscription(user.uid, 'free', null).catch(err => {
+                    console.warn('Could not sync lapsed RevenueCat subscription to Firestore:', err);
+                  });
                 }
               }
             }).catch(e => console.warn('RevenueCat check error:', e));
