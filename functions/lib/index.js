@@ -758,7 +758,7 @@ exports.verifyPaymentSignature = (0, https_1.onCall)({ secrets: [razorpayKeySecr
  */
 function getSmtpCredentials() {
     let userVal = "sukrat.kaushik@gmail.com";
-    let passVal = "nijjonasspwrrjxs";
+    let passVal = "";
     try {
         const rawUser = smtpUserSecret.value();
         if (rawUser && !rawUser.endsWith("@ourpregnancy.in")) {
@@ -771,10 +771,10 @@ function getSmtpCredentials() {
         }
     }
     try {
-        passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
+        passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
     }
     catch {
-        passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
+        passVal = process.env.SMTP_PASS || "";
     }
     return { userVal, passVal };
 }
@@ -791,8 +791,7 @@ function createSmtpTransporter(userVal, passVal) {
     });
 }
 /**
- * Sends mail via Nodemailer with automatic failover to verified credentials
- * if primary SMTP credentials encounter Google 535 Bad Credentials or handshake failure.
+ * Sends mail via Nodemailer using credentials from Cloud Secrets Manager.
  */
 async function sendEmailWithFallback(mailOptions) {
     const transporter = createSmtpTransporter();
@@ -800,21 +799,7 @@ async function sendEmailWithFallback(mailOptions) {
         return await transporter.sendMail(mailOptions);
     }
     catch (err) {
-        const errMsg = String(err?.message || "");
-        const isAuthErr = err?.responseCode === 535 || errMsg.includes("535") || errMsg.includes("BadCredentials");
-        if (isAuthErr) {
-            console.warn("[SMTP RETRY]: Primary SMTP auth failed, retrying with verified fallback credentials...");
-            const fallbackTransporter = nodemailer_1.default.createTransport({
-                host: "smtp.gmail.com",
-                port: 465,
-                secure: true,
-                auth: {
-                    user: "sukrat.kaushik@gmail.com",
-                    pass: "nijjonasspwrrjxs",
-                },
-            });
-            return await fallbackTransporter.sendMail(mailOptions);
-        }
+        console.error("[SMTP ERROR]: Failed to send email:", err?.message || err);
         throw err;
     }
 }

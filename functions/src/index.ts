@@ -755,7 +755,7 @@ export const verifyPaymentSignature = onCall(
  */
 function getSmtpCredentials(): { userVal: string; passVal: string } {
   let userVal = "sukrat.kaushik@gmail.com";
-  let passVal = "nijjonasspwrrjxs";
+  let passVal = "";
 
   try {
     const rawUser = smtpUserSecret.value();
@@ -769,9 +769,9 @@ function getSmtpCredentials(): { userVal: string; passVal: string } {
   }
 
   try {
-    passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
+    passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
   } catch {
-    passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
+    passVal = process.env.SMTP_PASS || "";
   }
 
   return { userVal, passVal };
@@ -791,29 +791,14 @@ function createSmtpTransporter(userVal?: string, passVal?: string) {
 }
 
 /**
- * Sends mail via Nodemailer with automatic failover to verified credentials
- * if primary SMTP credentials encounter Google 535 Bad Credentials or handshake failure.
+ * Sends mail via Nodemailer using credentials from Cloud Secrets Manager.
  */
 async function sendEmailWithFallback(mailOptions: nodemailer.SendMailOptions) {
   const transporter = createSmtpTransporter();
   try {
     return await transporter.sendMail(mailOptions);
   } catch (err: any) {
-    const errMsg = String(err?.message || "");
-    const isAuthErr = err?.responseCode === 535 || errMsg.includes("535") || errMsg.includes("BadCredentials");
-    if (isAuthErr) {
-      console.warn("[SMTP RETRY]: Primary SMTP auth failed, retrying with verified fallback credentials...");
-      const fallbackTransporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 465,
-        secure: true,
-        auth: {
-          user: "sukrat.kaushik@gmail.com",
-          pass: "nijjonasspwrrjxs",
-        },
-      });
-      return await fallbackTransporter.sendMail(mailOptions);
-    }
+    console.error("[SMTP ERROR]: Failed to send email:", err?.message || err);
     throw err;
   }
 }
