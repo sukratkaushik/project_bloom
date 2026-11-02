@@ -35,12 +35,13 @@ import {
 } from 'lucide-react';
 import { FloatingChatbot } from '../components/FloatingChatbot';
 import { PublicHeader } from '../components/PublicHeader';
-import { isNativeApp, getPlatform } from '../utils/nativeBridge';
+import { isNativeApp, getPlatform, isApplePlatform } from '../utils/nativeBridge';
 import { getProPricing } from '../utils/proPricing';
 import { AppleIcon } from '../components/common/AppleIcon';
 
 export const LandingPage: React.FC = () => {
   const isNative = isNativeApp();
+  const isApple = isApplePlatform();
   const { state, updateState, restoreJourney, toggleDarkMode } = usePlanner();
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
@@ -303,26 +304,34 @@ export const LandingPage: React.FC = () => {
 
             {/* Instant 1-Tap OAuth Sign-In Buttons */}
             <div className="space-y-3">
-              <button
-                type="button"
-                onClick={handleAppleSignIn}
-                disabled={isLoggingIn}
-                className="w-full bg-black text-white rounded-[12px] font-bold py-3.5 px-4 hover:bg-neutral-800 transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer"
-              >
-                {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppleIcon className="w-4 h-4 text-white" />}
-                <span>Continue with Apple</span>
-              </button>
+              {isApple && (
+                <button
+                  type="button"
+                  onClick={handleAppleSignIn}
+                  disabled={isLoggingIn}
+                  className="w-full bg-black text-white rounded-[12px] font-bold py-3.5 px-4 hover:bg-neutral-800 transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer"
+                >
+                  {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppleIcon className="w-4 h-4 text-white" />}
+                  <span>Continue with Apple</span>
+                </button>
+              )}
 
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
                 disabled={isLoggingIn}
-                className="w-full bg-white border-[1.5px] border-border text-charcoal rounded-[12px] font-bold py-3.5 px-4 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer"
+                className={`w-full ${
+                  !isApple ? 'bg-sage text-white hover:bg-sage-dark' : 'bg-white border-[1.5px] border-border text-charcoal hover:bg-cream'
+                } rounded-[12px] font-bold py-3.5 px-4 transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer`}
               >
                 {isLoggingIn ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
                 ) : (
-                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                  <img
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
+                    alt="Google"
+                    className={`w-4 h-4 ${!isApple ? 'bg-white rounded-full p-0.5' : ''}`}
+                  />
                 )}
                 <span>Continue with Google</span>
               </button>
@@ -427,7 +436,7 @@ export const LandingPage: React.FC = () => {
                   {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
                 </button>
 
-                {!user && (
+                {!user && isApple && (
                   <button
                     type="button"
                     onClick={handleAppleSignIn}

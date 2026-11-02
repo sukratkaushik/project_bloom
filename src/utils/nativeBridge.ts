@@ -19,6 +19,19 @@ export const getPlatform = (): 'android' | 'ios' | 'web' => {
 };
 
 /**
+ * Detects if the current user device belongs to the Apple ecosystem:
+ * iOS (native / web), iPadOS (native / web), or macOS (MacBooks, iMacs).
+ */
+export const isApplePlatform = (): boolean => {
+  if (typeof navigator === 'undefined') return false;
+  if (getPlatform() === 'ios') return true;
+  const ua = navigator.userAgent || '';
+  if (/iPad|iPhone|iPod|Macintosh/i.test(ua)) return true;
+  if (navigator.platform === 'MacIntel' && (navigator.maxTouchPoints || 0) > 1) return true;
+  return false;
+};
+
+/**
  * Native tactile haptic feedback for kick counts, contraction timer, and action buttons.
  * Gracefully falls back to navigator.vibrate on mobile web / PWA browsers.
  */
