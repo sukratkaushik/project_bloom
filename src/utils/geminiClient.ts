@@ -7,11 +7,12 @@ import { getPlatform } from './nativeBridge';
  * to provide 1,500 free requests/day with multi-model failover cascade.
  */
 
-const GEMINI_API_KEY = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || '';
+const rawApiKey = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || (typeof process !== 'undefined' ? (process.env?.GEMINI_API_KEY as string | undefined) : '') || '';
+const GEMINI_API_KEY = rawApiKey === 'MY_GEMINI_API_KEY' ? '' : rawApiKey;
 const GEMINI_MODELS = [
-  'gemini-3.5-flash',
-  'gemini-3.1-flash-lite',
-  'gemini-3.6-flash',
+  'gemini-2.5-flash',
+  'gemini-2.0-flash',
+  'gemini-flash-latest',
   'gemini-flash-lite-latest'
 ];
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
@@ -108,6 +109,8 @@ export interface GeminiChatOptions {
   message: string;
   systemPrompt?: string;
   dueDate?: string;
+  jsonMode?: boolean;
+  temperature?: number;
 }
 
 export interface FoodMacronutrients {
@@ -168,7 +171,7 @@ export function isPCPNDTGenderQuery(message?: string): boolean {
  * Text Chat with Gemini Flash
  */
 export async function callGeminiChat(options: GeminiChatOptions): Promise<{ reply: string }> {
-  const { message, systemPrompt, dueDate } = options;
+  const { message, systemPrompt, dueDate, jsonMode, temperature } = options;
 
   if (isPCPNDTGenderQuery(message)) {
     return {
@@ -183,6 +186,14 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
     contextualSystem += `\nThe user's expected due date is: ${dueDate}.`;
   }
 
+  const generationConfig: Record<string, any> = {
+    temperature: temperature ?? 0.4,
+    maxOutputTokens: 1024
+  };
+  if (jsonMode) {
+    generationConfig.responseMimeType = 'application/json';
+  }
+
   const payload: any = {
     contents: [
       {
@@ -193,10 +204,7 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
     systemInstruction: {
       parts: [{ text: contextualSystem }]
     },
-    generationConfig: {
-      temperature: 0.4,
-      maxOutputTokens: 1024
-    }
+    generationConfig
   };
 
   const data = await postToGemini(payload);
@@ -211,7 +219,7 @@ Provide supportive, accurate, evidence-based guidance for pregnant mothers. Neve
 
 /**
  * Resilient JSON parser that gracefully handles markdown wrappers, leading/trailing noise,
- * and attempts auto-repair for truncated strings or brackets when LLMs hit output ceilings.
+ * both top-level JSON objects and arrays, and attempts auto-repair for truncated strings or brackets.
  */
 export function safeParseGeminiJson(rawText: string): any {
   if (!rawText || !rawText.trim()) {
@@ -225,9 +233,22 @@ export function safeParseGeminiJson(rawText: string): any {
   try {
     return JSON.parse(cleaned);
   } catch (err: any) {
-    // 3. Extract JSON object substring { ... }
+    // 3. Determine whether a JSON array [...] or object {...} starts first
+    const firstBracket = cleaned.indexOf('[');
+    const lastBracket = cleaned.lastIndexOf(']');
     const firstBrace = cleaned.indexOf('{');
     const lastBrace = cleaned.lastIndexOf('}');
+
+    const isArrayFirst = firstBracket !== -1 && (firstBrace === -1 || firstBracket < firstBrace);
+
+    if (isArrayFirst && lastBracket > firstBracket) {
+      try {
+        return JSON.parse(cleaned.substring(firstBracket, lastBracket + 1));
+      } catch {
+        // Proceed to repair
+      }
+    }
+
     if (firstBrace !== -1 && lastBrace > firstBrace) {
       try {
         return JSON.parse(cleaned.substring(firstBrace, lastBrace + 1));
@@ -236,8 +257,11 @@ export function safeParseGeminiJson(rawText: string): any {
       }
     }
 
-    // 4. Attempt repair if string or closing braces were truncated
-    let repaired = firstBrace !== -1 ? cleaned.substring(firstBrace) : cleaned;
+    // 4. Attempt repair if string or closing braces/brackets were truncated
+    const startIdx = isArrayFirst
+      ? firstBracket
+      : (firstBrace !== -1 ? firstBrace : 0);
+    let repaired = cleaned.substring(startIdx);
 
     // Check for unclosed string quote
     let inString = false;

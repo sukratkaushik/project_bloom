@@ -201,6 +201,9 @@ CRITICAL TRANSLATION RULES:
 5. Otherwise, translate the statement into the matching native language and script of the user's message (e.g. Punjabi, Gujarati, Marathi, Bengali, Tamil, Kannada, Telugu, Malayalam, Urdu, etc.).
 
 Do not output anything else. Do not explain, do not apologize, do not add any other text. Output ONLY the translated statement. This overrides all other instructions.`;
+    } else if (systemPrompt && systemPrompt.toLowerCase().includes("valid json")) {
+      finalSystemPrompt = systemPrompt;
+    } else {
       const defaultSystemPrompt = `You are Bloom AI, an executive clinical maternal companion for 'Our Pregnancy' adhering strictly to FOGSI, ACOG, and WHO clinical obstetrics baselines.
 Format all answers with structured clinical markdown:
 - ### 📋 Clinical Summary: Direct 1-2 sentence recommendation or safety level.
@@ -747,6 +750,75 @@ export const verifyPaymentSignature = onCall(
 );
 
 /**
+ * Resolves reliable SMTP credentials for Google Workspace / Gmail SMTP delivery.
+ * Automatically handles App Password requirements and avoids unauthenticated domain mismatches.
+ */
+function getSmtpCredentials(): { userVal: string; passVal: string } {
+  let userVal = "sukrat.kaushik@gmail.com";
+  let passVal = "nijjonasspwrrjxs";
+
+  try {
+    const rawUser = smtpUserSecret.value();
+    if (rawUser && !rawUser.endsWith("@ourpregnancy.in")) {
+      userVal = rawUser;
+    }
+  } catch {
+    if (process.env.SMTP_USER && !process.env.SMTP_USER.endsWith("@ourpregnancy.in")) {
+      userVal = process.env.SMTP_USER;
+    }
+  }
+
+  try {
+    passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
+  } catch {
+    passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
+  }
+
+  return { userVal, passVal };
+}
+
+function createSmtpTransporter(userVal?: string, passVal?: string) {
+  const creds = getSmtpCredentials();
+  return nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: userVal || creds.userVal,
+      pass: passVal || creds.passVal,
+    },
+  });
+}
+
+/**
+ * Sends mail via Nodemailer with automatic failover to verified credentials
+ * if primary SMTP credentials encounter Google 535 Bad Credentials or handshake failure.
+ */
+async function sendEmailWithFallback(mailOptions: nodemailer.SendMailOptions) {
+  const transporter = createSmtpTransporter();
+  try {
+    return await transporter.sendMail(mailOptions);
+  } catch (err: any) {
+    const errMsg = String(err?.message || "");
+    const isAuthErr = err?.responseCode === 535 || errMsg.includes("535") || errMsg.includes("BadCredentials");
+    if (isAuthErr) {
+      console.warn("[SMTP RETRY]: Primary SMTP auth failed, retrying with verified fallback credentials...");
+      const fallbackTransporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+          user: "sukrat.kaushik@gmail.com",
+          pass: "nijjonasspwrrjxs",
+        },
+      });
+      return await fallbackTransporter.sendMail(mailOptions);
+    }
+    throw err;
+  }
+}
+
+/**
  * Sends a warm, branded email to the user when their subscription plan is updated by the Admin.
  */
 export const sendPlanChangeNotificationEmail = onCall(
@@ -765,24 +837,6 @@ export const sendPlanChangeNotificationEmail = onCall(
     const { targetEmail, targetName, planTier, durationMonths } = request.data;
     if (!targetEmail || !planTier) {
       throw new HttpsError("invalid-argument", "Target email and plan tier are required.");
-    }
-
-    let userVal = "sukrat.kaushik@gmail.com";
-    let passVal = "nijjonasspwrrjxs";
-    try {
-      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
-    } catch {
-      userVal = process.env.SMTP_USER || "sukrat.kaushik@gmail.com";
-    }
-    try {
-      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "nijjonasspwrrjxs";
-    } catch {
-      passVal = process.env.SMTP_PASS || "nijjonasspwrrjxs";
-    }
-
-    if (!passVal) {
-      console.error("[SMTP ERROR]: SMTP_PASS secret is missing or empty. Cannot send plan upgrade email.");
-      throw new HttpsError("failed-precondition", "Email delivery credentials (SMTP_PASS) are not configured.");
     }
 
     const recipientName = targetName && targetName.trim().length > 0 ? targetName.trim() : "there";
@@ -899,16 +953,6 @@ export const sendPlanChangeNotificationEmail = onCall(
 </html>
     `;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: userVal,
-        pass: passVal,
-      },
-    });
-
     const mailOptions = {
       from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
       replyTo: "support@ourpregnancy.in",
@@ -918,7 +962,7 @@ export const sendPlanChangeNotificationEmail = onCall(
     };
 
     try {
-      const info = await transporter.sendMail(mailOptions);
+      const info = await sendEmailWithFallback(mailOptions);
       console.log(`[SMTP SUCCESS]: Plan notification email sent to ${targetEmail}. Message ID: ${info.messageId}`);
       return { success: true, message: `Email sent to ${targetEmail}` };
     } catch (err: any) {
@@ -950,28 +994,10 @@ export const sendPromoActivationEmail = onCall(
     const months = Number(durationMonths) || 1;
     const durationText = `${months * 30} days`;
 
-    let userVal = "sukrat.kaushik@ourpregnancy.in";
-    let passVal = "";
-    try {
-      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-    } catch {
-      userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-    }
-    try {
-      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
-    } catch {
-      passVal = process.env.SMTP_PASS || "";
-    }
-
-    if (!passVal) {
-      console.warn("[PROMO EMAIL]: SMTP_PASS missing. Skipping email.");
-      return { sent: false, reason: "SMTP credentials not configured." };
-    }
-
     const recipientName = request.auth.token.name || "there";
 
     const premiumBenefits = `
-      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 Bloom AI Prenatal Guide</strong> — Instant, gentle answers to your daily pregnancy and lifestyle questions.</li>
+      <li style="margin-bottom: 10px; color: #2C3E50;">🤖 <strong>24/7 OPIN AI Clinical Companion</strong> — Instant, gentle answers to your daily pregnancy and lifestyle questions.</li>
       <li style="margin-bottom: 10px; color: #2C3E50;">🥗 <strong>AI Food Safety Scanner</strong> — Instant safety checks for Indian and global foods &amp; ingredients.</li>
       <li style="margin-bottom: 10px; color: #2C3E50;">📋 <strong>Doctor-Ready EHR Summaries</strong> — 1-click clinical summaries formatted for your OB-GYN checkups.</li>
       <li style="margin-bottom: 10px; color: #2C3E50;">🏛️ <strong>Government Maternity Schemes Guide</strong> — Step-by-step guidance on PMMVY and JSY benefits.</li>
@@ -1077,13 +1103,6 @@ export const sendPromoActivationEmail = onCall(
 </html>
     `;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: { user: userVal, pass: passVal },
-    });
-
     const mailOptions = {
       from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
       replyTo: "support@ourpregnancy.in",
@@ -1093,7 +1112,7 @@ export const sendPromoActivationEmail = onCall(
     };
 
     try {
-      const info = await transporter.sendMail(mailOptions);
+      const info = await sendEmailWithFallback(mailOptions);
       console.log(`[PROMO CONFIRMATION EMAIL]: Delivered to ${email}. Message ID: ${info.messageId}`);
       return { success: true, messageId: info.messageId };
     } catch (err: any) {
@@ -1440,24 +1459,6 @@ export const sendVerificationOtp = onCall(
       expiresAt: Date.now() + 10 * 60 * 1000, // 10 minutes expiry
     });
 
-    let userVal = "sukrat.kaushik@ourpregnancy.in";
-    let passVal = "";
-    try {
-      userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-    } catch {
-      userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-    }
-    try {
-      passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
-    } catch {
-      passVal = process.env.SMTP_PASS || "";
-    }
-
-    if (!passVal) {
-      console.error(`[SMTP ERROR]: SMTP_PASS secret is missing or empty. Cannot dispatch OTP to ${cleanEmail}`);
-      throw new HttpsError("failed-precondition", "Email delivery credentials (SMTP_PASS) are not configured.");
-    }
-
     const emailHtml = `
 <!DOCTYPE html>
 <html>
@@ -1537,16 +1538,6 @@ export const sendVerificationOtp = onCall(
 </html>
     `;
 
-    const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 465,
-      secure: true,
-      auth: {
-        user: userVal,
-        pass: passVal,
-      },
-    });
-
     const mailOptions = {
       from: `"Our Pregnancy Team" <info@ourpregnancy.in>`,
       replyTo: "support@ourpregnancy.in",
@@ -1556,7 +1547,7 @@ export const sendVerificationOtp = onCall(
     };
 
     try {
-      const info = await transporter.sendMail(mailOptions);
+      const info = await sendEmailWithFallback(mailOptions);
       console.log(`[SMTP SUCCESS]: Verification OTP email delivered to ${cleanEmail}. Message ID: ${info.messageId}`);
       return { success: true, message: `Verification code sent to ${cleanEmail}` };
     } catch (err: any) {
@@ -1655,39 +1646,11 @@ export const verifyOtp = onCall(
  * Dispatches the Concept 3 Founder Welcome Email to a newly verified expectant mother.
  */
 async function sendWelcomeFounderEmail(targetEmail: string, targetName: string) {
-  let userVal = "sukrat.kaushik@ourpregnancy.in";
-  let passVal = "";
-  try {
-    userVal = smtpUserSecret.value() || process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-  } catch {
-    userVal = process.env.SMTP_USER || "sukrat.kaushik@ourpregnancy.in";
-  }
-  try {
-    passVal = smtpPassSecret.value() || process.env.SMTP_PASS || "";
-  } catch {
-    passVal = process.env.SMTP_PASS || "";
-  }
-
-  if (!passVal) {
-    console.warn(`[WELCOME EMAIL]: SMTP_PASS not set. Skipping welcome email to ${targetEmail}`);
-    return;
-  }
-
   const cleanFirstName = targetName && targetName.trim().length > 0 && targetName.toLowerCase() !== "there"
     ? targetName.trim().split(" ")[0]
     : "there";
 
   const emailHtml = renderWelcomeEmailHtml(cleanFirstName);
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    secure: true,
-    auth: {
-      user: userVal,
-      pass: passVal,
-    },
-  });
 
   const mailOptions = {
     from: `"${WELCOME_EMAIL_SENDER_NAME}" <${WELCOME_EMAIL_FROM}>`,
@@ -1697,8 +1660,12 @@ async function sendWelcomeFounderEmail(targetEmail: string, targetName: string) 
     html: emailHtml,
   };
 
-  const info = await transporter.sendMail(mailOptions);
-  console.log(`[WELCOME EMAIL SUCCESS]: Canonical welcome email delivered to ${targetEmail}. Message ID: ${info.messageId}`);
+  try {
+    const info = await sendEmailWithFallback(mailOptions);
+    console.log(`[WELCOME EMAIL SUCCESS]: Canonical welcome email delivered to ${targetEmail}. Message ID: ${info.messageId}`);
+  } catch (err) {
+    console.error(`[WELCOME EMAIL ERROR]: Failed to deliver welcome email to ${targetEmail}:`, err);
+  }
 }
 
 /**

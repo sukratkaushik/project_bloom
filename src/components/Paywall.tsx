@@ -19,6 +19,7 @@ import {
 import { navigate } from '../utils/navigation';
 import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
 import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
+import { getProPricing, PRO_PROMO_MONTHLY_PRICE } from '../utils/proPricing';
 import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
 import { RotateCcw, ExternalLink } from 'lucide-react';
 
@@ -238,24 +239,21 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const isPremiumFeature = config.tier === 'premium';
   const HeroIcon = config.icon;
 
-  // 2-Tier Pricing: Original regular price ₹999/month, 50% OFF promotional offer for initial 3 months (₹499/mo)
-  const originalMonthlyPrice = 999;
-  const promoMonthlyPrice = 499;
-
-  let originalTotalPrice = originalMonthlyPrice * selectedMonths;
-  let finalTotalPrice = promoMonthlyPrice * selectedMonths;
-  if (selectedMonths === 9) {
-    // 9 Months (Full Journey) special: ₹3,999 (~₹444/mo)
-    finalTotalPrice = 3999;
-  }
-  const discountAmount = originalTotalPrice - finalTotalPrice;
-  const perMonthPrice = Math.round(finalTotalPrice / selectedMonths);
+  // 2-Tier Pricing: Regular ₹999/month, 50% OFF launch offer (₹499/mo), plus ₹50 off per full 3 months
+  const {
+    originalTotal: originalTotalPrice,
+    finalTotal: finalTotalPrice,
+    totalSavings: discountAmount,
+    perMonth: perMonthPrice
+  } = getProPricing(selectedMonths);
+  const threeMonthPricing = getProPricing(3);
+  const nineMonthPricing = getProPricing(9);
 
   const durationOptions = [
     {
       months: 1,
       title: '1 Month',
-      subtitle: `₹${promoMonthlyPrice}/mo`,
+      subtitle: `₹${PRO_PROMO_MONTHLY_PRICE}/mo`,
       badge: '50% OFF',
       tag: null,
       highlight: false
@@ -263,16 +261,16 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
     {
       months: 3,
       title: '3 Months',
-      subtitle: `₹${promoMonthlyPrice}/mo`,
-      badge: '50% OFF (Launch Offer)',
+      subtitle: `₹${threeMonthPricing.perMonth}/mo`,
+      badge: `Extra ₹${threeMonthPricing.durationDiscount} OFF`,
       tag: 'Most Popular',
       highlight: true
     },
     {
       months: 9,
       title: 'Full Journey',
-      subtitle: `₹${Math.round(3999 / 9)}/mo`,
-      badge: 'Save ₹4,992 (55% OFF)',
+      subtitle: `₹${nineMonthPricing.perMonth}/mo`,
+      badge: `Save ₹${nineMonthPricing.totalSavings.toLocaleString('en-IN')}`,
       tag: 'Best Value',
       highlight: false
     }

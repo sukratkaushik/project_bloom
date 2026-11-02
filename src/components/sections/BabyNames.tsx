@@ -4,7 +4,6 @@ import {
   Sparkles,
   Baby,
   Heart,
-  Globe,
   RefreshCw,
   AlertCircle,
   Copy,
@@ -15,7 +14,8 @@ import { ContextBanner } from '../ContextBanner';
 import { httpsCallable } from 'firebase/functions';
 import { functions } from '../../firebase';
 import { triggerHaptic } from '../../utils/nativeBridge';
-import { isGeminiSupported, callGeminiChat } from '../../utils/geminiClient';
+import { isGeminiSupported, callGeminiChat, safeParseGeminiJson } from '../../utils/geminiClient';
+import { curateNamesFromCatalog } from '../../utils/babyNamesCatalog';
 
 const QUICK_THEMES = [
   '☀️ Light & Radiance',
@@ -26,31 +26,6 @@ const QUICK_THEMES = [
   '✨ Star & Celestial'
 ];
 
-const FALLBACK_NAMES = [
-  { name: 'Advait', meaning: 'Unique, non-dual, spiritual oneness', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
-  { name: 'Aarav', meaning: 'Peaceful, calm wisdom and harmony', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
-  { name: 'Ananya', meaning: 'Incomparable, matchless grace', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
-  { name: 'Diya', meaning: 'Radiant light, lamp of hope', origin: 'Hindi / Sanskrit', gender: 'Girl', style: 'Modern' },
-  { name: 'Ishan', meaning: 'The sun, lord of auspicious wealth', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
-  { name: 'Kabir', meaning: 'Great, revered poet-saint of truth', origin: 'Indian / Arabic', gender: 'Neutral', style: 'Modern' },
-  { name: 'Mira', meaning: 'Prosperous, sea of devotion and grace', origin: 'Sanskrit / Global', gender: 'Girl', style: 'Modern' },
-  { name: 'Neil', meaning: 'Champion, sapphire blue, radiant sky', origin: 'Gaelic / Sanskrit', gender: 'Boy', style: 'Modern' },
-  { name: 'Reyansh', meaning: 'First ray of the morning sun, Lord Vishnu', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
-  { name: 'Tara', meaning: 'Guiding star, radiant shining protector', origin: 'Sanskrit / Global', gender: 'Girl', style: 'Modern' },
-  { name: 'Vivaan', meaning: 'Full of life, dawn rays of morning sun', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
-  { name: 'Zara', meaning: 'Radiance, blooming flower, dawn', origin: 'Arabic / Global', gender: 'Girl', style: 'Modern' },
-  { name: 'Arin', meaning: 'Mountain of strength, enlightened peace', origin: 'Sanskrit / Global', gender: 'Neutral', style: 'Modern' },
-  { name: 'Kiaan', meaning: 'Grace of God, ancient king, royal heritage', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' },
-  { name: 'Sia', meaning: 'Goddess Sita, white moonlight, beautiful', origin: 'Sanskrit', gender: 'Girl', style: 'Modern' },
-  { name: 'Zoya', meaning: 'Loving, caring, alive and joyous', origin: 'Global / Arabic', gender: 'Girl', style: 'Modern' },
-  { name: 'Reva', meaning: 'Narmada river, star, graceful movement', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
-  { name: 'Dev', meaning: 'Divine, shining, godlike spirit', origin: 'Sanskrit', gender: 'Boy', style: 'Traditional Sanskrit' },
-  { name: 'Ayla', meaning: 'Oak tree, halo of light around moon', origin: 'Global / Turkish', gender: 'Girl', style: 'Nature Inspired' },
-  { name: 'Bodhi', meaning: 'Awakening, spiritual enlightenment', origin: 'Sanskrit', gender: 'Neutral', style: 'Nature Inspired' },
-  { name: 'Ishani', meaning: 'Consort of Shiva, ruling goddess of strength', origin: 'Sanskrit', gender: 'Girl', style: 'Traditional Sanskrit' },
-  { name: 'Yuvan', meaning: 'Youthful vigor, Lord Shiva', origin: 'Sanskrit', gender: 'Boy', style: 'Modern' }
-];
-
 export const BabyNames: React.FC = () => {
   const { state, toggleFavoriteName } = usePlanner();
   const [gender, setGender] = useState('Neutral');
@@ -59,10 +34,12 @@ export const BabyNames: React.FC = () => {
   const [keywords, setKeywords] = useState('');
 
   const [isGenerating, setIsGenerating] = useState(false);
-  const [suggestions, setSuggestions] = useState<{ name: string, meaning: string, origin: string }[]>([]);
+  const [suggestions, setSuggestions] = useState<{ name: string; meaning: string; origin: string }[]>([]);
   const [error, setError] = useState('');
 
   const [copiedFavorites, setCopiedFavorites] = useState(false);
+
+  const favoriteNames = state.favoriteNames || [];
 
   const handleCopyFavorites = () => {
     if (!favoriteNames.length) return;
@@ -77,72 +54,135 @@ export const BabyNames: React.FC = () => {
     setIsGenerating(true);
     setError('');
 
-    try {
-      const prompt = `Generate 6 beautiful, meaningful baby names based on these preferences:
-      - Gender: ${gender}
-      - Origin/Style: ${origin}
-      ${startingLetter ? `- Must start with the letter: ${startingLetter}` : ''}
-      ${keywords ? `- Themes/Keywords: ${keywords}` : ''}
-      
-      Respond STRICTLY in valid JSON format with an array of objects. Do not use markdown backticks around the json. Do not explain anything. 
-      Schema:
-      [
-        {"name": "...", "meaning": "...", "origin": "..."}
-      ]`;
+    const cleanLetter = startingLetter.trim().toUpperCase().slice(0, 1);
+    const cleanKeywords = keywords.trim();
+    const previousNames = suggestions.map(s => s.name);
 
-      const systemPrompt = `You are a helpful assistant for expecting parents. You suggest beautiful baby names. Always respond with ONLY valid JSON — no markdown, no explanation, no extra text.`;
+    let validatedAiNames: { name: string; meaning: string; origin: string }[] = [];
+
+    try {
+      const genderInstruction =
+        gender === 'Boy'
+          ? 'Masculine baby BOY names ONLY'
+          : gender === 'Girl'
+          ? 'Feminine baby GIRL names ONLY'
+          : 'Unisex / Gender-Neutral baby names';
+
+      const prompt = `Generate 6 distinct, authentic, meaningful baby names that STRICTLY follow ALL of these instructions:
+1. Gender Focus: ${gender} (${genderInstruction}).
+2. Cultural Origin / Style: "${origin}". Every single name MUST authentically belong to "${origin}" heritage/style. Do NOT suggest unrelated Sanskrit/Hindi names when "${origin}" is selected unless "${origin}" is Sanskrit/Modern.
+${cleanLetter ? `3. Starting Letter (MANDATORY): Every single name MUST begin with the letter "${cleanLetter}". Zero exceptions — do NOT include any name starting with another letter.` : ''}
+${cleanKeywords ? `4. Meaning / Theme (MANDATORY): Every name's meaning MUST genuinely reflect the theme "${cleanKeywords}".` : ''}
+${previousNames.length > 0 ? `5. Freshness: Avoid repeating these previously shown names: ${previousNames.join(', ')}.` : ''}
+
+Respond STRICTLY with a valid JSON array of 6 objects. No markdown code fences, no commentary.
+Schema:
+[
+  {"name": "...", "meaning": "...", "origin": "${origin}"}
+]`;
+
+      const systemPrompt = `You are an expert cultural onomastician and baby naming assistant. You strictly follow every user constraint (exact starting letter, cultural origin/style, gender, and meaning theme). Always respond with ONLY valid JSON array format — no markdown, no extra text.`;
 
       let replyString = '';
       if (isGeminiSupported()) {
         try {
-          const geminiRes = await callGeminiChat({ message: prompt, systemPrompt });
+          const geminiRes = await callGeminiChat({
+            message: prompt,
+            systemPrompt,
+            jsonMode: true,
+            temperature: 0.7
+          });
           replyString = geminiRes.reply;
         } catch (geminiErr) {
-          console.warn("Gemini iOS BabyNames failed, falling back to server:", geminiErr);
+          console.warn('Gemini BabyNames failed, falling back to Cloud Function:', geminiErr);
         }
       }
 
       if (!replyString) {
         const chatWithAI = httpsCallable(functions, 'chatWithAI');
-        const response = await chatWithAI({ message: prompt, systemPrompt });
+        const response = await chatWithAI({ message: prompt, systemPrompt, maxTokens: 800 });
         const result = response.data as { reply: string };
         replyString = result.reply;
       }
 
-      const cleanText = replyString.replace(/```json/g, '').replace(/```/g, '').trim();
-      const parsed = JSON.parse(cleanText);
+      const parsed = safeParseGeminiJson(replyString);
+      const rawArray = Array.isArray(parsed)
+        ? parsed
+        : Array.isArray(parsed?.names)
+        ? parsed.names
+        : Array.isArray(parsed?.suggestions)
+        ? parsed.suggestions
+        : [];
 
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        setSuggestions(parsed);
-        triggerHaptic('success');
-      } else {
-        throw new Error("Invalid response format");
+      const seen = new Set<string>();
+      for (const item of rawArray) {
+        if (!item || typeof item.name !== 'string' || typeof item.meaning !== 'string') continue;
+        const cleanName = item.name.trim();
+        if (!cleanName) continue;
+
+        // Strictly enforce starting letter constraint
+        if (cleanLetter && !cleanName.toUpperCase().startsWith(cleanLetter)) {
+          continue;
+        }
+
+        // If user selected a specific cultural origin (e.g. Sikh / Punjabi or Islamic / Arabic),
+        // reject generic uncorrelated Sanskrit fallback hallucinations from weak models
+        const rawOrigin = typeof item.origin === 'string' && item.origin.trim() ? item.origin.trim() : origin;
+        if (
+          (origin === 'Sikh / Punjabi' || origin === 'Islamic / Arabic' || origin === 'Global / Western') &&
+          rawOrigin.toLowerCase() === 'sanskrit'
+        ) {
+          continue;
+        }
+
+        const key = cleanName.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          validatedAiNames.push({
+            name: cleanName,
+            meaning: item.meaning.trim(),
+            origin: rawOrigin
+          });
+        }
       }
-
     } catch (err) {
-      console.warn("AI generation fallback to offline curated name bank:", err);
-      // Fallback to offline curated database
-      let filtered = FALLBACK_NAMES.filter(n => {
-        if (gender !== 'Neutral' && n.gender !== gender && n.gender !== 'Neutral') return false;
-        if (startingLetter && !n.name.toUpperCase().startsWith(startingLetter.toUpperCase())) return false;
-        return true;
-      });
-      if (filtered.length === 0) {
-        filtered = FALLBACK_NAMES.filter(n => gender === 'Neutral' || n.gender === gender || n.gender === 'Neutral');
+      console.warn('AI generation unavailable or invalid, using instruction-compliant curated catalog:', err);
+    }
+
+    try {
+      // If AI returned fewer than 6 strictly matching names, top up from our instruction-compliant curated catalog
+      if (validatedAiNames.length < 6) {
+        const curated = curateNamesFromCatalog({
+          gender,
+          origin,
+          startingLetter: cleanLetter,
+          keywords: cleanKeywords,
+          excludeNames: [
+            ...validatedAiNames.map(n => n.name),
+            ...previousNames
+          ]
+        });
+
+        const existingNames = new Set(validatedAiNames.map(n => n.name.toLowerCase()));
+        for (const item of curated) {
+          if (!existingNames.has(item.name.toLowerCase())) {
+            existingNames.add(item.name.toLowerCase());
+            validatedAiNames.push(item);
+            if (validatedAiNames.length >= 6) break;
+          }
+        }
       }
-      const shuffled = [...filtered].sort(() => 0.5 - Math.random()).slice(0, 6);
-      if (shuffled.length > 0) {
-        setSuggestions(shuffled.map(s => ({ name: s.name, meaning: s.meaning, origin: s.origin })));
+
+      if (validatedAiNames.length > 0) {
+        setSuggestions(validatedAiNames.slice(0, 6));
         triggerHaptic('success');
       } else {
-        setError('Unable to curate suggestions. Please check your network or adjust filters.');
+        setError('Unable to curate suggestions for this combination. Please adjust your filters and try again.');
       }
     } finally {
       setIsGenerating(false);
     }
   };
-
-  const favoriteNames = state.favoriteNames || [];
 
   return (
     <div className="space-y-4 sm:space-y-5 animate-in fade-in duration-200 max-w-4xl mx-auto pb-12">
@@ -217,7 +257,7 @@ export const BabyNames: React.FC = () => {
                   maxLength={1}
                   placeholder="e.g. A"
                   value={startingLetter}
-                  onChange={e => setStartingLetter(e.target.value.toUpperCase())}
+                  onChange={e => setStartingLetter(e.target.value.replace(/[^a-zA-Z]/g, '').toUpperCase())}
                   className="px-3.5 py-2.5 border border-border/80 rounded-xl text-[13.5px] text-charcoal bg-cream/40 focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage"
                 />
               </div>
@@ -243,15 +283,15 @@ export const BabyNames: React.FC = () => {
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {QUICK_THEMES.map(theme => {
-                  const keyword = theme.split(' ')[1] || theme;
-                  const isSelected = keywords.toLowerCase() === keyword.toLowerCase();
+                  const keywordLabel = theme.replace(/^[^\w]+/, '').trim();
+                  const isSelected = keywords.trim().toLowerCase() === keywordLabel.toLowerCase();
                   return (
                     <button
                       key={theme}
                       type="button"
                       onClick={() => {
                         triggerHaptic('light');
-                        setKeywords(keyword);
+                        setKeywords(isSelected ? '' : keywordLabel);
                       }}
                       className={`px-2 py-1 rounded-lg text-[10.5px] font-bold transition-all cursor-pointer ${
                         isSelected
