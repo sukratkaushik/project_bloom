@@ -7,13 +7,17 @@ import { getPlatform } from './nativeBridge';
  * to provide 1,500 free requests/day with multi-model failover cascade.
  */
 
-const rawApiKey = (import.meta.env.VITE_GEMINI_API_KEY as string | undefined) || (typeof process !== 'undefined' ? (process.env?.GEMINI_API_KEY as string | undefined) : '') || '';
+const rawApiKey =
+  (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_GEMINI_API_KEY) ||
+  (typeof process !== 'undefined' ? (process.env?.VITE_GEMINI_API_KEY || process.env?.GEMINI_API_KEY) : '') ||
+  '';
 const GEMINI_API_KEY = rawApiKey === 'MY_GEMINI_API_KEY' ? '' : rawApiKey;
 const GEMINI_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-flash-latest',
-  'gemini-flash-lite-latest'
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.6-flash',
+  'gemini-flash-lite-latest',
+  'gemini-flash-latest'
 ];
 const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models';
 
