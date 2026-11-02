@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { usePlanner } from '../store';
 import { isSuperAdminEmail } from '../utils/adminConfig';
 import { navigate } from '../utils/navigation';
-import { auth, signInWithGoogle, signInWithApple, handleRedirectResult, signUpWithEmail, signInWithEmail, resetPassword, resendVerificationEmail, verifyOtpCallable, sendVerificationOtpCallable, triggerWelcomeEmailIfNewCallable } from '../firebase';
+import { auth, signInWithGoogle, signInWithApple, handleRedirectResult, triggerWelcomeEmailIfNewCallable } from '../firebase';
 import {
   ShieldCheck,
   WifiOff,
@@ -229,33 +229,14 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const [showEmailModal, setShowEmailModal] = useState(false);
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [showVerifyNotice, setShowVerifyNotice] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
-  const [cachedPassword, setCachedPassword] = useState('');
-  const [otpInput, setOtpInput] = useState('');
-  const [otpError, setOtpError] = useState('');
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
-  const [resendCooldown, setResendCooldown] = useState(0);
-  const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
-  const [resendMessage, setResendMessage] = useState('');
-  const [nameInput, setNameInput] = useState('');
-  const [emailInput, setEmailInput] = useState('');
-  const [passwordInput, setPasswordInput] = useState('');
-  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [authError, setAuthError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showForgotPassword, setShowForgotPassword] = useState(false);
-  const [resetSent, setResetSent] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   // Auto-open login modal if arriving with #login or ?login
   React.useEffect(() => {
     if (window.location.hash.includes('login') || window.location.search.includes('login')) {
-      setShowEmailModal(true);
-      setIsRegistering(false);
+      setShowAuthModal(true);
     }
   }, []);
 
@@ -268,560 +249,115 @@ export const LandingPage: React.FC = () => {
     }
   };
 
-  const handleEmailLoginClick = () => {
-    setShowEmailModal(true);
+  const handleAuthModalOpen = () => {
+    setAuthError('');
+    setShowAuthModal(true);
   };
 
   const clearModal = () => {
-    setShowEmailModal(false);
-    setIsRegistering(false);
-    setShowVerifyNotice(false);
-    setResendStatus('idle');
-    setResendMessage('');
-    setCachedPassword('');
-    setOtpInput('');
-    setOtpError('');
-    setIsVerifyingOtp(false);
-    setResendCooldown(0);
-    setNameInput('');
-    setEmailInput('');
-    setPasswordInput('');
-    setConfirmPasswordInput('');
+    setShowAuthModal(false);
     setAuthError('');
-    setIsSubmitting(false);
-    setShowForgotPassword(false);
-    setResetSent(false);
-    setShowPassword(false);
-  };
-
-  const formatOtpErrorMessage = (rawError: any): string => {
-    const msg = String(rawError?.message || rawError || '');
-    if (!msg) return 'Could not send verification code. Please try again.';
-    if (msg.includes('wait 45 seconds') || msg.includes('resource-exhausted')) {
-      return 'Please wait 45 seconds before requesting another code.';
-    }
-    if (msg.includes('535') || msg.includes('BadCredentials') || msg.includes('SMTP_PASS')) {
-      return 'Email delivery service is currently reconnecting. Please tap Resend Code in a moment.';
-    }
-    return msg.replace(/^Could not dispatch verification email:\s*/i, '');
-  };
-
-  const getFirebaseErrorMessage = (code: string) => {
-    switch (code) {
-      case 'auth/email-not-verified': return 'Your email address is not verified yet. We have sent a 6-digit verification code to your inbox.';
-      case 'auth/email-already-in-use': return 'This email is already registered. Try logging in instead.';
-      case 'auth/invalid-email': return 'Please enter a valid email address.';
-      case 'auth/weak-password': return 'Password must be at least 6 characters.';
-      case 'auth/user-not-found': return 'No account found with this email. Sign up first.';
-      case 'auth/wrong-password': return 'Incorrect password. Try again or reset it.';
-      case 'auth/invalid-credential': return 'Incorrect email or password. Please try again.';
-      case 'auth/too-many-requests': return 'Too many attempts. Please wait a moment and try again.';
-      case 'auth/network-request-failed': return 'Network error. Please check your connection.';
-      case 'auth/operation-not-allowed': return 'Email/Password sign-in is not enabled in your Firebase Console. Please enable it in Authentication > Sign-in method.';
-      default: return `Something went wrong (${code || 'Unknown Error'}). Please try again.`;
-    }
-  };
-
-  const handleVerifyOtpSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const cleanCode = otpInput.trim();
-    if (cleanCode.length !== 6) {
-      setOtpError('Please enter all 6 digits.');
-      return;
-    }
-    setOtpError('');
-    setIsVerifyingOtp(true);
-
-    try {
-      await verifyOtpCallable(registeredEmail, cleanCode);
-      // Successful verification!
-      if (cachedPassword) {
-        const user = await signInWithEmail(registeredEmail, cachedPassword);
-        clearModal();
-        const restored = await restoreJourney(user.uid);
-        if (restored) {
-          navigate('/dashboard');
-        } else {
-          updateState({ hasStartedOnboarding: true, isSetup: false });
-          navigate('/setup');
-        }
-      } else {
-        setShowVerifyNotice(false);
-        setIsRegistering(false);
-        setEmailInput(registeredEmail);
-        setAuthError('');
-        alert('Email verified successfully! Please enter your password to log in.');
-      }
-    } catch (err: any) {
-      setOtpError(formatOtpErrorMessage(err) || 'Invalid or expired verification code. Please try again.');
-    } finally {
-      setIsVerifyingOtp(false);
-    }
-  };
-
-  const handleEmailSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError('');
-    setResendMessage('');
-    setIsSubmitting(true);
-
-    try {
-      if (isRegistering) {
-        if (passwordInput !== confirmPasswordInput) {
-          setAuthError('Passwords do not match.');
-          setIsSubmitting(false);
-          return;
-        }
-        if (passwordInput.length < 6) {
-          setAuthError('Password must be at least 6 characters.');
-          setIsSubmitting(false);
-          return;
-        }
-        setCachedPassword(passwordInput);
-        await signUpWithEmail(emailInput, passwordInput, nameInput);
-        setRegisteredEmail(emailInput);
-        setShowVerifyNotice(true);
-        setIsRegistering(false);
-        setPasswordInput('');
-        setConfirmPasswordInput('');
-        setAuthError('');
-        setOtpInput('');
-        setOtpError('');
-        setResendStatus('idle');
-        setResendMessage('');
-      } else {
-        const existingUser = await signInWithEmail(emailInput, passwordInput);
-        clearModal();
-        // Try to restore existing journey
-        const restored = await restoreJourney(existingUser.uid);
-        if (restored) {
-          navigate('/dashboard');
-        } else {
-          updateState({ hasStartedOnboarding: true, isSetup: false });
-          navigate('/setup');
-        }
-      }
-    } catch (error: any) {
-      if (error?.code === 'auth/email-not-verified') {
-        const targetEmail = emailInput.trim().toLowerCase();
-        setRegisteredEmail(targetEmail);
-        setCachedPassword(passwordInput);
-        setShowVerifyNotice(true);
-        setOtpInput('');
-        setOtpError('');
-        setResendStatus('sending');
-        setResendMessage('Sending 6-digit verification code to your email...');
-        try {
-          await sendVerificationOtpCallable(targetEmail);
-          setResendStatus('sent');
-          setResendMessage('A 6-digit verification code was just sent to your inbox. Please check your email.');
-          setResendCooldown(45);
-          const timer = setInterval(() => {
-            setResendCooldown((prev) => {
-              if (prev <= 1) {
-                clearInterval(timer);
-                return 0;
-              }
-              return prev - 1;
-            });
-          }, 1000);
-        } catch (otpErr: any) {
-          console.warn("Auto-resend OTP on login error:", otpErr);
-          const errText = String(otpErr?.message || '');
-          if (errText.includes('wait 45 seconds') || errText.includes('resource-exhausted')) {
-            setResendStatus('idle');
-            setResendMessage('A code was recently sent. Please enter the 6 digits from your email, or wait 45s to request a new one.');
-          } else {
-            setResendStatus('error');
-            setResendMessage(formatOtpErrorMessage(otpErr));
-          }
-        }
-        return;
-      }
-      setAuthError(getFirebaseErrorMessage(error?.code || ''));
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleForgotPassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setAuthError('');
-    if (!emailInput.includes('@')) {
-      setAuthError('Please enter your email address first.');
-      return;
-    }
-    try {
-      await resetPassword(emailInput);
-      setResetSent(true);
-    } catch (error: any) {
-      setAuthError(getFirebaseErrorMessage(error?.code || ''));
-    }
   };
 
   return (
     <div className="min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
       <Helmet>
-        <title>Our Pregnancy — Secure & Private Indian Pregnancy Companion</title>
+        <title>Our Pregnancy — Secure &amp; Private Indian Pregnancy Companion</title>
         <meta name="description" content="A privacy-first, free pregnancy companion tailored for Indian mothers. Track milestones, blood pressure, kick counts, contraction timing, and scan food safety offline." />
         <link rel="canonical" href="https://ourpregnancy.in/" />
       </Helmet>
-      {/* Auth Modal */}
-      {showEmailModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4">
-          <div className="bg-white rounded-[24px] p-8 w-full max-w-[400px] shadow-2xl relative animate-in zoom-in-95 duration-200">
+
+      {/* 1-Tap OAuth Auth Modal */}
+      {showAuthModal && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-charcoal/60 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+          onClick={(e) => { if (e.target === e.currentTarget) clearModal(); }}
+        >
+          <div className="bg-white rounded-[24px] p-7 sm:p-8 w-full max-w-[390px] shadow-2xl relative animate-in zoom-in-95 duration-200 text-center">
             <button
+              type="button"
               onClick={clearModal}
-              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream"
+              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal transition-colors rounded-full hover:bg-cream cursor-pointer"
               aria-label="Close authentication modal"
             >
               <X size={20} />
             </button>
 
-            <div className="w-10 h-10 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-4 shadow-sm">
-              <Mail size={20} />
+            {/* Canonical Lotus Logo */}
+            <div className="w-16 h-16 bg-cream rounded-full flex items-center justify-center mb-4 mx-auto border border-sage/20 shadow-sm">
+              <img src="/logo.png" alt="Our Pregnancy Logo" className="w-10 h-10 object-contain" />
             </div>
 
-            {showVerifyNotice ? (
-              /* 6-Digit OTP Verification Screen */
-              <div className="text-center animate-in fade-in zoom-in-95 duration-200">
-                <div className="w-14 h-14 bg-sage-pale text-sage rounded-full flex items-center justify-center mb-3 shadow-sm mx-auto">
-                  <ShieldCheck size={28} />
-                </div>
-                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1.5">Enter 6-Digit Code</h2>
-                <p className="text-[13px] text-medium mb-5 leading-relaxed">
-                  We've sent a 6-digit verification code to<br />
-                  <strong className="text-charcoal font-semibold break-all">{registeredEmail}</strong>
-                </p>
+            <h2 className="font-serif text-[23px] sm:text-[25px] font-bold text-charcoal mb-1.5 leading-snug">
+              Welcome to Our Pregnancy
+            </h2>
+            <p className="text-[13px] sm:text-[13.5px] text-medium mb-6 leading-relaxed">
+              Sign in to sync your pregnancy journey securely across all your devices with 1-tap.
+            </p>
 
-                <form onSubmit={handleVerifyOtpSubmit} className="space-y-4 text-left">
-                  <div>
-                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block text-center">
-                      Security Code
-                    </label>
-                    <input
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      value={otpInput}
-                      onChange={(e) => {
-                        const val = e.target.value.replace(/\D/g, '').slice(0, 6);
-                        setOtpInput(val);
-                        setOtpError('');
-                      }}
-                      placeholder="••••••"
-                      className="w-full text-center font-mono text-[28px] font-bold tracking-[12px] py-2.5 px-4 bg-cream/60 border-[2px] border-border focus:border-sage rounded-xl focus:outline-none focus:ring-1 focus:ring-sage transition-all placeholder:tracking-[8px]"
-                      autoFocus
-                      required
-                    />
-                  </div>
-
-                  {otpError && (
-                    <div className="text-[12.5px] text-critical font-medium bg-red-50 border border-red-200 p-2.5 rounded-lg text-center leading-snug">
-                      {otpError}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isVerifyingOtp || otpInput.length !== 6}
-                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                  >
-                    {isVerifyingOtp && <Loader2 className="w-4 h-4 animate-spin" />}
-                    Verify & Activate Account
-                  </button>
-
-                  <div className="flex items-center justify-between text-[12px] pt-1">
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        if (resendCooldown > 0 || resendStatus === 'sending') return;
-                        setResendStatus('sending');
-                        setOtpError('');
-                        setResendMessage('');
-                        try {
-                          await sendVerificationOtpCallable(registeredEmail);
-                          setResendStatus('sent');
-                          setResendMessage('New 6-digit code sent! Check inbox.');
-                          setResendCooldown(45);
-                          const timer = setInterval(() => {
-                            setResendCooldown((prev) => {
-                              if (prev <= 1) {
-                                clearInterval(timer);
-                                return 0;
-                              }
-                              return prev - 1;
-                            });
-                          }, 1000);
-                        } catch (err: any) {
-                          setResendStatus('error');
-                          setResendMessage(formatOtpErrorMessage(err));
-                        }
-                      }}
-                      disabled={resendCooldown > 0 || resendStatus === 'sending'}
-                      className="text-sage font-bold hover:underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : "Resend code"}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowVerifyNotice(false);
-                        setIsRegistering(false);
-                        setEmailInput(registeredEmail);
-                        setAuthError('');
-                      }}
-                      className="text-medium hover:text-charcoal font-semibold transition-colors cursor-pointer"
-                    >
-                      Back to Log In
-                    </button>
-                  </div>
-
-                  {resendMessage && (
-                    <p className={`text-[12px] font-medium text-center ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
-                      {resendMessage}
-                    </p>
-                  )}
-                </form>
-
-                <p className="text-[11px] text-light mt-5 italic">
-                  💡 Tip: The 6-digit code expires in 10 minutes. Please check your junk/spam folder if you don't see it.
-                </p>
+            {authError && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-[12px] text-[12.5px] text-critical font-medium text-left leading-snug">
+                {authError}
               </div>
-            ) : showForgotPassword ? (
-              /* Forgot Password View */
-              <>
-                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">Reset password</h2>
-                <p className="text-[13px] text-medium mb-5 leading-relaxed">
-                  {resetSent
-                    ? `We've sent a password reset link to ${emailInput}. Check your inbox.`
-                    : "Enter your email and we'll send you a link to reset your password."}
-                </p>
-                {!resetSent ? (
-                  <form onSubmit={handleForgotPassword} className="flex flex-col gap-3">
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                      <input
-                        type="email"
-                        value={emailInput}
-                        onChange={(e) => setEmailInput(e.target.value)}
-                        placeholder="you@example.com"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                        required
-                      />
-                    </div>
-                    {authError && <div className="text-[13px] text-critical font-medium">{authError}</div>}
-                    <button type="submit" className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px]">
-                      Send Reset Link
-                    </button>
-                  </form>
-                ) : (
-                  <div className="flex items-center gap-2 p-3 bg-sage-pale rounded-[10px] text-sage text-[13px] font-medium">
-                    <CheckCircle2 size={16} /> Check your inbox for the reset link.
-                  </div>
-                )}
-                <button
-                  type="button"
-                  onClick={() => { setShowForgotPassword(false); setResetSent(false); setAuthError(''); }}
-                  className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors mt-4 block text-center w-full"
-                >
-                  ← Back to Log In
-                </button>
-              </>
-            ) : (
-              /* Login / Sign Up View */
-              <>
-                <h2 className="font-serif text-[22px] font-bold text-charcoal mb-1">
-                  {isRegistering ? 'Create your account' : 'Welcome back'}
-                </h2>
-                <p className="text-[13px] text-medium mb-5 leading-relaxed">
-                  {isRegistering ? 'Sign up with your email to get started.' : 'Log in to access your pregnancy dashboard.'}
-                </p>
-
-                <form onSubmit={handleEmailSubmit} className="flex flex-col gap-3">
-                  {isRegistering && (
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Full Name</label>
-                      <input
-                        type="text"
-                        value={nameInput}
-                        onChange={(e) => setNameInput(e.target.value)}
-                        placeholder="Jane Doe"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                        required
-                      />
-                    </div>
-                  )}
-                  <div>
-                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Email Address</label>
-                    <input
-                      type="email"
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                      placeholder="you@example.com"
-                      className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 flex justify-between items-end">
-                      <span>Password</span>
-                      {!isRegistering && (
-                        <button
-                          type="button"
-                          onClick={() => setShowForgotPassword(true)}
-                          className="text-[10px] text-sage normal-case font-semibold hover:text-sage-dark transition-colors"
-                        >
-                          Forgot password?
-                        </button>
-                      )}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={passwordInput}
-                        onChange={(e) => setPasswordInput(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow pr-12"
-                        required
-                        minLength={6}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-semibold text-medium hover:text-charcoal transition-colors"
-                      >
-                        {showPassword ? 'Hide' : 'Show'}
-                      </button>
-                    </div>
-                  </div>
-                  {isRegistering && (
-                    <div>
-                      <label className="text-[11px] font-bold tracking-[1px] uppercase text-charcoal mb-1.5 block">Confirm Password</label>
-                      <input
-                        type={showPassword ? 'text' : 'password'}
-                        value={confirmPasswordInput}
-                        onChange={(e) => setConfirmPasswordInput(e.target.value)}
-                        placeholder="••••••••"
-                        className="w-full border-[1.5px] border-border rounded-[10px] px-3.5 py-2.5 text-[14px] focus:outline-none focus:border-sage focus:ring-1 focus:ring-sage transition-shadow"
-                        required
-                        minLength={6}
-                      />
-                    </div>
-                  )}
-
-                  {authError && (
-                    <div className="space-y-1.5 p-3 bg-red-50/80 border border-red-200/60 rounded-[10px]">
-                      <div className="text-[12.5px] text-critical font-medium leading-snug">{authError}</div>
-                      {authError.includes('not verified') && (
-                        <div className="pt-1">
-                          <button
-                            type="button"
-                            onClick={async () => {
-                              if (!emailInput) {
-                                setResendMessage('Please enter your email above.');
-                                return;
-                              }
-                              setRegisteredEmail(emailInput);
-                              setCachedPassword(passwordInput);
-                              setShowVerifyNotice(true);
-                              setOtpInput('');
-                              setOtpError('');
-                              setResendMessage('');
-                              try {
-                                await sendVerificationOtpCallable(emailInput);
-                              } catch (err) {
-                                console.warn("Auto-resend OTP error:", err);
-                              }
-                            }}
-                            className="text-[12.5px] text-sage font-bold hover:underline inline-flex items-center gap-1 cursor-pointer"
-                          >
-                            Enter 6-digit verification code →
-                          </button>
-                        </div>
-                      )}
-                      {resendMessage && (
-                        <p className={`text-[11.5px] font-medium ${resendStatus === 'sent' ? 'text-green-600' : 'text-critical'}`}>
-                          {resendMessage}
-                        </p>
-                      )}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full bg-charcoal text-cream rounded-[10px] font-bold py-2.5 hover:opacity-90 transition-all mt-1 shadow-sm text-[14px] flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
-                  >
-                    {isSubmitting && <Loader2 className="w-4 h-4 animate-spin" />}
-                    {isRegistering ? 'Create Account' : 'Log In'}
-                  </button>
-                  <div className="text-center mt-1.5 mb-1.5">
-                    <button
-                      type="button"
-                      onClick={() => { setIsRegistering(!isRegistering); setAuthError(''); setResendMessage(''); setPasswordInput(''); setConfirmPasswordInput(''); }}
-                      className="text-[12px] text-medium font-semibold hover:text-charcoal transition-colors cursor-pointer"
-                    >
-                      {isRegistering ? "Already have an account? Log in" : "Don't have an account? Sign up"}
-                    </button>
-                  </div>
-
-                  <div className="relative flex py-1 items-center">
-                    <div className="flex-grow border-t border-border"></div>
-                    <span className="shrink-0 px-3 text-light text-[10px] font-bold uppercase tracking-[1px]">or</span>
-                    <div className="flex-grow border-t border-border"></div>
-                  </div>
-
-                  <div className="space-y-2 mt-1.5">
-                    <button
-                      type="button"
-                      onClick={handleAppleSignIn}
-                      disabled={isLoggingIn}
-                      className="w-full bg-black text-white rounded-[10px] font-bold py-2.5 hover:bg-neutral-800 transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
-                    >
-                      {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppleIcon className="w-4 h-4 text-white" />}
-                      Continue with Apple
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleGoogleSignIn}
-                      disabled={isLoggingIn}
-                      className="w-full bg-white border-[1.5px] border-border text-charcoal rounded-[10px] font-bold py-2.5 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 text-[14px] cursor-pointer"
-                    >
-                      {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />}
-                      Continue with Google
-                    </button>
-                  </div>
-
-                  <div className="text-center pt-2">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowEmailModal(false);
-                        if (state.isSetup) {
-                          navigate('/dashboard');
-                        } else {
-                          updateState({ hasStartedOnboarding: true });
-                          navigate('/setup');
-                        }
-                      }}
-                      className="text-[12px] text-light hover:text-charcoal underline transition-colors cursor-pointer"
-                    >
-                      Skip sign-in and continue as Guest →
-                    </button>
-                  </div>
-                </form>
-              </>
             )}
+
+            {/* Instant 1-Tap OAuth Sign-In Buttons */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleAppleSignIn}
+                disabled={isLoggingIn}
+                className="w-full bg-black text-white rounded-[12px] font-bold py-3.5 px-4 hover:bg-neutral-800 transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer"
+              >
+                {isLoggingIn ? <Loader2 className="w-4 h-4 animate-spin" /> : <AppleIcon className="w-4 h-4 text-white" />}
+                <span>Continue with Apple</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGoogleSignIn}
+                disabled={isLoggingIn}
+                className="w-full bg-white border-[1.5px] border-border text-charcoal rounded-[12px] font-bold py-3.5 px-4 hover:bg-cream transition-colors shadow-sm flex items-center justify-center gap-2.5 disabled:opacity-50 text-[15px] cursor-pointer"
+              >
+                {isLoggingIn ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-4 h-4" />
+                )}
+                <span>Continue with Google</span>
+              </button>
+            </div>
+
+            {/* Guest Option */}
+            <div className="pt-5 pb-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowAuthModal(false);
+                  if (state.isSetup) {
+                    navigate('/dashboard');
+                  } else {
+                    updateState({ hasStartedOnboarding: true });
+                    navigate('/setup');
+                  }
+                }}
+                className="text-[13px] text-medium hover:text-charcoal font-semibold underline transition-colors cursor-pointer"
+              >
+                Skip sign-in and continue as Guest →
+              </button>
+            </div>
+
+            <p className="text-[11.5px] text-light mt-4 flex items-center justify-center gap-1.5">
+              <span>🔒</span>
+              <span>Private &amp; encrypted. Core features 100% free.</span>
+            </p>
           </div>
         </div>
       )}
+
       <PublicHeader 
-        onLoginClick={() => { setIsRegistering(false); handleEmailLoginClick(); }}
-        onSignUpClick={() => { setIsRegistering(true); handleEmailLoginClick(); }}
+        onLoginClick={handleAuthModalOpen}
+        onSignUpClick={handleAuthModalOpen}
         isLoggingIn={isLoggingIn}
       />
 
@@ -870,31 +406,39 @@ export const LandingPage: React.FC = () => {
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={handleStart}
-                disabled={isLoggingIn}
-                className="group relative inline-flex items-center justify-center gap-2 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
-              >
-                {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
-                {isLoggingIn
-                  ? "Connecting..."
-                  : isLoggedInAndSetup 
-                  ? "Go to Dashboard" 
-                  : isLoggedInNeedsSetup 
-                  ? "✦ Complete Your Pregnancy Setup" 
-                  : "Start Tracking with Google"}
-                {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
-              </button>
-            )}
-            {!user && (
-              <button
-                type="button"
-                onClick={() => { setIsRegistering(false); handleEmailLoginClick(); }}
-                className="inline-flex items-center justify-center gap-2 bg-white border-[1.5px] border-sage text-sage rounded-full font-semibold px-8 py-4 text-[17px] hover:bg-sage-pale transition-colors w-full sm:w-auto cursor-pointer"
-              >
-                Log In / Email Sign In
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={handleStart}
+                  disabled={isLoggingIn}
+                  className="group relative inline-flex items-center justify-center gap-2.5 bg-sage text-white rounded-full font-semibold px-8 py-4 text-[17px] transition-all hover:bg-sage-dark hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(122,158,135,0.4)] w-full sm:w-auto disabled:opacity-70 cursor-pointer"
+                >
+                  {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
+                  {!isLoggedInAndSetup && !isLoggedInNeedsSetup && !isLoggingIn && (
+                    <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="w-5 h-5 bg-white rounded-full p-0.5" />
+                  )}
+                  {isLoggingIn
+                    ? "Connecting..."
+                    : isLoggedInAndSetup 
+                    ? "Go to Dashboard" 
+                    : isLoggedInNeedsSetup 
+                    ? "✦ Complete Your Pregnancy Setup" 
+                    : "Start Tracking with Google"}
+                  {!isLoggingIn && <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />}
+                </button>
+
+                {!user && (
+                  <button
+                    type="button"
+                    onClick={handleAppleSignIn}
+                    disabled={isLoggingIn}
+                    className="group relative inline-flex items-center justify-center gap-2 bg-black text-white rounded-full font-semibold px-7 py-4 text-[16px] transition-all hover:bg-neutral-800 hover:-translate-y-0.5 w-full sm:w-auto disabled:opacity-70 cursor-pointer shadow-sm"
+                  >
+                    {isLoggingIn ? <Loader2 className="w-5 h-5 animate-spin" /> : <AppleIcon className="w-5 h-5 text-white" />}
+                    <span>Continue with Apple</span>
+                  </button>
+                )}
+              </>
             )}
             {!user && (
               <button
