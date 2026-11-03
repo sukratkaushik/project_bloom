@@ -63,6 +63,7 @@ export interface UserProfile {
   displayName: string | null;
   role?: 'admin' | 'user';
   planTier?: 'free' | 'standard' | 'premium';
+  isPremium?: boolean;
   planExpiry?: number | null; // timestamp in ms, or null for lifetime
   emailVerified?: boolean;
   consentGiven?: boolean;

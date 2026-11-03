@@ -15,6 +15,7 @@ import { Task } from '../../types';
 import { NotificationSettingsModal } from './NotificationSettingsModal';
 import { RescheduleModal } from './RescheduleModal';
 import { DoctorModal } from './DoctorModal';
+import { ApplePaywallModal } from '../ApplePaywallModal';
 import { ALL_PREGNANCY_TOOLS } from './toolsData';
 import { getAuthoritativeNextMilestone } from '../../data/clinicalSchedule';
 
@@ -482,64 +483,12 @@ export const MobileShell: React.FC = () => {
         </div>
       )}
 
-      {/* Pricing / Pro Modal */}
-      {showPricingModal && (
-        <div 
-          className="fixed inset-0 bg-charcoal/40 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-          onClick={() => setShowPricingModal(false)}
-        >
-          <div 
-            className="bg-white rounded-3xl p-6 w-full max-w-sm shadow-2xl relative"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              type="button"
-              onClick={() => setShowPricingModal(false)}
-              className="absolute top-4 right-4 p-2 text-medium hover:text-charcoal rounded-full cursor-pointer"
-              aria-label="Close"
-            >
-              <X size={20} />
-            </button>
-            <div className="w-10 h-10 rounded-2xl bg-gold/15 text-gold-dark flex items-center justify-center mb-2">
-              <Sparkles size={20} />
-            </div>
-            <div className="inline-block px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800 text-[10.5px] font-bold uppercase tracking-wider mb-1.5 border border-amber-300">
-              50% OFF Introductory Offer
-            </div>
-            <h3 className="font-serif font-bold text-charcoal text-[20px]">
-              Pro Plan
-            </h3>
-            <div className="flex items-baseline gap-2 mt-1 mb-1.5">
-              <span className="font-serif text-[28px] font-bold text-charcoal">₹499</span>
-              <span className="text-[13px] text-medium">/ month</span>
-              <span className="text-[14px] line-through text-muted ml-1">₹999/mo</span>
-            </div>
-            <p className="text-[12.5px] text-medium leading-relaxed">
-              Unlimited 24/7 OPIN AI consultations, AI food vision scanner, doctor EHR/FHIR exports, and real-time partner sync.
-            </p>
-            <div className="mt-4 p-3 bg-sage-pale/60 border border-sage/30 rounded-2xl">
-              <span className="text-[11px] font-bold text-sage-dark uppercase block">
-                SPECIAL PROMO CODE: OPIN30
-              </span>
-              <p className="text-[13px] font-bold text-charcoal mt-0.5">
-                30 Days 100% Free VIP Trial
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                triggerHaptic('success');
-                updateState({ isPremium: true, planTier: 'premium' });
-                setShowPricingModal(false);
-                showToast('🎉 VIP 30-Day Pass activated!');
-              }}
-              className="mt-4 w-full py-3 bg-sage-dark text-white font-bold text-[13.5px] rounded-xl shadow-md hover:bg-sage transition-colors cursor-pointer"
-            >
-              Activate 30 Days Free
-            </button>
-          </div>
-        </div>
-      )}
+      {/* Native Mobile Paywall Modal (Google Play on Android / StoreKit 2 on iOS) */}
+      <ApplePaywallModal
+        isOpen={showPricingModal}
+        onClose={() => setShowPricingModal(false)}
+        featureTitle="Our Pregnancy Pro"
+      />
 
       {/* Interactive Prenatal Reschedule Modal */}
       <RescheduleModal

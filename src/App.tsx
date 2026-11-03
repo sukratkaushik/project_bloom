@@ -163,7 +163,7 @@ const AppContent: React.FC = () => {
   } else if (currentPath === '/terms') {
     content = <TermsOfService />;
   } else if (currentPath.startsWith('/checkout') || currentPath.startsWith('/payment')) {
-    content = getPlatform() === 'ios' ? <LandingPage /> : <CheckoutPage />;
+    content = isNativeApp() ? <LandingPage /> : <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
   } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {

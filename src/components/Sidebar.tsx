@@ -7,9 +7,10 @@ import { signOut } from 'firebase/auth';
 import { saveJourney } from '../cloudSync';
 import { ChevronDown, ChevronRight, Star, Search, X } from 'lucide-react';
 import { navigate } from '../utils/navigation';
-import { getPlatform } from '../utils/nativeBridge';
+import { getPlatform, isApplePlatform } from '../utils/nativeBridge';
 import { AppleIcon } from './common/AppleIcon';
 import { isSuperAdminEmail } from '../utils/adminConfig';
+import { ApplePaywallModal } from './ApplePaywallModal';
 
 type SidebarProps = {
   activePage: string;
@@ -47,6 +48,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'free' | 'pro'>('all');
+  const [showMobilePaywall, setShowMobilePaywall] = useState(false);
 
   // Accordion state (for desktop accordion view)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -428,7 +430,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             </div>
           ) : (
             <button
-              onClick={() => { navigate('/checkout?plan=premium'); }}
+              onClick={() => {
+                if (getPlatform() === 'android' || getPlatform() === 'ios') {
+                  setShowMobilePaywall(true);
+                } else {
+                  navigate('/checkout?plan=premium');
+                }
+              }}
               className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
             >
               <span className="flex items-center gap-2">
@@ -458,6 +466,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
             <span>Log Out</span>
           </button>
         </div>
+        <ApplePaywallModal
+          isOpen={showMobilePaywall}
+          onClose={() => setShowMobilePaywall(false)}
+          featureTitle="Our Pregnancy Pro"
+        />
       </div>
     );
   }
@@ -605,7 +618,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
       <div className="space-y-2">
         {planTier === 'free' && getPlatform() !== 'ios' && (
           <button
-            onClick={() => { navigate('/checkout?plan=premium'); }}
+            onClick={() => {
+              if (getPlatform() === 'android' || getPlatform() === 'ios') {
+                setShowMobilePaywall(true);
+              } else {
+                navigate('/checkout?plan=premium');
+              }
+            }}
             className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
           >
             <span className="flex items-center gap-2">
@@ -629,6 +648,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
 
         {!auth.currentUser ? (
           <div className="space-y-1.5 pt-1">
+            {isApplePlatform() && (
             <button
               type="button"
               onClick={async () => {
@@ -649,6 +669,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               <AppleIcon className="w-4 h-4 shrink-0 text-white" />
               <span>Sign in with Apple</span>
             </button>
+            )}
             <button
               type="button"
               onClick={async () => {
@@ -682,6 +703,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         )}
       </div>
 
+      <ApplePaywallModal
+        isOpen={showMobilePaywall}
+        onClose={() => setShowMobilePaywall(false)}
+        featureTitle="Our Pregnancy Pro"
+      />
     </div>
   );
 };

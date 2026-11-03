@@ -6,9 +6,20 @@ import { ArrowLeft, ArrowRight, ShieldCheck, CreditCard, Sparkles, Check, Loader
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { navigate } from '../utils/navigation';
+import { isNativeApp } from '../utils/nativeBridge';
 
 export const CheckoutPage: React.FC = () => {
   const { state, updateState, toggleDarkMode } = usePlanner();
+
+  useEffect(() => {
+    if (isNativeApp()) {
+      navigate('/dashboard');
+    }
+  }, []);
+
+  if (isNativeApp()) {
+    return null;
+  }
 
   // Get initial params from URL search or hash (e.g. /checkout?plan=premium&months=3)
   const getParams = () => {

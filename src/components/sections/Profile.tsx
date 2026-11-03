@@ -12,7 +12,7 @@ import {
   Languages, X, Download
 } from 'lucide-react';
 import { navigate } from '../../utils/navigation';
-import { triggerHaptic, getPlatform } from '../../utils/nativeBridge';
+import { triggerHaptic, getPlatform, isApplePlatform } from '../../utils/nativeBridge';
 import { AppleIcon } from '../common/AppleIcon';
 import { isSuperAdminEmail } from '../../utils/adminConfig';
 import { saveJourney } from '../../cloudSync';
@@ -20,6 +20,7 @@ import { SUPPORTED_LANGUAGES, getActiveLanguage, changeLanguage } from '../../ut
 import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
 import { PartnerModal } from '../mobile/PartnerModal';
+import { ApplePaywallModal } from '../ApplePaywallModal';
 import { 
   isBiometricLockEnabled, 
   setBiometricLockEnabled, 
@@ -48,6 +49,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [showComplianceModal, setShowComplianceModal] = useState(false);
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
+  const [showMobilePaywall, setShowMobilePaywall] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const due = state.dueDate ? new Date(state.dueDate) : null;
@@ -352,6 +354,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   You are currently using guest mode. Sign in to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
                 </p>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                  {isApplePlatform() && (
                   <button
                     type="button"
                     onClick={async () => {
@@ -383,6 +386,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     )}
                     <span>Sign in with Apple</span>
                   </button>
+                  )}
 
                   <button
                     type="button"
@@ -492,10 +496,25 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     )}
                   </div>
 
-                  {!(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email) || getPlatform() === 'ios') && (
+                  {!(state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)) && (
                     <button
                       type="button"
-                      onClick={() => { navigate('/checkout?plan=premium'); }}
+                      onClick={() => {
+                        if (getPlatform() === 'android' || getPlatform() === 'ios') {
+                          if (state.planTier === 'premium' || state.isPremium) {
+                            window.open(
+                              getPlatform() === 'android'
+                                ? 'https://play.google.com/store/account/subscriptions'
+                                : 'https://apps.apple.com/account/subscriptions',
+                              '_blank'
+                            );
+                          } else {
+                            setShowMobilePaywall(true);
+                          }
+                        } else {
+                          navigate('/checkout?plan=premium');
+                        }
+                      }}
                       className="text-[12px] sm:text-[12.5px] font-bold text-sage-dark hover:underline cursor-pointer"
                     >
                       {state.planTier === 'premium' || state.isPremium ? 'Manage Plan →' : 'Upgrade to Pro Plan →'}
@@ -506,7 +525,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 <p className="text-[11.5px] sm:text-[12.5px] text-medium leading-relaxed">
                   {state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)
                     ? 'You have perpetual lifetime access to all 24/7 AI clinical tools, clinical checklists, food safety scanner, and admin controls.'
-                    : getPlatform() === 'ios' || state.planTier === 'premium' || state.isPremium
+                    : state.planTier === 'premium' || state.isPremium
                     ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
                     : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food scanner, and partner sync.'}
                 </p>
@@ -1663,6 +1682,12 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
           </div>
         </div>
       )}
+
+      <ApplePaywallModal
+        isOpen={showMobilePaywall}
+        onClose={() => setShowMobilePaywall(false)}
+        featureTitle="Our Pregnancy Pro"
+      />
 
       {toastMessage && (
         <div className="fixed bottom-6 left-6 z-[100] bg-charcoal text-white px-5 py-3 rounded-[12px] shadow-lg flex items-center gap-2 text-sm font-semibold animate-in slide-in-from-bottom-5 duration-300 border border-light/20">

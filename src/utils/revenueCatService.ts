@@ -1,11 +1,11 @@
 import { Capacitor } from '@capacitor/core';
 import { Purchases, CustomerInfo, PurchasesOfferings, LOG_LEVEL } from '@revenuecat/purchases-capacitor';
 
-// Public Apple RevenueCat API Key (can be configured via .env VITE_REVENUECAT_APPLE_KEY)
-export const REVENUECAT_APPLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) : '') || 'appl_OurPregnancyProdKey';
+// Public Apple RevenueCat API Key (configured via .env VITE_REVENUECAT_APPLE_KEY)
+export const REVENUECAT_APPLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_APPLE_KEY as string) : '') || 'appl_CRqwuCsGLkqMBiPHPBXkHTJJMCZ';
 
-// Public Google Play RevenueCat API Key (can be configured via .env VITE_REVENUECAT_GOOGLE_KEY)
-export const REVENUECAT_GOOGLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_GOOGLE_KEY as string) : '') || 'goog_OurPregnancyProdKey';
+// Public Google Play RevenueCat API Key (configured via .env VITE_REVENUECAT_GOOGLE_KEY)
+export const REVENUECAT_GOOGLE_API_KEY = (typeof import.meta !== 'undefined' && import.meta.env ? (import.meta.env.VITE_REVENUECAT_GOOGLE_KEY as string) : '') || 'goog_wTxZCzGikLCZkjFvKoCyJyAmjIm';
 
 // Entitlement identifier configured in RevenueCat dashboard
 export const PRO_ENTITLEMENT_ID = 'pro';
@@ -106,8 +106,28 @@ export async function purchaseProSubscription(packageToPurchase?: any): Promise<
 
   const platform = Capacitor.getPlatform();
   const storeName = platform === 'android' ? 'Google Play Console' : 'App Store Connect';
+  const apiKey = platform === 'android' ? REVENUECAT_GOOGLE_API_KEY : REVENUECAT_APPLE_API_KEY;
 
   try {
+    // Ensure RevenueCat is initialized before calling any Purchases API
+    if (!isInitialized) {
+      const initialized = await initRevenueCat();
+      if (!initialized || !isInitialized) {
+        if (!apiKey || apiKey.includes('ProdKey')) {
+          return {
+            success: false,
+            error: platform === 'android'
+              ? 'Google Play Billing setup required: Please add your RevenueCat Google Public API Key in .env (VITE_REVENUECAT_GOOGLE_KEY).'
+              : 'App Store setup required: Please add your RevenueCat Apple Public API Key in .env (VITE_REVENUECAT_APPLE_KEY).'
+          };
+        }
+        return {
+          success: false,
+          error: `Could not connect to ${storeName}. Please check your store configuration.`
+        };
+      }
+    }
+
     let result;
     if (packageToPurchase) {
       result = await Purchases.purchasePackage({ aPackage: packageToPurchase });
@@ -126,13 +146,17 @@ export async function purchaseProSubscription(packageToPurchase?: any): Promise<
         availablePackages[0];
 
       if (!matchedPackage) {
-        throw new Error(`No active subscription package found in ${storeName}. Please ensure offerings and base plans are configured.`);
+        throw new Error(`No active subscription package found in ${storeName}. Please ensure '${PRO_MONTHLY_PRODUCT_ID}' is linked in RevenueCat.`);
       }
 
       result = await Purchases.purchasePackage({ aPackage: matchedPackage });
     }
 
-    const isPro = Boolean(result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID]);
+    const isPro = Boolean(
+      result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID] ||
+      result.customerInfo.entitlements.active['our_pregnancy_pro'] ||
+      Object.keys(result.customerInfo.entitlements.active).length > 0
+    );
     return { success: isPro, customerInfo: result.customerInfo };
   } catch (error: any) {
     if (error?.userCancelled) {
@@ -152,10 +176,30 @@ export async function restorePurchases(): Promise<{ success: boolean; isActive: 
   }
 
   const platform = Capacitor.getPlatform();
+  const apiKey = platform === 'android' ? REVENUECAT_GOOGLE_API_KEY : REVENUECAT_APPLE_API_KEY;
 
   try {
+    if (!isInitialized) {
+      const initialized = await initRevenueCat();
+      if (!initialized || !isInitialized) {
+        if (!apiKey || apiKey.includes('ProdKey')) {
+          return {
+            success: false,
+            isActive: false,
+            error: platform === 'android'
+              ? 'Google Play Billing setup required: Please add your RevenueCat Google Public API Key in .env (VITE_REVENUECAT_GOOGLE_KEY).'
+              : 'App Store setup required: Please add your RevenueCat Apple Public API Key in .env (VITE_REVENUECAT_APPLE_KEY).'
+          };
+        }
+      }
+    }
+
     const result = await Purchases.restorePurchases();
-    const isPro = Boolean(result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID]);
+    const isPro = Boolean(
+      result.customerInfo.entitlements.active[PRO_ENTITLEMENT_ID] ||
+      result.customerInfo.entitlements.active['our_pregnancy_pro'] ||
+      Object.keys(result.customerInfo.entitlements.active).length > 0
+    );
     return { success: true, isActive: isPro };
   } catch (error: any) {
     console.error(`${platform === 'android' ? 'Google Play' : 'Apple'} restore purchases failed:`, error);
@@ -167,7 +211,10 @@ export async function restorePurchases(): Promise<{ success: boolean; isActive: 
 export const restoreApplePurchases = restorePurchases;
 
 function parseCustomerInfo(info: CustomerInfo): SubscriptionDetails {
-  const entitlement = info.entitlements.active[PRO_ENTITLEMENT_ID];
+  const entitlement =
+    info.entitlements.active[PRO_ENTITLEMENT_ID] ||
+    info.entitlements.active['our_pregnancy_pro'] ||
+    (Object.keys(info.entitlements.active).length > 0 ? info.entitlements.active[Object.keys(info.entitlements.active)[0]] : undefined);
   if (entitlement) {
     return {
       isActive: true,

@@ -38,6 +38,7 @@ import { PublicHeader } from '../components/PublicHeader';
 import { isNativeApp, getPlatform, isApplePlatform } from '../utils/nativeBridge';
 import { getProPricing } from '../utils/proPricing';
 import { AppleIcon } from '../components/common/AppleIcon';
+import { ApplePaywallModal } from '../components/ApplePaywallModal';
 
 export const LandingPage: React.FC = () => {
   const isNative = isNativeApp();
@@ -46,6 +47,7 @@ export const LandingPage: React.FC = () => {
   const [isLoggingIn, setIsLoggingIn] = useState(false);
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [showLandingPaywall, setShowLandingPaywall] = useState(false);
   const [premiumMonths, setPremiumMonths] = useState(1);
   const premiumPricing = getProPricing(premiumMonths);
 
@@ -113,7 +115,6 @@ export const LandingPage: React.FC = () => {
       const googleUser = await signInWithGoogle();
       if (googleUser) {
         triggerWelcomeEmailIfNewCallable();
-        setShowEmailModal(false);
 
         // Try to restore from cloud
         let restored = false;
@@ -155,7 +156,6 @@ export const LandingPage: React.FC = () => {
       const user = await signInWithGoogle();
       if (user) {
         triggerWelcomeEmailIfNewCallable();
-        setShowEmailModal(false);
 
         // Try to restore user journey from cloud (Firestore)
         let restored = false;
@@ -196,7 +196,6 @@ export const LandingPage: React.FC = () => {
       const user = await signInWithApple();
       if (user) {
         triggerWelcomeEmailIfNewCallable();
-        setShowEmailModal(false);
 
         // Try to restore user journey from cloud (Firestore)
         let restored = false;
@@ -450,18 +449,20 @@ export const LandingPage: React.FC = () => {
               </>
             )}
             {!user && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (!state.isSetup) {
-                    updateState({ isSetup: true, hasStartedOnboarding: true, dueDate: state.dueDate || new Date(Date.now() + 151 * 86400000).toISOString() });
-                  }
-                  navigate('/dashboard');
-                }}
-                className="inline-flex items-center justify-center gap-1.5 text-medium hover:text-charcoal font-semibold px-4 py-4 text-[15px] transition-colors whitespace-nowrap cursor-pointer"
-              >
-                <span>Continue as Guest</span> ➜
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!state.isSetup) {
+                      updateState({ isSetup: true, hasStartedOnboarding: true, dueDate: state.dueDate || new Date(Date.now() + 151 * 86400000).toISOString() });
+                    }
+                    navigate('/dashboard');
+                  }}
+                  className="inline-flex items-center justify-center gap-1.5 text-medium hover:text-charcoal font-semibold px-4 py-4 text-[15px] transition-colors whitespace-nowrap cursor-pointer"
+                >
+                  <span>Continue as Guest</span> ➜
+                </button>
+              </>
             )}
             {isLoggedInNeedsSetup && (
               <div className="text-[13.5px] text-sage-dark font-medium px-2 py-1 flex items-center gap-1.5">
@@ -1085,6 +1086,22 @@ export const LandingPage: React.FC = () => {
                       <span>Every clinical tool & AI feature unlocked on iPhone</span>
                     </div>
                   </div>
+                ) : getPlatform() === 'android' ? (
+                  <div className="flex flex-col mt-4 mb-4">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        🎉 70% OFF Intro Offer (First 3 Months)
+                      </span>
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-[40px] font-serif font-bold text-charcoal">$2.99</span>
+                      <span className="text-[16px] line-through text-muted font-normal">$9.99</span>
+                      <span className="text-[14px] text-medium">/ month</span>
+                    </div>
+                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1">
+                      <span>Billed securely via Google Play • Cancel anytime</span>
+                    </div>
+                  </div>
                 ) : (
                   <div className="flex flex-col mt-4 mb-4">
                     <div className="flex items-center gap-2 mb-1">
@@ -1108,8 +1125,8 @@ export const LandingPage: React.FC = () => {
                   </div>
                 )}
 
-                {/* Pro Plan Slider (hidden on iOS) */}
-                {getPlatform() !== 'ios' && (
+                {/* Pro Plan Slider (hidden on native iOS & Android) */}
+                {getPlatform() !== 'ios' && getPlatform() !== 'android' && (
                   <div className="my-6">
                     <div className="flex justify-between items-center mb-2">
                       <label className="text-[12px] font-bold text-sage uppercase tracking-wider">Duration</label>
@@ -1161,10 +1178,16 @@ export const LandingPage: React.FC = () => {
               </div>
               <button
                 type="button"
-                onClick={handleStart}
+                onClick={() => {
+                  if (getPlatform() === 'android' || getPlatform() === 'ios') {
+                    setShowLandingPaywall(true);
+                  } else {
+                    handleStart();
+                  }
+                }}
                 className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
               >
-                {getPlatform() === 'ios' ? 'Start Tracking with Full Access' : 'Upgrade to Pro Plan'}
+                {getPlatform() === 'ios' ? 'Start Tracking with Full Access' : getPlatform() === 'android' ? 'View Google Play Subscription' : 'Upgrade to Pro Plan'}
               </button>
             </div>
           </div>
@@ -1266,6 +1289,12 @@ export const LandingPage: React.FC = () => {
           <span>📋</span> {toastMessage}
         </div>
       )}
+
+      <ApplePaywallModal
+        isOpen={showLandingPaywall}
+        onClose={() => setShowLandingPaywall(false)}
+        featureTitle="Our Pregnancy Pro"
+      />
 
     </div>
   );

@@ -3,8 +3,8 @@ import { navigate } from '../utils/navigation';
 import { getPlatform } from '../utils/nativeBridge';
 
 export const PromoBanner: React.FC = () => {
-  // iOS App Store Compliance (Guideline 3.1.1): Hide checkout promo banners on iOS
-  if (getPlatform() === 'ios') {
+  // App Store & Google Play Compliance: Hide web checkout promo banners on native iOS & Android
+  if (getPlatform() === 'ios' || getPlatform() === 'android') {
     return null;
   }
   const promoText = "🎁 Special Offer: Get 30 Days of Premium Subscription for FREE! Use code OPIN30 at checkout. Click to claim! ⚡";
