@@ -1,0 +1,169 @@
+{
+  "appPolicies" : {
+    "eula" : "",
+    "policies" : [
+      {
+        "locale" : "en_US",
+        "policyText" : "",
+        "policyURL" : ""
+      }
+    ]
+  },
+  "identifier" : "96629378",
+  "nonRenewingSubscriptions" : [
+
+  ],
+  "products" : [
+
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6829164182",
+    "_askToBuyEnabled" : false,
+    "_billingGracePeriodEnabled" : false,
+    "_billingIssuesEnabled" : false,
+    "_developerTeamID" : "92U9QN6YGY",
+    "_disableDialogs" : false,
+    "_failTransactionsEnabled" : false,
+    "_lastSynchronizedDate" : 815494224.59753299,
+    "_locale" : "en_US",
+    "_renewalBillingIssuesEnabled" : false,
+    "_storefront" : "USA",
+    "_storeKitErrors" : [
+
+    ],
+    "_timeRate" : 0
+  },
+  "subscriptionBundleGroups" : [
+
+  ],
+  "subscriptionGroups" : [
+    {
+      "id" : "22532257",
+      "localizations" : [
+        {
+          "description" : "",
+          "displayName" : "Our Pregnancy Pro",
+          "locale" : "en_US"
+        }
+      ],
+      "name" : "Our Pregnancy Pro",
+      "subscriptions" : [
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "9.99",
+              "displayPrice" : "9.99",
+              "internalID" : "6829249552_BILLED_UPFRONT",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 1,
+          "internalID" : "6829249552",
+          "introductoryOffer" : {
+            "billingPlanType" : "BILLED_UPFRONT",
+            "displayPrice" : "2.99",
+            "internalID" : "eyJzIjoiNjgyOTI0OTU1MiIsImQiOjE3OTM2MDY0MDAsImkiOiJVUyIsInQiOiIxMDAzNiIsInAiOiIwIn0",
+            "numberOfPeriods" : 12,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1M"
+          },
+          "introductoryOffers" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "2.99",
+              "internalID" : "eyJzIjoiNjgyOTI0OTU1MiIsImQiOjE3OTM2MDY0MDAsImkiOiJVUyIsInQiOiIxMDAzNiIsInAiOiIwIn0",
+              "numberOfPeriods" : 12,
+              "paymentMode" : "payAsYouGo",
+              "subscriptionPeriod" : "P1M"
+            }
+          ],
+          "localizations" : [
+            {
+              "description" : "Unlimited AI scans, OCR reports & prenatal chat.",
+              "displayName" : "Our Pregnancy Pro",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "opin_pro_monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Our Pregnancy Pro Monthly",
+          "subscriptionGroupID" : "22532257",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        },
+        {
+          "adHocOffers" : [
+
+          ],
+          "billingPlans" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "commitmentDisplayPrice" : "9.99",
+              "displayPrice" : "9.99",
+              "internalID" : "6829249553_BILLED_UPFRONT",
+              "isEnabled" : true
+            }
+          ],
+          "codeOffers" : [
+
+          ],
+          "displayPrice" : "9.99",
+          "familyShareable" : false,
+          "groupNumber" : 2,
+          "internalID" : "6829249553",
+          "introductoryOffer" : {
+            "billingPlanType" : "BILLED_UPFRONT",
+            "displayPrice" : "2.99",
+            "internalID" : "intro_offer_2",
+            "numberOfPeriods" : 12,
+            "paymentMode" : "payAsYouGo",
+            "subscriptionPeriod" : "P1M"
+          },
+          "introductoryOffers" : [
+            {
+              "billingPlanType" : "BILLED_UPFRONT",
+              "displayPrice" : "2.99",
+              "internalID" : "intro_offer_2",
+              "numberOfPeriods" : 12,
+              "paymentMode" : "payAsYouGo",
+              "subscriptionPeriod" : "P1M"
+            }
+          ],
+          "localizations" : [
+            {
+              "description" : "Unlimited AI scans, OCR reports & prenatal chat.",
+              "displayName" : "Our Pregnancy Pro",
+              "locale" : "en_US"
+            }
+          ],
+          "productID" : "opin_pro_monthly:monthly",
+          "recurringSubscriptionPeriod" : "P1M",
+          "referenceName" : "Our Pregnancy Pro Monthly",
+          "subscriptionGroupID" : "22532257",
+          "type" : "RecurringSubscription",
+          "winbackOffers" : [
+
+          ]
+        }
+      ]
+    }
+  ],
+  "subscriptionSuiteGroups" : [
+
+  ],
+  "version" : {
+    "major" : 6,
+    "minor" : 3
+  }
+}
