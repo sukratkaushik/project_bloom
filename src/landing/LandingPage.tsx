@@ -114,6 +114,7 @@ export const LandingPage: React.FC = () => {
       setIsLoggingIn(true);
       const googleUser = await signInWithGoogle();
       if (googleUser) {
+        setShowAuthModal(false);
         triggerWelcomeEmailIfNewCallable();
 
         // Try to restore from cloud
@@ -155,6 +156,7 @@ export const LandingPage: React.FC = () => {
       setIsLoggingIn(true);
       const user = await signInWithGoogle();
       if (user) {
+        setShowAuthModal(false);
         triggerWelcomeEmailIfNewCallable();
 
         // Try to restore user journey from cloud (Firestore)
@@ -195,6 +197,7 @@ export const LandingPage: React.FC = () => {
       setIsLoggingIn(true);
       const user = await signInWithApple();
       if (user) {
+        setShowAuthModal(false);
         triggerWelcomeEmailIfNewCallable();
 
         // Try to restore user journey from cloud (Firestore)
