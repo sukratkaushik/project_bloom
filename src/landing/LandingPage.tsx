@@ -1067,7 +1067,7 @@ export const LandingPage: React.FC = () => {
             {/* Pro Plan */}
             <div className="bg-white border-2 border-sage rounded-[28px] p-8 flex flex-col justify-between shadow-md hover:shadow-xl transition-all duration-300 relative group scale-102">
               <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-sage text-white text-[11px] font-bold tracking-[1.5px] uppercase py-1 px-4 rounded-full shadow-sm whitespace-nowrap">
-                {getPlatform() === 'ios' ? '✨ Full Access Included' : 'Most Popular • 50% OFF'}
+                {getPlatform() === 'ios' || getPlatform() === 'android' ? '🎉 70% OFF Intro Offer' : 'Most Popular • 50% OFF'}
               </div>
               <div>
                 <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Clinical Intelligence</span>
@@ -1077,16 +1077,17 @@ export const LandingPage: React.FC = () => {
                 {getPlatform() === 'ios' ? (
                   <div className="flex flex-col mt-4 mb-4">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="text-[10.5px] font-bold text-sage-dark bg-sage-pale border border-sage/40 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                        🎉 iOS Launch Edition
+                      <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                        🎉 70% OFF Intro Offer (First 12 Months)
                       </span>
                     </div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-[40px] font-serif font-bold text-charcoal">₹0</span>
-                      <span className="text-[14px] text-sage-dark font-semibold">/ All features free</span>
+                      <span className="text-[40px] font-serif font-bold text-charcoal">$2.99</span>
+                      <span className="text-[16px] line-through text-muted font-normal">$9.99</span>
+                      <span className="text-[14px] text-medium">/ month</span>
                     </div>
-                    <div className="text-[12px] font-bold text-sage-dark mt-1">
-                      <span>Every clinical tool & AI feature unlocked on iPhone</span>
+                    <div className="text-[12px] font-bold text-green-600 dark:text-green-400 mt-1">
+                      <span>Billed securely via Apple App Store • Cancel anytime</span>
                     </div>
                   </div>
                 ) : getPlatform() === 'android' ? (
@@ -1190,7 +1191,7 @@ export const LandingPage: React.FC = () => {
                 }}
                 className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
               >
-                {getPlatform() === 'ios' ? 'Start Tracking with Full Access' : getPlatform() === 'android' ? 'View Google Play Subscription' : 'Upgrade to Pro Plan'}
+                {getPlatform() === 'ios' ? 'View Apple Subscription' : getPlatform() === 'android' ? 'View Google Play Subscription' : 'Upgrade to Pro Plan'}
               </button>
             </div>
           </div>

@@ -481,10 +481,6 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                       <span className="px-3 py-1 bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300 font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-purple-300">
                         👑 Admin / App Owner (Lifetime Access)
                       </span>
-                    ) : getPlatform() === 'ios' ? (
-                      <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
-                        👑 Pro Plan Active (iOS Edition)
-                      </span>
                     ) : state.planTier === 'premium' || state.isPremium ? (
                       <span className="px-2.5 py-1 bg-gold-pale text-gold-dark font-bold rounded-full text-[11px] sm:text-[12px] uppercase tracking-wider border border-gold/30">
                         👑 Pro Plan Active
