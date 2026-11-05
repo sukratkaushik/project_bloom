@@ -21,6 +21,7 @@ import { ComplianceConsentModal } from '../ComplianceConsentModal';
 import { DoctorModal } from '../mobile/DoctorModal';
 import { PartnerModal } from '../mobile/PartnerModal';
 import { ApplePaywallModal } from '../ApplePaywallModal';
+import { CrossPlatformUpgradeModal } from '../CrossPlatformUpgradeModal';
 import { 
   isBiometricLockEnabled, 
   setBiometricLockEnabled, 
@@ -50,6 +51,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
   const [isDoctorModalOpen, setIsDoctorModalOpen] = useState(false);
   const [isPartnerModalOpen, setIsPartnerModalOpen] = useState(false);
   const [showMobilePaywall, setShowMobilePaywall] = useState(false);
+  const [showCrossPlatformModal, setShowCrossPlatformModal] = useState(false);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const due = state.dueDate ? new Date(state.dueDate) : null;
@@ -496,19 +498,17 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                     <button
                       type="button"
                       onClick={() => {
-                        if (getPlatform() === 'android' || getPlatform() === 'ios') {
-                          if (state.planTier === 'premium' || state.isPremium) {
-                            window.open(
-                              getPlatform() === 'android'
-                                ? 'https://play.google.com/store/account/subscriptions'
-                                : 'https://apps.apple.com/account/subscriptions',
-                              '_blank'
-                            );
-                          } else {
-                            setShowMobilePaywall(true);
-                          }
+                        if (state.planTier === 'premium' || state.isPremium) {
+                          window.open(
+                            getPlatform() === 'android'
+                              ? 'https://play.google.com/store/account/subscriptions'
+                              : 'https://apps.apple.com/account/subscriptions',
+                            '_blank'
+                          );
+                        } else if (getPlatform() === 'android' || getPlatform() === 'ios') {
+                          setShowMobilePaywall(true);
                         } else {
-                          navigate('/checkout?plan=premium');
+                          setShowCrossPlatformModal(true);
                         }
                       }}
                       className="text-[12px] sm:text-[12.5px] font-bold text-sage-dark hover:underline cursor-pointer"
@@ -1683,6 +1683,11 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
         isOpen={showMobilePaywall}
         onClose={() => setShowMobilePaywall(false)}
         featureTitle="Our Pregnancy Pro"
+      />
+
+      <CrossPlatformUpgradeModal
+        isOpen={showCrossPlatformModal}
+        onClose={() => setShowCrossPlatformModal(false)}
       />
 
       {toastMessage && (

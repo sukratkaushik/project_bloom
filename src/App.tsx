@@ -27,6 +27,7 @@ import { ComplianceConsentModal } from './components/ComplianceConsentModal';
 import { App as CapApp } from '@capacitor/app';
 import { isBiometricLockEnabled, BIOMETRIC_GRACE_PERIOD_MS } from './utils/biometricService';
 import { BiometricSecurityOverlay } from './components/BiometricSecurityOverlay';
+import { APP_STORE_URL, PLAY_STORE_URL } from './components/CrossPlatformUpgradeModal';
 
 const AppContent: React.FC = () => {
   const { state, updateState } = usePlanner();
@@ -162,8 +163,20 @@ const AppContent: React.FC = () => {
     content = <PrivacyPolicy />;
   } else if (currentPath === '/terms') {
     content = <TermsOfService />;
-  } else if (currentPath.startsWith('/checkout') || currentPath.startsWith('/payment')) {
+  } else if (currentPath.startsWith('/checkout') || currentPath.startsWith('/payment') || currentPath.startsWith('/upgrade')) {
     content = isNativeApp() ? <LandingPage /> : <CheckoutPage />;
+  } else if (currentPath === '/app' || currentPath === '/download') {
+    if (typeof window !== 'undefined') {
+      const ua = navigator.userAgent || '';
+      if (/iPhone|iPad|iPod/i.test(ua)) {
+        window.location.replace(APP_STORE_URL);
+        return null;
+      } else if (/Android/i.test(ua)) {
+        window.location.replace(PLAY_STORE_URL);
+        return null;
+      }
+    }
+    content = <CheckoutPage />;
   } else if (!isAuthReady || !splashFinished) {
     content = <SplashScreen />;
   } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {

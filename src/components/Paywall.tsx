@@ -23,6 +23,7 @@ import { getProPricing, PRO_PROMO_MONTHLY_PRICE } from '../utils/proPricing';
 import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
 import { auth, updateUserSubscription } from '../firebase';
 import { RotateCcw, ExternalLink } from 'lucide-react';
+import { CrossPlatformUpgradeModal } from './CrossPlatformUpgradeModal';
 
 interface PaywallProps {
   children: React.ReactNode;
@@ -164,6 +165,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
   const { state, updateState } = usePlanner();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedMonths, setSelectedMonths] = useState<number>(3); // 3 months default for best value
+  const [showCrossPlatformModal, setShowCrossPlatformModal] = useState(false);
 
   const [iosNotice, setIosNotice] = useState<{ type: 'error' | 'success'; message: string } | null>(null);
   const [isRestoringIos, setIsRestoringIos] = useState(false);
@@ -294,8 +296,7 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
 
   const handlePayment = () => {
     triggerHaptic('medium');
-    setIsProcessing(true);
-    navigate(`/checkout?plan=${config.tier}&months=${selectedMonths}`);
+    setShowCrossPlatformModal(true);
   };
 
   const handleActivateVip = () => {
@@ -674,6 +675,11 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
         <p className="text-[11px] text-light text-center">
           One-time payment • No auto-debit renewals • 100% private, on-device encrypted storage
         </p>
+
+        <CrossPlatformUpgradeModal
+          isOpen={showCrossPlatformModal}
+          onClose={() => setShowCrossPlatformModal(false)}
+        />
       </div>
     </div>
   );

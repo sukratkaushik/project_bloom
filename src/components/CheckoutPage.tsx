@@ -1,15 +1,34 @@
 import React, { useState, useEffect } from 'react';
 import { usePlanner } from '../store';
 import { httpsCallable } from 'firebase/functions';
-import { functions, auth, updateUserSubscription } from '../firebase';
-import { ArrowLeft, ArrowRight, ShieldCheck, CreditCard, Sparkles, Check, Loader2, Landmark, Tag, Heart } from 'lucide-react';
+import { functions, auth, db, updateUserSubscription } from '../firebase';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { 
+  ArrowLeft, 
+  ArrowRight, 
+  ShieldCheck, 
+  Sparkles, 
+  Check, 
+  Loader2, 
+  Tag, 
+  Heart, 
+  CheckCircle2, 
+  Smartphone, 
+  Copy, 
+  RefreshCw,
+  ExternalLink 
+} from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import { Header } from './Header';
 import { Footer } from './Footer';
 import { navigate } from '../utils/navigation';
-import { isNativeApp } from '../utils/nativeBridge';
+import { isNativeApp, isApplePlatform } from '../utils/nativeBridge';
+import { AppleIcon } from './common/AppleIcon';
+import { APP_STORE_URL, PLAY_STORE_URL } from './CrossPlatformUpgradeModal';
 
 export const CheckoutPage: React.FC = () => {
   const { state, updateState, toggleDarkMode } = usePlanner();
+  const isApple = isApplePlatform();
 
   useEffect(() => {
     if (isNativeApp()) {
@@ -21,130 +40,110 @@ export const CheckoutPage: React.FC = () => {
     return null;
   }
 
-  // Get initial params from URL search or hash (e.g. /checkout?plan=premium&months=3)
-  const getParams = () => {
-    const search = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
-    const params = new URLSearchParams(search);
-    return {
-      plan: 'premium' as const,
-      months: parseInt(params.get('months') || '3', 10),
-      coupon: params.get('coupon') || '',
-    };
+  const getInitialCoupon = () => {
+    try {
+      const search = window.location.search || (window.location.hash.includes('?') ? '?' + window.location.hash.split('?')[1] : '');
+      const params = new URLSearchParams(search);
+      return params.get('coupon') || '';
+    } catch {
+      return '';
+    }
   };
 
-  const initialParams = getParams();
-  const [selectedPlan, setSelectedPlan] = useState<'premium'>('premium');
-  const [months, setMonths] = useState<number>(initialParams.months);
-  const [couponCode, setCouponCode] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState<number>(0);
+  const [activePlatform, setActivePlatform] = useState<'apple' | 'google'>(isApple ? 'apple' : 'google');
+  const [couponCode, setCouponCode] = useState(getInitialCoupon());
   const [couponError, setCouponError] = useState('');
   const [couponSuccess, setCouponSuccess] = useState('');
-
-  // Flow states
-  const [checkoutStep, setCheckoutStep] = useState<'checkout' | 'processing' | 'success'>('checkout');
-  const [txnId, setTxnId] = useState('');
-  const [expiryDate, setExpiryDate] = useState('');
-  const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isApplyingFreePass, setIsApplyingFreePass] = useState(false);
+  const [isActivated, setIsActivated] = useState(false);
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [isCheckingStatus, setIsCheckingStatus] = useState(false);
+  const [isMobileScreen, setIsMobileScreen] = useState(false);
 
-  // Auto-fill user email/name if available
-  const userEmail = state.userName ? `${state.userName.toLowerCase().replace(/\s+/g, '')}@example.com` : "hello@ourpregnancy.in";
-
-  // Re-run param parser on hash change
+  // Responsive device check for mobile web
   useEffect(() => {
-    const handleHashChange = () => {
-      const params = getParams();
-      setSelectedPlan(params.plan);
-      setMonths(params.months);
+    const checkMobile = () => {
+      setIsMobileScreen(window.innerWidth < 768 || /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent));
     };
-    window.addEventListener('hashchange', handleHashChange);
-    return () => window.removeEventListener('hashchange', handleHashChange);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Trigger auto-apply coupon if present in URL
+  // Real-time Firestore Listener for Instant Desktop Activation Handshake
   useEffect(() => {
-    const params = getParams();
-    if (params.coupon) {
-      const promo = params.coupon.trim().toUpperCase();
-      setCouponCode(promo);
-      
-      const initialBase = params.plan === 'premium' ? 499 : 99;
-      const initialDurationDiscount = Math.floor(params.months / 3) * 50;
-      const initialRawSubtotal = initialBase * params.months - initialDurationDiscount;
-      
-      if (promo === 'OPIN30') {
-        if (params.plan === 'premium') {
-          const discount = params.months <= 1 ? initialRawSubtotal : initialBase;
-          setAppliedDiscount(discount);
-          setCouponSuccess('Promo code OPIN30 applied! 30 Days (1 Month) of Premium for FREE.');
-        } else {
-          setCouponError('Promo code OPIN30 is only valid for Premium plans.');
-        }
-      } else if (promo === 'VIPCARE90') {
-        if (params.plan === 'premium') {
-          const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
-          setAppliedDiscount(discount);
-          setCouponSuccess('Promo code VIPCARE90 applied! 90 Days (3 Months) of Pro Plan for FREE.');
-        } else {
-          setCouponError('Promo code VIPCARE90 is only valid for Pro plans.');
-        }
-      } else if (promo === 'BLOOM30') {
-        if (params.plan === 'premium') {
-          const discount = params.months <= 3 ? initialRawSubtotal : (initialBase * 3 - 50);
-          setAppliedDiscount(discount);
-          setCouponSuccess('Promo code BLOOM30 applied! 3 months of Pro Plan for free.');
-        } else {
-          setCouponError('Promo code BLOOM30 is only valid for Pro plans.');
-        }
-      } else if (promo === 'BLOOM50') {
-        setAppliedDiscount(Math.round(initialRawSubtotal * 0.5));
-        setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
-      } else if (promo === 'WELCOME10') {
-        setAppliedDiscount(Math.round(initialRawSubtotal * 0.1));
-        setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
-      }
+    const currentUser = auth.currentUser;
+    if (!currentUser) return;
+
+    if (state.isPremium || state.planTier === 'premium' || (state.planTier as string) === 'pro') {
+      setIsActivated(true);
+      return;
     }
-  }, [selectedPlan, months]);
 
-  // Compute pricing (Bloom PRO 2-Tier Model: Regular ₹999/mo, 50% OFF launch offer at ₹499/mo)
-  const basePrice = 499;
-  const originalMonthly = 999;
-  const durationDiscount = Math.floor(months / 3) * 50;
-  const rawSubtotal = basePrice * months - durationDiscount;
-  const finalPrice = Math.max(0, rawSubtotal - appliedDiscount);
+    const userDocRef = doc(db, 'users', currentUser.uid);
+    const unsubscribe = onSnapshot(
+      userDocRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const isPro = Boolean(
+            data?.isPremium || 
+            data?.planTier === 'premium' || 
+            data?.planTier === 'pro'
+          );
 
-  const applyCoupon = async () => {
+          if (isPro) {
+            setIsActivated(true);
+            updateState({
+              isPremium: true,
+              planTier: 'premium',
+              planExpiry: data?.planExpiry || null
+            });
+          }
+        }
+      },
+      (error) => {
+        console.warn('[CheckoutPage] Snapshot listener error:', error);
+      }
+    );
+
+    return () => unsubscribe();
+  }, [state.isPremium, state.planTier, updateState]);
+
+  const currentStoreUrl = activePlatform === 'apple' ? APP_STORE_URL : PLAY_STORE_URL;
+
+  const handleCopyLink = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(currentStoreUrl);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2500);
+    }
+  };
+
+  const handleApplyFreePromoPass = async () => {
     setCouponError('');
     setCouponSuccess('');
     const cleanedCode = couponCode.trim().toUpperCase();
 
     if (!cleanedCode) {
-      setCouponError('Please enter a coupon code.');
+      setCouponError('Please enter a VIP promo code.');
       return;
     }
 
     if (cleanedCode === 'OPIN30' || cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') {
       if (!auth.currentUser) {
-        setCouponError('Please sign in or create an account first to claim your free access.');
+        setCouponError('Please sign in or create an account first to claim your promo access.');
         return;
       }
 
       setIsApplyingFreePass(true);
       try {
-        const freeMonths = (cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') ? 3 : 1;
-        setSelectedPlan('premium');
-        setMonths(freeMonths);
-        const freeBasePrice = 499;
-        const discount = freeMonths <= 1 ? freeBasePrice : (freeBasePrice * 3 - 50);
-        setAppliedDiscount(discount);
-
+        const freeMonths = (cleanedCode === 'VIPCARE90') ? 3 : 1;
         const expiryTimestamp = Date.now() + freeMonths * 30 * 24 * 60 * 60 * 1000;
         const expiryIso = new Date(expiryTimestamp).toISOString();
 
-        // Update Firestore user document
         await updateUserSubscription(auth.currentUser.uid, 'premium', freeMonths);
 
-        // Update local planner state & Dexie
         updateState({
           planTier: 'premium',
           isPremium: true,
@@ -153,12 +152,8 @@ export const CheckoutPage: React.FC = () => {
           premiumExpiry: expiryIso,
         });
 
-        const freeTxn = `FREE_${cleanedCode}_${Date.now().toString(36).toUpperCase()}`;
-        setTxnId(freeTxn);
-        const computedExpiry = new Date(expiryTimestamp);
-        setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
-        setCouponSuccess(`Promo code ${cleanedCode} applied! Free Premium activated.`);
-        setShowSuccessModal(true);
+        setIsActivated(true);
+        setCouponSuccess(`Promo code ${cleanedCode} applied! Free Pro membership activated.`);
 
         // Dispatch promo confirmation email to user's inbox
         try {
@@ -177,458 +172,318 @@ export const CheckoutPage: React.FC = () => {
       return;
     }
 
-    if (cleanedCode === 'BLOOM50') {
-      const discount = Math.round(rawSubtotal * 0.5);
-      setAppliedDiscount(discount);
-      setCouponSuccess('Promo code BLOOM50 applied! You got 50% off.');
-    } else if (cleanedCode === 'WELCOME10') {
-      const discount = Math.round(rawSubtotal * 0.1);
-      setAppliedDiscount(discount);
-      setCouponSuccess('Promo code WELCOME10 applied! You got 10% off.');
-    } else {
-      setCouponError('Invalid coupon code.');
-    }
+    setCouponError('Invalid promo code. For subscriptions, please scan with your phone below.');
   };
 
-  const handlePaymentSubmit = async () => {
-    // Start payment processing
-    setCheckoutStep('processing');
-
-    if (!auth.currentUser) {
-      alert('You must be signed in to complete this order or claim your free access. Please sign in or create an account first.');
-      setCheckoutStep('checkout');
-      return;
-    }
-
-    const cleanedCode = couponCode.trim().toUpperCase();
-
-    // 100% Free Promo Pass Activation (Zero Gateway)
-    if (finalPrice === 0) {
-      try {
-        const freeMonths = (cleanedCode === 'VIPCARE90' || cleanedCode === 'BLOOM30') ? Math.min(months, 3) : Math.min(months, 1);
-        const actualMonths = Math.max(1, freeMonths);
-
-        // Expiry in ms
-        const expiryTimestamp = Date.now() + actualMonths * 30 * 24 * 60 * 60 * 1000;
-        const expiryIso = new Date(expiryTimestamp).toISOString();
-
-        // Update Firestore user document
-        await updateUserSubscription(auth.currentUser.uid, selectedPlan, actualMonths);
-
-        // Update local planner state & Dexie
-        updateState({
-          planTier: selectedPlan,
-          isPremium: selectedPlan === 'premium',
-          premiumPlan: actualMonths >= 12 ? 'annual' : 'monthly',
-          planExpiry: expiryTimestamp,
-          premiumExpiry: expiryIso,
-        });
-
-        const freeTxn = `FREE_${cleanedCode || 'PROMO'}_${Date.now().toString(36).toUpperCase()}`;
-        setTxnId(freeTxn);
-        const computedExpiry = new Date(expiryTimestamp);
-        setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
-        setCheckoutStep('success');
-        return;
-      } catch (err: any) {
-        console.error("Free pass activation failed:", err);
-        alert(`Could not activate promo pass: ${err.message || 'Please try again.'}`);
-        setCheckoutStep('checkout');
-        return;
+  const handleManualSyncCheck = () => {
+    setIsCheckingStatus(true);
+    setTimeout(() => {
+      if (state.isPremium || state.planTier === 'premium' || (state.planTier as string) === 'pro') {
+        setIsActivated(true);
       }
-    }
-
-    try {
-      const createOrderParams = { planTier: selectedPlan, months };
-      const createOrder = httpsCallable(functions, 'createPaymentOrder');
-      const orderRes = await createOrder(createOrderParams) as { data: { orderId: string, amount: number } };
-      
-      const { orderId, amount } = orderRes.data;
-
-      const options = {
-        key: import.meta.env.VITE_RAZORPAY_KEY_ID || 'rzp_test_YOUR_KEY_HERE', 
-        amount: amount, 
-        currency: "INR",
-        name: "Our Pregnancy",
-        description: "Pro Plan",
-        image: "https://ourpregnancy.in/logo.png",
-        order_id: orderId, 
-        handler: async function (response: any) {
-          try {
-            setCheckoutStep('processing');
-            const verifySig = httpsCallable(functions, 'verifyPaymentSignature');
-            const verifyRes = await verifySig({
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_signature: response.razorpay_signature,
-              planTier: selectedPlan,
-              months
-            }) as { data: { success: boolean, expiry: string } };
-
-            if (verifyRes.data.success) {
-              setTxnId(response.razorpay_payment_id);
-              const computedExpiry = new Date(verifyRes.data.expiry);
-              setExpiryDate(computedExpiry.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }));
-              
-              updateState({
-                planTier: selectedPlan,
-                isPremium: selectedPlan === 'premium',
-                premiumPlan: months >= 12 ? 'annual' : 'monthly',
-                planExpiry: computedExpiry.getTime(),
-                premiumExpiry: verifyRes.data.expiry,
-                razorpayPaymentId: response.razorpay_payment_id,
-              });
-
-              setCheckoutStep('success');
-            }
-          } catch (err: any) {
-            console.error("Verification failed:", err);
-            alert("Payment verification failed. If money was deducted, it will be refunded automatically.");
-            setCheckoutStep('checkout');
-          }
-        },
-        prefill: {
-          name: state.userName || "",
-          email: userEmail,
-        },
-        theme: {
-          color: "#8ab6a3"
-        },
-        modal: {
-          ondismiss: function() {
-            setCheckoutStep('checkout');
-          }
-        }
-      };
-
-      const rzp = new (window as any).Razorpay(options);
-      rzp.on('payment.failed', function (response: any){
-        alert("Payment Failed: " + response.error.description);
-        setCheckoutStep('checkout');
-      });
-      rzp.open();
-      
-    } catch (err: any) {
-      console.error("Payment initiation failed:", err);
-      alert(`Payment Error: ${err.message || 'Could not connect to payment gateway. Please try again.'}`);
-      setCheckoutStep('checkout');
-    }
+      setIsCheckingStatus(false);
+    }, 800);
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-cream font-sans overflow-x-hidden selection:bg-sage-pale selection:text-sage-dark text-charcoal relative">
-      <Header hideMenuIcon />
+    <div className="min-h-screen bg-cream font-sans flex flex-col justify-between selection:bg-sage-pale selection:text-sage-dark text-charcoal">
+      <Header toggleDarkMode={toggleDarkMode} />
 
-      {/* Background decoration */}
-      <div className="absolute top-20 left-10 w-96 h-96 bg-sage-light/10 rounded-full mix-blend-multiply filter blur-3xl -z-10 pointer-events-none" />
-      <div className="absolute top-1/3 right-10 w-96 h-96 bg-gold-pale/20 rounded-full mix-blend-multiply filter blur-3xl -z-10 pointer-events-none" />
+      <main className="flex-1 max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12">
+        {/* Back Link */}
+        <button
+          onClick={() => navigate('/dashboard')}
+          className="inline-flex items-center gap-1.5 text-medium hover:text-charcoal font-semibold text-[13.5px] mb-6 transition-colors cursor-pointer group"
+        >
+          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+          <span>Back to Pregnancy Dashboard</span>
+        </button>
 
-      <div className="max-w-5xl mx-auto w-full py-8 md:py-12 px-4 sm:px-6 md:px-12 lg:px-16 flex-1">
-        
-        <div className="mb-6">
-          <button
-            onClick={() => {
-              // Redirect back to dashboard if set up, else landing
-              navigate(state.isSetup ? '/dashboard' : '/');
-            }}
-            className="flex items-center gap-2 text-[14px] font-bold text-medium hover:text-sage transition-colors"
-          >
-            <ArrowLeft size={16} /> Back
-          </button>
-        </div>
+        {/* -------------------- STATE: CELEBRATION / ACTIVATED -------------------- */}
+        {isActivated ? (
+          <div className="bg-white border border-sage/25 rounded-[32px] p-8 sm:p-12 shadow-xl text-center max-w-xl mx-auto space-y-6 animate-in zoom-in-95 duration-300">
+            <div className="w-20 h-20 bg-emerald-50 text-emerald-600 rounded-full flex items-center justify-center mx-auto border-2 border-emerald-200 shadow-md">
+              <CheckCircle2 size={44} className="animate-bounce" />
+            </div>
 
-        {checkoutStep === 'checkout' && (
+            <div>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-200 mb-2">
+                🎉 Synced in Real Time
+              </span>
+              <h2 className="font-serif text-[28px] sm:text-[34px] font-bold text-charcoal">
+                Welcome to Our Pregnancy Pro!
+              </h2>
+              <p className="text-[14px] sm:text-[15px] text-medium mt-2 leading-relaxed">
+                Your maternal membership is active. All clinical AI features, food vision scanners, and EHR exports are unlocked on this browser and synced across all your devices.
+              </p>
+            </div>
+
+            <div className="p-5 bg-cream/70 rounded-2xl border border-sage/20 text-left space-y-2.5 text-[13.5px]">
+              <div className="flex items-center gap-2.5 text-charcoal font-semibold">
+                <Check size={16} className="text-sage-dark shrink-0" />
+                <span>Active on Web, Android, and iOS</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-charcoal font-semibold">
+                <Check size={16} className="text-sage-dark shrink-0" />
+                <span>Unlimited 24/7 Ask OPIN AI Obstetrician Companion</span>
+              </div>
+              <div className="flex items-center gap-2.5 text-charcoal font-semibold">
+                <Check size={16} className="text-sage-dark shrink-0" />
+                <span>AI Food Safety Scanner &amp; Real-Time Partner Sync</span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="w-full py-4 rounded-xl bg-sage text-white font-bold text-[15px] hover:bg-sage-dark shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>✦ Open Pro Dashboard</span>
+              <ArrowRight size={17} />
+            </button>
+          </div>
+        ) : (
+          /* -------------------- STATE: CHECKOUT & QR SCAN -------------------- */
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Left Column: Plan Summary */}
-            <div className="lg:col-span-5 space-y-6">
-              <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[24px] p-6 shadow-sm">
-                <h2 className="font-serif text-[22px] font-semibold mb-4 text-charcoal dark:text-white">Order Summary</h2>
-
-                {/* Plan detail card */}
-                <div className="p-4 rounded-xl border border-sage/30 bg-sage-pale/40 text-sage-dark mb-6">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="text-[10.5px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-full uppercase tracking-wider">
-                      🎉 50% OFF Launch Offer
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between font-bold text-[16px] mb-1">
-                    <span className="flex items-center gap-1.5 text-charcoal">
-                      <Sparkles size={16} className="text-sage" />
-                      Pro Plan
-                    </span>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="font-serif text-[18px] text-charcoal">₹{basePrice}/mo</span>
-                      <span className="text-[12.5px] line-through text-muted font-normal">₹999/mo</span>
-                    </div>
-                  </div>
-                  <p className="text-[12px] opacity-90 leading-relaxed text-charcoal/80">
-                    Includes 24/7 Ask OPIN AI chatbot, AI Food Hazard scanner, Doctor EHR exports, and real-time Partner Sync.
-                  </p>
-                </div>
-
-                {/* Duration selector */}
-                <div className="mb-6">
-                  <div className="flex justify-between items-center mb-2">
-                    <label className="text-[12px] font-bold text-charcoal dark:text-white uppercase tracking-wider">Select Duration</label>
-                    <span className={`text-[13px] font-semibold px-2.5 py-0.5 rounded-full ${
-                      selectedPlan === 'premium' ? 'bg-gold-pale text-gold border border-gold/20' : 'bg-sage-pale text-sage border border-sage/20'
-                    }`}>
-                      {months} {months === 1 ? 'Month' : 'Months'}
-                    </span>
-                  </div>
-                  <input
-                    type="range"
-                    min={1}
-                    max={12}
-                    value={months}
-                    onChange={(e) => { setMonths(Number(e.target.value)); setAppliedDiscount(0); setCouponSuccess(''); }}
-                    className="w-full h-2 rounded-full appearance-none cursor-pointer bg-cream dark:bg-[#0F172A] border border-border dark:border-white/10"
-                    style={{
-                      accentColor: selectedPlan === 'premium' ? "var(--color-gold, #F4A261)" : "var(--color-sage, #8ab6a3)"
-                    }}
-                  />
-                  <div className="flex justify-between mt-1 text-[10px] text-medium font-bold px-1">
-                    <span>1m</span>
-                    <span>3m</span>
-                    <span>6m</span>
-                    <span>9m</span>
-                    <span>12m</span>
-                  </div>
-                </div>
-
-                {/* Pricing breakdown */}
-                <div className="space-y-2 text-[13.5px] border-t border-border dark:border-white/10 pt-4 mb-4">
-                  <div className="flex justify-between text-medium">
-                    <span>Subtotal ({months} months)</span>
-                    <span>₹{basePrice * months}</span>
-                  </div>
-                  {durationDiscount > 0 && (
-                    <div className="flex justify-between text-green-600 dark:text-green-400 font-medium">
-                      <span>Duration Discount</span>
-                      <span>-₹{durationDiscount}</span>
-                    </div>
-                  )}
-                  {appliedDiscount > 0 && (
-                    <div className="flex justify-between text-green-600 dark:text-green-400 font-medium animate-in fade-in">
-                      <span>Promo Coupon Discount</span>
-                      <span>-₹{appliedDiscount}</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between text-medium">
-                    <span>Platform Fee & Tax</span>
-                    <span className="text-green-600 dark:text-green-400 font-medium">FREE</span>
-                  </div>
-                  <div className="h-px bg-border dark:border-white/10 my-2" />
-                  <div className="flex justify-between font-serif text-[18px] font-bold text-charcoal dark:text-white">
-                    <span>Total Amount</span>
-                    <span>₹{finalPrice}</span>
-                  </div>
-                </div>
+            {/* Left Column: Plan Benefits & Summary */}
+            <div className="lg:col-span-5 bg-white border border-border/80 rounded-[28px] p-6 sm:p-7 shadow-sm space-y-6">
+              <div className="flex items-center gap-2 text-sage-dark font-bold text-[11.5px] uppercase tracking-wider bg-sage-pale px-3 py-1 rounded-full w-max border border-sage/20">
+                <Sparkles size={13} className="text-sage" />
+                <span>Maternal Membership</span>
               </div>
 
-              {/* Coupon box */}
-              <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[24px] p-5 shadow-sm">
-                <label className="block text-[11px] font-bold text-charcoal dark:text-white uppercase tracking-wider mb-2">Have a coupon?</label>
-                <div className="flex gap-2">
-                  <div className="relative flex-grow">
-                    <Tag size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-light" />
-                    <input
-                      type="text"
-                      value={couponCode}
-                      onChange={(e) => setCouponCode(e.target.value)}
-                      className="w-full pl-9 pr-3 py-2 border border-border dark:border-white/10 rounded-xl bg-cream dark:bg-[#0F172A] text-[13px] font-semibold text-charcoal dark:text-white focus:outline-none focus:border-sage uppercase"
-                    />
+              <div>
+                <h1 className="font-serif text-[24px] sm:text-[27px] font-bold text-charcoal leading-snug">
+                  Our Pregnancy Pro
+                </h1>
+                <p className="text-[13px] text-medium mt-1 leading-relaxed">
+                  Full clinical companion with AI intelligence, doctor EHR exports, and real-time partner synchronization.
+                </p>
+              </div>
+
+              <div className="h-px bg-border" />
+
+              <div className="space-y-3">
+                <span className="text-[11px] uppercase tracking-wider font-bold text-medium block">
+                  Included in Your Membership
+                </span>
+                {[
+                  "24/7 Ask OPIN AI Obstetrician Companion",
+                  "AI Food & Hazard Vision Scanner (FOGSI safe)",
+                  "Doctor-Ready EHR Vault & FHIR R4 Exports",
+                  "Encrypted Real-Time Cross-Device Partner Sync",
+                  "AI Baby Names Generator & Garbh Sanskar Audio",
+                  "Priority clinical updates & continuous support"
+                ].map((feat, idx) => (
+                  <div key={idx} className="flex items-start gap-2.5 text-[13px] text-charcoal">
+                    <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />
+                    <span>{feat}</span>
                   </div>
+                ))}
+              </div>
+
+              {/* VIP Coupon Box */}
+              <div className="p-4 bg-cream/60 rounded-2xl border border-sage/20 space-y-2.5">
+                <div className="flex items-center gap-1.5 text-[12px] font-bold text-charcoal">
+                  <Tag size={13} className="text-sage" />
+                  <span>Have a VIP Promo Pass?</span>
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="e.g. OPIN30"
+                    className="flex-1 bg-white border border-border rounded-xl px-3 py-2 text-[13px] uppercase font-mono tracking-wider focus:outline-none focus:border-sage"
+                  />
                   <button
                     type="button"
-                    onClick={applyCoupon}
+                    onClick={handleApplyFreePromoPass}
                     disabled={isApplyingFreePass}
-                    className="px-4 py-2 bg-charcoal dark:bg-white dark:text-charcoal hover:bg-gray-800 dark:hover:bg-white/95 text-white font-bold text-[12px] rounded-xl transition-all flex items-center gap-1.5 disabled:opacity-50"
+                    className="bg-charcoal text-white px-4 py-2 rounded-xl text-[12.5px] font-bold hover:bg-black transition-all cursor-pointer disabled:opacity-50"
                   >
-                    {isApplyingFreePass ? <Loader2 size={14} className="animate-spin" /> : null}
-                    Apply
+                    {isApplyingFreePass ? <Loader2 size={14} className="animate-spin" /> : 'Apply'}
                   </button>
                 </div>
-                {couponError && <p className="text-[11.5px] text-red-500 font-semibold mt-2">{couponError}</p>}
-                {couponSuccess && <p className="text-[11.5px] text-green-600 dark:text-green-400 font-semibold mt-2">{couponSuccess}</p>}
+                {couponError && <p className="text-[11.5px] text-critical">{couponError}</p>}
+                {couponSuccess && <p className="text-[11.5px] text-emerald-700 font-semibold">{couponSuccess}</p>}
               </div>
             </div>
 
-            {/* Right Column: Checkout Action */}
-            <div className="lg:col-span-7 bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 shadow-sm flex flex-col justify-center items-center text-center">
-              <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white mb-4">
-                {finalPrice === 0 ? 'Activate Free Premium' : 'Complete Your Upgrade'}
-              </h2>
-              <p className="text-[14px] text-medium mb-8 max-w-[340px]">
-                {finalPrice === 0
-                  ? 'Your promo pass covers 100% of this period! Click below to unlock your premium features immediately without a credit card.'
-                  : 'You will be redirected to our secure payment gateway to complete your purchase using UPI, Card, Netbanking, or Wallet.'}
-              </p>
-
-              <button
-                onClick={handlePaymentSubmit}
-                className={`w-full max-w-[320px] py-4 rounded-xl font-bold text-[15px] text-white transition-all shadow-md flex items-center justify-center gap-2 hover:-translate-y-0.5 active:translate-y-0 cursor-pointer
-                  ${finalPrice === 0
-                    ? 'bg-sage-dark hover:bg-sage text-white shadow-sage/20'
-                    : selectedPlan === 'premium' ? 'bg-gold hover:bg-yellow-500 text-charcoal shadow-gold/20' : 'bg-sage hover:bg-sage-dark shadow-sage/20'}`}
-              >
-                {finalPrice === 0 ? <Sparkles size={18} /> : <ShieldCheck size={18} />}
-                {finalPrice === 0 ? 'Claim Free Premium Access' : 'Proceed to Secure Checkout'}
-              </button>
-
-              <div className="flex items-center justify-center gap-1 text-[11px] text-light mt-6">
-                {finalPrice === 0 ? (
-                  <span>⚡ Instant 100% Free Activation • No Credit Card Required</span>
-                ) : (
-                  <span>🔒 Secured by Razorpay | SSL encryption | PCI-DSS compliant</span>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {checkoutStep === 'processing' && (
-          <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[32px] p-12 shadow-md max-w-lg mx-auto text-center space-y-6">
-            <div className="relative w-20 h-20 mx-auto flex items-center justify-center">
-              <Loader2 className="w-16 h-16 animate-spin text-sage" />
-              <ShieldCheck className="w-8 h-8 text-sage absolute" />
-            </div>
-            
-            <div className="space-y-2">
-              <h2 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white">Processing Subscription</h2>
-              <p className="text-[14px] text-medium max-w-sm mx-auto leading-relaxed">
-                Please do not close this window. We are verifying your promotional pass and activating your features.
-              </p>
-            </div>
-
-            <div className="text-[11px] text-light border border-border/60 dark:border-white/5 rounded-xl p-3 bg-cream dark:bg-[#0F172A] italic">
-              Updating your pregnancy workspace...
-            </div>
-          </div>
-        )}
-
-        {checkoutStep === 'success' && (
-          <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[32px] p-8 sm:p-12 shadow-xl max-w-xl mx-auto text-center space-y-6 animate-in zoom-in duration-300">
-            {/* Celebration Badge */}
-            <div className="w-20 h-20 bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-800 rounded-full flex items-center justify-center mx-auto text-green-600 dark:text-green-400 shadow-md">
-              <Check size={40} className="stroke-[3]" />
-            </div>
-
-            <div className="space-y-2">
-              <h2 className="font-serif text-[28px] font-semibold text-charcoal dark:text-white flex items-center justify-center gap-2">
-                {txnId.startsWith('FREE_') ? 'Free Trial Activated!' : 'Payment Successful!'} <Sparkles size={24} className="text-gold fill-gold" />
-              </h2>
-              <p className="text-[14.5px] text-medium leading-relaxed">
-                {txnId.startsWith('FREE_')
-                  ? 'Thank you! Your complimentary VIP access has been activated, and your pregnancy workspace is upgraded.'
-                  : 'Thank you for upgrading! Your subscription is active, and your pregnancy workspace has been updated.'}
-              </p>
-            </div>
-
-            {/* Receipt Details */}
-            <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-5 text-left text-[13px] space-y-2.5">
-              <div className="flex justify-between">
-                <span className="text-light font-medium">Plan Activated:</span>
-                <span className="font-bold text-charcoal dark:text-white uppercase">
-                  👑 Pro Plan
+            {/* Right Column: Scan to Subscribe (Mobile Store Integration) */}
+            <div className="lg:col-span-7 bg-white border border-sage/30 rounded-[28px] p-6 sm:p-8 shadow-md space-y-6">
+              <div className="text-center space-y-2">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <ShieldCheck size={13} className="text-emerald-600" />
+                  <span>Apple StoreKit &amp; Google Play Billing</span>
                 </span>
+                <h2 className="font-serif text-[22px] sm:text-[25px] font-bold text-charcoal">
+                  Subscribe via Mobile &amp; Sync Instantly
+                </h2>
+                <p className="text-[13px] text-medium max-w-md mx-auto leading-relaxed">
+                  We use Apple Pay and Google Play for 1-tap hardware security and global currency support. Your subscription unlocks on this browser automatically.
+                </p>
               </div>
-              <div className="flex justify-between">
-                <span className="text-light font-medium">Validity Period:</span>
-                <span className="font-semibold text-charcoal dark:text-white">{months} Months</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-light font-medium">Expires On:</span>
-                <span className="font-semibold text-charcoal dark:text-white">{expiryDate}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-light font-medium">{txnId.startsWith('FREE_') ? 'Activation Pass:' : 'Transaction ID:'}</span>
-                <span className="font-mono text-medium font-semibold select-all">{txnId}</span>
-              </div>
-              <div className="h-px bg-border dark:border-white/10 my-1" />
-              <div className="flex justify-between">
-                <span className="text-light font-medium">Account:</span>
-                <span className="font-semibold text-charcoal dark:text-white">{auth.currentUser?.email || userEmail}</span>
-              </div>
-            </div>
 
-            <div className="pt-4 space-y-4">
-              <button
-                onClick={() => {
-                  navigate('/dashboard');
-                }}
-                className="w-full py-4 bg-charcoal text-[#ffffff] dark:bg-[#ffffff] dark:text-[#0F172A] hover:bg-gray-800 dark:hover:bg-white/90 font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Go to Dashboard
-              </button>
-              
-              <p className="text-[11px] text-light italic flex items-center justify-center gap-1.5">
-                <Heart size={12} className="text-blush fill-blush" /> We hope Our Pregnancy helps make your pregnancy journey safer and happier!
-              </p>
+              {/* Platform Selector Tabs */}
+              <div className="grid grid-cols-2 gap-2 bg-cream/60 p-1.5 rounded-2xl border border-border/80">
+                <button
+                  type="button"
+                  onClick={() => setActivePlatform('apple')}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-[13px] sm:text-[13.5px] transition-all cursor-pointer ${
+                    activePlatform === 'apple'
+                      ? 'bg-black text-white shadow-sm'
+                      : 'text-medium hover:text-charcoal hover:bg-white/60'
+                  }`}
+                >
+                  <AppleIcon className={`w-4 h-4 ${activePlatform === 'apple' ? 'text-white' : 'text-charcoal'}`} />
+                  <span>Apple App Store</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setActivePlatform('google')}
+                  className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl font-semibold text-[13px] sm:text-[13.5px] transition-all cursor-pointer ${
+                    activePlatform === 'google'
+                      ? 'bg-sage text-white shadow-sm'
+                      : 'text-medium hover:text-charcoal hover:bg-white/60'
+                  }`}
+                >
+                  <img 
+                    src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                    alt="Google Play" 
+                    className="w-4 h-4 bg-white rounded-full p-0.5" 
+                  />
+                  <span>Google Play</span>
+                </button>
+              </div>
+
+              {/* Dynamic View: Mobile Web 1-Tap CTA vs Desktop High-Res QR Code */}
+              {isMobileScreen ? (
+                <div className="py-2 space-y-4 text-center">
+                  <div className="p-4 bg-cream/50 rounded-2xl border border-sage/20 text-left space-y-2.5">
+                    <div className="flex items-center gap-2 text-[13px] font-semibold text-charcoal">
+                      <Smartphone size={16} className="text-sage" />
+                      <span>Mobile Device Detected</span>
+                    </div>
+                    <p className="text-[12.5px] text-medium leading-relaxed">
+                      Tap below to open the official app directly on your phone and subscribe with 1-tap using {activePlatform === 'apple' ? 'Face ID / Apple Pay' : 'Google Play / UPI'}.
+                    </p>
+                  </div>
+
+                  <a
+                    href={currentStoreUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={`w-full py-4 px-6 rounded-xl font-bold text-[15px] shadow-md transition-all flex items-center justify-center gap-2.5 text-white ${
+                      activePlatform === 'apple' ? 'bg-black hover:bg-neutral-800' : 'bg-sage hover:bg-sage-dark'
+                    }`}
+                  >
+                    {activePlatform === 'apple' ? (
+                      <>
+                        <AppleIcon className="w-5 h-5 text-white" />
+                        <span>Open on Apple App Store</span>
+                      </>
+                    ) : (
+                      <>
+                        <img 
+                          src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" 
+                          alt="Google" 
+                          className="w-5 h-5 bg-white rounded-full p-0.5" 
+                        />
+                        <span>Open on Google Play Store</span>
+                      </>
+                    )}
+                    <ExternalLink size={16} />
+                  </a>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-2 space-y-4">
+                  <div className="p-4 bg-white rounded-[24px] border-2 border-sage/30 shadow-md flex items-center justify-center">
+                    <QRCodeSVG
+                      value={currentStoreUrl}
+                      size={200}
+                      level="H"
+                      includeMargin={false}
+                      imageSettings={{
+                        src: "/logo.png",
+                        x: undefined,
+                        y: undefined,
+                        height: 42,
+                        width: 42,
+                        excavate: true,
+                      }}
+                    />
+                  </div>
+
+                  {/* 3 Step Visual Guide */}
+                  <div className="w-full grid grid-cols-3 gap-2.5 text-center pt-2">
+                    <div className="p-3 bg-cream/50 rounded-xl border border-border/60">
+                      <span className="w-5 h-5 rounded-full bg-sage text-white text-[11px] font-bold flex items-center justify-center mx-auto mb-1.5">1</span>
+                      <p className="text-[11.5px] text-charcoal font-semibold leading-tight">Scan with Camera</p>
+                      <p className="text-[10px] text-medium mt-0.5">Point phone at QR code</p>
+                    </div>
+                    <div className="p-3 bg-cream/50 rounded-xl border border-border/60">
+                      <span className="w-5 h-5 rounded-full bg-sage text-white text-[11px] font-bold flex items-center justify-center mx-auto mb-1.5">2</span>
+                      <p className="text-[11.5px] text-charcoal font-semibold leading-tight">1-Tap Subscribe</p>
+                      <p className="text-[10px] text-medium mt-0.5">Apple Pay or Google Play</p>
+                    </div>
+                    <div className="p-3 bg-cream/50 rounded-xl border border-border/60">
+                      <span className="w-5 h-5 rounded-full bg-sage text-white text-[11px] font-bold flex items-center justify-center mx-auto mb-1.5">3</span>
+                      <p className="text-[11.5px] text-charcoal font-semibold leading-tight">Auto-Unlocks</p>
+                      <p className="text-[10px] text-medium mt-0.5">Real-time cloud sync</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Real-Time Live Sync Status Pill */}
+              <div className="p-3.5 bg-emerald-50/70 border border-emerald-200/70 rounded-xl flex items-center justify-between gap-2 text-[12.5px] text-emerald-950 font-medium">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="relative flex h-2.5 w-2.5 shrink-0">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                  </span>
+                  <span className="truncate">Listening for mobile subscription in real-time...</span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleManualSyncCheck}
+                  disabled={isCheckingStatus}
+                  className="text-[11.5px] font-bold text-emerald-800 hover:text-emerald-950 underline flex items-center gap-1 shrink-0 cursor-pointer disabled:opacity-50"
+                >
+                  {isCheckingStatus ? (
+                    <Loader2 size={12} className="animate-spin" />
+                  ) : (
+                    <RefreshCw size={12} />
+                  )}
+                  <span>Check Status</span>
+                </button>
+              </div>
+
+              {/* Footer: Copy Link */}
+              <div className="pt-2 border-t border-border flex items-center justify-between text-[12px] text-medium">
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="inline-flex items-center gap-1.5 hover:text-charcoal transition-colors cursor-pointer"
+                >
+                  {copiedLink ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
+                  <span>{copiedLink ? 'Store link copied to clipboard!' : 'Copy direct store link'}</span>
+                </button>
+
+                <div className="flex items-center gap-1 text-[11.5px] text-light">
+                  <Heart size={12} className="text-blush" />
+                  <span>Private, encrypted &amp; cancel anytime</span>
+                </div>
+              </div>
             </div>
           </div>
         )}
-      </div>
+      </main>
 
-      <div className="max-w-[1000px] mx-auto px-4 md:px-10 lg:px-12 w-full pb-8">
-        <Footer />
-      </div>
-
-      {/* Free Promo Activation Pop-up Modal */}
-      {showSuccessModal && (
-        <div className="fixed inset-0 z-[200] bg-charcoal/60 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="bg-white dark:bg-[#1E293B] border border-border dark:border-white/10 rounded-[28px] p-6 sm:p-8 max-w-md w-full shadow-2xl text-center space-y-5 animate-in zoom-in-95 duration-200">
-            {/* Celebration Icon */}
-            <div className="w-16 h-16 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 rounded-full flex items-center justify-center mx-auto text-emerald-600 dark:text-emerald-400 shadow-sm">
-              <Check size={32} className="stroke-[3]" />
-            </div>
-
-            <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gold/15 text-gold-dark text-[12px] font-bold uppercase tracking-wider">
-                <Sparkles size={13} className="text-gold fill-gold" /> Promo Code Applied
-              </div>
-              <h3 className="font-serif text-[24px] font-semibold text-charcoal dark:text-white">
-                {months === 1 ? '30 Days Free Premium Unlocked!' : `${months * 30} Days Free Premium Unlocked!`}
-              </h3>
-              <p className="text-[14px] text-medium leading-relaxed">
-                Code <strong className="font-mono text-charcoal dark:text-white">{couponCode.trim().toUpperCase()}</strong> has been activated on your account. All Premium features are now unlocked for you.
-              </p>
-            </div>
-
-            {/* Feature Pills */}
-            <div className="bg-cream dark:bg-[#0F172A] border border-border dark:border-white/5 rounded-2xl p-4 text-left text-[13px] space-y-2.5">
-              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
-                <span className="text-base">🤖</span>
-                <span>24/7 AI Prenatal Guide</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
-                <span className="text-base">🥗</span>
-                <span>AI Food Safety Scanner</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-charcoal dark:text-white font-medium">
-                <span className="text-base">📋</span>
-                <span>Doctor-Ready EHR Medical Summaries</span>
-              </div>
-              <div className="flex justify-between items-center pt-2 border-t border-border/60 dark:border-white/10 text-[12px] text-medium">
-                <span>Free Access Expiry:</span>
-                <span className="font-bold text-charcoal dark:text-white">{expiryDate}</span>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <button
-                onClick={() => {
-                  navigate('/dashboard');
-                }}
-                className="w-full py-3.5 bg-sage hover:bg-sage-dark text-white font-bold text-[15px] rounded-xl transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Go to Dashboard <ArrowRight size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <Footer />
     </div>
   );
 };

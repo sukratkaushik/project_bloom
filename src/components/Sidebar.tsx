@@ -11,6 +11,7 @@ import { getPlatform, isApplePlatform } from '../utils/nativeBridge';
 import { AppleIcon } from './common/AppleIcon';
 import { isSuperAdminEmail } from '../utils/adminConfig';
 import { ApplePaywallModal } from './ApplePaywallModal';
+import { CrossPlatformUpgradeModal } from './CrossPlatformUpgradeModal';
 
 type SidebarProps = {
   activePage: string;
@@ -49,6 +50,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
   const [searchQuery, setSearchQuery] = useState('');
   const [tierFilter, setTierFilter] = useState<'all' | 'free' | 'pro'>('all');
   const [showMobilePaywall, setShowMobilePaywall] = useState(false);
+  const [showCrossPlatformModal, setShowCrossPlatformModal] = useState(false);
 
   // Accordion state (for desktop accordion view)
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
@@ -434,7 +436,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
                 if (getPlatform() === 'android' || getPlatform() === 'ios') {
                   setShowMobilePaywall(true);
                 } else {
-                  navigate('/checkout?plan=premium');
+                  setShowCrossPlatformModal(true);
                 }
               }}
               className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-700 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
@@ -622,7 +624,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
               if (getPlatform() === 'android' || getPlatform() === 'ios') {
                 setShowMobilePaywall(true);
               } else {
-                navigate('/checkout?plan=premium');
+                setShowCrossPlatformModal(true);
               }
             }}
             className="w-full py-2.5 px-3.5 bg-yellow-500/10 dark:bg-yellow-500/20 border border-gold/40 rounded-[10px] font-sans text-[13px] font-bold text-yellow-800 dark:text-gold cursor-pointer transition-all hover:bg-gold hover:text-charcoal flex items-center justify-between shadow-xs"
@@ -707,6 +709,11 @@ export const Sidebar: React.FC<SidebarProps> = ({ activePage, setActivePage, fil
         isOpen={showMobilePaywall}
         onClose={() => setShowMobilePaywall(false)}
         featureTitle="Our Pregnancy Pro"
+      />
+
+      <CrossPlatformUpgradeModal
+        isOpen={showCrossPlatformModal}
+        onClose={() => setShowCrossPlatformModal(false)}
       />
     </div>
   );

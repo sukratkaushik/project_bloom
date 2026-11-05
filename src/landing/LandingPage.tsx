@@ -39,6 +39,7 @@ import { isNativeApp, getPlatform, isApplePlatform } from '../utils/nativeBridge
 import { getProPricing } from '../utils/proPricing';
 import { AppleIcon } from '../components/common/AppleIcon';
 import { ApplePaywallModal } from '../components/ApplePaywallModal';
+import { CrossPlatformUpgradeModal } from '../components/CrossPlatformUpgradeModal';
 
 export const LandingPage: React.FC = () => {
   const isNative = isNativeApp();
@@ -48,6 +49,7 @@ export const LandingPage: React.FC = () => {
   const [user, setUser] = useState(auth.currentUser);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showLandingPaywall, setShowLandingPaywall] = useState(false);
+  const [showCrossPlatformModal, setShowCrossPlatformModal] = useState(false);
   const [premiumMonths, setPremiumMonths] = useState(1);
   const premiumPricing = getProPricing(premiumMonths);
 
@@ -1151,10 +1153,10 @@ export const LandingPage: React.FC = () => {
                   if (getPlatform() === 'android' || getPlatform() === 'ios') {
                     setShowLandingPaywall(true);
                   } else {
-                    handleStart();
+                    setShowCrossPlatformModal(true);
                   }
                 }}
-                className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98"
+                className="w-full mt-8 py-3.5 rounded-xl bg-sage text-white font-bold text-[14px] hover:bg-sage-dark transition-all shadow-md active:scale-98 cursor-pointer"
               >
                 {getPlatform() === 'ios' ? 'View Apple Subscription' : getPlatform() === 'android' ? 'View Google Play Subscription' : 'Upgrade to Pro Plan'}
               </button>
@@ -1263,6 +1265,11 @@ export const LandingPage: React.FC = () => {
         isOpen={showLandingPaywall}
         onClose={() => setShowLandingPaywall(false)}
         featureTitle="Our Pregnancy Pro"
+      />
+
+      <CrossPlatformUpgradeModal
+        isOpen={showCrossPlatformModal}
+        onClose={() => setShowCrossPlatformModal(false)}
       />
 
     </div>
