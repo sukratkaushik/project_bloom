@@ -21,6 +21,7 @@ import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
 import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
 import { getProPricing, PRO_PROMO_MONTHLY_PRICE } from '../utils/proPricing';
 import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
+import { auth, updateUserSubscription } from '../firebase';
 import { RotateCcw, ExternalLink } from 'lucide-react';
 
 interface PaywallProps {
@@ -197,6 +198,11 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
       const res = await purchaseProSubscription();
       if (res.success) {
         updateState({ isPremium: true, planTier: 'premium' });
+        if (auth.currentUser?.uid) {
+          updateUserSubscription(auth.currentUser.uid, 'premium', 1).catch(err => {
+            console.warn('Could not sync subscription to Firestore:', err);
+          });
+        }
         setIosNotice({ type: 'success', message: 'Welcome to Pro! All features unlocked.' });
         triggerHaptic('heavy');
       } else if (res.error && !res.error.toLowerCase().includes('cancel')) {
@@ -218,6 +224,11 @@ export const Paywall: React.FC<PaywallProps> = ({ children, featureName }) => {
       const res = await restorePurchases();
       if (res.isActive) {
         updateState({ isPremium: true, planTier: 'premium' });
+        if (auth.currentUser?.uid) {
+          updateUserSubscription(auth.currentUser.uid, 'premium', 1).catch(err => {
+            console.warn('Could not sync restored subscription to Firestore:', err);
+          });
+        }
         setIosNotice({ type: 'success', message: 'Your subscription was successfully restored!' });
         triggerHaptic('heavy');
       } else {

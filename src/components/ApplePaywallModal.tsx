@@ -14,6 +14,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { purchaseProSubscription, restorePurchases } from '../utils/revenueCatService';
+import { auth, updateUserSubscription } from '../firebase';
 import { usePlanner } from '../store';
 import { triggerHaptic, getPlatform } from '../utils/nativeBridge';
 import { getLocalMonetizationConfig } from '../utils/monetizationConfig';
@@ -58,6 +59,11 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
       const res = await purchaseProSubscription();
       if (res.success) {
         updateState({ isPremium: true, planTier: 'premium' });
+        if (auth.currentUser?.uid) {
+          updateUserSubscription(auth.currentUser.uid, 'premium', 1).catch(err => {
+            console.warn('Could not sync subscription to Firestore:', err);
+          });
+        }
         setSuccessNotice('Welcome to Our Pregnancy Pro! All premium maternal AI tools are now unlocked.');
         triggerHaptic('heavy');
         setTimeout(() => {
@@ -83,6 +89,11 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
       const res = await restorePurchases();
       if (res.isActive) {
         updateState({ isPremium: true, planTier: 'premium' });
+        if (auth.currentUser?.uid) {
+          updateUserSubscription(auth.currentUser.uid, 'premium', 1).catch(err => {
+            console.warn('Could not sync restored subscription to Firestore:', err);
+          });
+        }
         setSuccessNotice('Your Pro subscription was successfully restored!');
         triggerHaptic('heavy');
         setTimeout(() => {

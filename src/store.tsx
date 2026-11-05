@@ -202,6 +202,11 @@ export const PlannerProvider: React.FC<{ children: React.ReactNode }> = ({ child
                 const sub = await checkRevenueCatSubscription();
                 if (sub.isActive) {
                   setState(prev => ({ ...prev, isPremium: true, planTier: 'premium' }));
+                  if (profile?.planTier !== 'premium') {
+                    updateUserSubscription(user.uid, 'premium', 1).catch(err => {
+                      console.warn('Could not sync active RevenueCat subscription to Firestore:', err);
+                    });
+                  }
                 } else if (profile?.isPremium || profile?.planTier === 'premium') {
                   // RevenueCat subscription expired or cancelled on iOS / Android: synchronize downgrade
                   updateUserSubscription(user.uid, 'free', null).catch(err => {
