@@ -168,7 +168,7 @@ const AppContent: React.FC = () => {
     content = <SplashScreen />;
   } else if (currentPath.startsWith('/dashboard') || currentPath === '/setup') {
     // Protected Routes Security Guard: Zero-Trust Verification Check
-    if (!user && !isNativeApp() && !state.isSetup) {
+    if (!user) {
       // Unauthenticated visitor -> Landing Page
       content = <LandingPage />;
     } else if (user && !isVerifiedUser) {

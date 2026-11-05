@@ -339,25 +339,6 @@ export const LandingPage: React.FC = () => {
               </button>
             </div>
 
-            {/* Guest Option */}
-            <div className="pt-5 pb-1">
-              <button
-                type="button"
-                onClick={() => {
-                  setShowAuthModal(false);
-                  if (state.isSetup) {
-                    navigate('/dashboard');
-                  } else {
-                    updateState({ hasStartedOnboarding: true });
-                    navigate('/setup');
-                  }
-                }}
-                className="text-[13px] text-medium hover:text-charcoal font-semibold underline transition-colors cursor-pointer"
-              >
-                Skip sign-in and continue as Guest →
-              </button>
-            </div>
-
             <p className="text-[11.5px] text-light mt-4 flex items-center justify-center gap-1.5">
               <span>🔒</span>
               <span>Private &amp; encrypted. Core features 100% free.</span>
@@ -449,22 +430,6 @@ export const LandingPage: React.FC = () => {
                     <span>Continue with Apple</span>
                   </button>
                 )}
-              </>
-            )}
-            {!user && (
-              <>
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!state.isSetup) {
-                      updateState({ isSetup: true, hasStartedOnboarding: true, dueDate: state.dueDate || new Date(Date.now() + 151 * 86400000).toISOString() });
-                    }
-                    navigate('/dashboard');
-                  }}
-                  className="inline-flex items-center justify-center gap-1.5 text-medium hover:text-charcoal font-semibold px-4 py-4 text-[15px] transition-colors whitespace-nowrap cursor-pointer"
-                >
-                  <span>Continue as Guest</span> ➜
-                </button>
               </>
             )}
             {isLoggedInNeedsSetup && (

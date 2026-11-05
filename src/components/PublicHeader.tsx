@@ -123,15 +123,6 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
               </button>
             ) : (
               <>
-                {state.isSetup && (
-                  <button 
-                    type="button" 
-                    onClick={handleDashboard} 
-                    className="hidden sm:inline-flex bg-white border border-border text-charcoal rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2 sm:px-3.5 py-1.5 sm:py-2 hover:bg-cream transition-colors whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    Guest Dashboard
-                  </button>
-                )}
                 <button 
                   type="button" 
                   onClick={handleLogin} 
@@ -139,15 +130,13 @@ export const PublicHeader: React.FC<PublicHeaderProps> = ({
                 >
                   Log In
                 </button>
-                {!state.isSetup && (
-                  <button 
-                    type="button" 
-                    onClick={handleSignUp} 
-                    className="hidden sm:inline-flex bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
-                  >
-                    Sign Up
-                  </button>
-                )}
+                <button 
+                  type="button" 
+                  onClick={handleSignUp} 
+                  className="hidden sm:inline-flex bg-charcoal text-cream rounded-[10px] text-[12px] sm:text-[13px] md:text-[14px] font-semibold px-2.5 py-1.5 sm:px-4 sm:py-2 hover:opacity-90 transition-all shadow-sm whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Sign Up
+                </button>
               </>
             )}
           </div>

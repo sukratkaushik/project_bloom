@@ -38,6 +38,16 @@ ios/DerivedData/
 
 scratch/
 
+# Store Deployment Credentials & Fastlane Artifacts
+.credentials/
+*.ipa
+*.dSYM.zip
+android/fastlane/report.xml
+android/fastlane/README.md
+ios/App/fastlane/report.xml
+ios/App/fastlane/README.md
+
+
 
 
 

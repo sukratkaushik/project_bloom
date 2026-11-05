@@ -1,7 +1,7 @@
 {
   "name": "projectbloom",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.1.0",
   "type": "module",
   "repository": {
     "type": "git",
@@ -23,7 +23,17 @@
     "cap:sync:ios": "npm run build && cap sync ios",
     "cap:open:ios": "cap open ios",
     "cap:build:ios": "npm run build && cap sync ios && xcodebuild -workspace ios/App/App.xcworkspace -scheme App -destination 'generic/platform=iOS Simulator' build",
-    "postbuild": "react-snap || exit 0"
+    "postbuild": "react-snap || exit 0",
+    "release:status": "node scripts/version-sync.mjs --status",
+    "release:version": "node scripts/version-sync.mjs",
+    "release:android:build": "cd android && fastlane build_and_sync",
+    "release:android:alpha": "cd android && fastlane deploy_play track:alpha",
+    "release:android:internal": "cd android && fastlane deploy_play track:internal",
+    "release:android:play": "cd android && fastlane deploy_play",
+    "release:ios:build": "cd ios/App && fastlane build_ipa",
+    "release:ios:testflight": "cd ios/App && fastlane deploy_testflight",
+    "release:ios:appstore": "cd ios/App && fastlane deploy_appstore",
+    "release:all": "npm run release:android:alpha && npm run release:ios:testflight"
   },
   "dependencies": {
     "@aparajita/capacitor-biometric-auth": "^10.0.0",
