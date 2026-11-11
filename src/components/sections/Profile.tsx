@@ -520,10 +520,10 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
 
                 <p className="text-[11.5px] sm:text-[12.5px] text-medium leading-relaxed">
                   {state.isAdmin || isSuperAdminEmail(auth.currentUser?.email)
-                    ? 'You have perpetual lifetime access to all 24/7 AI clinical tools, clinical checklists, food safety scanner, and admin controls.'
+                    ? 'You have perpetual lifetime access to all 24/7 AI maternal wellness tools, checklists, food nutrition guide, and admin controls.'
                     : state.planTier === 'premium' || state.isPremium
-                    ? 'All features unlocked: 24/7 Ask OPIN AI clinical assistant, AI Food & Barcode Scanner, Doctor EHR & FHIR exports, and real-time Partner Sync.'
-                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, clinical checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food scanner, and partner sync.'}
+                    ? 'All features unlocked: 24/7 Ask OPIN AI wellness companion, AI Food & Barcode Guide, Personal Pregnancy Folder & PDF exports, and real-time Partner Sync.'
+                    : 'Free plan includes weekly milestones, all daily logs, hospital bag, birth plan, government maternity schemes, checklists, and postpartum healing. Upgrade to Pro Plan for 24/7 AI guidance, food guide, and partner sync.'}
                 </p>
 
                 {state.planExpiry && !state.isAdmin && !isSuperAdminEmail(auth.currentUser?.email) && (

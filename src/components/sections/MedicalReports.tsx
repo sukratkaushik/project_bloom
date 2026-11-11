@@ -331,7 +331,7 @@ export const MedicalReports: React.FC = () => {
       <div className="animate-in fade-in duration-300">
         {/* Top Context Banner */}
         <ContextBanner
-          description="Upload and organise your ultrasound scans, blood test reports, and clinical prescriptions. All health records are stored securely in the cloud with strict industry-standard encryption and privacy controls, accessible across all your linked devices."
+          description="Save and organize your personal pregnancy notes, milestone keepsakes, and visit checklists. All files in your Personal Pregnancy Folder are stored privately on your device so you can keep your pregnancy journey organized in one calm place."
         />
 
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.8fr] gap-6 items-start">
@@ -360,10 +360,10 @@ export const MedicalReports: React.FC = () => {
               </div>
 
               <h3 className="text-[14px] font-bold text-charcoal mb-1">
-                {isUploading ? "Uploading & encrypting..." : "Upload Medical Report"}
+                {isUploading ? "Saving to personal folder..." : "Save Personal Note or Photo"}
               </h3>
               <p className="text-[12px] text-medium max-w-[210px] leading-relaxed mb-2.5">
-                Drag & drop your files here, or click to browse.
+                Drag &amp; drop your files here, or tap to browse.
               </p>
               <span className="text-[10px] text-light uppercase tracking-wider font-semibold px-2 py-0.5 bg-cream rounded-md border border-border/40">
                 PDF, PNG, JPG (Max 10MB)
@@ -382,7 +382,7 @@ export const MedicalReports: React.FC = () => {
                 <Info className="w-4 h-4 text-sage" /> Quick Tip
               </h4>
               <p className="text-[11.5px] xs:text-[12px] text-medium leading-relaxed">
-                When storing reports, rename them with clear labels (e.g. <em>"12 Week Ultrasound Scan"</em> or <em>"CBC Blood Test - May 2026"</em>) and add important summaries in the doctor notes block.
+                When saving items, label them clearly by week or topic (e.g. <em>"Week 12 Visit Questions"</em> or <em>"Second Trimester Checklist"</em>) and add personal notes below each entry.
               </p>
             </div>
           </div>
@@ -391,17 +391,17 @@ export const MedicalReports: React.FC = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between pl-1">
               <h3 className="text-[12.5px] font-bold text-charcoal uppercase tracking-[0.8px]">
-                My Stored Records ({reports.length})
+                My Personal Folder ({reports.length})
               </h3>
               <button
                 type="button"
                 onClick={handleExportCarePlan}
                 disabled={isExportingCarePlan}
                 className="px-3 py-1.5 bg-sage hover:bg-sage-dark text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-3xs transition-all cursor-pointer active:scale-95 whitespace-nowrap"
-                title="Export complete Care Plan PDF"
+                title="Export Personal Pregnancy Summary PDF"
               >
                 <Download size={13} />
-                <span>{isExportingCarePlan ? 'Generating...' : 'Export Care Plan (PDF)'}</span>
+                <span>{isExportingCarePlan ? 'Generating...' : 'Export Pregnancy Summary (PDF)'}</span>
               </button>
             </div>
 
@@ -410,9 +410,9 @@ export const MedicalReports: React.FC = () => {
                 <div className="w-11 h-11 bg-cream text-light rounded-full flex items-center justify-center mb-3">
                   <FileText className="w-5 h-5" />
                 </div>
-                <h4 className="text-[13.5px] font-bold text-charcoal mb-1">No reports uploaded yet</h4>
+                <h4 className="text-[13.5px] font-bold text-charcoal mb-1">No personal notes or files saved yet</h4>
                 <p className="text-[12px] text-medium max-w-[260px] leading-relaxed">
-                  Keep all your screenings, vitals records, and vaccine receipts safe in one place. Drag & drop files on the left to add one!
+                  Keep your pregnancy milestone notes, visit checklists, and keepsake photos organized in one private folder.
                 </p>
               </div>
             ) : (

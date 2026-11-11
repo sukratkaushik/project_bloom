@@ -100,7 +100,7 @@ export const exportToPDF = async (state: PlannerState) => {
   doc.setFont('helvetica', 'normal');
   doc.setFontSize(14);
   doc.setTextColor(120, 120, 120);
-  doc.text('Personalized Pregnancy Care Plan', margin, 32);
+  doc.text('Personal Pregnancy Milestone & Birth Preferences Summary', margin, 32);
 
   // Top info metadata
   doc.setFontSize(11);
@@ -128,11 +128,11 @@ export const exportToPDF = async (state: PlannerState) => {
     yPos += 6.5;
   }
 
-  // Clinical Identifiers & Baseline Parameters
+  // Personal Summary Metadata
   doc.setFont('helvetica', 'bold');
-  doc.text('Clinical ID (UHID):', margin, yPos);
+  doc.text('Document Type:', margin, yPos);
   doc.setFont('helvetica', 'normal');
-  doc.text('#98421  |  Blood: B+ (Rh+)  |  Allergy: NKDA', margin + 48, yPos);
+  doc.text('Personal Wellness & Milestone Organizer', margin + 48, yPos);
   yPos += 6.5;
 
   const today = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });

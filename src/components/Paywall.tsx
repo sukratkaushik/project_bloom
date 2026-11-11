@@ -54,13 +54,13 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
     perks: [
       {
         icon: Smartphone,
-        title: 'Real-Time Kick & Vitals Alerts',
-        desc: 'Instant notifications on your partner’s device when baby moves or health logs update.'
+        title: 'Real-Time Kick & Wellness Alerts',
+        desc: 'Instant notifications on your partner’s device when baby moves or daily logs update.'
       },
       {
         icon: Calendar,
-        title: 'Shared Doctor Scans & Milestones',
-        desc: 'Keep both parents aligned on ultrasound visits, trimester labs, and hospital bags.'
+        title: 'Shared Checklists & Milestones',
+        desc: 'Keep both parents aligned on prenatal visits, trimester prep, and hospital bags.'
       },
       {
         icon: ShieldCheck,
@@ -68,82 +68,82 @@ const FEATURE_CONFIGS: Record<PaywallProps['featureName'], FeatureConfig> = {
         desc: 'Direct peer-to-peer sync with private encryption. Your memories never touch third parties.'
       }
     ],
-    includedSummary: 'Includes 24/7 Ask OPIN AI, Food Safety Scanner & Doctor EHR Vault'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Food & Meal Guide & Personal Pregnancy Vault'
   },
   AskOurPregnancy: {
     tier: 'premium',
     badge: 'Pro Plan • 24/7 AI Companion',
     title: 'Warm, Empathetic Maternal Guidance',
-    subtitle: 'Ask about symptoms, trimester changes, cravings, or hospital prep anytime, day or night.',
+    subtitle: 'Ask about pregnancy milestones, trimester changes, cravings, or hospital bag prep anytime, day or night.',
     icon: Bot,
     perks: [
       {
         icon: Sparkles,
-        title: 'Unlimited Trimester Consultations',
-        desc: 'Instant compassionate guidance tailored specifically to your gestational week and symptoms.'
+        title: 'Unlimited Trimester Q&A',
+        desc: 'Instant compassionate wellness guidance tailored specifically to your gestational week.'
       },
       {
         icon: ShieldCheck,
-        title: 'Medically-Grounded Safety Standards',
-        desc: 'Curated against verified obstetric protocols, Indian clinical guidelines, and maternal health research.'
+        title: 'Evidence-Informed Maternal Wellness',
+        desc: 'Thoughtful educational answers on nutrition, rest, movement, and preparing for doctor visits.'
       },
       {
         icon: HeartHandshake,
-        title: 'Personalized to Your Profile',
-        desc: 'Context-aware responses factoring in your trimester, diet preferences, and medical history.'
+        title: 'Personalized to Your Journey',
+        desc: 'Context-aware responses factoring in your trimester, diet preferences, and birth plan wishes.'
       }
     ],
-    includedSummary: 'Includes Food Scanner, Doctor EHR Vault & Real-Time Partner Sync'
+    includedSummary: 'Includes AI Food Guide, Personal Pregnancy Vault & Real-Time Partner Sync'
   },
   FoodScanner: {
     tier: 'premium',
-    badge: 'Pro Plan • AI Nutrition Scanner',
+    badge: 'Pro Plan • AI Nutrition Guide',
     title: 'Nourish Safely, Every Meal',
-    subtitle: 'Scan meals, restaurant dishes, and packaged snacks for pregnancy-safe ingredients.',
+    subtitle: 'Scan meals, restaurant dishes, and packaged snacks for pregnancy-friendly ingredients.',
     icon: UtensilsCrossed,
     perks: [
       {
         icon: ShieldCheck,
-        title: 'Instant Hazard & Heat Detection',
-        desc: 'Detects unpasteurized dairy, raw sprouts, high-mercury fish, and high-heat Ayurvedic spices.'
+        title: 'Instant Ingredient & Spice Insights',
+        desc: 'Identifies unpasteurized dairy, raw sprouts, high-mercury fish, and traditional warming spices.'
       },
       {
         icon: Sparkles,
         title: 'Trimester-Specific Nutrient Balancing',
-        desc: 'Highlights critical iron, calcium, folate, and protein density in every Indian food item.'
+        desc: 'Highlights iron, calcium, folate, and protein density in everyday Indian and global meals.'
       },
       {
         icon: CheckCircle2,
         title: 'Wholesome Craving Swaps',
-        desc: 'Safe, satisfying alternatives for street foods, sweets, and spicy cravings.'
+        desc: 'Delicious, nourishing alternatives for street foods, sweets, and spicy cravings.'
       }
     ],
-    includedSummary: 'Includes 24/7 Ask OPIN AI, Doctor EHR Vault & Real-Time Partner Sync'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Personal Pregnancy Vault & Real-Time Partner Sync'
   },
   EhrExports: {
     tier: 'premium',
-    badge: 'Pro Plan • Health Vault',
-    title: 'Doctor-Ready Medical Records',
-    subtitle: 'Generate comprehensive FHIR R4 clinical exports and hospital admission health summaries.',
+    badge: 'Pro Plan • Personal Vault',
+    title: 'Personal Pregnancy Folder & Notes',
+    subtitle: 'Organize your pregnancy keepsake photos, visit notes, and printable milestone summaries in one private folder.',
     icon: FileText,
     perks: [
       {
         icon: FileText,
-        title: 'One-Tap Clinical PDF Export',
-        desc: 'Formatted obstetric summaries ready to print or WhatsApp to your gynecologist.'
+        title: 'One-Tap Printable Pregnancy Summary',
+        desc: 'Formatted personal milestone, birth plan, and checklist PDF ready to print or share with family.'
       },
       {
         icon: ShieldCheck,
-        title: 'Hospital Admission Readiness',
-        desc: 'Instant emergency card with blood group, allergies, vitals trends, and emergency contacts.'
+        title: 'Visit Questions & Checklist Organizer',
+        desc: 'Keep all your appointment questions, notes, and hospital bag checklists neatly organized in one place.'
       },
       {
         icon: Sparkles,
-        title: 'ABDM & FHIR Compliant Records',
-        desc: 'Structured digital health records matching national Ayushman Bharat health standards.'
+        title: 'Plain-Language Note Summarizer',
+        desc: 'Get easy-to-read plain-language educational explanations for your saved notes and documents.'
       }
     ],
-    includedSummary: 'Includes 24/7 Ask OPIN AI, Food Safety Scanner & Real-Time Partner Sync'
+    includedSummary: 'Includes 24/7 Ask OPIN AI, Food & Meal Guide & Real-Time Partner Sync'
   }
 };
 

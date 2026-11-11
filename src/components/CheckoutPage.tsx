@@ -214,7 +214,7 @@ export const CheckoutPage: React.FC = () => {
                 Welcome to Our Pregnancy Pro!
               </h2>
               <p className="text-[14px] sm:text-[15px] text-medium mt-2 leading-relaxed">
-                Your maternal membership is active. All clinical AI features, food vision scanners, and EHR exports are unlocked on this browser and synced across all your devices.
+                Your maternal membership is active. All AI wellness features, meal guides, and printable pregnancy summaries are unlocked on this browser and synced across all your devices.
               </p>
             </div>
 
@@ -225,11 +225,11 @@ export const CheckoutPage: React.FC = () => {
               </div>
               <div className="flex items-center gap-2.5 text-charcoal font-semibold">
                 <Check size={16} className="text-sage-dark shrink-0" />
-                <span>Unlimited 24/7 Ask OPIN AI Obstetrician Companion</span>
+                <span>Unlimited 24/7 Ask OPIN AI Maternal Companion</span>
               </div>
               <div className="flex items-center gap-2.5 text-charcoal font-semibold">
                 <Check size={16} className="text-sage-dark shrink-0" />
-                <span>AI Food Safety Scanner &amp; Real-Time Partner Sync</span>
+                <span>AI Food &amp; Meal Guide &amp; Real-Time Partner Sync</span>
               </div>
             </div>
 
@@ -257,7 +257,7 @@ export const CheckoutPage: React.FC = () => {
                   Our Pregnancy Pro
                 </h1>
                 <p className="text-[13px] text-medium mt-1 leading-relaxed">
-                  Full clinical companion with AI intelligence, doctor EHR exports, and real-time partner synchronization.
+                  Full pregnancy milestone companion with AI wellness guidance, printable summaries, and real-time partner synchronization.
                 </p>
               </div>
 
@@ -268,12 +268,12 @@ export const CheckoutPage: React.FC = () => {
                   Included in Your Membership
                 </span>
                 {[
-                  "24/7 Ask OPIN AI Obstetrician Companion",
-                  "AI Food & Hazard Vision Scanner (FOGSI safe)",
-                  "Doctor-Ready EHR Vault & FHIR R4 Exports",
+                  "24/7 Ask OPIN AI Maternal Wellness Companion",
+                  "AI Food & Meal Nutrition Guide",
+                  "Personal Pregnancy Folder & Printable PDF Summary",
                   "Encrypted Real-Time Cross-Device Partner Sync",
                   "AI Baby Names Generator & Garbh Sanskar Audio",
-                  "Priority clinical updates & continuous support"
+                  "Priority updates & continuous support"
                 ].map((feat, idx) => (
                   <div key={idx} className="flex items-start gap-2.5 text-[13px] text-charcoal">
                     <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />

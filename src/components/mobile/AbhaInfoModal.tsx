@@ -44,14 +44,14 @@ export const AbhaInfoModal: React.FC<AbhaInfoModalProps> = ({ isOpen, onClose })
             <div className="min-w-0">
               <div className="flex items-center gap-1.5">
                 <h2 className="font-serif font-bold text-charcoal dark:text-cream text-[17px] leading-tight truncate">
-                  Understanding ABHA
+                  Personal Pregnancy Vault
                 </h2>
                 <span className="text-[9.5px] font-bold text-sage-dark dark:text-sage-light bg-sage-pale dark:bg-sage-dark/30 px-2 py-0.2 rounded-full uppercase border border-sage/20 shrink-0">
-                  Govt. of India
+                  Private
                 </span>
               </div>
               <p className="text-[11.5px] text-medium dark:text-stone-400 truncate mt-0.5">
-                Ayushman Bharat Digital Mission (ABDM)
+                On-Device Personal Journal &amp; Organizer
               </p>
             </div>
           </div>
@@ -67,61 +67,61 @@ export const AbhaInfoModal: React.FC<AbhaInfoModalProps> = ({ isOpen, onClose })
 
         {/* Scrollable Modal Content */}
         <div className="flex-1 overflow-y-auto pt-4 space-y-4 pr-0.5 custom-scrollbar text-charcoal dark:text-stone-200 text-[12.5px] leading-relaxed">
-          {/* 1. Clarification & Peace of Mind: NOT Mandatory */}
+          {/* 1. Clarification & Peace of Mind */}
           <div className="p-3.5 rounded-2xl bg-sage-pale/60 dark:bg-sage-dark/20 border border-sage/30 dark:border-sage/40 flex items-start gap-2.5">
             <CheckCircle2 size={18} className="text-sage-dark dark:text-sage-light shrink-0 mt-0.5" />
             <div>
               <span className="text-[11px] font-bold uppercase tracking-wider text-sage-dark dark:text-sage-light block">
-                100% Voluntary & Optional
+                100% Personal &amp; Under Your Control
               </span>
               <p className="text-[12px] text-charcoal/90 dark:text-stone-200 mt-0.5 leading-snug">
-                You do <strong>not</strong> need an ABHA ID to receive pregnancy care, visit your doctor, or deliver at any hospital in India. Having one is entirely your choice.
+                Your Personal Pregnancy Vault is a private digital folder on your device where you can organize pregnancy milestone photos, appointment questions, and personal notes.
               </p>
             </div>
           </div>
 
-          {/* 2. What is ABHA? */}
+          {/* 2. How Your Personal Vault Works */}
           <div>
             <h3 className="font-serif font-bold text-[14px] text-charcoal dark:text-cream mb-1 flex items-center gap-1.5">
-              <span>What is an ABHA ID?</span>
+              <span>How Your Personal Vault Works</span>
             </h3>
             <p className="text-medium dark:text-stone-300">
-              <strong>ABHA</strong> (Ayushman Bharat Health Account) is a unique <strong>14-digit health identification number</strong> created by the National Health Authority (NHA). Think of it as a secure digital identity for your medical records — similar to how UPI works for bank accounts — allowing Indian hospitals and diagnostic centers to share lab reports and ultrasound scans without physical paper.
+              <strong>Our Pregnancy</strong> is designed local-first. Any personal notes, milestone keepsakes, or reference documents you add to your folder are stored privately on your device so you can keep your pregnancy checklists and visit questions organized in one calm space.
             </p>
           </div>
 
           {/* 3. Core Benefits for Expectant Mothers */}
           <div className="space-y-2.5 pt-1">
             <h3 className="font-serif font-bold text-[14px] text-charcoal dark:text-cream">
-              Key Benefits for Mothers:
+              Key Features for Expectant Parents:
             </h3>
 
-            {/* Benefit A: Paperless Scans & Labs */}
+            {/* Benefit A: Organized Visit Notes */}
             <div className="p-3 rounded-xl bg-cream/70 dark:bg-stone-800/80 border border-border/70 dark:border-stone-700 flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-white dark:bg-stone-700 text-sage-dark dark:text-sage-light flex items-center justify-center shrink-0 border border-border/50 shadow-3xs">
                 <FileText size={16} />
               </div>
               <div className="min-w-0 flex-1">
                 <h4 className="font-bold text-[13px] text-charcoal dark:text-cream leading-tight">
-                  Paperless Medical History
+                  Organized Visit Notes &amp; Checklists
                 </h4>
                 <p className="text-[11.5px] text-medium dark:text-stone-300 mt-0.5 leading-relaxed">
-                  Major maternity chains (Cloudnine, Apollo, Fortis, Manipal) can digitally link your blood tests and ultrasound reports without you having to carry thick paper folders.
+                  Keep your prenatal visit questions, birth preferences, and milestone keepsakes neatly organized by date so you never forget what to ask at your next checkup.
                 </p>
               </div>
             </div>
 
-            {/* Benefit B: Government Maternity Aid (DBT) */}
+            {/* Benefit B: Printable Personal Summary */}
             <div className="p-3 rounded-xl bg-cream/70 dark:bg-stone-800/80 border border-border/70 dark:border-stone-700 flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-white dark:bg-stone-700 text-gold-dark dark:text-gold flex items-center justify-center shrink-0 border border-border/50 shadow-3xs">
-                <BadgeIndianRupee size={16} />
+                <Sparkles size={16} />
               </div>
               <div className="min-w-0 flex-1">
                 <h4 className="font-bold text-[13px] text-charcoal dark:text-cream leading-tight">
-                  Direct Maternity Benefit Transfers (DBT)
+                  Printable Pregnancy Summary (PDF)
                 </h4>
                 <p className="text-[11.5px] text-medium dark:text-stone-300 mt-0.5 leading-relaxed">
-                  Seamlessly qualifies and connects checkups to welfare schemes like <strong>PMMVY</strong> (₹5,000 cash aid), <strong>JSY</strong>, and <strong>PMSMA</strong> for direct bank deposits.
+                  Export a clean, printable PDF of your gestational timeline, hospital bag checklist, and birth plan preferences anytime.
                 </p>
               </div>
             </div>
@@ -133,22 +133,22 @@ export const AbhaInfoModal: React.FC<AbhaInfoModalProps> = ({ isOpen, onClose })
               </div>
               <div className="min-w-0 flex-1">
                 <h4 className="font-bold text-[13px] text-charcoal dark:text-cream leading-tight">
-                  100% Consent-Driven Privacy
+                  100% Private Local Storage
                 </h4>
                 <p className="text-[11.5px] text-medium dark:text-stone-300 mt-0.5 leading-relaxed">
-                  No hospital or doctor can view your medical history without your active OTP or consent. In Our Pregnancy, all files are stored with AES-256 encryption on your device.
+                  Your personal folder stays on your device and is never shared with third parties. You can delete any saved note or file at any time.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* 4. How Our Pregnancy Handles It */}
+          {/* 4. Non-Medical Wellness Disclaimer */}
           <div className="p-3 rounded-xl bg-white dark:bg-stone-800 border border-border/80 dark:border-stone-700 text-[11.5px] text-medium dark:text-stone-300 space-y-1">
             <span className="font-bold text-charcoal dark:text-cream block">
-              🌸 Using Our Pregnancy without an ABHA ID:
+              🌸 Personal Wellness Disclaimer:
             </span>
             <p>
-              If you don't have an ABHA ID, you can still use every feature in Our Pregnancy — uploading scan photos/PDFs, viewing AI ultrasound summaries, tracking vitals, and printing the Doctor Care Plan PDF.
+              Our Pregnancy is a personal pregnancy milestone tracker and lifestyle journal. It is not a medical device or regulated electronic health record system, and does not provide medical diagnosis or treatment advice.
             </p>
           </div>
         </div>

@@ -540,7 +540,7 @@ export const LandingPage: React.FC = () => {
                   tag: "⭐ Pro Plan",
                   tagClass: "bg-gold/15 text-gold border-gold/30 font-extrabold",
                   title: "AI Prenatal Care",
-                  desc: "Put a 24/7 AI clinical companion in your pocket. Scan Indian food safety, decipher medical reports, and export FHIR R4 EHRs for your OB-GYN.",
+                  desc: "Put a 24/7 AI maternal wellness companion in your pocket. Scan Indian meal safety, organize visit notes, and export printable pregnancy summaries.",
                   icon: <Sparkles className="w-6 h-6 text-gold" />
                 }
               ].map((item, i) => (
@@ -579,15 +579,15 @@ export const LandingPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[12.5px] font-semibold text-charcoal">
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
                     <CheckCircle2 size={15} className="text-sage shrink-0" />
-                    <span>24/7 AI Clinical Chat</span>
+                    <span>24/7 AI Wellness Chat</span>
                   </div>
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
                     <CheckCircle2 size={15} className="text-sage shrink-0" />
-                    <span>AI Food & Report Scanner</span>
+                    <span>AI Food &amp; Note Organizer</span>
                   </div>
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
                     <CheckCircle2 size={15} className="text-sage shrink-0" />
-                    <span>FHIR R4 Doctor EHR Export</span>
+                    <span>Printable Pregnancy Summary</span>
                   </div>
                 </div>
               </div>
@@ -686,16 +686,16 @@ export const LandingPage: React.FC = () => {
                   </span>
                 </div>
                 <h3 className="font-serif text-[19px] md:text-[20px] font-bold text-charcoal mb-2">
-                  AI Medical Report Analyzer
+                  Personal Note &amp; Visit Organizer
                 </h3>
                 <p className="text-[13px] text-medium leading-relaxed mb-4">
-                  Upload CBC blood panels, anomaly scans, or glucose tests for immediate, reassuring explanations in plain language.
+                  Save your prenatal visit notes, milestone checklists, and reference documents with clear, reassuring plain-language summaries.
                 </p>
               </div>
               <div className="grid grid-cols-3 gap-1.5 text-center text-[10.5px] font-semibold text-charcoal pt-2 border-t border-gold/20">
-                <span className="bg-white/80 p-1.5 rounded-lg border border-border">Ultrasound</span>
-                <span className="bg-white/80 p-1.5 rounded-lg border border-border">Lab Ranges</span>
-                <span className="bg-white/80 p-1.5 rounded-lg border border-border">OB Questions</span>
+                <span className="bg-white/80 p-1.5 rounded-lg border border-border">Milestones</span>
+                <span className="bg-white/80 p-1.5 rounded-lg border border-border">Visit Notes</span>
+                <span className="bg-white/80 p-1.5 rounded-lg border border-border">Questions</span>
               </div>
             </div>
           </div>
@@ -715,12 +715,12 @@ export const LandingPage: React.FC = () => {
                 </div>
                 <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Ask OPIN 24/7 AI</h4>
                 <p className="text-[13px] text-medium leading-relaxed">
-                  Empathetic, instant guidance for 3 AM symptoms. Grounded in ACOG and WHO clinical obstetric guidelines.
+                  Empathetic, instant wellness guidance for trimester questions, nutrition, rest, and preparing for upcoming checkups.
                 </p>
               </div>
             </div>
 
-            {/* Card 2: Doctor Clinical PDF & EHR */}
+            {/* Card 2: Personal Pregnancy Summary PDF */}
             <div className="bg-white border border-border rounded-2xl p-5 md:p-6 hover:shadow-md transition-all duration-300 flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between mb-3">
@@ -731,9 +731,9 @@ export const LandingPage: React.FC = () => {
                     Pro
                   </span>
                 </div>
-                <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Doctor Clinical PDF & EHR</h4>
+                <h4 className="font-bold text-[16px] text-charcoal mb-1.5">Printable Pregnancy Summary</h4>
                 <p className="text-[13px] text-medium leading-relaxed">
-                  Export months of vitals, kick logs, and symptoms into a structured medical PDF or FHIR R4 report for your OB-GYN.
+                  Export your pregnancy timeline, kick logs, checklists, and birth preferences into a clean printable PDF summary.
                 </p>
               </div>
             </div>
@@ -1128,17 +1128,17 @@ export const LandingPage: React.FC = () => {
                   </div>
                 )}
 
-                <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to 24/7 clinical AI companions, food vision intelligence & doctor EHR exports.</p>
+                <p className="text-[14px] text-medium mb-6 leading-relaxed">Full access to 24/7 AI maternal wellness companions, meal nutrition insights &amp; printable pregnancy summaries.</p>
                 <div className="h-px bg-border mb-6" />
                 <ul className="space-y-3.5">
                   {[
                     "Everything in Free starter plan",
-                    "24/7 Ask OPIN AI Obstetrician Companion",
-                    "AI Food & Calorie Vision Scanner (FOGSI safe)",
-                    "Doctor-Ready EHR Vault & FHIR R4 / ABDM Exports",
+                    "24/7 Ask OPIN AI Maternal Wellness Companion",
+                    "AI Food & Meal Nutrition Guide",
+                    "Personal Pregnancy Folder & Printable PDF Summary",
                     "Encrypted Real-Time Cross-Device Partner Sync",
                     "AI Baby Names Generator & Garbh Sanskar Audio",
-                    "Priority clinical updates & continuous support"
+                    "Priority updates & continuous support"
                   ].map((feat, i) => (
                     <li key={i} className="flex items-start gap-2.5 text-[13.5px] text-charcoal">
                       <CheckCircle2 size={16} className="text-sage mt-0.5 shrink-0" />

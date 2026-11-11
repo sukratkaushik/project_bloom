@@ -9,6 +9,7 @@ interface HeaderProps {
   setIsMobileMenuOpen?: (open: boolean) => void;
   progressPct?: number;
   hideMenuIcon?: boolean;
+  toggleDarkMode?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ 

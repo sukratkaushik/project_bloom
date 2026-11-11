@@ -202,8 +202,8 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
                 <UtensilsCrossed className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-charcoal dark:text-white leading-tight">Unlimited AI Food & Calorie Vision</p>
-                <p className="text-medium text-[11px] leading-tight truncate">ICMR-NIN nutrients, pregnancy safety & heat alerts</p>
+                <p className="font-semibold text-charcoal dark:text-white leading-tight">Unlimited AI Food &amp; Meal Guide</p>
+                <p className="text-medium text-[11px] leading-tight truncate">Daily nutrients, pregnancy meal tips &amp; ingredient checks</p>
               </div>
             </div>
 
@@ -212,8 +212,8 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
                 <FileText className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-charcoal dark:text-white leading-tight">Instant Ultrasound & Lab Report OCR</p>
-                <p className="text-medium text-[11px] leading-tight truncate">Plain-language medical analysis and prescription guidance</p>
+                <p className="font-semibold text-charcoal dark:text-white leading-tight">Personal Pregnancy Folder &amp; Notes</p>
+                <p className="text-medium text-[11px] leading-tight truncate">Organize keepsakes, visit notes &amp; printable PDF summaries</p>
               </div>
             </div>
 
@@ -222,8 +222,8 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
                 <Sparkles className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-charcoal dark:text-white leading-tight">24/7 Maternal AI Obstetric Companion</p>
-                <p className="text-medium text-[11px] leading-tight truncate">Continuous symptom analysis, milestones & care insights</p>
+                <p className="font-semibold text-charcoal dark:text-white leading-tight">24/7 Maternal AI Wellness Companion</p>
+                <p className="text-medium text-[11px] leading-tight truncate">Trimester milestones, comfort tips &amp; daily wellness Q&amp;A</p>
               </div>
             </div>
 
@@ -232,8 +232,8 @@ export const ApplePaywallModal: React.FC<ApplePaywallModalProps> = ({ isOpen, on
                 <Users className="w-3.5 h-3.5" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-charcoal dark:text-white leading-tight">Real-Time Partner Sync & Vault</p>
-                <p className="text-medium text-[11px] leading-tight truncate">Live device sync for kick logs, appointments & checklists</p>
+                <p className="font-semibold text-charcoal dark:text-white leading-tight">Real-Time Partner Sync &amp; Checklists</p>
+                <p className="text-medium text-[11px] leading-tight truncate">Live device sync for kick logs, appointments &amp; hospital bag</p>
               </div>
             </div>
           </div>

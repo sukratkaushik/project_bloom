@@ -168,21 +168,21 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     },
     {
       id: 5,
-      shortTitle: '5. Doctor Consult',
-      title: '90-Second Clinical Handoff & Care Plan Export',
-      category: 'Clinic Checkup',
-      badge: 'OB-GYN Ready',
+      shortTitle: '5. Visit Summary',
+      title: 'Printable Pregnancy Summary & Visit Prep',
+      category: 'Visit Prep',
+      badge: 'Printable PDF',
       badgeColor: 'bg-purple-100 text-purple-800',
       icon: Download,
-      description: 'Doctors have only 90 seconds to review a patient file. OPIN compresses weeks of tracking into an obstetrician-optimized PDF and FHIR R4 medical bundle.',
+      description: 'Keep your prenatal checkup questions, birth preferences, and daily wellness logs organized in a clean printable PDF summary.',
       keyActions: [
-        'Generate 1-Click Care Plan PDF formatted specifically for OB-GYNs',
-        'Clinical charts: Blood pressure curves, maternal weight gain curve, kick count duration trends',
-        'Export HL7 FHIR R4 Observation records for hospital EHR compatibility',
-        'Present pre-compiled question lists so you never forget what to ask your doctor'
+        'Generate a 1-Click Personal Pregnancy Summary PDF',
+        'Review daily logs: hydration, kick count duration trends, and weight notes',
+        'Organize hospital bag packing lists and birth plan preferences',
+        'Present pre-compiled question lists so you never forget what to ask at your appointment'
       ],
-      tip: 'Handing your OB-GYN a clean, chronological vitals sheet dramatically improves clinical dialogue and peace of mind.',
-      ctaText: 'Export Care Plan PDF Now',
+      tip: 'Bringing an organized list of questions and personal notes makes every prenatal checkup calmer and more productive.',
+      ctaText: 'Export Pregnancy Summary PDF',
       ctaAction: handleExportPdf
     }
   ];

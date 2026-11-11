@@ -109,14 +109,13 @@ export const RescheduleModal: React.FC<RescheduleModalProps> = ({
   if (!isOpen) return null;
 
   const effectiveReason = customReason.trim() || selectedReason;
-  const doctorName = state.doctor?.name || 'Obstetrician';
+  const doctorName = state.doctor?.name || 'Care Provider';
   const cleanPhone = state.doctor?.phone ? state.doctor.phone.replace(/[^\d+]/g, '') : '';
   const cleanPhoneForWa = state.doctor?.phone ? state.doctor.phone.replace(/[^\d]/g, '') : '';
 
   // Generate Email Text
   const generateEmailContent = () => {
-    const patientName = state.userName || 'Patient';
-    const uhid = '#98421';
+    const patientName = state.userName || 'Expectant Parent';
     const gestationStr = `Wk ${currentWeek}+${gestationDays}d`;
     const formattedPrefDate = preferredDate
       ? new Date(preferredDate + 'T00:00:00').toLocaleDateString('en-US', {
@@ -127,14 +126,13 @@ export const RescheduleModal: React.FC<RescheduleModalProps> = ({
         })
       : 'Nearest upcoming date';
 
-    const subject = `Reschedule Request: ${patientName} (UHID ${uhid}) - ${appointmentTitle}`;
+    const subject = `Reschedule Request: ${patientName} (${gestationStr}) - ${appointmentTitle}`;
 
     const body = `Dear Dr. ${doctorName} & Care Team,
 
 I hope this email finds you well. I am writing to kindly request a reschedule for my upcoming prenatal visit:
 
-• Patient Name: ${patientName}
-• UHID: ${uhid}
+• Name: ${patientName}
 • Current Gestation: ${gestationStr}
 • Current Scheduled Visit: ${appointmentTitle} (${currentSlot})
 • Hospital / Clinic: ${facility}
@@ -345,7 +343,7 @@ ${state.doctor?.phone ? `Contact: ${state.doctor.phone}` : ''}
                       </span>
                     </div>
                     <p className="text-[12px] text-medium mt-1 leading-snug">
-                      Choose your preferred dates. Our Pregnancy will draft a formal, professional clinic request with your patient UHID, gestation week & notes, ready to email or WhatsApp directly.
+                      Choose your preferred dates. Our Pregnancy will draft a polite appointment reschedule request with your gestation week &amp; notes, ready to email or WhatsApp directly.
                     </p>
                     <div className="mt-2.5 flex items-center gap-1 text-[12px] font-bold text-sage-dark">
                       <span>Draft Request to Doctor</span>

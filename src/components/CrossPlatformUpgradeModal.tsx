@@ -179,7 +179,7 @@ export const CrossPlatformUpgradeModal: React.FC<CrossPlatformUpgradeModalProps>
                 Welcome to Our Pregnancy Pro!
               </h3>
               <p className="text-[13px] text-medium mt-1.5 max-w-sm mx-auto leading-relaxed">
-                Your subscription has been verified. All 24/7 AI obstetrician features, food safety scanning, and EHR exports are now unlocked on this screen.
+                Your subscription has been verified. All 24/7 AI maternal wellness features, food &amp; meal guides, and personal folder exports are now unlocked on this screen.
               </p>
             </div>
 
@@ -190,11 +190,11 @@ export const CrossPlatformUpgradeModal: React.FC<CrossPlatformUpgradeModalProps>
               </div>
               <div className="flex items-center gap-2 text-charcoal font-semibold">
                 <Check size={15} className="text-sage-dark shrink-0" />
-                <span>Unlimited 24/7 Ask OPIN AI Obstetrician</span>
+                <span>Unlimited 24/7 Ask OPIN AI Wellness Companion</span>
               </div>
               <div className="flex items-center gap-2 text-charcoal font-semibold">
                 <Check size={15} className="text-sage-dark shrink-0" />
-                <span>Encrypted Partner Sync &amp; Doctor EHR Vault</span>
+                <span>Encrypted Partner Sync &amp; Personal Pregnancy Vault</span>
               </div>
             </div>
 
