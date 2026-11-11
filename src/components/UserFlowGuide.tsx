@@ -51,7 +51,7 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
 
   const handleSaveDoctor = (doctorData: DoctorInfo) => {
     updateState({ doctor: doctorData });
-    showToast('Obstetrician profile saved to your local Care Plan!');
+    showToast('Care provider contact saved to your Pregnancy Plan!');
   };
 
   const handleRemoveDoctor = () => {
@@ -64,9 +64,9 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     try {
       const { exportCarePlanPdf } = await import('../utils/pdfExport');
       exportCarePlanPdf(state);
-      showToast('Care Plan PDF downloaded for your OB-GYN visit!');
+      showToast('Personal Pregnancy Summary PDF downloaded!');
     } catch (err) {
-      console.error('Failed to export Care Plan PDF:', err);
+      console.error('Failed to export Pregnancy Summary PDF:', err);
       showToast('Could not generate PDF. Please try again.');
     }
   };
@@ -80,19 +80,19 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     {
       id: 1,
       shortTitle: '1. Setup Journey',
-      title: 'Calibrate Your 42-Week Gestational Timeline',
+      title: 'Calibrate Your 40-Week Gestational Timeline',
       category: 'Day 0 Setup',
       badge: isTimelineSet ? 'Completed ✅' : 'Action Needed',
       badgeColor: isTimelineSet ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800',
       icon: Calendar,
-      description: 'Your due date and last menstrual period (LMP) anchor your entire pregnancy progression, developmental milestones, and screening schedules.',
+      description: 'Your due date and last menstrual period (LMP) anchor your weekly pregnancy progression, developmental milestones, and preparation checklists.',
       keyActions: [
-        'Select your Estimated Due Date (or LMP) via the calibrated date picker',
-        'Declare specific maternal context (First vs. subsequent baby, working situation, dietary preference)',
-        'Toggle clinical flags (IVF conception, twin pregnancy, high-risk or gestational hypertension) to adapt AI safety bounds',
-        'Review and grant DPDP local-first consent'
+        'Select your Estimated Due Date (or LMP) via the date picker',
+        'Set your personal preferences (First vs. subsequent baby, working situation, dietary preference)',
+        'Customize your trimester reminders and daily wellness goals',
+        'Review and grant DPDP local-first privacy consent'
       ],
-      tip: 'The app automatically calculates your trimester transition dates and weekly fetal size analogies (e.g. Week 12: plum, Week 24: mango).',
+      tip: 'The app automatically calculates your trimester transition dates and weekly baby size comparisons (e.g. Week 12: plum, Week 24: mango).',
       ctaText: 'Adjust Pregnancy Setup',
       ctaAction: () => {
         triggerHaptic('light');
@@ -101,21 +101,21 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     },
     {
       id: 2,
-      shortTitle: '2. Care Team & Doctor',
-      title: 'Configure Your Obstetrician & Emergency Safety Net',
-      category: 'Critical Safety Step',
-      badge: isDoctorSet ? 'Doctor Linked 🩺' : 'Recommended',
+      shortTitle: '2. Care Team Contacts',
+      title: 'Save Your Care Provider & Family Contacts',
+      category: 'Quick Access',
+      badge: isDoctorSet ? 'Provider Linked 🩺' : 'Recommended',
       badgeColor: isDoctorSet ? 'bg-emerald-100 text-emerald-800' : 'bg-purple-100 text-purple-800',
       icon: Stethoscope,
-      description: 'Link your primary obstetrician or maternity hospital so your dashboard can trigger direct emergency speed dials during high-risk vitals or active labor.',
+      description: 'Save your preferred maternity clinic and family contacts so you can reach them with 1 tap when scheduling visits or preparing for delivery.',
       keyActions: [
-        'Add Doctor Name & Maternity Hospital (e.g. Dr. Priya Sharma, Cloudnine)',
-        'Save OPD clinic phone and emergency labor ward direct hotline',
-        'Record hospital email and doctor-specific instructions (e.g. Rh-negative blood, aspirin regimen)',
-        'Test automated 1-tap emergency dialer (108 / 112 / Hospital Hotline)'
+        'Add Care Provider Name & Maternity Hospital (e.g. Dr. Priya Sharma, Cloudnine)',
+        'Save clinic reception phone and emergency contact numbers',
+        'Record clinic email for polite appointment reschedule requests',
+        'Keep 1-tap quick-dial numbers accessible from your dashboard'
       ],
-      tip: 'When your contraction timer registers the 5-1-1 rule or blood pressure exceeds 140/90 mmHg, OPIN surfaces a 1-tap call button directly to your doctor.',
-      ctaText: isDoctorSet ? 'Edit Doctor Profile' : '+ Configure Doctor Now',
+      tip: 'Having your clinic and partner contact details saved in one place makes coordinating prenatal appointments effortless.',
+      ctaText: isDoctorSet ? 'Edit Provider Contact' : '+ Add Provider Contact',
       ctaAction: () => {
         triggerHaptic('medium');
         setIsDoctorModalOpen(true);
@@ -123,21 +123,21 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     },
     {
       id: 3,
-      shortTitle: '3. Medical Vault',
-      title: 'Upload Ultrasound Scans & Lab Biomarkers',
-      category: 'Zero-Leak Health Vault',
+      shortTitle: '3. Personal Vault',
+      title: 'Organize Milestone Notes & Visit Checklists',
+      category: 'Private On-Device Folder',
       badge: 'Local-First',
       badgeColor: 'bg-blue-100 text-blue-800',
       icon: FileText,
-      description: 'Digitize paper prescriptions, ultrasound scan reports, and blood tests on-device. No sensitive patient health information leaves your browser.',
+      description: 'Keep your pregnancy keepsake photos, visit notes, and appointment question checklists organized on your device.',
       keyActions: [
-        'Upload Ultrasound reports (NT Scan, Anomaly Scan, Growth USG)',
-        'Client-side OCR extracts clinical biometric markers (CRL, BPD, AFI, Placenta Grade)',
-        'Secure bloodwork panels (CBC, HbA1c, OGTT, Thyroid TSH)',
-        'AI translates medical abbreviations into plain, reassuring explanations'
+        'Save personal milestone notes and trimester keepsakes',
+        'Organize questions to ask at your upcoming prenatal checkups',
+        'Keep hospital bag packing lists and birth plan wishes in one folder',
+        'Generate plain-language summaries of your saved notes'
       ],
-      tip: 'Never scramble through plastic folders at the clinic. Your entire pregnancy diagnostic archive is accessible offline.',
-      ctaText: 'Open Medical Reports Vault',
+      tip: 'Your entire personal pregnancy folder is stored locally on your device so it works even when offline.',
+      ctaText: 'Open Personal Pregnancy Folder',
       ctaAction: () => {
         triggerHaptic('light');
         if (onNavigate) onNavigate('medical-reports');
@@ -146,21 +146,21 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
     {
       id: 4,
       shortTitle: '4. Daily Routine',
-      title: 'Your 60-Second Daily Maternal Health Routine',
+      title: 'Your 60-Second Daily Maternal Wellness Routine',
       category: 'Active Tracking',
       badge: 'Daily Wellness',
       badgeColor: 'bg-emerald-100 text-emerald-800',
       icon: Activity,
-      description: 'A quiet, non-judgmental tracking loop designed to catch red flags early without creating unnecessary anxiety.',
+      description: 'A calm, supportive daily logging habit designed to help you track hydration, movement, and rest throughout each trimester.',
       keyActions: [
         'Morning: Review your Daily Knowledge Drop and log mood or hydration',
-        'Meals: Snap food photos or scan packaged barcodes across 3M+ items for pregnancy safety checks (Folate, Iron, Calcium, Listeria & Papain alerts)',
-        'Evening: Record blood pressure and resting vitals (especially if tracking pre-eclampsia)',
-        'Trimester 3: Kick Counter (fetal movement) and Contraction Timer (5-1-1 labor rule)',
-        'Midnight: 24/7 AI clinical triage for unusual symptoms or nighttime cramps'
+        'Meals: Snap meal photos or scan packaged barcodes for pregnancy nutrition tips (Folate, Iron, Calcium & spice insights)',
+        'Evening: Log rest, weight notes, and daily comfort check-ins',
+        'Trimester 3: Kick Counter (daily movement) and Contraction Timer (5-1-1 timing guide)',
+        'Anytime: 24/7 AI maternal wellness companion for trimester questions & comfort tips'
       ],
       tip: 'Tracking is 100% local-first in encrypted IndexedDB. Your logs stay on your device with optional P2P partner sync.',
-      ctaText: 'Try AI Food Scanner',
+      ctaText: 'Try AI Food Guide',
       ctaAction: () => {
         triggerHaptic('light');
         if (onNavigate) onNavigate('foodscanner');
@@ -212,7 +212,7 @@ export const UserFlowGuide: React.FC<UserFlowGuideProps> = ({
               How Our Pregnancy Works
             </h2>
             <p className="text-[14px] text-medium max-w-[620px] leading-relaxed mt-1.5">
-              From your first due date calculation to your labor ward handoff: here is how OPIN protects your health, configures your clinical safety net, and keeps your data 100% private.
+              From your first due date calculation to your hospital bag checklist: here is how OPIN organizes your pregnancy milestones, daily wellness habits, and keeps your personal notes 100% private.
             </p>
           </div>
 

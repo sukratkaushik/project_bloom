@@ -398,7 +398,7 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
         {/* Context Banner */}
         <div className="shrink-0 [&>*]:mb-0">
           <ContextBanner 
-            description="Evidence-based prenatal AI companion grounded in FOGSI & ACOG clinical guidelines. Ask about trimester symptoms, scans, and maternal diet." 
+            description="Empathetic 24/7 prenatal wellness companion. Ask about weekly pregnancy milestones, trimester changes, nutrition, and preparing for appointments." 
           />
         </div>
 
@@ -415,7 +415,7 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                   Ask OPIN AI
                 </h3>
                 <span className="text-[10.5px] text-medium font-medium block">
-                  Evidence-based clinical guidance
+                  24/7 Maternal wellness guidance
                 </span>
               </div>
             </div>
@@ -438,9 +438,9 @@ Your goal is to provide supportive, accurate, practical, and safe prenatal healt
                     <div className="flex items-center justify-between pb-1.5 border-b border-border/50 text-[11.5px]">
                       <div className="flex items-center gap-1.5 text-sage-dark font-semibold">
                         <Sparkles size={13} className="text-sage shrink-0" />
-                        <span className="whitespace-nowrap">OPIN AI Clinical Guide</span>
+                        <span className="whitespace-nowrap">OPIN AI Wellness Guide</span>
                       </div>
-                      <span className="text-[10px] text-light whitespace-nowrap">Evidence-based</span>
+                      <span className="text-[10px] text-light whitespace-nowrap">Educational</span>
                     </div>
 
                     <div className="markdown-body text-[13px] leading-relaxed text-charcoal/95 space-y-1 prose-headings:font-serif prose-headings:font-bold prose-headings:text-charcoal prose-h3:text-[13.5px] prose-h3:mt-2.5 prose-h3:mb-1 prose-p:my-1 prose-ul:my-1 prose-li:my-0.5">

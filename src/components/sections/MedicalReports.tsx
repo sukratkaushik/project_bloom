@@ -43,11 +43,11 @@ const formatBytes = (bytes: number, decimals = 2) => {
 
 const AILoadingMessage: React.FC = () => {
   const messages = [
-    "Reading report file...",
-    "Deciphering doctor handwriting...",
-    "Translating medical abbreviations...",
-    "Extracting prescribed medications...",
-    "Formulating safe guidelines...",
+    "Reading your saved note...",
+    "Organizing key highlights...",
+    "Creating plain-language summary...",
+    "Extracting helpful action items...",
+    "Formatting visit checklist...",
   ];
 
   const [index, setIndex] = useState(0);
@@ -458,13 +458,13 @@ export const MedicalReports: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Doctor Notes Textarea */}
+                    {/* Personal Notes Textarea */}
                     <div>
-                      <label className="text-[10px] font-bold tracking-[0.8px] uppercase text-light mb-1.5 block">Summary & Doctor Instructions</label>
+                      <label className="text-[10px] font-bold tracking-[0.8px] uppercase text-light mb-1.5 block">Personal Notes &amp; Visit Questions</label>
                       <textarea
                         value={report.notes || ''}
                         onChange={(e) => updateReportField(report.id, 'notes', e.target.value)}
-                        placeholder="Doctor guidelines, vaccine follow-ups, parameters to watch out for..."
+                        placeholder="Add your personal notes, milestone highlights, or questions for your next visit..."
                         className="w-full p-2.5 bg-cream/30 border border-border rounded-[10px] text-[13px] text-charcoal resize-y min-h-[50px] font-sans leading-relaxed focus:outline-none focus:border-sage transition-colors placeholder:text-light/80 placeholder:italic"
                       />
                     </div>
@@ -473,15 +473,15 @@ export const MedicalReports: React.FC = () => {
                     <div className="mt-2 border-t border-border/40 pt-4">
                       {!report.aiAnalysedAt && !analyzingMap[report.id] && (
                         isAiConsentBlocked(state.aiProcessingConsent) ? (
-                          <AiConsentPrompt compact message="Turn on AI features in your Profile to analyze medical reports" />
+                          <AiConsentPrompt compact message="Turn on AI features in your Profile to summarize your personal notes" />
                         ) : (
                           <div className="bg-sage-pale/20 border border-sage/10 rounded-[14px] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                             <div className="flex gap-2.5 items-start">
                               <Brain className="w-5 h-5 text-sage shrink-0 mt-0.5" />
                               <div className="text-left">
-                                <h5 className="text-[13px] font-bold text-charcoal">Decipher & Summarize with AI</h5>
+                                <h5 className="text-[13px] font-bold text-charcoal">Summarize Note with AI</h5>
                                 <p className="text-[11px] text-medium leading-relaxed max-w-[400px]">
-                                  Extract prescriptions, decode doctor's handwriting, and get a simplified medical summary.
+                                  Organize key highlights, action items, and a plain-language summary from your saved note or document.
                                 </p>
                               </div>
                             </div>
@@ -489,7 +489,7 @@ export const MedicalReports: React.FC = () => {
                               onClick={() => runAIAnalysis(report)}
                               className="px-4 py-2 bg-sage hover:bg-sage-dark text-white font-semibold text-xs rounded-[10px] flex items-center gap-1.5 transition-colors cursor-pointer shrink-0 self-start sm:self-center"
                             >
-                              <Sparkles size={13} /> Analyze Report
+                              <Sparkles size={13} /> Summarize Note
                             </button>
                           </div>
                         )
@@ -522,14 +522,14 @@ export const MedicalReports: React.FC = () => {
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5">
                               <Brain size={16} className="text-sage" />
-                              <span className="text-[11px] font-bold tracking-[0.8px] uppercase text-sage">AI Digital Helper Findings</span>
+                              <span className="text-[11px] font-bold tracking-[0.8px] uppercase text-sage">AI Note Summary &amp; Highlights</span>
                             </div>
                             <button
                               onClick={() => resetAIAnalysis(report)}
                               className="text-[11px] text-medium hover:text-critical flex items-center gap-1 transition-colors cursor-pointer"
-                              title="Clear AI Analysis"
+                              title="Clear AI Summary"
                             >
-                              <RotateCcw size={11} /> Reset Analysis
+                              <RotateCcw size={11} /> Reset Summary
                             </button>
                           </div>
 
@@ -537,17 +537,17 @@ export const MedicalReports: React.FC = () => {
                           {report.aiSummary && (
                             <div className="bg-sage-pale/20 border border-sage/10 rounded-[12px] p-3.5">
                               <h6 className="text-[11px] font-bold text-sage-dark mb-1 flex items-center gap-1">
-                                <Sparkles size={12} /> Patient-Friendly Summary
+                                <Sparkles size={12} /> Plain-Language Summary
                               </h6>
                               <p className="text-[12.5px] text-charcoal leading-relaxed font-sans">{report.aiSummary}</p>
                             </div>
                           )}
 
                           <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            {/* Prescriptions */}
+                            {/* Key Action Items */}
                             <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
                               <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
-                                <Pill size={12} className="text-rose-400" /> Deciphered Prescriptions
+                                <Pill size={12} className="text-rose-400" /> Key Action Items &amp; Notes
                               </h6>
                               {report.aiPrescriptions && report.aiPrescriptions.length > 0 ? (
                                 <ul className="space-y-1.5 flex-1">
@@ -558,14 +558,14 @@ export const MedicalReports: React.FC = () => {
                                   ))}
                                 </ul>
                               ) : (
-                                <span className="text-[12px] text-light italic">No prescriptions detected in this record.</span>
+                                <span className="text-[12px] text-light italic">No specific action items detected in this note.</span>
                               )}
                             </div>
 
-                            {/* Warnings / Guidance */}
+                            {/* Reminders / Questions */}
                             <div className="bg-cream/40 border border-border/70 rounded-[12px] p-3.5 flex flex-col gap-2">
                               <h6 className="text-[11px] font-bold text-charcoal mb-1 flex items-center gap-1">
-                                <AlertTriangle size={12} className="text-amber-500" /> Key Warnings & Guidelines
+                                <AlertTriangle size={12} className="text-amber-500" /> Helpful Reminders &amp; Questions
                               </h6>
                               {report.aiWarnings && report.aiWarnings.length > 0 ? (
                                 <ul className="space-y-1.5 flex-1">
@@ -576,7 +576,7 @@ export const MedicalReports: React.FC = () => {
                                   ))}
                                 </ul>
                               ) : (
-                                <span className="text-[12px] text-light italic">No safety warnings detected.</span>
+                                <span className="text-[12px] text-light italic">No additional reminders noted.</span>
                               )}
                             </div>
                           </div>
@@ -585,7 +585,7 @@ export const MedicalReports: React.FC = () => {
                           <div className="bg-cream/20 border border-border/50 rounded-[10px] p-2.5 flex gap-2 items-start">
                             <ShieldCheck size={14} className="text-sage shrink-0 mt-0.5" />
                             <p className="text-[10px] text-medium leading-relaxed font-sans">
-                              <strong>Medical Verification Notice:</strong> This analysis is processed using AI to decipher doctor note formats and is strictly for informational aid. Never alter medications, dosages, or schedules without consulting your practitioner or pharmacist.
+                              <strong>Personal Wellness Notice:</strong> This summary is generated for personal educational organization only and is not a substitute for professional medical advice, diagnosis, or treatment. Always consult your healthcare provider for medical guidance.
                             </p>
                           </div>
                         </div>
@@ -633,7 +633,7 @@ export const MedicalReports: React.FC = () => {
               Strict Compliance with Indian Law (PCPNDT Act, 1994)
             </h4>
             <p className="text-[11.5px] xs:text-[12px] text-charcoal/85 dark:text-gray-300 leading-relaxed">
-              In accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994</strong>, determination or disclosure of the sex/gender of a fetus is strictly prohibited in India. This application and its AI tools <strong>do not identify, predict, or reveal fetal gender</strong> under any circumstances. This feature is intended solely for organizing your prescriptions, tracking diagnostic test records, and preparing medical summaries for your OB-GYN consultations.
+              In accordance with the <strong>Pre-Conception and Pre-Natal Diagnostic Techniques (PCPNDT) Act, 1994</strong>, determination or disclosure of the sex/gender of a fetus is strictly prohibited in India. This application and its AI tools <strong>do not identify, predict, or reveal fetal gender</strong> under any circumstances. This feature is intended solely for organizing your personal pregnancy milestone notes, visit checklists, and keepsake summaries.
             </p>
           </div>
         </div>

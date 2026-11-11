@@ -571,10 +571,10 @@ export const LandingPage: React.FC = () => {
                   <Sparkles size={13} className="text-gold" /> Why Upgrade to Pro Plan?
                 </div>
                 <h3 className="font-serif text-2xl md:text-[26px] font-bold text-charcoal mb-2.5 leading-snug">
-                  Essential care is free. Clinical AI intelligence is your superpower.
+                  Essential tracking is free. AI maternal wellness is your superpower.
                 </h3>
                 <p className="text-medium text-[14px] leading-relaxed mb-4">
-                  While daily kick tracking and government scheme navigators are free forever, Pro Plan gives you an on-demand medical-grade support system whenever concerns arise — day or night.
+                  While daily kick tracking and government scheme navigators are free forever, Pro Plan gives you an on-demand 24/7 maternal wellness companion whenever questions arise — day or night.
                 </p>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-[12.5px] font-semibold text-charcoal">
                   <div className="flex items-center gap-2 bg-cream/70 p-2.5 rounded-xl border border-border">
@@ -1037,7 +1037,7 @@ export const LandingPage: React.FC = () => {
                 {getPlatform() === 'ios' || getPlatform() === 'android' ? '🎉 70% OFF Intro Offer' : 'Most Popular • 50% OFF'}
               </div>
               <div>
-                <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Clinical Intelligence</span>
+                <span className="text-[12px] font-bold tracking-[1px] uppercase text-sage">AI Maternal Companion</span>
                 <h3 className="font-serif text-[28px] font-bold text-charcoal mt-2">Pro Plan</h3>
 
                 {/* Pro Plan Price Display */}

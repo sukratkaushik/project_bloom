@@ -83,13 +83,13 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
     try {
       setIsExporting(true);
       triggerHaptic('success');
-      setToastMessage('📄 Generating Care Plan PDF...');
+      setToastMessage('📄 Generating Personal Pregnancy Summary PDF...');
       const { exportCarePlanPdf } = await import('../../utils/pdfExport');
       await exportCarePlanPdf(state);
-      setToastMessage('✅ Care Plan PDF exported successfully!');
+      setToastMessage('✅ Pregnancy Summary PDF exported successfully!');
       setTimeout(() => setToastMessage(null), 3500);
     } catch (err) {
-      console.error('Failed to export Care Plan PDF:', err);
+      console.error('Failed to export Pregnancy Summary PDF:', err);
       setToastMessage('❌ Could not generate PDF. Please try again.');
       setTimeout(() => setToastMessage(null), 3500);
     } finally {
@@ -353,7 +353,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   </div>
                 </div>
                 <p className="text-[12px] text-charcoal/80 leading-relaxed">
-                  You are currently using guest mode. Sign in to backup your kick counts, vitals, medical reports, and pregnancy journey securely.
+                  You are currently using guest mode. Sign in to backup your kick counts, daily logs, personal notes, and pregnancy journey securely.
                 </p>
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                   {isApplePlatform() && (
@@ -638,7 +638,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 How Our Pregnancy Works
               </h3>
               <p className="text-[13px] sm:text-[13.5px] text-medium leading-relaxed">
-                Step-by-step interactive roadmap: Calibrating your gestational timeline, linking your doctor, securing clinical records in the local vault, and 1-click OB-GYN consultations.
+                Step-by-step interactive roadmap: Calibrating your gestational timeline, saving care provider contacts, organizing milestone notes in your private folder, and printing visit summaries.
               </p>
             </div>
 
@@ -1015,7 +1015,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                 </label>
               </div>
               <p className="text-medium text-[11.5px] sm:text-xs mt-2 leading-relaxed">
-                Allow AI clinical chat, food safety scanner, and medical report analysis to process photos and health details using secure third-party AI models.
+                Allow AI maternal wellness chat, food &amp; meal guide, and personal note summaries to process photos and notes using secure third-party AI models.
               </p>
             </div>
 
@@ -1122,9 +1122,9 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
             <div className="p-3.5 bg-cream/30 rounded-2xl border border-border/70">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex-1">
-                  <h4 className="text-[11px] font-bold tracking-wider uppercase text-charcoal/70 mb-1">Retention & Export Policy</h4>
+                  <h4 className="text-[11px] font-bold tracking-wider uppercase text-charcoal/70 mb-1">Retention &amp; Export Policy</h4>
                   <p className="text-medium text-[11.5px] sm:text-xs leading-relaxed">
-                    Your pregnancy journey and health logs are safely preserved in your private cloud profile. You can export a complete clinical summary of your records as a PDF at any time, or permanently delete your account below.
+                    Your pregnancy journey and daily logs are safely preserved in your private profile. You can export a personal summary of your pregnancy milestones and checklists as a PDF at any time, or permanently delete your account below.
                   </p>
                 </div>
                 <button
@@ -1134,7 +1134,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
                   className="px-3.5 py-2 bg-charcoal hover:bg-black text-white font-bold text-xs rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-center shadow-3xs flex items-center gap-1.5 active:scale-95 whitespace-nowrap"
                 >
                   <Download className="w-3.5 h-3.5" />
-                  <span>{isExporting ? 'Generating...' : 'Export Care Plan (PDF)'}</span>
+                  <span>{isExporting ? 'Generating...' : 'Export Pregnancy Summary (PDF)'}</span>
                 </button>
               </div>
             </div>
@@ -1370,7 +1370,7 @@ export const Profile: React.FC<ProfileProps> = ({ isMobileModal = false, onClose
         </section>
 
         <p className="text-center text-[11px] text-light pt-2 pb-4 notranslate">
-          Our Pregnancy v1.0.4 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : 'dev'}
+          Our Pregnancy v1.1.3 · Build {typeof __BUILD_TIME__ !== 'undefined' ? __BUILD_TIME__ : '14'}
         </p>
 
       </div>

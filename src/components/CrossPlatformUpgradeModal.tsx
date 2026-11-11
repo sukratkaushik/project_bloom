@@ -27,7 +27,7 @@ interface CrossPlatformUpgradeModalProps {
 }
 
 export const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=in.ourpregnancy.bloom";
-export const APP_STORE_URL = "https://apps.apple.com/app/id6741498877";
+export const APP_STORE_URL = "https://apps.apple.com/app/id6829164182";
 
 export const CrossPlatformUpgradeModal: React.FC<CrossPlatformUpgradeModalProps> = ({
   isOpen,
